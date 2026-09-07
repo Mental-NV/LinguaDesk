@@ -1,9 +1,9 @@
 # LinguaDesk — Architecture Decision Records
 
-**Document:** #9 · **Version:** 1.1 · **Status:** Reviewed technical decisions; implementation evidence pending
-**Updated:** 2026-09-07
+**Document:** #9 · **Version:** 1.2 · **Status:** Reviewed technical decisions; implementation evidence pending
+**Updated:** 2026-09-08
 
-Reviewed against PRD v0.2 and the architecture/UX baseline at `a07c0e2`. The current design is in [architecture v1.1](03-architecture.md); generated contract governance is in [document #0](00-SDD-Planning-Workflow.md). These technical decisions preserve P-005/P-006 proposal status. Amended decisions record the original choice and the correction; superseded text is historical.
+Updated against user-approved PRD v0.3 and architecture/UX v1.2, from review baseline `54343c3`. The current design is in [architecture v1.2](03-architecture.md); generated contract governance is in [document #0](00-SDD-Planning-Workflow.md). These technical decisions preserve P-005/P-006 proposal status. Amended decisions record the original choice and the correction; superseded text is historical.
 
 ## ADR-001: Combined Hosting and SPA Fallback
 
@@ -106,12 +106,29 @@ Reviewed against PRD v0.2 and the architecture/UX baseline at `a07c0e2`. The cur
 
 ## ADR-009: Unit-Heavy Pyramid with Focused Boundary Evidence
 
-**Status:** Accepted 2026-09-07; aligns UX v1.1 Sections 10–14.
+**Status:** Accepted 2026-09-07; scope amended 2026-09-08 for PRD D-17 and UX v1.2 Sections 10–14.
 
 **Context:** Moving every backend policy into HTTP integration produces a wide middle of the pyramid. Moving UI assertions entirely into server tests leaves coverage gaps. DOM tests cannot replace layout or native-browser evidence.
 
 **Alternatives:** Full browser scenario matrix; all backend behavior through WebApplicationFactory; lowest-sufficient-layer assertion ownership with a small integrated browser suite.
 
-**Decision:** Most cases are pure MSTest/Vitest units and focused DOM components. Real SQLite/API tests cover integrity/contracts; Playwright covers browser-sensitive behavior, nine initial curated visual compositions, and two integrated feature journeys with real frontend/API/database and fake external adapters. Preserve all UX IDs and manual supported-browser/AT evidence. #6 maps compound scenarios by assertion, without replaying them at every layer.
+**Decision:** Most cases are pure MSTest/Vitest units and focused DOM components. Real SQLite/API tests cover integrity/contracts; Playwright covers browser-sensitive behavior, seven current curated visual baselines, and explicit Translation/full-Rewrite journeys with real frontend/API/local auth/database and fake external adapters. Preserve all UX IDs with active/deferred/retired status and manual evidence for current supported-browser/AT journeys. #6 maps compound scenarios by assertion, without replaying them at every layer.
 
 **Consequences:** Faster deterministic feedback and fewer fragile UI fixtures without losing key browser/SQL boundaries. Browser automation remains a small top layer; live-provider evaluation stays separate. No arbitrary percentage or line-coverage target replaces requirement/risk coverage. See #3 Section 9 and #2 Sections 12–14.
+
+
+## ADR-010: Explicit Whole-Text MVP with Deferred Assistance
+
+**Status:** Accepted 2026-09-08; derived from user approval of all ten scope dispositions in PRD D-17 / Section 3.2. Product authority remains the PRD, not this ADR.
+
+**Context:** Automatic submissions, editable sentence correspondence, assistance caches, custom controls, route-rule configuration, prefix processing and dual sign-in methods multiply UI/API/accounting/test branches around the core Translation and Rewriting value. The user elected to remove targeted preservation and defer the larger optional capabilities while retaining independent API access.
+
+**Alternatives:** Keep all discovery scope; merely reduce browser test coverage while retaining behavior; hide future features behind flags; or ship a smaller active product with explicit later intent. Lower test coverage alone would not remove the implementation burden and would leave behavior unverified.
+
+**Decision:** Use explicit Translate/Rewrite actions, complete plain editable/copyable results, one native Writing mode dropdown, inline controls, rejection of oversized whole text, local email/password accounts and two simple provider chains (one primary plus at most one fallback per family). Keep cookie and independent-client bearer contracts, canonical API generation, full-input accounting, durable reservations, stale/edit protection, privacy and current accessibility evidence. No simplified diff or alternatives operation ships yet.
+
+PRD DF-001–DF-007 record deferred alternatives, change review, automatic processing, advanced routing, bespoke UI, prefix processing and Google. No placeholder sentence schemas, rich editor, timer subsystem, route-rule DSL or Google configuration is built now. Targeted sentence preservation and duplicate correction-toggle restoration are retired, not automatically included in later assistance.
+
+**Consequences:** Fewer state combinations and external integrations; users explicitly submit each transformation, shorten long inputs and refine output manually. API-first capability remains demonstrable. Simple chain candidates must still meet quality requirements across every route they serve. Most tests remain units/components with focused integrity/API checks and two small integrated feature journeys. Scope cuts do not justify weakening accounting, privacy, authentication, migrations or accessibility.
+
+**Reactivation:** The PRD register governs later selection; refine only the selected capability in its normal delivery package, re-evaluate the old UX at `54343c3`, and update owners/tests. Deferred work does not block current implementation or release readiness. See #3 Sections 1, 5, 8–9 and UX #2 Sections 11–15.

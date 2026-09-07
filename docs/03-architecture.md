@@ -1,18 +1,20 @@
 # LinguaDesk — Architecture and Engineering Principles
 
-**Document:** #3 · **Version:** 1.1 · **Status:** Ready for scoped implementation planning; contract and launch dependencies remain
-**Updated:** 2026-09-07
+**Document:** #3 · **Version:** 1.2 · **Status:** Ready for scoped implementation planning; contract and launch dependencies remain
+**Updated:** 2026-09-08
 
 ## 1. Authority, Inputs, and Scope
 
 | Input | Recorded revision | Role |
 | --- | --- | --- |
-| [SDD Planning Workflow](00-SDD-Planning-Workflow.md) | v1.1, amended with this review; prior baseline `a07c0e2` | Process, document ownership, generated contract governance |
-| [Product Requirements Document](01-PRD.md) | v0.2 at `a07c0e2` | Product baseline and proposal dispositions; unchanged by this review |
-| [UX/UI Specification](02-ux-specification.md) | v1.1, amended with this review; prior baseline `a07c0e2` | Interface behavior and allocation of verification |
-| Architecture and ADR review baseline | Git commit `a07c0e2` | Original architecture v1.0 and ADR-001–ADR-006 |
+| [SDD Planning Workflow](00-SDD-Planning-Workflow.md) | v1.2, scoped-deferral clarification in this change; prior baseline `54343c3` | Process and generated contract governance |
+| [Product Requirements Document](01-PRD.md) | v0.3, user-approved 2026-09-08 simplification | Active product baseline and canonical DF-001–DF-007 register |
+| [UX/UI Specification](02-ux-specification.md) | v1.2, aligned in this change | Native controls, explicit processing, active/inactive scenario allocation |
+| Architecture and ADR review baseline | Git commit `54343c3` | Architecture/ADRs v1.1 before scope simplification |
 
-P-001–P-004 retain their accepted/amended PRD dispositions. P-005/NFR-008 (additional abuse safeguards) and P-006 (compatibility guarantees) remain proposed. This document defines technical defaults within accepted scope; it does not claim to close Q-001/Q-004/Q-008 in full. Section 11 names their remaining dependencies. Stable UX scenario IDs remain behavioral contracts, not a mandatory count of browser tests.
+PRD D-17 and Section 3 define current scope. P-001–P-004 retain their **newly amended** dispositions; P-005/NFR-008 and P-006 remain proposed. This document does not claim to close Q-001/Q-004/Q-008 in full. Active UX IDs remain behavioral contracts, not a mandatory browser-test count; Deferred/Retired IDs require no MVP implementation/evidence.
+
+**Current feature boundary:** two explicit whole-text operations, plain editable/copyable results, one rewriting mode, native/inline UI, local accounts, two simple model chains, and an independent authenticated API. No sentence IDs, correspondence algorithms, assistance caches, rich-text/diff editor, debounce service, Google handler, priority rule engine, prefix processing, or dormant feature flags are required. Deferred features are designed when selected under PRD Section 3.1; do not prebuild their infrastructure.
 
 ## 2. Architecture Drivers and Stack Selection
 
@@ -24,7 +26,7 @@ P-001–P-004 retain their accepted/amended PRD dispositions. P-005/NFR-008 (add
 | --- | --- | --- |
 | Backend | .NET 10 LTS, ASP.NET Core Minimal APIs | Pin a supported SDK patch; framework features before custom middleware/frameworks |
 | Persistence | EF Core 10 and SQLite | Small deployment; one writer, short transactions, no multi-host database volume |
-| Frontend | React, TypeScript, Vite | Two build toolchains, but one deployment; preserves the drafted interactive UX |
+| Frontend | React, TypeScript, Vite | Two build toolchains, but one deployment; supports the simplified native-control UX |
 | Tests | MSTest; Vitest + React Testing Library; Playwright | Most cases run without HTTP/browser; a small real-browser suite proves wiring and native behavior |
 
 Use vertical feature slices without MediatR, generic repositories, a second Unit of Work, event buses, or speculative microservices. EF Core already provides persistence tracking and transactions. Introduce a boundary when it isolates an actual external effect or substantial policy, not one interface per class. No separate Node runtime, Redis, message broker, or orchestration platform is required for this topology.
@@ -84,14 +86,14 @@ This is a planned structure, not a claim that scaffolding or commands already ex
 
 ### 4.1 Boundaries
 
-- `LinguaDesk.Api` references `LinguaDesk.Core`; Core references neither ASP.NET Core nor EF Core. Core holds counting/allowance calculations, state transitions, and routing/output policies as they are specified. Time, configuration, and inputs are explicit arguments.
+- `LinguaDesk.Api` references `LinguaDesk.Core`; Core references neither ASP.NET Core nor EF Core. Core holds counting/allowance calculations, state transitions, and simple family-chain/output policies as they are specified. Time, configuration, and inputs are explicit arguments.
 - Endpoints handle transport, authentication/authorization, validation, and typed results. Simple CRUD can use `DbContext` directly. Multi-step paid operations use a small concrete feature coordinator so HTTP concerns do not swallow all testable policy.
 - Coordinators call pure policy and concrete persistence operations. Use narrow provider/email interfaces and .NET `TimeProvider` at effect boundaries; replace these in tests. Do not mock `DbSet`/LINQ queries or Identity internals.
 - Use built-in DI and typed `HttpClient` adapters. A scoped `DbContext` is never shared concurrently. Each independent transaction gets its own scope/context; awaited I/O remains asynchronous end to end.
 
 ### 4.2 Representative full rewrite
 
-1. Authenticate and require a verified account. Parse and validate the typed request against #5 and the configured routing policy.
+1. On explicit Rewrite activation (or an independent API call), authenticate a verified local account. Validate complete input length, supported language, the single mode and request identity against #5. Reject oversized input; never truncate it. Resolve detection/eligibility within this requested operation, not via a typing-driven frontend pipeline.
 2. In a short database transaction, claim the account-scoped operation key and reserve user/global character capacity and the next provider attempt's monetary exposure. Commit before any network call.
 3. Execute provider HTTP and output validation outside the transaction, under the overall deadline and #4's bounded attempt policy.
 4. In a second short transaction, conditionally finalize the operation. Valid success converts character reservations into one charge; definitive failure releases character capacity. Settle or conservatively retain monetary exposure separately. Commit before returning success.
@@ -101,15 +103,17 @@ This is a planned structure, not a claim that scaffolding or commands already ex
 
 ### 5.1 Identity
 
-Use ASP.NET Core Identity for local accounts, password hashing, verification/reset tokens, and external-login mappings. Use Google's ASP.NET Core external authentication handler; LLM routes enforce verified-account authorization server-side.
+Use ASP.NET Core Identity for local accounts, password hashing and verification/reset tokens. LLM routes enforce verified-account authorization server-side. Google/external sign-in is DF-007: no OAuth callback, credentials, handler, linking flow or Google smoke requirement in MVP. Do not customize or fork Identity merely to remove unused framework-provided tables.
 
-The SPA uses Secure, HttpOnly cookies with appropriate SameSite settings and antiforgery validation for cookie-authenticated state changes, including logout. Google callbacks use the handler's correlation protection. Independent clients use the explicitly selected bearer scheme in #5; do not build an OAuth server or assume Identity's built-in opaque bearer tokens are JWT/OIDC tokens. Before the account slice is ready, #5 must fix issuance, expiry/refresh, revocation, and API 401/403 behavior for both schemes. A separate API client must work without loading the SPA.
+The SPA uses Secure, HttpOnly cookies with appropriate SameSite settings and antiforgery validation for cookie-authenticated state changes, including logout. Independent clients use the explicitly selected bearer scheme in #5; do not build an OAuth server or assume Identity's built-in opaque bearer tokens are JWT/OIDC tokens. Before the account slice is ready, #5 must fix issuance, expiry/refresh, revocation, and API 401/403 behavior for both schemes. A separate API client must work without loading the SPA.
 
-Persist Data Protection keys outside the deployment directory with restricted filesystem access and a stable application identity. Back them up with account data. Never auto-link accounts solely because two providers return the same email; account linking/deletion and session revocation need the Q-004 account design before implementation. Real email delivery is an adapter; deterministic tests use a capturing fake.
+Persist Data Protection keys outside the deployment directory with restricted filesystem access and a stable application identity. Back them up with account data. Local-account deletion and cookie/bearer session revocation need the Q-004 account design before implementation. External-account linking is a DF-007 dependency, not a current blocker; when selected it must not link solely by matching email. Real email delivery is an adapter; deterministic tests use a capturing fake.
 
 ### 5.2 Configuration and diagnostics
 
-Bind validated typed options from configuration, environment variables, and local user secrets. Provider/OAuth/email credentials stay exclusively on the backend. Pin supported dependencies; never commit secrets. Fail startup on invalid enabled routes, ambiguous priorities, missing credentials, unwritable durable storage, or missing cost bounds for paid serving. An explicit local/test configuration supplies fakes without requiring production credentials.
+Bind validated typed options from configuration, environment variables, and local user secrets. Provider/email credentials stay exclusively on the backend. Pin supported dependencies; never commit secrets. Fail startup on an invalid operation-family chain, missing required credentials, unwritable durable storage, or missing cost bounds for paid serving. Each of the two chains requires one primary and permits at most one fallback; reject extra candidates instead of silently accepting an advanced chain. There are no route-priority/overlap settings to validate. An explicit local/test configuration supplies fakes without requiring production credentials.
+
+Translation uses the same configured chain for all 12 directions; Rewriting uses its configured chain for all four languages and nine single-dropdown modes. Each configured candidate must qualify for every route/mode it serves. Preserve the PRD default-model preference subject to provider eligibility. Per-route rules, priorities and arbitrary-length candidate lists are deferred as DF-004. #4 specifies the simple primary/fallback policy first; it needs no generic rule DSL.
 
 Use structured logs with an allowlist: opaque operation ID, operation type, duration, classified outcome, attempt number, and numeric usage/cost metadata. Disable request/response body logging and redact cookies, tokens, email-link queries, and provider error bodies. Do not attach submitted text to exceptions or traces. Health checks establish process/storage readiness without paid provider calls. Track failures, DB contention, outstanding monetary exposure, and cap suspension; exact operational alert thresholds remain with #6/#10, not an invented uptime SLA.
 
@@ -129,9 +133,9 @@ For deployment, stop/drain the single instance, take a consistent backup, run th
 
 | Data | Location | Lifecycle |
 | --- | --- | --- |
-| Accounts, external-login mappings, Data Protection keys | Durable backend storage | Account lifecycle; exact deletion/backup retention remains Q-004 |
+| Local accounts, Data Protection keys | Durable backend storage | Account lifecycle; exact deletion/backup retention remains Q-004 |
 | Operation status, reservations, usage and cost metadata | SQLite; no text bodies | Bounded replay/reconciliation window, then required aggregates only; exact durations remain Q-004/#5 |
-| Source/result, comparisons, alternatives, workspace settings | Per-tab browser memory | Cleared on UX #2 Section 3.4 boundaries |
+| Source/result and single-mode/language workspace settings | Per-tab browser memory | Cleared on UX #2 Section 3.4 boundaries |
 | Provider request/response bodies | Backend transient memory | Only bounded active processing/delivery; no persistent result cache, queue payload, logs, or analytics |
 
 Do not retain an unkeyed text hash as a harmless substitute for content. If #5 requires replay-payload matching, use a server-keyed fingerprint with bounded metadata retention and key lifecycle; never log it. Avoid text in URLs/history, storage, HTTP caches, or service workers; text-bearing/auth responses use `Cache-Control: no-store`.
@@ -165,26 +169,30 @@ Recovery uses the durable metadata and a bounded in-process reconciliation servi
 
 ### 7.3 Monthly monetary ceiling
 
-Admission enforces `known spend + unresolved exposure + new attempt upper bound <= configured cap` atomically across requests. The estimate covers all billable input (including alternative context), bounded output/reasoning tokens, and provider-specific charges. An unknown price or unbounded billable attempt makes that configuration ineligible for paid dispatch. Release unused exposure only on authoritative evidence; a timeout can still cost money. Provider-side hard budgets, when available, are an additional backstop.
+Admission enforces `known spend + unresolved exposure + new attempt upper bound <= configured cap` atomically across requests. The estimate covers all billable input, bounded output/reasoning tokens, and provider-specific charges for the two active operations. Any paid eligibility/detection attempt also needs cost admission even when no character charge results. Alternative context is deferred with DF-001; it adds no MVP accounting branch. An unknown price or unbounded billable attempt makes that configuration ineligible for paid dispatch. Release unused exposure only on authoritative evidence; a timeout can still cost money. Provider-side hard budgets, when available, are an additional backstop.
 
 #4 must supply eligible price/billing bounds and fallback attempt budgets; #5 defines month-boundary reservation assignment; Q-001 still owns the actual cap amount and serving arrangement. This is a conservative application admission guarantee under those verified bounds, not a promise to control unrelated account spend or provider billing changes. Suspensions preserve the workspace and return #5's budget category.
 
 ## 8. Frontend and Agent Development Rules
 
-### 8.1 State and sentence correspondence
+### 8.1 Explicit actions and plain-text state
 
-Use feature reducers and pure helpers for debounce decisions, request identity, usage ordering, manual-edit protection, and sentence metadata invalidation. Effects perform transport; reducers do not. Context is sufficient for auth/usage/shared workspace state; no broad global state manager by default.
+Use feature reducers and pure helpers for explicit-dispatch guards, request/workspace identity, usage ordering and manual-edit protection. Effects perform transport; reducers do not. Context suffices for auth/usage/shared workspace state. Native textareas/selects and inline settings implement the UI; no broad global state manager or editor framework is needed.
 
-Sentence splitting alone cannot preserve identities through insertions, deletions, merges, or splits. The rewriting package must implement affected-range correspondence against UX #2's existing fixtures, preserve unaffected opaque identities, and invalidate only the local ambiguous group. #5 defines how independent clients provide context/revisions without server-persisted text. Do not duplicate the same correspondence algorithm on client and server unless a concrete contract requires it; share cross-language counting/contract fixtures instead.
+A valid explicit action captures input/settings/result-edit revision. Typing, pasting, mode/language changes, reconnect, usage reset and elapsed time never dispatch a transformation. Ignore activation while composing; do not queue an automatic post-composition request. Detection/eligibility can complete the same explicit submission only if its captured revisions still match. One unsettled operation per feature page suppresses duplicate UI activation; the backend still enforces concurrent-client integrity. Settings and both source/result text stay editable while processing; any intervening edit or editor compositionstart blocks stale text application, even if composition is later cancelled.
+
+Full-result replacement uses request/workspace revisions, not sentence/version associations. Plain result editing needs no segmentation, merge/split matching, cached metadata or comparison state. Targeted metadata preservation is cut, not merely delayed. Future DF-001/DF-002 must invalidate all assistance metadata on any manual edit; design those features only when selected. Share canonical count fixtures across C#/TypeScript; reject over-limit full text consistently on both sides.
 
 ### 8.2 Reproducible feedback
 
 - Pin the .NET SDK in `global.json`, central package versions, local EF tool, Node version, npm lockfile, schema generator, and browser runtime. Set nullable reference types, TypeScript `strict`, and a fixed analyzer level. Apply recommended .NET/ESLint checks to owned code; generated output has explicit exclusions. Avoid unrelated analyzer or dependency upgrades during a feature.
 - Provide one documented entry point each for setup, fast checks, integration, contract generation, browser smoke, and publish. They must be noninteractive, work from a clean checkout, return useful exit codes, and clean up only owned processes/files. #10 records executable commands once implemented.
-- Ordinary unit/API checks need no browser install, Docker daemon, Google account, paid credentials, or frontend dev server. Backend-only builds do not invoke npm. The explicit publish command builds the frontend once and packages it with the host.
+- Ordinary unit/API checks need no browser install, Docker daemon, external account, paid credentials, or frontend dev server. Backend-only builds do not invoke npm. The explicit publish command builds the frontend once and packages it with the host.
 - New edge cases default to pure unit tests. Add an integration/browser test only for a boundary that a lower test cannot establish. Use assertions on behavior and data, not private method calls or large DOM snapshots.
 
 ### 8.3 Generated API contract
+
+Generate only active local-account authentication, language/mode/usage, Translation and Rewriting operations and their errors/status recovery. Do not emit speculative alternatives/sentence schemas or Google flows. Cookie **and** independent-client bearer lifecycle remain current contracts; simplifying sign-in providers does not remove API access.
 
 Follow document #0's amended ownership rule: `docs/05-openapi.yaml` remains the reviewed contract artifact. Use .NET's `Microsoft.AspNetCore.OpenApi` plus `Microsoft.Extensions.ApiDescription.Server` for build-time generation, with explicit operation IDs, typed success/error DTOs, auth metadata, and semantic descriptions. Pin OpenAPI 3.1 for client-tool compatibility. Build-time generation emits JSON; the same contract command deterministically serializes it to the canonical YAML file using a pinned serializer, with no schema edits or second schema source. Generate without a live database, migrations, external network, or production secrets; build-time host startup must be side-effect free.
 
@@ -198,14 +206,14 @@ The broadest set of cases belongs to pure units, followed by focused DOM compone
 
 | Layer | Owns | Does not establish |
 | --- | --- | --- |
-| MSTest pure units | Count/limit boundaries, reservation and settlement decisions, cost arithmetic, route precedence, failure classification, deadline policy with fake time | SQL atomicity, migrations, HTTP/auth wiring |
-| Vitest pure units | Reducers, debounce decisions, stale-response ordering, revision/correspondence helpers, cache invalidation | Browser editing/layout |
+| MSTest pure units | Count/limit boundaries, reservation and settlement decisions, cost arithmetic, two-family chain validation/order, failure classification, deadline policy with fake time | SQL atomicity, migrations, HTTP/auth wiring |
+| Vitest pure units | Reducers, explicit-dispatch/duplicate guards, no-auto-resume policy, stale-response and usage ordering, workspace/result-edit revisions | Browser editing/layout |
 | Vitest + Testing Library DOM components | Visible messages, forms, control state, effect request counts, usage rendering, semantic names/live-region mutations | Real clipboard, layout, bfcache, native IME, complete accessibility |
 | EF/SQLite integration | Queries, constraints, transaction rollback, concurrent admission/settlement, crash recovery metadata, migrations | Provider language quality or browser behavior |
 | MSTest HTTP integration (`WebApplicationFactory`) | Routing, validation, auth/antiforgery, error/usage serialization, independent API operations, unknown API paths | Actual socket/TLS/static publish behavior |
 | Playwright browser contracts | Small keyboard/focus/clipboard/editing/history/privacy/reflow set and curated visual baselines per UX #2 | Server accounting when API responses are intercepted |
-| Playwright integrated smoke | Published SPA → real API/auth → migrated SQLite → deterministic provider adapter; one Translation and one Rewrite/alternatives journey | Live Google/email/provider service reliability |
-| Separate release evidence (#6) | Live identity/email smoke, provider quality/retention/cost eligibility, performance, manual browser/assistive-technology checks | Cannot be replaced by fixture success |
+| Playwright integrated smoke | Published SPA → real API/auth → migrated SQLite → deterministic provider adapter; one explicit Translation and one full-Rewrite journey with local sign-in | Live email/provider service reliability |
+| Separate release evidence (#6) | Live local-account/email smoke, provider quality/retention/cost eligibility, performance, manual browser/assistive-technology checks | Cannot be replaced by fixture success |
 
 ### 9.2 Deterministic integration harness
 
@@ -225,13 +233,13 @@ Browsers cannot connect to in-memory TestServer. Integrated smoke therefore laun
 - **PR gate:** All fast tests, backend build/integration, schema/client drift check, frontend production build, and the small integrated Chromium smoke. UI changes also run the affected browser contracts/curated visuals; harness/hosting/shared-style changes run the whole relevant browser set. If change selection is uncertain, run the relevant suite in full.
 - **Release gate:** Add UX #2's targeted engine/device checks, actual published-host behavior, migration/restore and process recovery, measured workloads and provider evaluations from #6. Paid/non-deterministic evaluations stay outside the ordinary PR loop and cannot substitute for deterministic tests.
 
-#6 maps every accepted requirement and UX-AC ID to executable checks, layer, environment, and evidence. Split a compound scenario by assertion: e.g., UX-AC-106's ordering algorithm is a unit, its displayed usage a component check, and its server sequence fields an API check. Do not rerun the entire scenario in each layer. A screenshot or backend test does not discharge unrelated UI assertions. All 112 UX IDs stay stable.
+#6 maps every current-MVP requirement and active UX-AC ID to checks, layer, environment and evidence. Preserve Deferred/Retired IDs with their disposition instead of implementing them or reporting them as failed/missing/passing tests. A compound row with a deferred branch verifies only its active acceptance now. Split a compound scenario by assertion: e.g., UX-AC-106's ordering algorithm is a unit, its displayed usage a component check, and its server sequence fields an API check. Do not rerun the entire scenario in each layer. A screenshot or backend test does not discharge unrelated UI assertions. All 112 original UX IDs stay stable, but only active rows create current acceptance obligations. Curated screenshot scope is seven current baselines in UX Section 12.10; no sentence/Google/prefix/custom-tools matrix remains.
 
 No runtime tests have been executed for this spec-only repository. Document validation is not implementation evidence.
 
 ## 10. Decision Records and Source Basis
 
-[Document #9](09-architecture-decisions.md) records ADR-001–ADR-005 as amended, ADR-006 as superseded, and ADR-007–ADR-009 for migration parity, short reservations, and pyramid ownership.
+[Document #9](09-architecture-decisions.md) records ADR-001–ADR-005 as amended, ADR-006 as superseded, ADR-007–ADR-009 for migration parity, short reservations and pyramid ownership, and ADR-010 for the approved simplified MVP. Earlier decision scopes follow PRD D-17.
 
 Technical guidance checked on 2026-09-07; the choices above are LinguaDesk's application of it:
 
@@ -250,11 +258,11 @@ Technical guidance checked on 2026-09-07; the choices above are LinguaDesk's app
 | Question / owner | Remaining decision | Blocks |
 | --- | --- | --- |
 | Q-001, #4/#6 and owner configuration | Serving arrangement, no-training/retention evidence, eligible models and cost bounds, monetary cap amount | Paid serving and launch |
-| Q-002, rewriting package/#5 | Sentence correspondence and opaque revision/context representation satisfying existing UX fixtures | Rewriting interaction implementation |
+| Q-002, PRD D-17 | Targeted matching and toggle restoration resolved by removal; future assistance association is DF-001/002 | No current-MVP blocker |
 | Q-003/Q-006, #5 with #3 | Unicode counts, quota/month rollover, operation/status/replay/output-unavailable semantics, bearer lifecycle, error fields | Accounting/auth and their dependent clients |
-| Q-004, account/privacy package with #3/#5/#10 | Metadata/replay/backup retention durations, deletion/linking, revocation, provider disclosure | Related account features and launch |
-| Q-007, #4 | Output validity, provider error classes, attempt/deadline budgets | Provider adapter orchestration |
+| Q-004, account/privacy package with #3/#5/#10 | Metadata/replay/backup retention durations, local-account deletion/revocation, provider disclosure; external linking deferred DF-007 | Related account features and launch |
+| Q-007, #4 | Output validity, detection/eligibility, provider errors, bounded attempts/deadlines for the two simple chains | Active provider orchestration; advanced routing/context deferred |
 | Q-005, #6 | Coverage mapping, evaluation workload, actual evidence | Release acceptance |
 | Q-008/Q-010, PRD then #3/#10 | P-005 safeguard scope and any additional operational thresholds | Adoption of proposed controls; no silent acceptance |
 
-The topology, engineering defaults, and test allocation are ready for **scoped planning**. Documents #4–#6 need only resolve the contracts required by the selected package before its implementation; unrelated future decisions do not block independent work. This is not a claim of launch readiness or full resolution of privacy/cost questions.
+The topology, engineering defaults, and test allocation are ready for **scoped planning**. Documents #4–#6 need only resolve the contracts required by the selected package before its implementation; unrelated future decisions do not block independent work. DF-001–DF-007 do not block MVP and create no speculative framework or testing work. This is not a claim of launch readiness or full resolution of privacy/cost questions.

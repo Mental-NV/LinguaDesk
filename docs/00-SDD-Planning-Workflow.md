@@ -1,6 +1,6 @@
 # LinguaDesk — SDD Planning Workflow
 
-**Version:** 1.1 · **Updated:** September 7, 2026
+**Version:** 1.2 · **Updated:** September 8, 2026
 
 **Role:** Document #0 — authoritative entry point and governance for specification-driven development (SDD).
 
@@ -18,7 +18,7 @@ Authority is assigned by subject:
 
 Resolve contradictions in the document that owns the decision, then update its dependents. A more detailed or newer document does not automatically override its source. Implementation is evidence of current behavior, not authority to silently rewrite requirements.
 
-The existing [PRD](01-PRD.md) is a review draft with confirmed requirements, unaccepted proposals, and deferred questions. Preserve those distinctions. Finished authoring does not mean every proposal is accepted. Reuse its stable `FR-*`, `NFR-*`, `P-*`, `Q-*`, and `RG-*` IDs; do not duplicate its requirement catalog or policy values here. Existing approvals and delegated decisions remain valid.
+The current [PRD](01-PRD.md) is a product baseline with active MVP requirements, explicitly deferred/retired scope, unaccepted proposals and scoped open questions. Preserve those distinctions. Finished authoring does not mean every proposal is accepted. Reuse its stable `FR-*`, `NFR-*`, `P-*`, `Q-*`, and `RG-*` IDs; do not duplicate its requirement catalog or policy values here. Existing approvals and delegated decisions remain valid.
 
 ## 2. Document map
 
@@ -149,9 +149,12 @@ Maintain one product coverage table in document #6:
 
 **PRD requirement / release-gate ID → shared design or API reference → backlog item / package scenario → verification check → evidence and status**.
 
-Include uncovered requirements as pending rather than omitting them. In each package, link scenarios to tasks and evidence without recreating the whole product matrix. Backlog files own item state, `tasks.md` owns task completion, and document #7 owns only the milestone summary and links. Mark a parent item done only when all of its acceptance criteria are verified.
+Include uncovered **active** requirements as pending rather than omitting them. Retain deferred/retired IDs with that status and their owning PRD reference; do not count them as active gaps or passing checks. In each package, link scenarios to tasks and evidence without recreating the whole product matrix. Backlog files own item state, `tasks.md` owns task completion, and document #7 owns only the milestone summary and links. Mark a parent item done only when all of its acceptance criteria are verified.
 
 ## 7. Changing specifications and resuming work
+
+**Deferring product scope:** Use an explicit PRD status/register, not a lower priority that could still be read as an MVP obligation. The PRD owns what is deferred, retired, or retained; affected shared specifications show the same dispositions. A deferred capability has later-phase intent but no scheduled milestone until selected. Do not create full future implementation specs, dormant endpoints/flags, or placeholder tests just to retain intent. Keep the old design in Git as historical evidence and preserve stable IDs. When the capability is selected, refine it against the current baseline and create its normal #8 backlog/package. Retired behavior is not reactivated implicitly with adjacent deferred features.
+
 
 Before resuming a package, compare its recorded input revisions with the current PRD, shared designs, and implementation. If relevant inputs changed, reassess readiness and update the plan/tasks before continuing affected work. Unrelated changes do not require regenerating every artifact.
 
