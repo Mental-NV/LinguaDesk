@@ -672,12 +672,14 @@ Support the current and immediately previous major stable releases at the date o
 
 | Representative lane | Viewport | Automated scope | Manual scope |
 | --- | ---: | --- | --- |
-| Chromium desktop (current) | 1440×900 | Full functional suite, clipboard, races, visual baselines, axe-equivalent scan | Keyboard/zoom smoke |
-| Firefox desktop (current) | 1024×768 | Core auth, editors, IME event contract, alternatives, errors | NVDA full journey |
-| WebKit desktop (current) | 1440×900 | Core functional, focus, clipboard, visual baseline | VoiceOver full journey |
-| Chromium narrow | 390×844 and 320×640 | Full responsive suite, sheets, reflow, long content | Android Chrome/TalkBack at 360×800 |
-| WebKit narrow | 390×844 | Core responsive, software-keyboard-safe layout assertions where automatable | iOS Safari/VoiceOver and keyboard |
-| Previous-major smoke lanes | 1440×900, 390×844 | Auth, translate success/error, rewrite success/alternatives/copy | Only when automation flags divergence |
+| Chromium desktop (current) | 1440×900 | Browser-sensitive journeys (clipboard, focus routing), core visual baselines, axe-equivalent scan | Keyboard/zoom smoke |
+| Firefox desktop (current) | 1024×768 | Targeted IME event contract only | NVDA full journey |
+| WebKit desktop (current) | 1440×900 | Core focus and navigation smoke | VoiceOver full journey |
+| Chromium narrow | 390×844 | Narrow visual baselines, sheet/reflow smoke | Android Chrome/TalkBack at 360×800 |
+| WebKit narrow | 390×844 | Excluded from automated lane (displaced to manual/Chromium narrow) | iOS Safari/VoiceOver and keyboard |
+| Previous-major smoke lanes | 1440×900, 390×844 | Excluded from automated lane | Only when manual tests flag divergence |
+
+*Amendment (2026-09-07):* Automated cross-browser test volume is reduced. State machine races, comprehensive form validation, and component-level rendering are displaced to Vitest component tests and MSTest API integration tests. Playwright verifies only browser-specific behaviors (clipboard, focus, cross-page routing) and core visual baselines.
 
 ## 11. User stories
 
@@ -742,7 +744,9 @@ For 2-option and 4-option sets, take the first two ALT-OK entries or append `The
 
 Auth fixture data: email `writer@example.test`; accepted password `Maple!River2026`; rejected credentials return UX-MSG-028; password checklist fixture is minimum 12 characters only. Missing/mismatch run uses `short` and `different`; rejected-policy response returns UX-MSG-042. `invalid-link` and `expired-link` are harness route contexts, not prescribed token formats. Verification success starts from AUTH-LOCAL-UNVERIFIED; a separate signed-out variant requires sign-in. Auth duplicate-submit and navigation races use deferred promises exactly as language races do.
 
-All scenarios start afresh with AUTH-OK, zero observed requests, desktop Chromium 1440×900, 1,000 ms debounce, and initial usage 7,500 unless overridden. “Existing result” means seed W-OK/T-OK-A with its corresponding post-success usage and exclude that seed from observed request counts. Explicitly parameterized lanes in Section 10 run core scenarios on Firefox/WebKit and narrow viewports. All UI fixture success/failure responses are explicitly released by the harness; never infer success from timing. Count logical language operations separately from eligibility, usage, status, and authentication requests.
+All scenarios start afresh with AUTH-OK, zero observed requests, desktop Chromium 1440×900, 1,000 ms debounce, and initial usage 7,500 unless overridden. “Existing result” means seed W-OK/T-OK-A with its corresponding post-success usage and exclude that seed from observed request counts.
+
+*Amendment (2026-09-07):* Explicit cross-browser parameterization is reduced. Scenarios without browser-specific dependencies (e.g., race conditions, logical accounting validation, state transitions) must be executed in Vitest or MSTest rather than Playwright. All UI fixture success/failure responses are explicitly released by the harness; never infer success from timing. Count logical language operations separately from eligibility, usage, status, and authentication requests.
 
 Primary locators must use roles and accessible names: `getByRole('link', {name:'Translation'})`, `getByRole('textbox', {name:'Source text'})`, `getByRole('textbox', {name:'Translation result'})`, `getByRole('textbox', {name:'Improved result'})`, `getByRole('combobox', {name:'Source language'})`, `getByRole('combobox', {name:'Target language'})`, `getByRole('combobox', {name:'Writing style or tone'})`, and named buttons/checkboxes from Section 5. Stable test IDs are permitted only for the invisible processed-boundary anchor (`translation-boundary`), sentence fixture wrapper (`sentence-<opaque-fixture-key>`), and live-region probe (`app-status`), because semantic locators cannot uniquely observe those internals. Production behavior must not depend on test IDs.
 
@@ -907,7 +911,9 @@ For screenshot runs, explicitly substitute locally bundled Noto Sans and Noto Sa
 - Translation empty, previous-result updating, uncertain detection, same-language error, 5,312-character truncation with boundary/result disclosure, total failure, and user/global/budget unavailable.
 - Rewriting empty/default tools, changed result with comparison, tools rail/sheet, three alternatives loading/ready, manual-edited affected sentence, stale-success notice, and 2,001-character block.
 - Login, registration errors, verification, forgot/reset success and expired-link states, session-expired banner, and workspace-reset dialog.
-- Each above at its most important `1440×900` and `390×844` composition; translation/rewrite primary states also at `1024×768` and `320×640`; Chinese and long-label fixtures at `390×844`.
+- Each above at its most important `1440×900` and `390×844` composition.
+
+*Amendment (2026-09-07):* Intermediate resolutions (`1024×768`, `320×640`) and exhaustive component-level states are displaced to Vitest visual/DOM checks or dropped if safely covered by the remaining extremes.
 
 Snapshots assert layout and state, not wording quality. Dynamic anti-aliasing differences must be controlled by the pinned CI image; broad pixel thresholds must not mask missing alerts, focus rings, or boundary markers.
 
@@ -925,6 +931,13 @@ Snapshots assert layout and state, not wording quality. Dynamic anti-aliasing di
 No scenario above is a test result. Document #6 must assign executable checks, environments, evidence, and status.
 
 ## 14. UX-scoped traceability matrix
+
+*Amendment (2026-09-07) Displaced Verification Mapping:*
+- **State machine & Race conditions** (e.g., UX-AC-023, 034, 046, 058): Displaced from Playwright to Vitest component testing.
+- **Form validation logic** (e.g., UX-AC-007, 018, 101): Displaced from Playwright to Vitest and MSTest API integration.
+- **Accounting & Reconcilation logic** (e.g., UX-AC-065-076, 105-108): Displaced to MSTest API integration.
+- **Core Browser mechanics** (Clipboard, Navigation, Focus mapping): Retained in Playwright (Chromium).
+All observable behaviors and stability of scenario IDs are preserved.
 
 This matrix feeds, but does not replace, the product-wide coverage table owned by document #6. `UI + integration` means fixture UI assertions plus an integrated contract/accounting check. `Evaluation` means document #6 language/provider evaluation.
 
