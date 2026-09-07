@@ -1,6 +1,6 @@
 # LinguaDesk — UX/UI Specification
 
-**Document:** #2 · **Version:** 1.0 · **Status:** Ready for implementation planning; runtime verification pending · **Updated:** September 7, 2026 (UTC)
+**Document:** #2 · **Version:** 1.1 · **Status:** Ready for implementation planning; runtime verification pending · **Updated:** September 7, 2026 (UTC)
 
 **Owner:** UX/UI specification. This document resolves Q-009 and the UX-owned portions of Q-002 and Q-004. Product policy remains owned by [document #1](01-PRD.md); architecture, persistence mechanics, API schemas, model behavior, and product-wide verification remain owned by documents #3–#6.
 
@@ -668,18 +668,19 @@ Required manual checks before RG-006 evidence:
 
 ### 10.5 Browser/device policy
 
-Support the current and immediately previous major stable releases at the date of each release candidate for Chrome, Edge, Firefox, desktop Safari, iOS Safari, and Android Chrome. CI pins exact versions in document #6 evidence; if a browser major changes during a release, rerun smoke and visual coverage before support is claimed. No Internet Explorer, embedded legacy WebView, native-app, or extension support is implied.
+Support the current and immediately previous major stable releases at the date of each release candidate for Chrome, Edge, Firefox, desktop Safari, iOS Safari, and Android Chrome. Record exact tested versions and manual evidence in #6. Playwright's bundled Chromium/WebKit are engine coverage, not proof of branded Chrome/Edge/Safari versions or physical devices. A browser-major change triggers affected smoke checks; it does not require a new screenshot baseline for every supported version. No Internet Explorer, embedded legacy WebView, native-app, or extension support is implied.
 
 | Representative lane | Viewport | Automated scope | Manual scope |
 | --- | ---: | --- | --- |
-| Chromium desktop (current) | 1440×900 | Browser-sensitive journeys (clipboard, focus routing), core visual baselines, axe-equivalent scan | Keyboard/zoom smoke |
-| Firefox desktop (current) | 1024×768 | Targeted IME event contract only | NVDA full journey |
-| WebKit desktop (current) | 1440×900 | Core focus and navigation smoke | VoiceOver full journey |
-| Chromium narrow | 390×844 | Narrow visual baselines, sheet/reflow smoke | Android Chrome/TalkBack at 360×800 |
-| WebKit narrow | 390×844 | Excluded from automated lane (displaced to manual/Chromium narrow) | iOS Safari/VoiceOver and keyboard |
-| Previous-major smoke lanes | 1440×900, 390×844 | Excluded from automated lane | Only when manual tests flag divergence |
+| Chromium desktop | 1440×900 | Small browser-sensitive set (clipboard, editing, keyboard/focus, history/privacy), curated visuals, accessibility scan, integrated smoke per #3 | Keyboard/zoom smoke; branded Chrome/Edge release checks |
+| Firefox desktop | 1024×768 | Targeted composition-event contract and short keyboard/editor smoke; no full state matrix | NVDA core journeys and actual supported Firefox versions |
+| WebKit desktop | 1440×900 | Short focus/navigation/editor smoke; no screenshot matrix | Actual Safari/VoiceOver core journeys |
+| Chromium narrow | 390×844 | Curated narrow visuals and sheet/reflow smoke | Android Chrome/TalkBack at 360×800 |
+| Chromium reflow/breakpoint probes | 320×640 and 1024×768 | Small geometry/overflow and rail-to-sheet checks; no extra baseline matrix | Zoom/text-spacing checks per 10.4 |
+| WebKit narrow | 390×844 | No separate automated lane | Actual iOS Safari/VoiceOver and software keyboard |
+| Previous-major supported releases | Representative desktop/mobile | No full automated matrix | Bounded core access/editor/copy/navigation smoke before release support is claimed; #6 records actual versions or an explicit unresolved evidence gap |
 
-*Amendment (2026-09-07):* Automated cross-browser test volume is reduced. State machine races, comprehensive form validation, and component-level rendering are displaced to Vitest component tests and MSTest API integration tests. Playwright verifies only browser-specific behaviors (clipboard, focus, cross-page routing) and core visual baselines.
+Most acceptance assertions execute in pure units and Vitest DOM components, with focused MSTest persistence/API checks. Chromium owns the comprehensive **browser-sensitive subset**, not every acceptance scenario. Firefox/WebKit smoke and actual-device/manual evidence are release checks or triggered by changes to the covered behavior. Preserve required supported-browser evidence without multiplying all scenarios across engines. Manual AT assessment in Section 10.4 remains necessary for RG-006.
 
 ## 11. User stories
 
@@ -709,7 +710,9 @@ All acceptance IDs refer to Section 12. Shared behavior is normative in Sections
 
 ### 12.1 Harness and fixture contract
 
-Scenarios are contracts for Playwright or equivalent tooling, not claims that tests exist or pass. All network behavior is intercepted at the application boundary. No scenario calls a live LLM, Google, email system, or production account service; no scenario uses arbitrary sleeps.
+Scenarios are layer-independent acceptance contracts, not a Playwright test inventory or claims of passing tests. Pure logic defaults to MSTest/Vitest units; visible UI behavior defaults to Vitest with React Testing Library in a DOM environment. Retain Playwright only for behavior requiring a real browser and the small integrated smoke in #3 Section 9. A compound scenario may map to several focused checks without replaying its complete journey at each layer.
+
+In fixture UI tests, replace transport at the application boundary and control all responses. In integrated smoke, run the real frontend, API, authentication, and migrated SQLite; replace only external provider/email dependencies. Neither deterministic suite calls live LLM, Google, email, or production account services. No test uses arbitrary sleeps.
 
 Use fake timers for the 1,000 ms debounce, fixed system time `2026-09-07T17:40:00Z`, timezone `UTC` for assertions that include reset text, and controllable deferred responses for races. Flush framework work explicitly after advancing time. Each logical request has a harness correlation key solely for counting/ordering; this does not prescribe the API identifier format.
 
@@ -744,11 +747,11 @@ For 2-option and 4-option sets, take the first two ALT-OK entries or append `The
 
 Auth fixture data: email `writer@example.test`; accepted password `Maple!River2026`; rejected credentials return UX-MSG-028; password checklist fixture is minimum 12 characters only. Missing/mismatch run uses `short` and `different`; rejected-policy response returns UX-MSG-042. `invalid-link` and `expired-link` are harness route contexts, not prescribed token formats. Verification success starts from AUTH-LOCAL-UNVERIFIED; a separate signed-out variant requires sign-in. Auth duplicate-submit and navigation races use deferred promises exactly as language races do.
 
-All scenarios start afresh with AUTH-OK, zero observed requests, desktop Chromium 1440×900, 1,000 ms debounce, and initial usage 7,500 unless overridden. “Existing result” means seed W-OK/T-OK-A with its corresponding post-success usage and exclude that seed from observed request counts.
+All scenarios start afresh with AUTH-OK, zero observed requests, 1,000 ms debounce, and initial usage 7,500 unless overridden. Browser checks default to Chromium 1440×900; pure unit/DOM checks require no browser or viewport. “Existing result” means seed W-OK/T-OK-A with its corresponding post-success usage and exclude that seed from observed request counts.
 
-*Amendment (2026-09-07):* Explicit cross-browser parameterization is reduced. Scenarios without browser-specific dependencies (e.g., race conditions, logical accounting validation, state transitions) must be executed in Vitest or MSTest rather than Playwright. All UI fixture success/failure responses are explicitly released by the harness; never infer success from timing. Count logical language operations separately from eligibility, usage, status, and authentication requests.
+Execute state/race/counting parameter sets at the lowest sufficient layer. UI usage/messages still need component assertions even when server accounting is covered in MSTest. All fixture success/failure responses are explicitly released by the harness; never infer success from timing. Count logical language operations separately from eligibility, usage, status, and authentication requests.
 
-Primary locators must use roles and accessible names: `getByRole('link', {name:'Translation'})`, `getByRole('textbox', {name:'Source text'})`, `getByRole('textbox', {name:'Translation result'})`, `getByRole('textbox', {name:'Improved result'})`, `getByRole('combobox', {name:'Source language'})`, `getByRole('combobox', {name:'Target language'})`, `getByRole('combobox', {name:'Writing style or tone'})`, and named buttons/checkboxes from Section 5. Stable test IDs are permitted only for the invisible processed-boundary anchor (`translation-boundary`), sentence fixture wrapper (`sentence-<opaque-fixture-key>`), and live-region probe (`app-status`), because semantic locators cannot uniquely observe those internals. Production behavior must not depend on test IDs.
+Component queries and browser locators must use roles and accessible names (Testing Library equivalents are valid): `getByRole('link', {name:'Translation'})`, `getByRole('textbox', {name:'Source text'})`, `getByRole('textbox', {name:'Translation result'})`, `getByRole('textbox', {name:'Improved result'})`, `getByRole('combobox', {name:'Source language'})`, `getByRole('combobox', {name:'Target language'})`, `getByRole('combobox', {name:'Writing style or tone'})`, and named buttons/checkboxes from Section 5. Stable test IDs are permitted only for the invisible processed-boundary anchor (`translation-boundary`), sentence fixture wrapper (`sentence-<opaque-fixture-key>`), and live-region probe (`app-status`), because semantic locators cannot uniquely observe those internals. Production behavior must not depend on test IDs.
 
 Common assertions include visible exact text, role/name/value/checked/disabled/busy/invalid state, focus target, URL, clean clipboard text, absence of source mutation, and logical request count/payload category. Storage assertions inspect localStorage, sessionStorage, IndexedDB database names, Cache Storage entries, URL, and history state for absence of source/result text.
 
@@ -785,7 +788,7 @@ Common assertions include visible exact text, role/name/value/checked/disabled/b
 | UX-AC-022 / US-006 | Target Romanian, `T-OK-A` | Fill source, advance 999 ms, then 1 ms; resolve | 0 then 1 request; UX-MSG-003; complete Romanian fixture replaces placeholder; UX-MSG-005; source focus/value unchanged; usage 7,546. Parameterize eligibility completion at 500/1,500 ms: submission at 1,000/1,500 ms respectively, never another full pause after eligibility. |
 | UX-AC-023 / US-006 | Valid source/target | Type three edits 400 ms apart, then advance 999/1 ms | Debounce restarts; exactly one request with final value; no arbitrary wait. |
 | UX-AC-024 / US-006 | Existing result; source edit then target change inside debounce | Advance controlled clock | Previous result stays with UX-MSG-002 then 004; exactly one request carries final source/target; no partial result appears. |
-| UX-AC-025 / US-006 | Chinese IME-capable source and target English | Dispatch compositionstart/update events, advance 5 seconds, compositionend, then 999/1 ms | Zero requests during composition; one only after full post-composition pause; caret/value preserved. Run Chromium and Firefox lanes. |
+| UX-AC-025 / US-006 | Chinese IME-capable source and target English | Dispatch compositionstart/update events, advance 5 seconds, compositionend, then 999/1 ms | Zero requests during composition; one only after full post-composition pause; caret/value preserved. Run the timing permutations in Vitest and one composition-event smoke in Chromium/Firefox; actual native IME remains Section 10.4 manual evidence. |
 | UX-AC-026 / US-007 | Existing translation result | Clear source; advance 2 seconds | Source empty/focused; no new request; old result and `Source cleared — previous result shown.` remain copyable. |
 | UX-AC-027 / US-005, US-007 | Detect automatically, `T-UNCERTAIN`, valid target | Validation resolves | UX-MSG-006; source combobox invalid; zero provider operations/charge. Select English and advance 1 second → one request automatically. |
 | UX-AC-028 / US-005, US-007 | Source Russian, target English, no text; change source to English | Make source eligible | Retained target English is disabled in its menu and invalid as current value; UX-MSG-007; zero operation. Select Romanian and advance 1 second → one request. |
@@ -857,9 +860,9 @@ Common assertions include visible exact text, role/name/value/checked/disabled/b
 
 | ID / story | Given | When | Then |
 | --- | --- | --- | --- |
-| UX-AC-077 / US-016 | Each route, `320×640` and fixed fonts/content | Capture layout and inspect scroll dimensions | One column, all controls visible/reachable, no horizontal page overflow, language labels usable, sheets fit viewport. |
-| UX-AC-078 / US-016 | Workspace at `1440×900`, `1024×768`, `390×844` | Compare fixed visual fixtures for empty, processing, result, warning, error, alternatives, and dialog | Layout matches Section 4 at each breakpoint; no clipped long English/Chinese content; deterministic screenshots within approved threshold. |
-| UX-AC-079 / US-016 | Keyboard-only, current desktop Chromium/WebKit/Firefox | Traverse full translation/rewrite/alternative/comparison flows | Focus order matches 5.3; every focus visible/unobscured; Escape closes/returns; no keyboard trap; source caret unchanged by operations. |
+| UX-AC-077 / US-016 | Each route, `320×640` and fixed fonts/content | Run browser geometry/overflow assertions; no pixel baseline required | One column, all controls visible/reachable, no horizontal page overflow, language labels usable, sheets fit viewport. |
+| UX-AC-078 / US-016 | Workspace at `1440×900`, `1024×768`, `390×844` | Check curated screenshots from 12.10 and breakpoint geometry; check remaining state rendering in components | Layout matches Section 4; no clipped long English/Chinese content; only the curated screenshots require pixel baselines, with semantic state coverage retained in components. |
+| UX-AC-079 / US-016 | Keyboard-only; Chromium full browser-sensitive subset, WebKit/Firefox focused smoke plus manual AT per 10.4–10.5 | Traverse translation/rewrite/alternative/comparison keyboard flows in Chromium; sample shared primitives in other engines | Focus order matches 5.3; every focus visible/unobscured; Escape closes/returns; no keyboard trap; source caret unchanged by operations. |
 | UX-AC-080 / US-016 | Result caret in sentence; pointer unavailable | Use Sentence actions list and `Alt+ArrowDown` | Same menu/actions/options as pointer path; accessible sentence excerpt/ordinal; focus restoration exact. |
 | UX-AC-081 / US-016 | Automated accessibility scan and token contrast check on all important states | Run scanner/calculator | No serious/critical automated violations; prescribed foreground/background and focus pairs meet ratios; errors/states have non-color cues. Manual limitations remain stated. |
 | UX-AC-082 / US-016 | Fake timer and live-region observer | Type repeatedly, submit, resolve, copy, produce validation error | No announcement per key/debounce restart; one start, one completion, one copy; changed error announced once; applied result text not auto-read. |
@@ -867,7 +870,7 @@ Common assertions include visible exact text, role/name/value/checked/disabled/b
 | UX-AC-084 / US-017 | Active text/results/settings | Activate Start new workspace, then Cancel | Dialog exact copy; initial focus Cancel; Escape/Cancel preserves everything and returns account-menu trigger. |
 | UX-AC-085 / US-017 | Same state with two pending operations | Confirm Start new workspace; later resolve both | Both pages clear/default; `/translate`; source focused; no response applies or restores content; usage may reconcile only from authoritative stale successes without text. |
 | UX-AC-086 / US-017 | Empty new workspace | Activate Start new workspace | No dialog; defaults remain; `/translate`; source focused; zero operation requests. |
-| UX-AC-087 / US-017 | Workspace uses distinctive source/result strings | Switch pages, inspect URL/history/storage; reload; simulate bfcache pageshow and tab duplication fixture | Strings exist only in live DOM memory before boundary; never in URL/history/storage/cache; all boundary restorations are empty. Architecture/privacy integration tests must prove actual teardown. |
+| UX-AC-087 / US-017 | Workspace uses distinctive source/result strings | Switch pages, inspect URL/history/storage; reload; simulate bfcache pageshow and tab duplication fixture | Strings exist only in live DOM memory before boundary; never in URL/history/storage/cache; all boundary restorations are empty. A synthetic pageshow only proves handler behavior; real navigation/reload/restoration browser checks plus backend privacy integration establish the wider contract. #6 records if actual bfcache entry or tab duplication could not be exercised; it must not label synthetic events as that evidence. |
 
 ### 12.8 Additional language scenarios
 
@@ -906,22 +909,29 @@ Common assertions include visible exact text, role/name/value/checked/disabled/b
 
 ### 12.10 Visual regression suite
 
-For screenshot runs, explicitly substitute locally bundled Noto Sans and Noto Sans SC for the entire system-font stack; pin the font files and browser/container image in #6's evidence. Wait for the font-ready signal before capture. Use device scale factor 1, disabled caret, fixed time, reduced motion, deterministic scrollbars, and fixture output—never live provider text. Keep per-engine baselines. Compare with per-pixel color threshold 0.1 and maximum differing-pixel ratio 0.001; structural/semantic assertions must still pass independently. Baselines are required for:
+Screenshots cover distinct layout structures, not every state × viewport × engine. The initial curated baseline inventory is:
 
-- Translation empty, previous-result updating, uncertain detection, same-language error, 5,312-character truncation with boundary/result disclosure, total failure, and user/global/budget unavailable.
-- Rewriting empty/default tools, changed result with comparison, tools rail/sheet, three alternatives loading/ready, manual-edited affected sentence, stale-success notice, and 2,001-character block.
-- Login, registration errors, verification, forgot/reset success and expired-link states, session-expired banner, and workspace-reset dialog.
-- Each above at its most important `1440×900` and `390×844` composition.
+| Layout | Baselines |
+| --- | --- |
+| Translation: long-input boundary with previous result updating | 1440×900 and 390×844 |
+| Rewriting: changed result and comparison surface | 1440×900 and 390×844 |
+| Rewriting: alternatives ready beside the desktop tools rail; narrow Writing tools sheet in a separate state | 1440×900 and 390×844 respectively |
+| Registration: long validation errors | 1440×900 and 390×844 |
+| Workspace-reset dialog | 390×844 |
 
-*Amendment (2026-09-07):* Intermediate resolutions (`1024×768`, `320×640`) and exhaustive component-level states are displaced to Vitest visual/DOM checks or dropped if safely covered by the remaining extremes.
+These nine baselines are the starting set, not a permanent test-count limit. Add one only for a distinct layout risk unsupported by existing evidence. Empty/loading/success/failure/expired-link copy and control-state combinations remain DOM component checks; small browser geometry assertions cover any unique layout risk. The 320×640 reflow and 1024×768 breakpoint probes remain real-browser checks without separate pixel baselines. DOM emulators do not perform real layout; moving tests to Vitest does not prove clipping, reflow, zoom, caret positioning, or screenshots. Do not introduce a second browser runner through Vitest Browser Mode solely to rename browser tests as component tests.
 
-Snapshots assert layout and state, not wording quality. Dynamic anti-aliasing differences must be controlled by the pinned CI image; broad pixel thresholds must not mask missing alerts, focus rings, or boundary markers.
+For screenshot runs, substitute locally bundled Noto Sans and Noto Sans SC for the system-font stack; pin files and the Chromium/container version in #6's evidence. Wait for font readiness, use device scale factor 1, disabled caret, fixed time, reduced motion, deterministic scrollbars, and fixture output. Start with per-pixel color threshold 0.1 and maximum differing-pixel ratio 0.001. If rendering noise requires adjustment, record the measured reason; never automatically accept regenerated baselines or loosen thresholds to hide missing controls. Structural/semantic assertions pass independently. No Firefox/WebKit screenshot baselines are required by this contract.
+
+Snapshots establish layout/state, not wording quality, native device behavior, or complete accessibility.
 
 ## 13. Verification boundaries
 
 | Evidence class | What this specification's UI contract can establish | What it must not claim |
 | --- | --- | --- |
-| Mocked UI automation | Routing, forms, visible messages, debounce/request count, response ordering, state protection, semantic controls, focus, clipboard, storage observation, responsive layout | Real account/provider behavior, server atomicity, actual email/Google delivery, production latency |
+| Unit / DOM component tests | State policy, forms/messages, request counts, ordering, semantic names/states, live-region mutations | Real browser layout/clipboard/IME/history/bfcache or server accounting |
+| Fixture browser contracts | Real routing/editing/focus/clipboard, storage observation, reflow, curated layout | Real account/provider behavior or server atomicity when API responses are intercepted |
+| Integrated browser smoke | Published frontend/API/auth/database wiring with external adapters faked | Live Google/email/provider delivery or language quality |
 | API/accounting integration | Error-category mapping, authoritative counts/usage, successful stale charging, single logical charge, allowance concurrency, reset, reconciliation | Language usefulness or full browser accessibility |
 | Document #6 language/model evaluation | Correct languages/scripts, meaning/factual/structural preservation, usable outputs, option distinctness/context fit, fallback quality | Pixel/UI behavior unless explicitly coupled to UI fixtures |
 | Performance/reliability tests | NFR-002 timings/deadlines, concurrency, fallback, interrupted-operation semantics, no overrun/duplicate charge | A mocked spinner duration as proof of performance |
@@ -932,14 +942,18 @@ No scenario above is a test result. Document #6 must assign executable checks, e
 
 ## 14. UX-scoped traceability matrix
 
-*Amendment (2026-09-07) Displaced Verification Mapping:*
-- **State machine & Race conditions** (e.g., UX-AC-023, 034, 046, 058): Displaced from Playwright to Vitest component testing.
-- **Form validation logic** (e.g., UX-AC-007, 018, 101): Displaced from Playwright to Vitest and MSTest API integration.
-- **Accounting & Reconcilation logic** (e.g., UX-AC-065-076, 105-108): Displaced to MSTest API integration.
-- **Core Browser mechanics** (Clipboard, Navigation, Focus mapping): Retained in Playwright (Chromium).
-All observable behaviors and stability of scenario IDs are preserved.
+The default allocation below replaces the earlier browser-wide reading of Section 12. #6 assigns executable check IDs and records any further split by assertion; none of the 112 stable UX-AC IDs is dropped.
 
-This matrix feeds, but does not replace, the product-wide coverage table owned by document #6. `UI + integration` means fixture UI assertions plus an integrated contract/accounting check. `Evaluation` means document #6 language/provider evaluation.
+| Assertion family / example IDs | Primary verification | Retained boundary evidence |
+| --- | --- | --- |
+| State machines, races, revision/cache correspondence: 023–024, 034–035, 046–047, 058–064, 096–100 | Vitest pure units; a focused component check for each distinct visible outcome | Browser only for native editing/caret behavior |
+| Form validation and auth state: 007–020, 101–104 | Vitest form components; MSTest policy and real-auth API integration | Small login/focus/navigation browser path; actual external-auth/email release evidence |
+| Accounting/recovery display: 065–076, 105–108 | MSTest pure policy plus SQLite/API integrity checks; Vitest counters/messages/status-request behavior | Integrated smoke confirms one real usage update; no browser accounting permutation matrix |
+| Language/mode/count permutations: 021, 027–032, 038–045, 088–091, 109–110 | Units and components with shared canonical fixtures; API authoritative validation | Native composition and processed-boundary browser probes |
+| Semantics/live regions: 081–082 | Component semantics, live-region assertions, pure color calculations | Real-browser accessibility scans for curated states; manual AT for interpretation |
+| Browser editing, clipboard, history, privacy, keyboard, layout: 001–003, 015–016, 025, 033, 037, 049–051, 077–080, 083–087, 092–095 | Focused Playwright subset per 10.5; split logic branches into units/components | Manual device/AT evidence per 10.4; curated visuals per 12.10 |
+
+IDs can appear in more than one row because assertions cross boundaries, not because every scenario must be duplicated. Unlisted IDs follow the same lowest-sufficient-layer rule. `UI` in the traceability matrix means component evidence by default, with browser evidence only when its assertion needs a real browser. `UI + integration` means visible component assertions plus focused server contract/accounting checks; `Evaluation` means document #6 language/provider evaluation. This matrix feeds but does not replace #6's product-wide coverage table.
 
 | PRD ID | UX section / component | Story | Scenarios | Verification / boundary |
 | --- | --- | --- | --- | --- |
@@ -1031,7 +1045,7 @@ An implementation package is not ready if it cannot map its concrete API fields/
 
 ## 16. Specification validation and readiness
 
-### 16.1 Authoring checks completed
+### 16.1 Original authoring checks (v1.0)
 
 - Re-read document #0 and current PRD v0.2; preserved FR/NFR/P/Q/RG IDs and P-001–P-004 dispositions.
 - Covered every user-facing confirmed requirement with a story and deterministic UI scenario path; backend-only/proposed items are explicitly marked.
@@ -1041,6 +1055,12 @@ An implementation package is not ready if it cannot map its concrete API fields/
 - Recorded directly observed DeepL evidence separately from official documentation, design adaptation, and inaccessible states.
 - Validated 17 unique story IDs, 112 unique acceptance IDs, 44 message IDs, story/scenario references, complete FR/NFR/RG matrix membership, Markdown table widths/fences, and existing local links. Rechecked official DeepL help links and unchanged upstream SHA-256 hashes. `git diff --check` is clean. These are document checks, not executed application acceptance tests.
 
-### 16.2 Readiness statement
+### 16.2 Architecture/testing review (2026-09-07)
+
+Review inputs: architecture/UX/ADR baseline at `a07c0e2`, unchanged PRD v0.2, and document #0 v1.1 amended in the same review. The hashes in Section 1.1 identify original authoring inputs; they are not hashes of the amended workflow.
+
+Version 1.1 consolidates the earlier verification amendments: acceptance contracts are layer-independent, accounting UI assertions remain covered, browser-only evidence stays in real browsers, and screenshots are bounded to distinct compositions. Sections 10.5, 12.1, 12.10, 13, and 14 govern allocation; the affected scenario rows are aligned. Product behavior, manual accessibility obligations, and all 112 acceptance IDs are retained. This is a specification review, not executed runtime evidence.
+
+### 16.3 Readiness statement
 
 This specification is **ready for implementation planning** as document #2. It is not an implementation plan, task list, test implementation, or claim of passing runtime checks. Documents #3–#6 must resolve the external contracts in Section 15.2 before the corresponding implementation package can satisfy document #0's ready-for-implementation gate.

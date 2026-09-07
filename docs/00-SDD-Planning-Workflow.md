@@ -1,6 +1,6 @@
 # LinguaDesk — SDD Planning Workflow
 
-**Version:** 1.0 · **Updated:** September 6, 2026
+**Version:** 1.1 · **Updated:** September 7, 2026
 
 **Role:** Document #0 — authoritative entry point and governance for specification-driven development (SDD).
 
@@ -31,12 +31,14 @@ Document numbers identify responsibilities, not a mandatory waterfall sequence. 
 | 2 | **UX/UI specification** — `docs/02-ux-specification.md` | Layouts, wireframes, components, interaction states, messages, responsive behavior, browser coverage, and accessibility checks. Own Q-009; coordinate Q-002 with selected feature specifications and the workspace interactions in Q-004. |
 | 3 | **Architecture and engineering principles** — `docs/03-architecture.md` | Technology choices, component boundaries, deployment, identity, data lifecycle, concurrency/accounting, configuration, secrets, observability, privacy, security, and cost enforcement. Own technical design for Q-001, Q-004, and Q-008; coordinate Q-003 and Q-006 with the API contract. |
 | 4 | **LLM behavior and routing specification** — `docs/04-llm-specification.md` | Prompt versions, provider adapters/settings, configuration validation, routing, output checks, error classification, context bounds, and attempt budgets. Own Q-007 and provider/model eligibility evidence for Q-001 with architecture and evaluation. Reference product policies and thresholds. |
-| 5 | **API contract** — `docs/05-openapi.yaml` | Operations, schemas, authentication, identifiers and lifecycle, errors, counting rules, usage fields, retry/cancellation semantics, and compatibility. Own Q-003 and Q-006 with architecture and selected feature design. Keep client-facing examples in OpenAPI descriptions. |
+| 5 | **API contract** — `docs/05-openapi.yaml` | Operations, schemas, authentication, identifiers and lifecycle, errors, counting rules, usage fields, retry/cancellation semantics, and compatibility. Own Q-003 and Q-006 with architecture and selected feature design. Keep client-facing examples in OpenAPI descriptions. Use the generation and review rules below. |
 | 6 | **Verification and LLM evaluation plan** — `docs/06-verification-plan.md` | Test strategy, requirement coverage, evaluation corpus/rubric, human review, workloads, and reproducible evidence. Own Q-005. Map requirements and release gates to checks and results, referencing product thresholds. |
 | 7 | **Roadmap and milestone plan** — `docs/07-roadmap.md` | Stable milestone IDs, outcomes, dependency order, exit criteria, backlog links, blockers, and the current milestone summary. Detail near-term delivery; keep later milestones at outcome level. |
 | 8 | **Milestone/feature backlogs and selected delivery packages** — `docs/08-backlogs/<scope-id>-<slug>.md`; `specs/<sequence>-<slug>/` | Backlogs define candidate outcomes and acceptance criteria. A separate delivery package specifies a selected subset and contains its implementation plan and tasks only when that subset is about to be built. See Section 4. |
 | 9 | **Architecture decision records** — `docs/09-architecture-decisions.md` | Stable ADR IDs, context, alternatives, decision, consequences, status, and links. Preserve superseded decisions; maintain current design in its owning specification. |
 | 10 | **README, operating guide, and portfolio walkthrough** — `README.md` | Working setup, configuration, deployment/rollback, diagnostics, recovery, and a guided demo. Link architecture, API, evaluation evidence, and actual limitations. Include procedures arising from Q-004/Q-008. |
+
+**API contract authoring:** Document #5 remains the canonical, version-controlled `docs/05-openapi.yaml` artifact. Endpoint metadata, typed DTOs, and OpenAPI descriptions/transformers in C# generate it deterministically; do not hand-edit generated YAML. Review its diff as a design change against the selected specification before dependent clients rely on it. A selected package defines required API behavior before implementation; contract-only DTO/endpoint metadata scaffolding may be authored during planning to review the generated shape, without claiming that handlers are implemented. Generation does not let implementation silently redefine that behavior. CI regenerates the schema and client and fails on drift. This replaces duplicate manual schema maintenance, without changing document #5's ownership of the external contract or accepting P-006 compatibility guarantees.
 
 Keep diagrams and decision/checklist sections with their subject. Executable schemas, fixtures, configuration, and generated evidence may live beside code and be linked from specifications. Create supporting planning files only when they have a distinct purpose; avoid duplicate contracts, requirement lists, and status reports.
 

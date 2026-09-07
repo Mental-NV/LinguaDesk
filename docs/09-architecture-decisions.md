@@ -1,76 +1,73 @@
 # LinguaDesk — Architecture Decision Records
 
-**Document:** #9 · **Version:** 1.0
+**Document:** #9 · **Version:** 1.1 · **Status:** Reviewed technical decisions; implementation evidence pending
 **Updated:** 2026-09-07
+
+Reviewed against PRD v0.2 and the architecture/UX baseline at `a07c0e2`. The current design is in [architecture v1.1](03-architecture.md); generated contract governance is in [document #0](00-SDD-Planning-Workflow.md). These technical decisions preserve P-005/P-006 proposal status. Amended decisions record the original choice and the correction; superseded text is historical.
 
 ## ADR-001: Combined Hosting and SPA Fallback
 
-**Context:** LinguaDesk requires a frontend React SPA and a backend API. Hosting these separately increases deployment complexity, CORS management overhead, and operational surface area.
+**Status:** Accepted; clarified 2026-09-07.
 
-**Alternatives Considered:**
-1. Separate Node.js host (Next.js/Remix) for the frontend, communicating with the .NET backend.
-2. Static hosting (e.g., AWS S3/CloudFront, Vercel) for the frontend, communicating with the .NET backend.
+**Context:** A React SPA and API need a simple deployable artifact without a production Node service.
 
-**Decision:** Build the React/Vite application into static files and publish them into the `.NET` backend's `wwwroot` directory. The ASP.NET Core host will serve the static files and use `MapFallbackToFile("index.html")` for SPA client-side routing.
+**Alternatives:** Separate frontend static hosting or a Node rendering server. Both introduce extra deployment/configuration surfaces without a current requirement for them.
 
-**Consequences:**
-* Simplifies deployment to a single artifact and single process instance.
-* Eliminates cross-origin resource sharing (CORS) issues for the primary client.
-* Requires careful ordering of static asset discovery during the build and publish steps to ensure frontend assets are packaged properly.
+**Decision:** Build Vite assets before ASP.NET Core publish discovers static content. Serve the SPA and API from one host. Explicitly exclude `/api` and missing assets from SPA fallback. Use Vite's API proxy in development.
+
+**Consequences:** One release artifact and same-origin official client. Two build toolchains remain. A published-host smoke must catch packaging/routing errors that an in-memory HTTP host cannot. This clarifies the original unrestricted fallback description; see #3 Section 3.
 
 ## ADR-002: SQLite WAL on Durable Volume
 
-**Context:** LinguaDesk requires a durable, low-overhead relational database for user accounts and usage ledgers. The application targets a single instance.
+**Status:** Accepted; clarified 2026-09-07.
 
-**Alternatives Considered:**
-1. PostgreSQL or MySQL (requires separate infrastructure provisioning).
-2. SQLite without WAL (can face write concurrency contention).
+**Context:** Account/usage metadata needs durable relational integrity with low operational overhead.
 
-**Decision:** Use SQLite with Write-Ahead Logging (WAL) enabled, stored on a persistent host volume (e.g., `/var/lib/linguadesk/linguadesk.db`). Migrations are managed via EF Core.
+**Alternatives:** PostgreSQL adds a service but better supports concurrent writers and multi-instance growth; rollback-journal SQLite offers less reader/writer overlap.
 
-**Consequences:**
-* Extremely low operational overhead and zero external database dependencies.
-* WAL mode improves concurrent read/write performance suitable for the expected traffic.
-* Precludes easy horizontal scaling to multiple application instances without migrating the database or using distributed file systems (which are often unsafe for SQLite). This matches the confirmed single-instance deployment constraint.
+**Decision:** EF Core with SQLite WAL on a local durable volume, foreign keys, bounded contention handling, and short transactions. Use one application instance. Reassess PostgreSQL when measured contention or deployment requirements justify it.
+
+**Consequences:** No database daemon, but one writer at a time and no multi-host network volume. WAL alone does not make long writes safe. The single-instance choice is an architecture default, not a confirmed PRD constraint as the original record claimed. See #3 Sections 6–7.
 
 ## ADR-003: Vertical Feature Slices without Generic Abstractions
 
-**Context:** To optimize for maintainability and implementation by autonomous agents, the backend structure needs to minimize boilerplate and indirection.
+**Status:** Accepted; refined 2026-09-07.
 
-**Alternatives Considered:**
-1. Traditional N-Tier architecture with generic Repositories, Unit of Work, and MediatR.
-2. Clean Architecture with fully separated domain, application, infrastructure, and presentation layers.
+**Context:** Agents need locally understandable changes and testable policy without boilerplate layers.
 
-**Decision:** Organize the `LinguaDesk.Api` project using pragmatic vertical feature slices. Handlers will depend directly on the EF Core `DbContext` rather than abstracting it behind a generic repository. Domain logic that is completely framework-independent resides in `LinguaDesk.Core`.
+**Alternatives:** Generic repositories/Unit of Work plus MediatR; four-layer Clean Architecture; all business logic inline in endpoints.
 
-**Consequences:**
-* Reduces boilerplate and jumping between files for simple orchestration tasks.
-* Makes the system easier to navigate and verify for automated agents.
-* Cross-feature code sharing must be managed deliberately to avoid dependency cycles.
+**Decision:** Group by feature. Use EF directly for data access, thin transport endpoints, concrete coordinators for multi-step effects, and framework-independent Core policies. Introduce narrow provider/email adapters and injected time for external effects.
 
-## ADR-004: Auto-Generated OpenAPI Contract
+**Consequences:** Few projects and explicit call paths. Units cover most policy without mocking EF or starting a host; real SQL behavior gets integration coverage. Avoid interfaces for every class and avoid concentrating all business logic in endpoints. See #3 Sections 4 and 8.
 
-**Context:** Requiring an AI agent to manually synchronize C# backend changes with a static `docs/05-openapi.yaml` file introduces a high-friction failure point. Agents frequently update one side of the contract and forget the other, breaking the frontend build.
+## ADR-004: Generated and Reviewed OpenAPI Contract
 
-**Decision:** The OpenAPI specification will be auto-generated directly from the C# Minimal API definitions at build/startup time (e.g., using NSwag or Swashbuckle). A frontend tool (like Orval or RTK Query) will automatically generate TypeScript types and API clients from this generated schema.
+**Status:** Accepted; amended 2026-09-07 with document #0 Section 2 updated first.
 
-**Consequences:**
-* The single source of truth for the API contract is the executable C# code.
-* Eliminates manual YAML authoring and synchronization errors.
-* Ensures strict, immediate feedback for the agent when crossing the frontend/backend boundary.
+**Context:** Manual synchronization of C#, YAML, and client types creates drift. The original decision also removed document #5's canonical path and made runtime code the authority for behavior, contradicting document #0.
 
-## ADR-005: In-Memory Integration Testing via WebApplicationFactory
+**Alternatives:** Hand-maintained schema plus DTOs; a contract-first server generator; runtime-only schema with no reviewed artifact.
 
-**Context:** When AI agents write API integration tests that bind to real TCP ports (e.g., `localhost:5000`), they frequently encounter port collisions, zombie processes, and parallel execution failures, leading to distracting infrastructure debugging loops.
+**Decision:** Generate version-controlled `docs/05-openapi.yaml` from C# metadata with native ASP.NET Core build-time OpenAPI 3.1 JSON generation and deterministic YAML serialization in one command. Generate TypeScript definitions with pinned `openapi-typescript`; use a small `openapi-fetch` wrapper. Keep selected behavior design and schema diff review before client adoption. Generation starts no real services or migrations; CI rejects schema/client drift.
 
-**Decision:** All backend API integration tests must use ASP.NET Core's `WebApplicationFactory`. This spins up the application test host using an in-memory `TestServer`.
+**Consequences:** One editable schema source and a reviewable contract artifact; no mandatory runtime server or React state library for code generation. Typed schemas still need semantic descriptions and contract tests. P-006 compatibility guarantees are not accepted by this tooling decision. See #3 Section 8.3.
 
-**Consequences:**
-* Zero TCP port conflicts.
-* Tests run faster and can be safely parallelized.
-* The agent receives purely deterministic feedback focused on business logic rather than network environment issues.
+## ADR-005: In-Process HTTP Integration with Explicit Isolation
+
+**Status:** Accepted; narrowed 2026-09-07.
+
+**Context:** Fixed listening ports create collisions, but the original assertion that every integration test must use TestServer and becomes inherently deterministic/parallel-safe was too broad.
+
+**Alternatives:** Full HTTP server for every test; mocked controllers/endpoints; in-process HTTP host plus direct persistence tests and a small published-host suite.
+
+**Decision:** Use `WebApplicationFactory`/TestServer for HTTP integration by default. Test pure policy without a host and persistence directly where HTTP adds no evidence. Use unique migrated SQLite files, independent contexts, fake external adapters/time, and explicit response barriers. Allow an owned real Kestrel process on a discovered ephemeral port for browser/publish/process-boundary checks.
+
+**Consequences:** Most HTTP tests have no TCP dependency. Isolation is explicit; TestServer is not an in-memory database and cannot serve Playwright's browser. The small real-host exception catches wiring and lifecycle failures. See #3 Section 9.
 
 ## ADR-006: Stateless Schema Iteration via EnsureCreated
+
+**Status:** Superseded on 2026-09-07 by ADR-007. The original record below is historical and must not guide implementation.
 
 **Context:** EF Core Migrations are highly stateful, requiring CLI commands to add, apply, or remove migration files. When an AI agent rapidly iterates on a feature and makes incremental changes to entity models, it often botches the sequential migration chain, leading to broken snapshots and failed rollbacks that severely disrupt the autonomous workflow.
 
@@ -81,3 +78,40 @@
 * Integration tests can instantly build the freshest schema without tracking migration history.
 * The final generated migration file is clean, consolidated, and immutable, keeping the production migration history pristine.
 * Production startup strictly uses `MigrateAsync()`; `EnsureCreated()` is forbidden in the production pathway.
+
+
+## ADR-007: Migration Parity before Feature Completion
+
+**Status:** Accepted 2026-09-07; supersedes ADR-006.
+
+**Context:** EnsureCreated bypasses migration history and cannot smoothly transition to migrations. Deferring migrations until the absolute final step leaves upgrade behavior untested and creates late rework.
+
+**Alternatives:** ADR-006's mandatory database resets; runtime startup migrations everywhere; migrations in normal development/tests with an explicit deployment step.
+
+**Decision:** Use migrations from the first persistent schema. Consolidate only unshared/unreleased changes during iteration, then inspect and test before completion. Never rewrite applied/shared migrations. Test fresh creation, relevant prior-schema upgrades, and pending-model drift. Restrict EnsureCreated to explicitly disposable non-migration cases; no ordinary automatic database deletion. Deploy a tested migration bundle while the single instance is stopped/drained.
+
+**Consequences:** Slightly more deliberate schema iteration, substantially less late drift and data-loss risk. Agents get the same schema path locally and in CI/production. Backup/restore and failure recovery remain explicit. See #3 Section 6.1 and its EF guidance links.
+
+## ADR-008: Short Durable Reservations around Provider Calls
+
+**Status:** Accepted 2026-09-07; API edge semantics remain the scoped dependencies in #3 Section 11.
+
+**Context:** SQLite has one writer. Holding a transaction over LLM latency serializes unrelated work, and rollback cannot preserve an idempotency record. External provider effects cannot participate atomically in the local database transaction.
+
+**Alternatives:** Long transaction over HTTP; completion-only charging without capacity reservations; distributed queue/transaction infrastructure.
+
+**Decision:** Commit metadata-only operation claims and user/global/cost reservations before dispatch. Execute HTTP outside transactions; conditionally finalize and charge once afterward. Enforce unique operation charges and include outstanding reservations in admission. Fence late completion and reconcile crash windows conservatively. No automatic redispatch of ambiguous paid attempts or persisted text for replay.
+
+**Consequences:** A small durable operation state machine is necessary integrity work. Capacity may remain conservatively reserved while outcome/cost is unknown. Exactly-once provider execution and lost-result recovery are not promised. #5 must settle replay, rollover, cancellation, and output-unavailable UX mapping before dependent implementation. See #3 Section 7.
+
+## ADR-009: Unit-Heavy Pyramid with Focused Boundary Evidence
+
+**Status:** Accepted 2026-09-07; aligns UX v1.1 Sections 10–14.
+
+**Context:** Moving every backend policy into HTTP integration produces a wide middle of the pyramid. Moving UI assertions entirely into server tests leaves coverage gaps. DOM tests cannot replace layout or native-browser evidence.
+
+**Alternatives:** Full browser scenario matrix; all backend behavior through WebApplicationFactory; lowest-sufficient-layer assertion ownership with a small integrated browser suite.
+
+**Decision:** Most cases are pure MSTest/Vitest units and focused DOM components. Real SQLite/API tests cover integrity/contracts; Playwright covers browser-sensitive behavior, nine initial curated visual compositions, and two integrated feature journeys with real frontend/API/database and fake external adapters. Preserve all UX IDs and manual supported-browser/AT evidence. #6 maps compound scenarios by assertion, without replaying them at every layer.
+
+**Consequences:** Faster deterministic feedback and fewer fragile UI fixtures without losing key browser/SQL boundaries. Browser automation remains a small top layer; live-provider evaluation stays separate. No arbitrary percentage or line-coverage target replaces requirement/risk coverage. See #3 Section 9 and #2 Sections 12–14.
