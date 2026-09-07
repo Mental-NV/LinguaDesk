@@ -1,18 +1,18 @@
 # LinguaDesk — Architecture and Engineering Principles
 
-**Document:** #3 · **Version:** 1.2 · **Status:** Ready for scoped implementation planning; contract and launch dependencies remain
+**Document:** #3 · **Version:** 1.3 · **Status:** Ready for scoped implementation planning; contract and launch dependencies remain
 **Updated:** 2026-09-08
 
 ## 1. Authority, Inputs, and Scope
 
 | Input | Recorded revision | Role |
 | --- | --- | --- |
-| [SDD Planning Workflow](00-SDD-Planning-Workflow.md) | v1.2, scoped-deferral clarification in this change; prior baseline `54343c3` | Process and generated contract governance |
-| [Product Requirements Document](01-PRD.md) | v0.3, user-approved 2026-09-08 simplification | Active product baseline and canonical DF-001–DF-007 register |
-| [UX/UI Specification](02-ux-specification.md) | v1.2, aligned in this change | Native controls, explicit processing, active/inactive scenario allocation |
-| Architecture and ADR review baseline | Git commit `54343c3` | Architecture/ADRs v1.1 before scope simplification |
+| [SDD Planning Workflow](00-SDD-Planning-Workflow.md) | v1.2 at `b5c01a1` | Process and generated contract governance |
+| [Product Requirements Document](01-PRD.md) | v0.4, 2026-09-08 provider-policy amendment | Active product baseline and canonical DF-001–DF-007 register |
+| [UX/UI Specification](02-ux-specification.md) | v1.3, aligned provider-policy references | Native controls, explicit processing, active/inactive scenario allocation |
+| Architecture and ADR review baseline | Git commit `b5c01a1` | Architecture/ADRs v1.2 before provider-policy amendment |
 
-PRD D-17 and Section 3 define current scope. P-001–P-004 retain their **newly amended** dispositions; P-005/NFR-008 and P-006 remain proposed. This document does not claim to close Q-001/Q-004/Q-008 in full. Active UX IDs remain behavioral contracts, not a mandatory browser-test count; Deferred/Retired IDs require no MVP implementation/evidence.
+PRD D-17/D-18 and Section 3 define current scope. P-001–P-004 retain their **newly amended** dispositions; P-005/NFR-008 and P-006 remain proposed. This document does not claim to close Q-001/Q-004/Q-008 in full. Active UX IDs remain behavioral contracts, not a mandatory browser-test count; Deferred/Retired IDs require no MVP implementation/evidence.
 
 **Current feature boundary:** two explicit whole-text operations, plain editable/copyable results, one rewriting mode, native/inline UI, local accounts, two simple model chains, and an independent authenticated API. No sentence IDs, correspondence algorithms, assistance caches, rich-text/diff editor, debounce service, Google handler, priority rule engine, prefix processing, or dormant feature flags are required. Deferred features are designed when selected under PRD Section 3.1; do not prebuild their infrastructure.
 
@@ -113,7 +113,7 @@ Persist Data Protection keys outside the deployment directory with restricted fi
 
 Bind validated typed options from configuration, environment variables, and local user secrets. Provider/email credentials stay exclusively on the backend. Pin supported dependencies; never commit secrets. Fail startup on an invalid operation-family chain, missing required credentials, unwritable durable storage, or missing cost bounds for paid serving. Each of the two chains requires one primary and permits at most one fallback; reject extra candidates instead of silently accepting an advanced chain. There are no route-priority/overlap settings to validate. An explicit local/test configuration supplies fakes without requiring production credentials.
 
-Translation uses the same configured chain for all 12 directions; Rewriting uses its configured chain for all four languages and nine single-dropdown modes. Each configured candidate must qualify for every route/mode it serves. Preserve the PRD default-model preference subject to provider eligibility. Per-route rules, priorities and arbitrary-length candidate lists are deferred as DF-004. #4 specifies the simple primary/fallback policy first; it needs no generic rule DSL.
+Translation uses the same configured chain for all 12 directions; Rewriting uses its configured chain for all four languages and nine single-dropdown modes. Each configured candidate must qualify for every route/mode it serves. Preserve the PRD default-model preference subject to quality/performance/cost eligibility. Low-cost providers/models and provider-managed caching are allowed; no provider retention/no-training certification is required. Per-route rules, priorities and arbitrary-length candidate lists are deferred as DF-004. #4 specifies the simple primary/fallback policy first; it needs no generic rule DSL.
 
 Use structured logs with an allowlist: opaque operation ID, operation type, duration, classified outcome, attempt number, and numeric usage/cost metadata. Disable request/response body logging and redact cookies, tokens, email-link queries, and provider error bodies. Do not attach submitted text to exceptions or traces. Health checks establish process/storage readiness without paid provider calls. Track failures, DB contention, outstanding monetary exposure, and cap suspension; exact operational alert thresholds remain with #6/#10, not an invented uptime SLA.
 
@@ -142,7 +142,9 @@ Do not retain an unkeyed text hash as a harmless substitute for content. If #5 r
 
 Clear client references and invalidate the workspace generation on reset, sign-out, expiry, and navigation teardown. Use `pagehide` and defensive `pageshow` handling for bfcache; do not depend on the unreliable `unload` event or clear on ordinary tab backgrounding. Test actual restoration separately from synthetic event dispatch. Garbage-collected runtimes cannot promise immediate byte erasure; the contract is no durable text and no application restoration. Backend processing has its own bounded deadline even after disconnection, with no unbounded in-memory replay cache.
 
-Provider no-training terms and disclosed retention must be verified for every selected serving arrangement before launch (NFR-004). This document does not claim that verification has happened.
+PRD D-18 removes provider retention/no-training eligibility requirements. NFR-004 still governs LinguaDesk’s own text storage/logging and workspace teardown; it makes no guarantee about provider retention or training use. Q-001 continues to resolve serving capability, quality/performance and monetary bounds.
+
+The user clarified that caching is **provider-managed**. #4 records the selected provider's supported cache behavior and pricing; no LinguaDesk completed-response cache, new persistence layer or cache-lifetime decision is required. Provider cache savings affect provider expenditure, not FR-024/026's successful-character charging. Use conservative monetary reservations until a discounted charge is supported by the actual billing contract; a cache miss must still fit the cap. Workspace teardown and application `no-store` behavior stay unchanged.
 
 ## 7. Operations, Accounting, and Crash Recovery
 
@@ -213,7 +215,7 @@ The broadest set of cases belongs to pure units, followed by focused DOM compone
 | MSTest HTTP integration (`WebApplicationFactory`) | Routing, validation, auth/antiforgery, error/usage serialization, independent API operations, unknown API paths | Actual socket/TLS/static publish behavior |
 | Playwright browser contracts | Small keyboard/focus/clipboard/editing/history/privacy/reflow set and curated visual baselines per UX #2 | Server accounting when API responses are intercepted |
 | Playwright integrated smoke | Published SPA → real API/auth → migrated SQLite → deterministic provider adapter; one explicit Translation and one full-Rewrite journey with local sign-in | Live email/provider service reliability |
-| Separate release evidence (#6) | Live local-account/email smoke, provider quality/retention/cost eligibility, performance, manual browser/assistive-technology checks | Cannot be replaced by fixture success |
+| Separate release evidence (#6) | Live local-account/email smoke, provider quality/performance/cost eligibility, manual browser/assistive-technology checks | Cannot be replaced by fixture success |
 
 ### 9.2 Deterministic integration harness
 
@@ -239,7 +241,7 @@ No runtime tests have been executed for this spec-only repository. Document vali
 
 ## 10. Decision Records and Source Basis
 
-[Document #9](09-architecture-decisions.md) records ADR-001–ADR-005 as amended, ADR-006 as superseded, ADR-007–ADR-009 for migration parity, short reservations and pyramid ownership, and ADR-010 for the approved simplified MVP. Earlier decision scopes follow PRD D-17.
+[Document #9](09-architecture-decisions.md) records ADR-001–ADR-005 as amended, ADR-006 as superseded, ADR-007–ADR-009 for migration parity, short reservations and pyramid ownership, ADR-010 for the approved simplified MVP, and ADR-011 for removal of provider retention/no-training gates. Earlier decision scopes follow PRD D-17.
 
 Technical guidance checked on 2026-09-07; the choices above are LinguaDesk's application of it:
 
@@ -257,7 +259,7 @@ Technical guidance checked on 2026-09-07; the choices above are LinguaDesk's app
 
 | Question / owner | Remaining decision | Blocks |
 | --- | --- | --- |
-| Q-001, #4/#6 and owner configuration | Serving arrangement, no-training/retention evidence, eligible models and cost bounds, monetary cap amount | Paid serving and launch |
+| Q-001, #4/#6 and owner configuration | Serving/provider-managed caching capabilities, models/settings meeting quality/performance/cost criteria, monetary cap amount; no retention/no-training gate | Paid serving and launch |
 | Q-002, PRD D-17 | Targeted matching and toggle restoration resolved by removal; future assistance association is DF-001/002 | No current-MVP blocker |
 | Q-003/Q-006, #5 with #3 | Unicode counts, quota/month rollover, operation/status/replay/output-unavailable semantics, bearer lifecycle, error fields | Accounting/auth and their dependent clients |
 | Q-004, account/privacy package with #3/#5/#10 | Metadata/replay/backup retention durations, local-account deletion/revocation, provider disclosure; external linking deferred DF-007 | Related account features and launch |

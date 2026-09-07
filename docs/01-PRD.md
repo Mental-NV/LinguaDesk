@@ -1,6 +1,6 @@
 # LinguaDesk — Product Requirements Document
 
-**Version:** 0.3 · **Status:** Simplified MVP product baseline; deferred scope explicit; P-005/P-006 remain proposed · **Updated:** September 8, 2026 (UTC)
+**Version:** 0.4 · **Status:** Simplified MVP product baseline; deferred scope explicit; P-005/P-006 remain proposed · **Updated:** September 8, 2026 (UTC)
 
 This document consolidates the discovery decisions. It specifies product outcomes for later UX, architecture, API, and feature specifications. It contains no implementation plan or development task breakdown.
 
@@ -185,9 +185,9 @@ The limits are configuration-controlled product values rather than fixed client 
 | FR-033 | Eligible fallback triggers | Try the next candidate for provider failures, including timeouts/throttling/service errors, and clearly invalid outputs such as empty or unusable responses. Invalid user input, user authentication failures, and exhausted allowances end the request without model fallback. |
 | FR-034 | Quality and failure outcomes | Every candidate must pass the same applicable minimum quality criteria. Successful fallback is invisible to users. Exhaustion or deadline expiry produces a clear failure, preserves work, and consumes no character allowance. |
 
-**Initial default (unchanged discovery choice):** DeepSeek V4 Flash in non-thinking mode. The prior discovery review recorded non-thinking support and the need to disable default thinking explicitly; this scope-only revision does not reverify current provider behavior. #4 must verify the actual serving configuration before relying on it. This is not evidence of LinguaDesk’s quality, latency, or privacy eligibility. [DeepSeek thinking-mode documentation](https://api-docs.deepseek.com/guides/thinking_mode/)
+**Initial default (unchanged discovery choice):** DeepSeek V4 Flash in non-thinking mode. The prior discovery review recorded non-thinking support and the need to disable default thinking explicitly; this scope-only revision does not reverify current provider behavior. #4 must verify the actual serving configuration before relying on it. This is not evidence of LinguaDesk’s quality, latency, or cost eligibility. [DeepSeek thinking-mode documentation](https://api-docs.deepseek.com/guides/thinking_mode/)
 
-The serving provider/contract, eligible fallback configurations, and their evaluations remain pre-launch dependencies. Selection of a model does not establish compliance with the agreed no-training/retention requirements.
+The serving arrangement, supported model settings, quality/performance evaluation and monetary bounds remain pre-launch dependencies. Under D-18, provider retention and no-training guarantees are not selection or launch requirements. Low-cost models and provider-managed caching are permitted when they satisfy the remaining functional, quality, performance and cost requirements; this does not assert any provider data-use guarantee.
 
 ### 5.6 MVP interface state
 
@@ -214,7 +214,7 @@ API documentation and integration examples should make the above behavior indepe
 | NFR-001 | Must / C | **Quality:** at least 90% usable outputs in each evaluated route/language and operation, with no critical meaning/factual errors in the release set. Apply the same standard to every eligible primary/fallback configuration. |
 | NFR-002 | Must / C | **Performance:** meet the percentile targets and overall deadlines below. These are acceptance targets requiring measurement, not assumed provider performance. |
 | NFR-003 | Must / C | **Reliability:** controlled failure/concurrency tests show no source loss, stale response replacing a newer source/settings result or manual result edit, duplicate allowance charging, or allowance overruns. User-visible failure is bounded by the overall deadline. No additional numerical uptime SLA has been agreed. |
-| NFR-004 | Must / C | **Privacy:** no saved text history or source/result content in LinguaDesk’s persistent logs. Source and result text may exist only for active-workspace/session processing and are not persisted across its end; only necessary usage/operational metadata is retained afterward. A provider must not use submitted content for training; limited, disclosed retention is permitted and must be verified before selection. The exact active-workspace/session boundary and teardown mechanics remain under Q-004. |
+| NFR-004 | Must / C | **Privacy:** no saved text history or source/result content in LinguaDesk’s persistent logs. Source and result text may exist only for active-workspace/session processing and are not persisted across its end; only necessary usage/operational metadata is retained afterward. These are LinguaDesk-managed storage/logging rules. Provider retention duration and no-training guarantees are not eligibility requirements (D-18). The exact active-workspace/session boundary and teardown mechanics remain under Q-004; provider-managed caching is permitted and does not change these application rules or add a LinguaDesk completed-response cache. |
 | NFR-005 | Must / C | **Accessibility and responsiveness:** complete the core journeys in desktop/mobile browsers, with keyboard and screen-reader access. This includes native mode/language controls, explicit submission, text editing, copy, validation, and processing/failure status. Deferred tools add no MVP accessibility journey. Exact browser coverage and accessibility test criteria are deferred to UX specification. |
 | NFR-006 | Must / C | **Cost:** enforce character allowances and establish the separate monthly monetary cap before launch. Suspend further paid processing at that ceiling, preserving work and returning a budget-related availability error. Assess provider exposure using the actual serving arrangements, including unsuccessful attempts. Alternative context is evaluated only when DF-001 is selected. The monetary amount remains unset. |
 | NFR-007 | Should / C | **Visual direction:** minimalist, professional, office-like presentation; monochrome icons are preferred. Detailed layout, typography, and component design belong to UX specification. |
@@ -250,7 +250,7 @@ Apply the same criteria to every model/settings configuration on the routes it m
 | RG-004 — Accounting and recovery | Verify user/global sharing, UTC reset, full-submission charges, zero charge for rejected oversize input, duplicate/retry protection, configured fallback/failures, stale successes, interruption/status recovery and concurrent requests. |
 | RG-005 — Access and integration | Verify local registration/sign-in, email verification, password recovery, meaningful errors, and an independent authenticated API consumer completing Translation and Rewriting with usage information. Google and alternatives are deferred. |
 | RG-006 — Web access | Verify core journeys on the agreed desktop/mobile browser matrix and through keyboard/screen-reader interaction. |
-| RG-007 — Privacy and cost | Verify LinguaDesk’s text-retention/logging behavior, provider training/retention eligibility, eligible model configurations, and a configured monetary ceiling. |
+| RG-007 — Privacy and cost | Verify LinguaDesk’s own text-retention/logging behavior, model quality/performance and supported settings, and a configured monetary ceiling. Provider retention/no-training certification is not a release gate. |
 | RG-008 — Specification readiness | Resolve current-MVP pre-launch questions in Section 11. Deferred-feature dependencies are excluded from this release gate. Review proposed safeguards before making them binding. |
 
 There is no agreed minimum pilot-user count or adoption gate. Actual launch evidence, model evaluation, and performance testing will be produced during subsequent work.
@@ -259,7 +259,7 @@ There is no agreed minimum pilot-user count or adoption gate. Actual launch evid
 
 | Dependency or risk | Product implication / required response |
 | --- | --- |
-| Default model’s serving arrangement is unverified | Confirm no-training terms, retention, access, model settings, and pricing before launch. The model name alone does not settle provider eligibility. |
+| Default model’s serving arrangement is unverified | Confirm access, model settings, quality/performance and pricing before launch. Provider retention/no-training guarantees are not eligibility conditions; the model name alone does not establish the remaining criteria. |
 | Qualified human review in all four languages | Arrange reviewers and an evaluation protocol; AI grading alone does not satisfy the chosen release approach. |
 | Configured fallback models and credentials | Each candidate needs applicable quality/latency evaluation. Sharing a provider can leave correlated outages; assess this during model/provider selection. |
 | Explicit resubmission and charged stale successes | A later submission charges the full text on success. Manual edits protect the displayed result but cannot reverse an already successful charge; communicate usage and unknown outcomes clearly. |
@@ -286,7 +286,7 @@ Accepted and amended dispositions below are incorporated into the confirmed requ
 
 ### Historical decision log and current amendment
 
-D-01–D-16 record the discovery baseline. Their automatic processing, alternatives/comparison, prefix translation, Google, targeted invalidation, and advanced routing clauses are **superseded or deferred by D-17 / Sections 3 and 5**; they are not current MVP instructions. Unaffected product choices remain, including the default model preference subject to eligibility.
+D-01–D-16 record the discovery baseline. Their automatic processing, alternatives/comparison, prefix translation, Google, targeted invalidation, and advanced routing clauses are **superseded or deferred by D-17 / Sections 3 and 5**; they are not current MVP instructions. D-18 additionally supersedes D-10’s provider no-training/retention clauses. Unaffected product choices remain, including the default model preference subject to the remaining quality/performance/cost criteria.
 
 | ID | Confirmed decision / superseded alternative |
 | --- | --- |
@@ -307,12 +307,13 @@ D-01–D-16 record the discovery baseline. Their automatic processing, alternati
 | D-15 | P-003 amended: empty input is not processed; uncertain and same-language cases require language correction; all resume automatically when valid. Oversized translation processes and charges a clearly disclosed 5,000-character prefix, while oversized rewriting remains blocked. |
 | D-16 | P-004 accepted: the MVP UI is English; preferences and source/result text do not persist across sessions; session-only control state is permitted; new workspaces use the confirmed defaults. |
 | D-17 | **2026-09-08 user approval:** adopt all ten dispositions in Section 3.2. MVP uses explicit buttons, plain editable output, single dropdown, native/inline controls, whole-input limits, local accounts, two simple chains, and the independent API. DF-001–DF-007 are later-phase scope; targeted invalidation and the duplicate toggle are retired. |
+| D-18 | **2026-09-08 user approval:** remove LLM-provider retention/no-training eligibility requirements from Q-001, NFR-004 and RG-007. Favor low-cost serving and allow provider caching subject to existing quality/performance/cost criteria. The user clarified that caching is **provider-managed**; no LinguaDesk completed-response cache is selected and per-tab text teardown is unchanged. #4 verifies provider cache capabilities/pricing; successful-character accounting remains unchanged. |
 
 ### Open questions and their scope
 
 | ID | Open decision | Resolution phase / dependency |
 | --- | --- | --- |
-| Q-001 | Hosting/provider arrangement, verified no-training/retention terms, eligible fallback models/settings, and monetary cap amount | Model/provider evaluation and cost specification, before launch |
+| Q-001 | Hosting/provider arrangement, model/fallback settings meeting quality/performance/cost criteria, provider-managed caching capabilities/pricing and monetary cap amount. Provider retention/no-training eligibility checks are removed by D-18 | Model/provider evaluation and cost specification, before launch |
 | Q-002 | **Resolved for MVP by D-17.** Targeted sentence-correspondence and toggle restoration are cut. No sentence metadata exists in MVP. Future assistance uses whole-result metadata invalidation on manual edits. | No MVP blocker. Future sentence/alternative association design belongs to DF-001; change review belongs to DF-002. |
 | Q-003 | Exact Unicode/whitespace/newline counting; retry identity; interrupted/cancelled operations; operation crossing midnight; usage fields and concurrent allowance enforcement semantics | API/feature specification and architecture, before implementation of accounting |
 | Q-004 | Confirm per-tab memory teardown, metadata/backup retention, local-account deletion/revocation and provider disclosure. External-account linking is deferred with Google (DF-007). | Privacy/security and local-account specifications before launch; UX fixes observable workspace lifetime. |
@@ -329,7 +330,7 @@ The primary source is the confirmed discovery conversation. External verificatio
 
 - [DeepSeek model documentation](https://api-docs.deepseek.com/quick_start/pricing/) — available model/mode information; no price or monthly budget is committed by this PRD.
 - [DeepSeek thinking-mode documentation](https://api-docs.deepseek.com/guides/thinking_mode/) — non-thinking support and the need to disable the default thinking mode explicitly.
-- [DeepSeek Open Platform terms](https://cdn.deepseek.com/policies/en-US/deepseek-open-platform-terms-of-service.html) — a source for the still-open provider eligibility review; this draft does not assert that the chosen arrangement meets the privacy requirements.
+- [DeepSeek Open Platform terms](https://cdn.deepseek.com/policies/en-US/deepseek-open-platform-terms-of-service.html) — historical discovery reference; provider retention/no-training eligibility checks were removed by D-18. No provider privacy guarantee is asserted here.
 - [User-supplied rewriting widget](https://chatgpt.com/s/w_6a9c7faf64148191abb437fe326d861c) — not accessible during discovery. The user’s written six-rule behavior description is the confirmed source, not an inferred widget implementation.
 
-**Review outcome:** The product owner approved the ten scope dispositions in Section 3.2 on September 8, 2026, superseding affected discovery decisions and P-001–P-004 clauses. Current behavior is specified in Sections 3–8; DF-001–DF-007 preserve later intent without blocking MVP. P-005/P-006 remain proposed. This baseline is ready for scoped planning, not evidence of implementation or release readiness.
+**Review outcome:** The product owner approved the ten scope dispositions in Section 3.2 on September 8, 2026, superseding affected discovery decisions and P-001–P-004 clauses. D-18 subsequently removes provider retention/no-training eligibility gates and records the clarified choice of provider-managed caching. Current behavior is specified in Sections 3–8; DF-001–DF-007 preserve later intent without blocking MVP. P-005/P-006 remain proposed. This baseline is ready for scoped planning, not evidence of implementation or release readiness.

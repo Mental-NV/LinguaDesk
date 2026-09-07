@@ -1,9 +1,9 @@
 # LinguaDesk — Architecture Decision Records
 
-**Document:** #9 · **Version:** 1.2 · **Status:** Reviewed technical decisions; implementation evidence pending
+**Document:** #9 · **Version:** 1.3 · **Status:** Reviewed technical decisions; implementation evidence pending
 **Updated:** 2026-09-08
 
-Updated against user-approved PRD v0.3 and architecture/UX v1.2, from review baseline `54343c3`. The current design is in [architecture v1.2](03-architecture.md); generated contract governance is in [document #0](00-SDD-Planning-Workflow.md). These technical decisions preserve P-005/P-006 proposal status. Amended decisions record the original choice and the correction; superseded text is historical.
+Updated against user-approved PRD v0.4 and architecture/UX v1.3, from provider-policy review baseline `b5c01a1`. The current design is in [architecture v1.3](03-architecture.md); generated contract governance is in [document #0](00-SDD-Planning-Workflow.md). These technical decisions preserve P-005/P-006 proposal status. Amended decisions record the original choice and the correction; superseded text is historical.
 
 ## ADR-001: Combined Hosting and SPA Fallback
 
@@ -132,3 +132,16 @@ PRD DF-001–DF-007 record deferred alternatives, change review, automatic proce
 **Consequences:** Fewer state combinations and external integrations; users explicitly submit each transformation, shorten long inputs and refine output manually. API-first capability remains demonstrable. Simple chain candidates must still meet quality requirements across every route they serve. Most tests remain units/components with focused integrity/API checks and two small integrated feature journeys. Scope cuts do not justify weakening accounting, privacy, authentication, migrations or accessibility.
 
 **Reactivation:** The PRD register governs later selection; refine only the selected capability in its normal delivery package, re-evaluate the old UX at `54343c3`, and update owners/tests. Deferred work does not block current implementation or release readiness. See #3 Sections 1, 5, 8–9 and UX #2 Sections 11–15.
+
+
+## ADR-011: Provider Retention and No-Training Are Not Eligibility Gates
+
+**Status:** Accepted 2026-09-08; product decision PRD D-18. Does not change the independent API, quality targets or monetary safeguards.
+
+**Context:** The owner wants low-cost LLM serving and cached responses, and explicitly removed provider retention/no-training eligibility requirements from Q-001. Leaving the same restrictions in NFR-004, release gates or downstream design would make that change ineffective.
+
+**Alternatives:** Remove only the Q-001 wording while leaving contradictory gates; or remove the provider requirements consistently while keeping application text-lifecycle decisions separately owned.
+
+**Decision:** Provider selection and launch no longer require a no-training guarantee or a verified retention limit. Q-001 still resolves serving access/settings, quality/performance, provider-managed caching capabilities/pricing and the monetary cap. Align PRD NFR-004/RG-007 and UX/architecture handoffs. Do not make unsupported privacy claims about the chosen provider.
+
+**Consequences:** Low-cost models and provider-managed caching are permitted if they meet the remaining product criteria. LinguaDesk's no-text-logging, workspace teardown and current application-storage rules remain. The user clarified provider-managed caching: no LinguaDesk completed-response cache or new application cache-lifetime blocker is introduced. #4 verifies provider cache capabilities/pricing for cost bounds; successful-character accounting and current text-lifecycle behavior stay unchanged. No additional blocking provider-privacy review is introduced elsewhere.

@@ -1,11 +1,11 @@
 # LinguaDesk — UX/UI Specification
 
-**Document:** #2 · **Version:** 1.2 · **Status:** Simplified MVP ready for scoped planning; runtime verification pending
+**Document:** #2 · **Version:** 1.3 · **Status:** Simplified MVP ready for scoped planning; runtime verification pending
 **Updated:** September 8, 2026 (UTC)
 
 ## 1. Authority, inputs, and scope
 
-[Document #0](00-SDD-Planning-Workflow.md) owns process; [PRD v0.3](01-PRD.md) owns product scope and the seven DF-* deferred groups. Inputs are the documents at Git revision `54343c3` and the user's ten approved simplifications on 2026-09-08, incorporated into PRD v0.3 in this change. Architecture v1.2 is updated alongside this document. No runtime implementation has been inspected or verified.
+[Document #0](00-SDD-Planning-Workflow.md) owns process; [PRD v0.4](01-PRD.md) owns product scope and the seven DF-* deferred groups. The original simplification inputs were Git revision `54343c3` and the user's ten approvals on 2026-09-08, previously incorporated into PRD v0.3. Provider-policy amendment D-18 is based on `b5c01a1` and incorporated with PRD v0.4 / architecture v1.3. Active UI behavior and scenario dispositions are unchanged by that amendment. No runtime implementation has been inspected or verified.
 
 This document owns current routes, layout, controls, messages, state transitions and acceptance contracts. `Must` is binding for the **active MVP**; rows marked **Deferred** or **Retired** impose no current implementation/test gate. The 17 UX-US, 112 UX-AC, and original 44 UX-MSG IDs remain traceable; some are amended and some inactive. In compact references, AC/US/MSG mean UX-AC/UX-US/UX-MSG. IDs are never reused for unrelated behavior.
 
@@ -80,7 +80,7 @@ Refresh, full-document navigation and tab close end the workspace. After authent
 
 A verified tab's workspace ends at Start new workspace confirmation, reload/full-document navigation/tab close, sign-out, session expiry or account invalidation. Source/result/settings live only in memory, never URLs/history payloads, local/session storage, IndexedDB, service-worker/HTTP caches, autofill-restored workspace values or analytics. Disable workspace editor autocomplete/restoration where controllable; account password-manager support remains allowed. Invalidate pending callbacks with the workspace generation before rendering cleared/login state. Backend accounting may still settle an already submitted operation without restoring its text.
 
-Footer: `Text and settings are cleared when this workspace ends, including refresh, sign-out, or session expiry.` No text is saved as history. Provider retention disclosure remains a separate verified #3/#4 obligation.
+Footer: `Text and settings are cleared when this workspace ends, including refresh, sign-out, or session expiry.` No text is saved as history. This footer describes the browser workspace lifetime, not a provider retention or no-training promise. D-18 removes provider eligibility requirements of that kind; the clarified provider-managed caching choice does not change workspace teardown or introduce application response storage.
 
 Provide inline account actions **Start new workspace** and **Sign out**, avoiding a bespoke account menu. If both pages are empty, reset immediately. Otherwise use an accessible native modal dialog: heading `Start a new workspace?`; body `Source text, results, and workspace settings in this tab will be cleared. This cannot be undone.`; buttons `Cancel` (initial focus) and `Start new workspace`. Escape/Cancel preserves state and returns focus to its trigger. Confirm clears both pages, restores defaults, navigates to `/translate`, and focuses Source text. It submits no operation.
 
@@ -535,7 +535,7 @@ UX-D-001–UX-D-007 remain stable historical decision IDs. Their current disposi
 | UX-D-007 | Retained: server-authoritative usage and explicit stale-success disclosure, no provider/global/budget amounts |
 | UX-D-008 | Accepted 2026-09-08: PRD D-17 replaces affected prior UX; DF register controls later scope, no dormant MVP widgets/tests |
 
-Before dependent implementation, #5 must define canonical Unicode counting, single-mode values, operation/status identity and ordering, local cookie/bearer lifecycle, verification/password policy, errors, cancellation/replay/rollover and lost-output status. #3/#4 must define verified provider/no-training/retention/cost and the simple family chains' output/deadline checks. #6 supplies current-scope evidence mapping. Q-002 targeted matching and Google linking no longer block MVP. Advanced routing and sentence context are deferred dependencies only.
+Before dependent implementation, #5 must define canonical Unicode counting, single-mode values, operation/status identity and ordering, local cookie/bearer lifecycle, verification/password policy, errors, cancellation/replay/rollover and lost-output status. #3/#4 must define serving capability, cost bounds and the simple family chains' quality/output/deadline checks; provider retention/no-training certification is not a prerequisite. Provider-managed caching changes no current UI, character accounting or application text-lifecycle contract. #6 supplies current-scope evidence mapping. Q-002 targeted matching and Google linking no longer block MVP. Advanced routing and sentence context are deferred dependencies only.
 
 Deferred work is selected through PRD Section 3.1 and the existing #8 package workflow; no new full deferred implementation spec is authored now. At reactivation, refine only the selected capability, reassess affected historical UX IDs, and update its owning contracts/tests. Custom visual tools do not restore obsolete toggles or targeted sentence preservation.
 
