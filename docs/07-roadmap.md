@@ -1,6 +1,6 @@
 # LinguaDesk — Roadmap and Milestone Plan
 
-**Document:** #7 · **Version:** 1.1 · **Status:** M001 selected and prepared; implementation not started
+**Document:** #7 · **Version:** 1.2 · **Status:** M001 done; next milestone not selected
 **Updated:** 2026-09-08
 
 ## 1. Authority and planning basis
@@ -37,7 +37,7 @@ A milestone is done only when its selected exit criteria, applicable #6 checks a
 
 ## 3. Priority, dependency and current milestone summary
 
-**Current milestone: [M001 — Backend foundation](08-backlogs/M001-backend-foundation.md).** State: **Selected / package prepared; implementation not started**. [Package 001](../specs/001-backend-foundation/spec.md) selects BI-001 and supplies its specification, plan and unchecked tasks. Local SDK inspection found .NET 10; execution still requires restore/process preflight and the full 30-minute feasibility check. No human action is presently required. Frontend publishing, persistence and standalone AI remain separate infrastructure outcomes. No milestone is complete.
+**Most recently completed milestone: [M001 — Backend foundation](08-backlogs/M001-backend-foundation.md).** State: **Done**. [Package 001](../specs/001-backend-foundation/spec.md) delivered BI-001 with all six scenarios passed; its [completion record](../specs/001-backend-foundation/tasks.md#3-completion-record) records locked setup/build, nine HTTP tests and real-process smoke evidence. No next milestone is selected. Frontend publishing, persistence and standalone AI remain separate candidate infrastructure outcomes.
 
 The numbered sections below group related outcomes; **M IDs are identities, not execution positions**. The current priority policy is:
 
@@ -46,7 +46,7 @@ The numbered sections below group related outcomes; **M IDs are identities, not 
 3. Enable a verified independent API operation with durable limits and recovery, then connect its web journey. Prefer demonstrated Translation followed by Rewriting over polishing all account screens or all visuals first.
 4. Integrate accessibility, privacy and failure checks with each feature. Begin bounded corpus/evaluation and operational preparation as soon as inputs are available; do not leave qualification risk until the final release review.
 
-Dependencies in Section 4 are the minimum named prerequisites, not substitutes for #8's code/design readiness check. Satisfy transitive dependencies and the applicable Section 5 blockers too. Choose the highest-value eligible milestone; a blocked independent track need not stop another eligible one. M001 is selected as linked above. All other listed milestones remain **Candidate**, with **Backlog: not created; Package: none; Evidence: pending**. No runtime evidence exists for M001 either. These shared values are stated once instead of repeating empty columns.
+Dependencies in Section 4 are the minimum named prerequisites, not substitutes for #8's code/design readiness check. Satisfy transitive dependencies and the applicable Section 5 blockers too. Choose the highest-value eligible milestone; a blocked independent track need not stop another eligible one. M001 is done as linked above. All other listed milestones remain **Candidate**, with **Backlog: not created; Package: none; Evidence: pending**. These shared values are stated once instead of repeating empty columns.
 
 M001 now has its [owning backlog](08-backlogs/M001-backend-foundation.md) and [selected package](../specs/001-backend-foundation/spec.md). Later milestones use #0's `Mxxx-<slug>.md` convention, or link an existing owning feature backlog. Replace the corresponding milestone title with a link to its actual backlog when created; record actual package/evidence links there and in #6. Do not create empty backlogs or package placeholders for this entire roadmap.
 
@@ -167,8 +167,10 @@ Use milestone summary states **Candidate → Selected → In progress → Done**
 
 **Selection update — 2026-09-08:** Created M001 backlog/BI-001 and package 001 with six acceptance scenarios and six unchecked execution tasks. Added the initial/end human-step rule from #0 v1.6; no human action is required for M001 as scoped. Updated its check references to the actual host portions of V-009/V-012; independent AI verification remains M004.
 
+**M001 completion — 2026-09-08:** Implemented the pinned two-project backend scaffold, process-only liveness and absent-route boundary. Locked clean/repeated Release checks executed nine passing HTTP cases; successful and controlled-failure real-process smokes verified ephemeral loopback startup, nonzero propagation and cleanup. All package scenarios passed within the execution allowance; no product or release gate is claimed.
+
 ## 7. Next applicable gate and validation
 
-M001's #8 backlog and package are now prepared. The next action is its [T001 execution preflight](../specs/001-backend-foundation/tasks.md#1-ordered-tasks), followed by implementation when the environment and 30-minute feasibility checks hold. No coding task has been executed by this authoring change; no other milestone is selected.
+M001's #8 backlog and package are complete. The next action is to select the highest-value eligible candidate through #0/#8; M002–M005 are now dependency-eligible, but none is selected by this completion update.
 
-**Authoring review:** Local source links, unique milestone IDs, dependency existence/order, check references and the separation of active/deferred/proposed scope were checked. The roadmap covers infrastructure, access, independent AI, accounting/recovery, both API/web operations, evaluation and release preparation without copying #6's full product matrix. No milestone duration has been measured and no runtime or release check has passed. Candidate feasibility must be established during #8 selection against the then-current implementation.
+**Completion review:** Local source links, unique milestone IDs, dependency existence/order, check references and the separation of active/deferred/proposed scope were checked. M001 runtime evidence is linked; all later milestones and release gates remain pending. Candidate feasibility must be established during #8 selection against the then-current implementation.

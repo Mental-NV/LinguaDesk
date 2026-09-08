@@ -1,7 +1,7 @@
 # M001 — Backend Foundation Backlog
 
-**Document:** #8 · **Version:** 1.0 · **Updated:** 2026-09-08
-**State:** Selected for the first delivery package; implementation not started
+**Document:** #8 · **Version:** 1.1 · **Updated:** 2026-09-08
+**State:** Done; implementation and package evidence complete
 **Roadmap:** [M001 — Backend foundation](../07-roadmap.md#41-basic-infrastructure)
 
 ## 1. Outcome, scope and authority
@@ -16,7 +16,7 @@ Only the host, process liveness, absent-route behavior and repeatable backend ve
 
 | Item ID | Outcome/title | Priority | Target milestone | Dependencies/blockers | State | Delivery package |
 | --- | --- | --- | --- | --- | --- | --- |
-| BI-001 | Start and verify a minimal backend without application services | First / necessary enablement | M001 | No prior milestone; execution preflight below | selected | [001-backend-foundation](../../specs/001-backend-foundation/spec.md) |
+| BI-001 | Start and verify a minimal backend without application services | First / necessary enablement | M001 | No prior milestone | done | [001-backend-foundation](../../specs/001-backend-foundation/spec.md) |
 
 ### BI-001 — Start and verify a minimal backend
 
@@ -24,7 +24,7 @@ Only the host, process liveness, absent-route behavior and repeatable backend ve
 
 **Acceptance summary:** The selected package owns detailed [AC-001–AC-006](../../specs/001-backend-foundation/spec.md#3-selected-acceptance). They cover a clean build/check path, truthful process liveness, missing-route failures, isolation/no application-service requirements, real loopback process startup/cleanup, and reproducible evidence/documentation. Boundary cases include wrong probe method, missing API paths, repeated isolated runs and command failure propagation. Do not copy the scenarios into this backlog.
 
-**Dependencies and questions:** .NET 10 and restore access are execution prerequisites. Local observation on 2026-09-08 found SDK `10.0.302` and ASP.NET runtime `10.0.10`; relevant package versions were present in the local NuGet cache. Restore completeness, actual build, test discovery and socket execution remain unverified. These are preflight checks, not successful implementation evidence. No blocking product question applies; Q-001/Q-004/Q-006/Q-007 decisions for later services remain open.
+**Dependencies and questions:** .NET 10 and restore access are execution prerequisites. Execution on 2026-09-08 verified SDK `10.0.302`, ASP.NET runtime `10.0.10`, locked restoration, clean Release compilation, nine HTTP integration cases and real loopback process execution. No blocking product question applies; Q-001/Q-004/Q-006/Q-007 decisions for later services remain open.
 
 **Nonfunctional scope:** Apply backend dependency isolation, deterministic HTTP tests, clean error behavior, no credentials/text processing and owned-process cleanup. UI/accessibility, storage/concurrency, auth, language quality, cost accounting and live-service evidence are not applicable to this increment because it introduces none of those capabilities. Their release obligations remain pending in #6.
 
@@ -36,6 +36,6 @@ There is no planned human step at the end either. Unexpected human-only dependen
 
 ## 4. Selection and completion
 
-The user requested the first milestone's #8 artifacts on 2026-09-08. BI-001 is selected into package `001-backend-foundation`; no other item or milestone is selected. The [plan](../../specs/001-backend-foundation/plan.md) and [tasks](../../specs/001-backend-foundation/tasks.md) prepare this immediate next increment; this request does not execute them.
+The user requested the first milestone's #8 artifacts and then implementation on 2026-09-08. BI-001 was delivered through package `001-backend-foundation`; no other item or milestone was selected. The [plan](../../specs/001-backend-foundation/plan.md) and [tasks/evidence](../../specs/001-backend-foundation/tasks.md#3-completion-record) record the completed increment.
 
-Selection review: scope and authoritative behavior are coherent; no product clarification is required. Implementation begins only after environment preflight and the [30-minute feasibility check](../../specs/001-backend-foundation/plan.md#5-budget-risks-and-human-handoff). Split before starting if the complete increment cannot fit. Mark BI-001/M001 done only after all selected scenarios pass, tasks/evidence agree, and #6/#7 plus implemented operating instructions are updated. Current evidence: **Pending — no runtime checks executed**.
+Completion review: all AC-001–006 scenarios passed within the 30-minute execution envelope. Locked setup, clean-output and repeated Release checks, nine discovered tests, successful real-process smoke, controlled failure propagation/cleanup, dependency inspection and implemented operating instructions are recorded in the [completion record](../../specs/001-backend-foundation/tasks.md#3-completion-record). This closes only the selected enabling scope; product and release evidence remains pending in #6.

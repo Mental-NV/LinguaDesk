@@ -1,8 +1,8 @@
 # 001 — Backend Foundation: Implementation Plan
 
-**Version:** 1.0 · **Updated:** 2026-09-08
-**State:** Technical plan reviewed; execution preflight and runtime evidence pending
-**Selected scope:** [spec.md](spec.md) v1.0, US-001 / AC-001–006; [BI-001](../../docs/08-backlogs/M001-backend-foundation.md) v1.0
+**Version:** 1.1 · **Updated:** 2026-09-08
+**State:** Implemented and verified; runtime evidence recorded
+**Selected scope:** [spec.md](spec.md) v1.1, US-001 / AC-001–006; [BI-001](../../docs/08-backlogs/M001-backend-foundation.md) v1.1
 
 ## 1. Context and readiness
 
@@ -12,7 +12,7 @@ The [specification](spec.md) fixes acceptance; [architecture #3](../../docs/03-a
 
 ## 2. Technical decisions and targets
 
-| Target to create during implementation | Responsibility |
+| Implemented target | Responsibility |
 | --- | --- |
 | `global.json` | Pin observed SDK `10.0.302`, disallow prerelease and use `rollForward: disable`; a missing SDK is diagnosed rather than silently selecting another |
 | `backend/LinguaDesk.slnx` | Include only the host and its actual HTTP test project |
@@ -24,7 +24,7 @@ The [specification](spec.md) fixes acceptance; [architecture #3](../../docs/03-a
 | `.gitignore`, per-project `packages.lock.json` | Ignore generated build/test/temp output; commit resolved package locks for reproducible restore |
 | `README.md` | #10's working backend-only setup/check/run/smoke instructions, scaffold limitations and current evidence links |
 
-Initial package pins: `Microsoft.AspNetCore.Mvc.Testing` **10.0.10**, `Microsoft.NET.Test.Sdk` **18.0.1**, `MSTest.TestFramework` and `MSTest.TestAdapter` **4.0.2**. Use the ordinary VSTest-compatible `dotnet test` path; no runner migration or extra coverage/reporting package is needed. These are inspected available versions, not a claim that they are the latest. Establish restore/test compatibility at preflight; if a correction is necessary, record the narrow pin change here before dependent implementation. The installed adapter metadata supports .NET 8+ and references its framework version; the chosen host/testing versions match the observed ASP.NET runtime patch.
+Implemented package pins: `Microsoft.AspNetCore.Mvc.Testing` **10.0.10**, `Microsoft.NET.Test.Sdk` **18.0.1**, `MSTest.TestFramework` and `MSTest.TestAdapter` **4.0.2**. The ordinary VSTest-compatible `dotnet test` path is used; no runner migration or extra coverage/reporting package was needed. Locked restore, compilation and test execution verified their compatibility. These versions are deliberate pins, not a claim that they are the latest.
 
 Use built-in health-check registration/mapping for `GET /health/live`, limited to GET so POST yields 405; no database/provider registrations or custom health framework. Return the plain health body without exposing metadata. Allow the test project to reference the real entry point with the minimal visibility hook needed by `WebApplicationFactory`.
 
@@ -32,7 +32,7 @@ Register the absent `/api` and `/api/{**path}` boundary as a 404 Problem Details
 
 ## 3. Verification and command contract
 
-The following names are **planned interfaces, not commands that exist today**. `scripts/backend.sh` runs from any working directory by resolving the repository root. Avoid an unnecessary script framework or global tool installation.
+The following implemented interfaces are exposed by `scripts/backend.sh`, which runs from any working directory by resolving the repository root. No additional script framework or global tool installation is required.
 
 | Planned invocation | Required behavior |
 | --- | --- |
@@ -47,7 +47,7 @@ Use one factory per independently owned fixture with explicit environment and di
 
 The real-process smoke complements TestServer, which does not prove Kestrel listening or process cleanup. Bound readiness polling and the entire smoke to 30 seconds, use short per-probe request timeouts, and terminate the owned process/tree in cleanup. Start the built application directly so process ownership is unambiguous; discover its ephemeral port rather than reserving and releasing a port. Cleanup must also work on partial startup/failure. This is a harness bound, not a product latency target. It verifies local HTTP only, not production TLS or the future published SPA pipeline.
 
-Scoped allocation: AC-001/004/006 use build, dependency inspection and evidence; AC-002/003 use V-009 HTTP-boundary checks; AC-005 uses only V-012's real-process lifecycle. Frontend/browser, database/migration, auth, AI/live-quality, cost and complete schema/client gates are pending for later milestones, not silently passed or reduced. No executable schema or code is created during this authoring turn.
+Scoped allocation: AC-001/004/006 use build, dependency inspection and evidence; AC-002/003 use V-009 HTTP-boundary checks; AC-005 uses only V-012's real-process lifecycle. Frontend/browser, database/migration, auth, AI/live-quality, cost and complete schema/client gates remain pending for later milestones; M001 does not silently pass or reduce them.
 
 ## 4. Rollout, data and diagnostics
 
@@ -67,4 +67,4 @@ Main risk is restore or harness behavior consuming the reserve. Probe access ear
 
 Microsoft documents [WebApplicationFactory/TestServer](https://learn.microsoft.com/en-us/aspnet/core/test/integration-tests?view=aspnetcore-10.0) as the HTTP integration boundary, [health checks](https://learn.microsoft.com/en-us/aspnet/core/host-and-deploy/health-checks?view=aspnetcore-10.0) as host probes, and [global.json](https://learn.microsoft.com/en-us/dotnet/core/tools/global-json) SDK selection/roll-forward rules. Checked 2026-09-08; use these capabilities within the repository's narrower choices above.
 
-Authoring review: the story, six scenarios, targets, tasks and scoped #6 references agree; the probe/loopback boundary is recorded in #3; no product/schema or deferred feature is added. The technical approach is specified. Ordinary execution preflight, restore compatibility and all runtime evidence remain pending; no unresolved product choice requires user input now.
+Execution review: the story, six scenarios, implemented targets, tasks and scoped #6 references agree; the probe/loopback boundary remains as recorded in #3. Locked restore, clean Release build, nine HTTP tests, repeated isolation checks and both real-process smoke paths passed. No product schema or deferred feature was added, and no human follow-up is required. See the [completion record](tasks.md#3-completion-record).

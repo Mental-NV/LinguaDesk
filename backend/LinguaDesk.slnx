@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/LinguaDesk.Api/LinguaDesk.Api.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/LinguaDesk.Api.Tests/LinguaDesk.Api.Tests.csproj" />
+  </Folder>
+</Solution>

@@ -1,0 +1,12 @@
+# .NET build and test output
+**/bin/
+**/obj/
+artifacts/
+
+# Local IDE and operating-system files
+.vs/
+.idea/
+.vscode/
+.DS_Store
+*.user
+*.suo

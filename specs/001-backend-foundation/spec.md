@@ -1,7 +1,7 @@
 # 001 — Backend Foundation: Selected Specification
 
-**Version:** 1.0 · **Updated:** 2026-09-08
-**State:** Selected; ready for technical planning; implementation evidence pending
+**Version:** 1.1 · **Updated:** 2026-09-08
+**State:** Implemented and verified; AC-001–006 passed
 **Milestone/item:** [M001 / BI-001](../../docs/08-backlogs/M001-backend-foundation.md#bi-001--start-and-verify-a-minimal-backend)
 
 ## 1. Selection and authoritative inputs
@@ -45,4 +45,4 @@ Clarifications resolved through existing delegated design authority: the probe i
 
 ## 5. Readiness and completion
 
-Behavioral scope is ready for planning: one story, six testable scenarios, explicit exclusions and no unresolved product choice. The [plan](plan.md) records the technical approach and environment preflight; [tasks](tasks.md) derives execution and verification. Any relevant upstream change requires reassessment before implementation. AC-001–006 are **Pending**, not implemented or passed. The milestone completes only with their evidence and the #0 completion updates.
+Behavioral scope was implemented without expansion: one story, six testable scenarios and the stated exclusions. The [plan](plan.md) records the technical approach and [tasks/evidence](tasks.md#3-completion-record) records the verified execution. AC-001–006 are **Passed** for the M001 enabling scope. Any relevant upstream change still requires impact assessment; later product and release capabilities remain pending.
