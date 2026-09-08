@@ -1,8 +1,10 @@
 # M001 — Backend Foundation Backlog
 
-**Document:** #8 · **Version:** 1.1 · **Updated:** 2026-09-08
+**Document:** #8 · **Version:** 1.2 · **Updated:** 2026-09-09
 **State:** Done; implementation and package evidence complete
 **Roadmap:** [M001 — Backend foundation](../07-roadmap.md#41-basic-infrastructure)
+
+**Policy maintenance — 2026-09-09:** Removed superseded milestone duration rules under #0 v1.7. Completed scope, acceptance results and measured durations are unchanged.
 
 ## 1. Outcome, scope and authority
 
@@ -38,4 +40,4 @@ There is no planned human step at the end either. Unexpected human-only dependen
 
 The user requested the first milestone's #8 artifacts and then implementation on 2026-09-08. BI-001 was delivered through package `001-backend-foundation`; no other item or milestone was selected. The [plan](../../specs/001-backend-foundation/plan.md) and [tasks/evidence](../../specs/001-backend-foundation/tasks.md#3-completion-record) record the completed increment.
 
-Completion review: all AC-001–006 scenarios passed within the 30-minute execution envelope. Locked setup, clean-output and repeated Release checks, nine discovered tests, successful real-process smoke, controlled failure propagation/cleanup, dependency inspection and implemented operating instructions are recorded in the [completion record](../../specs/001-backend-foundation/tasks.md#3-completion-record). This closes only the selected enabling scope; product and release evidence remains pending in #6.
+Completion review: all AC-001–006 scenarios passed. Locked setup, clean-output and repeated Release checks, nine discovered tests, successful real-process smoke, controlled failure propagation/cleanup, dependency inspection and implemented operating instructions are recorded in the [completion record](../../specs/001-backend-foundation/tasks.md#3-completion-record). This closes only the selected enabling scope; product and release evidence remains pending in #6.

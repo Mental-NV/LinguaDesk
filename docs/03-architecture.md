@@ -1,7 +1,7 @@
 # LinguaDesk — Architecture and Engineering Principles
 
-**Document:** #3 · **Version:** 1.8 · **Status:** Ready for scoped implementation planning; contract and launch dependencies remain
-**Updated:** 2026-09-08
+**Document:** #3 · **Version:** 1.9 · **Status:** Ready for scoped implementation planning; contract and launch dependencies remain
+**Updated:** 2026-09-09
 
 ## 1. Authority, Inputs, and Scope
 
@@ -128,7 +128,7 @@ Translation uses the same configured chain for all 12 directions; Rewriting uses
 
 Use structured logs with an allowlist: opaque operation ID, operation type, duration, classified outcome, attempt number, and numeric usage/cost metadata. Disable request/response body logging and redact cookies, tokens, email-link queries, and provider error bodies. Do not attach submitted text to exceptions or traces. Health checks establish process/storage readiness without paid provider calls. Track failures, DB contention, outstanding monetary exposure, and cap suspension; exact operational alert thresholds remain with #6/#10, not an invented uptime SLA.
 
-M001 introduces only process liveness at `GET /health/live`, with no dependency probes or product-readiness claim; storage readiness follows with persistence. Its scaffold can run over loopback HTTP without credentials or a certificate because it exposes no account/text operation. This does not relax HTTPS, Secure cookies or production serving validation for later features. The [M001 package](../specs/001-backend-foundation/spec.md) specifies the bounded behavior; product OpenAPI still begins with the first selected product API slice.
+M001 introduces only process liveness at `GET /health/live`, with no dependency probes or product-readiness claim; storage readiness is required before database-dependent serving is introduced. Its scaffold can run over loopback HTTP without credentials or a certificate because it exposes no account/text operation. This does not relax HTTPS, Secure cookies or production serving validation for later features. The [M001 package](../specs/001-backend-foundation/spec.md) specifies the bounded behavior; product OpenAPI still begins with the first selected product API slice.
 
 ## 6. Data Classification and Lifecycle
 
@@ -141,6 +141,8 @@ Use EF migrations from the first persistent schema in normal local development, 
 `EnsureCreated` is permitted only for explicitly disposable prototypes or isolated tests that make no migration claims. It is not the default integration setup and must never initialize a database later passed to `Migrate`. No automatic `EnsureDeleted` on startup or on an ordinary developer database. Test cleanup owns only its uniquely created temporary paths.
 
 For deployment, stop/drain the single instance, take a consistent backup, run the tested EF migration bundle once, and start the app after success. Normal serving and OpenAPI generation do not mutate schemas on startup. On migration failure, remain unavailable and use the verified recovery procedure; do not automatically downgrade or delete data. Back up with SQLite's backup mechanism or a stopped, consistent database; copying a live `.db` without its WAL is insufficient. Restore testing belongs in #6/#10.
+
+**M003 staging — 2026-09-09:** The [durable-storage package](../specs/003-durable-storage-foundation/spec.md) establishes explicit local initialization, scoped runtime access and file-backed migration/restart checks. Its initial schema contains framework migration metadata only; account and ledger models arrive with their owning features. Ordinary shell startup remains free of database I/O, and runtime connections do not create a missing file. No storage-readiness endpoint is selected here. Add the storage availability/startup validation from Section 5.2 before introducing database-dependent serving; production migration bundles, backup/restore and operational readiness retain M040's evidence gate. This staging does not weaken the production deployment rules above.
 
 ### 6.2 Privacy and retention (Q-004)
 

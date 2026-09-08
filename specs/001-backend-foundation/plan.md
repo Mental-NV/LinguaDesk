@@ -1,8 +1,10 @@
 # 001 — Backend Foundation: Implementation Plan
 
-**Version:** 1.1 · **Updated:** 2026-09-08
+**Version:** 1.2 · **Updated:** 2026-09-09
 **State:** Implemented and verified; runtime evidence recorded
 **Selected scope:** [spec.md](spec.md) v1.1, US-001 / AC-001–006; [BI-001](../../docs/08-backlogs/M001-backend-foundation.md) v1.1
+
+**Policy maintenance — 2026-09-09:** Removed superseded milestone duration rules under #0 v1.7. Completed scope, acceptance results and measured durations are unchanged.
 
 ## 1. Context and readiness
 
@@ -59,7 +61,7 @@ At closeout, update tasks and BI-001/M001 states and link the actual evidence in
 
 **Human actions: none required or deferred for this scope.** At the beginning, recheck SDK/package access, available shell/curl and loopback process permissions. These are autonomous checks. Resolve routine issues with existing authorization. If human-controlled access/install action is indispensable, request it in the initial preflight and do not start dependent work. Queue any unexpected nonblocking human step to the end with the prepared action and affected evidence; if nothing independent can proceed, report the blocker rather than inventing success. No certificate trust prompt, email-link click or paid-service consent should arise in M001.
 
-Planning allowance for the full 30-minute envelope: context/package readiness and preflight 5 minutes; host/build setup 7; focused tests 5; command wrappers and working instructions 4; verification/correction/closeout 9. This allocation includes necessary package preparation; reuse these prepared artifacts on execution and count any revision work. It is not measured model throughput. Record the actual start/elapsed time for execution, account for preparation work in sizing, and split/replan before coding if the total required work cannot fit. Do not hide test/restore waiting outside the limit or mark incomplete work done at timeout.
+Execution readiness includes tooling/access, coherent scope and all required verification. The 2026-09-09 workflow amendment removes the former fixed-duration allowance and time-based stop/split rules. Recorded durations remain historical evidence. Complete acceptance and applicable checks before closeout; preserve incomplete work and describe any real blocker honestly.
 
 Main risk is restore or harness behavior consuming the reserve. Probe access early; avoid live dependencies and broad test infrastructure. If pins/restoration require investigation beyond a narrow correction, keep implementation unstarted and resize the milestone. A later missing human prerequisite must not turn into repeated mid-run questioning.
 

@@ -1,8 +1,10 @@
 # 002 — Published Web Shell: Implementation Plan
 
-**Version:** 1.1 · **Updated:** 2026-09-08
+**Version:** 1.2 · **Updated:** 2026-09-09
 **State:** Implemented and verified; runtime evidence recorded
 **Inputs:** [spec.md](spec.md) v1.1 and [BI-002](../../docs/08-backlogs/M002-published-web-shell.md) v1.1
+
+**Policy maintenance — 2026-09-09:** Removed superseded milestone duration rules under #0 v1.7. Completed scope, acceptance results and measured durations are unchanged.
 
 ## 1. Current state and tooling
 
@@ -51,7 +53,7 @@ Names below are planned, not implemented commands. All wrappers resolve their ow
 | `bash scripts/publish.sh` | Produce the single complete host/static artifact using one fresh frontend build and locked backend restore; no deployment |
 | `bash scripts/frontend.sh smoke` | Use a freshly published artifact; launch its owned Kestrel on an OS-assigned loopback port, run the focused pinned Chromium suite and clean up |
 
-Keep the working `backend.sh` commands independent. Do not put frontend build/browser downloads inside its 30-second backend smoke. The published-shell smoke has a separate bounded setup/readiness/test timeout, recorded in its implementation and within the milestone budget; downloads happen in initial setup. Use bounded readiness, per-test timeouts, teardown on failure/interruption and no fixed shared listening port or `/api` interception. Do not reuse an unrelated running development server as evidence.
+Keep the working `backend.sh` commands independent. Do not put frontend build/browser downloads inside its 30-second backend smoke. The published-shell smoke has a separate bounded setup/readiness/test timeout, recorded in its implementation; downloads happen in initial setup. Use bounded readiness, per-test timeouts, teardown on failure/interruption and no fixed shared listening port or `/api` interception. Do not reuse an unrelated running development server as evidence.
 
 ## 3. Verification and regression allocation
 
@@ -72,7 +74,7 @@ Keep the working `backend.sh` commands independent. Do not put frontend build/br
 
 **Feature-specific human actions: none, at either beginning or end.** The execution preflight must provision/verify Node 24.20.0, npm pins, packages and matching Chromium before dependent coding. Existing Node 25/cache presence is not sufficient. Use authorized autonomous setup; batch any indispensable human-only installation/access request at the beginning. No certificate, real email, provider account, domain or deployment permission belongs to this scope. Unexpected nonblocking human steps are prepared for the end under #0, with affected evidence pending.
 
-M001 consumed 22m18s. M002 adds a toolchain and a publish boundary, so **do not assume its size is proven**. Initial full-envelope allowance: preparation/tooling/readiness 5 minutes; shell/configuration 6; publishing/boundary integration 6; scoped tests and regression runs 8; correction/docs/closeout 5. Count necessary package revisions, downloads and test waiting. Before execution, if prerequisites or the full increment cannot credibly fit 30 minutes, split M002 into fresh dependent milestone IDs under #7; do not weaken acceptance or silently treat a half-working publish as done. No split is claimed necessary solely from an unmeasured estimate, but readiness is conditional on this explicit check.
+Execution readiness includes tooling/access, coherent scope and all required verification. The 2026-09-09 workflow amendment removes the former fixed-duration allowance and time-based stop/split rules. Recorded durations remain historical evidence. Complete acceptance and applicable checks before closeout; preserve incomplete work and describe any real blocker honestly.
 
 No deployment, persistent data migration, credentials or paid calls are involved. Cleanup owns generated output only; reports should contain synthetic shell content and relevant tool/runtime/commit data. Do not modify a completed M001 package to make new behavior look previously verified.
 

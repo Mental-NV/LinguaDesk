@@ -1,11 +1,11 @@
 # LinguaDesk — Roadmap and Milestone Plan
 
-**Document:** #7 · **Version:** 1.4 · **Status:** M001 and M002 done; next milestone unselected
-**Updated:** 2026-09-08
+**Document:** #7 · **Version:** 1.5 · **Status:** M001 and M002 done; M003 selected
+**Updated:** 2026-09-09
 
 ## 1. Authority and planning basis
 
-This roadmap follows [planning workflow #0](00-SDD-Planning-Workflow.md), including its v1.5 amendment for the user's 30-minute milestone ceiling. It orders small user/API outcomes and necessary infrastructure. Concrete backlog items, acceptance scenarios, implementation decisions and tasks are authored through #8 when a milestone approaches execution.
+This roadmap follows [planning workflow #0](00-SDD-Planning-Workflow.md), including its v1.7 amendment removing the milestone duration limit. It orders small user/API outcomes and necessary infrastructure. Concrete backlog items, acceptance scenarios, implementation decisions and tasks are authored through #8 when a milestone approaches execution.
 
 | Authoritative input | Revision read at Git `dede27c7e14409dff54c04ea0aaafc13cc0f3af9` | Responsibility |
 | --- | --- | --- |
@@ -17,27 +17,25 @@ This roadmap follows [planning workflow #0](00-SDD-Planning-Workflow.md), includ
 | [API design #5](05-api-design.md) | v1.1 | Shared auth, counting, identity/recovery/usage behavior and contract lifecycle |
 | [Verification plan #6](06-verification-plan.md) | v1.0 | Checks, corpus/rubric/reviews, workloads, coverage and release evidence |
 | [ADRs #9](09-architecture-decisions.md) | v1.7 | Existing decision rationale |
-| User direction | 2026-09-08 | Infrastructure first; small feature/story milestones; easy rearrangement; maximum 30 minutes for GPT-5.6 Sol (high), including testing |
+| User direction | 2026-09-08 | Infrastructure first; small feature/story milestones; easy rearrangement (duration rule superseded below) |
 
-The repository contains specifications only. No backend/frontend, generated OpenAPI, #8 backlog, delivery package or runtime evidence was present at this baseline. No implementation or model-speed benchmark is claimed here. The roadmap is a delivery hypothesis to revise after observing actual work.
+**Current policy — user direction, 2026-09-09:** No fixed milestone duration limit; this supersedes the original time cap and associated stop/split rules.
+
+At the original roadmap baseline, the repository contained specifications only. No backend/frontend, generated OpenAPI, #8 backlog, delivery package or runtime evidence was present at this baseline. No implementation or model-speed benchmark is claimed here. The roadmap is a delivery hypothesis to revise after observing actual work.
 
 MVP scope remains the PRD's two explicit whole-text operations, local accounts, independent API, shared allowances/cost bounds and accessible private workspace. Deferred capabilities remain in [PRD Section 3.1](01-PRD.md#31-deferred-scope-register-product-authority) with no scheduled milestone. Retired behavior is not restored; P-005/NFR-008 and P-006 are not accepted by scheduling adjacent work. Product thresholds and the full requirement-to-evidence matrix stay in #1/#6.
 
 ## 2. Milestone size and completion rules
 
-Each executable milestone must fit **at most 30 elapsed minutes of autonomous development by GPT-5.6 Sol (high)**. Count necessary context/package preparation, implementation, dependency restore/build, tests, debugging, review, documentation and evidence recording. Required CI/test waiting also consumes that envelope. Do not interpret the budget as 30 minutes of coding followed by unbounded verification, or as a reason to omit a check.
+Each executable milestone delivers a small, coherent outcome with explicit dependencies and observable acceptance. There is no fixed execution-duration limit. At #8 selection, inspect current code and previous evidence to assess scope, verification effort and risks. Split a candidate when independently valuable boundaries or dependencies justify it; elapsed time alone does not require stopping or splitting an active milestone.
 
-At #8 selection, use current code and measured prior runs to assess feasibility. As an initial planning allowance, leave roughly half the envelope for preparation, verification and correction; this is a sizing heuristic, not a throughput claim. A row that cannot credibly fit is split into smaller milestones **before execution**. Its exit criterion is an outcome boundary, not permission to cram an entire feature into the time limit. The initial rows below are candidates, not certified duration estimates.
+Apply [#0's human-step timing](00-SDD-Planning-Workflow.md#selecting-work-and-creating-a-package): batch indispensable requests at the beginning; queue nonblocking human steps for the end with prepared instructions and pending evidence. Resolve necessary access, product decisions and external evidence dependencies before dependent execution. Section 5 tracks aggregate human/live-service gates separately; preparation and evidence-producing milestones can proceed without claiming those gates passed.
 
-Apply [#0's human-step timing](00-SDD-Planning-Workflow.md#selecting-work-and-creating-a-package): batch indispensable requests at the beginning; queue nonblocking human steps for the end with prepared instructions and pending evidence. M002 has no feature-specific human action; toolchain/access prerequisites are checked at the beginning. Resolve necessary access, product decisions and external evidence dependencies before admitting a run that needs them. External human reviews, provider/email access and device availability have no assumed 30-minute completion time. Section 5 tracks their aggregate gates separately; bounded preparation and evidence-producing milestones can proceed without claiming those gates passed.
-
-At the ceiling, record an honest incomplete/blocked outcome with the elapsed time and remaining work. Do not mark an unfinished milestone done or silently extend its budget. Preserve the work; revise/split the remaining outcome before another run. Unexpected overruns inform later sizing. There is no fixed calendar schedule or total-duration promise obtained by multiplying milestone count by 30 minutes.
-
-A milestone is done only when its selected exit criteria, applicable #6 checks and documentation/evidence updates are complete under #0's gates. Account isolation, no unintended submissions, privacy, durable accounting and cost admission apply when a capability is first introduced. Later cross-feature verification adds evidence; it does not authorize temporarily violating those contracts. Required regressions grow with the application: if they consume the envelope, reduce change scope or improve the measured feedback path without weakening #6.
+A milestone is done only when its selected exit criteria, applicable #6 checks and documentation/evidence updates are complete under #0's gates. Account isolation, no unintended submissions, privacy, durable accounting and cost admission apply when a capability is first introduced. Later cross-feature verification adds evidence; it does not authorize temporarily violating those contracts. Run all applicable regressions and record actual results. Durations may inform planning but are not readiness or completion gates. If work cannot continue because of a real blocker, preserve it and record the remaining outcome honestly. There is no fixed calendar schedule or total-duration promise.
 
 ## 3. Priority, dependency and current milestone summary
 
-**Most recently completed milestone: [M002 — Published web shell](08-backlogs/M002-published-web-shell.md).** State: **Done**. [Package 002](../specs/002-published-web-shell/spec.md) delivered BI-002 with all eight scenarios passed; its [completion record](../specs/002-published-web-shell/tasks.md#3-completion-record) records locked frontend checks, 20 HTTP cases, isolated published-host Chromium smoke and stale-asset cleanup. M001 remains complete with its history preserved. No next milestone is selected; persistence and standalone AI remain separate candidates.
+**Most recently completed milestone: [M002 — Published web shell](08-backlogs/M002-published-web-shell.md).** State: **Done**. [Package 002](../specs/002-published-web-shell/spec.md) delivered BI-002 with all eight scenarios passed; its [completion record](../specs/002-published-web-shell/tasks.md#3-completion-record) records locked frontend checks, 20 HTTP cases, isolated published-host Chromium smoke and stale-asset cleanup. M001 remains complete with its history preserved. **Next selected milestone: [M003 — Durable storage foundation](08-backlogs/M003-durable-storage-foundation.md).** BI-003 has a [prepared package](../specs/003-durable-storage-foundation/spec.md); execution preflight and all runtime evidence are pending. Standalone AI remains a separate candidate.
 
 The numbered sections below group related outcomes; **M IDs are identities, not execution positions**. The current priority policy is:
 
@@ -46,7 +44,7 @@ The numbered sections below group related outcomes; **M IDs are identities, not 
 3. Enable a verified independent API operation with durable limits and recovery, then connect its web journey. Prefer demonstrated Translation followed by Rewriting over polishing all account screens or all visuals first.
 4. Integrate accessibility, privacy and failure checks with each feature. Begin bounded corpus/evaluation and operational preparation as soon as inputs are available; do not leave qualification risk until the final release review.
 
-Dependencies in Section 4 are the minimum named prerequisites, not substitutes for #8's code/design readiness check. Satisfy transitive dependencies and the applicable Section 5 blockers too. Choose the highest-value eligible milestone; a blocked independent track need not stop another eligible one. M001 and M002 are done as linked above. All remaining listed milestones are **Candidate**, with **Backlog: not created; Package: none; Evidence: pending**. These shared values are stated once instead of repeating empty columns.
+Dependencies in Section 4 are the minimum named prerequisites, not substitutes for #8's code/design readiness check. Satisfy transitive dependencies and the applicable Section 5 blockers too. Choose the highest-value eligible milestone; a blocked independent track need not stop another eligible one. M001 and M002 are done as linked above. M003 is **Selected**, with its package linked above and evidence pending. All other remaining listed milestones are **Candidate**, with **Backlog: not created; Package: none; Evidence: pending**. These shared values are stated once instead of repeating empty columns.
 
 M001 now has its [owning backlog](08-backlogs/M001-backend-foundation.md) and [selected package](../specs/001-backend-foundation/spec.md). Later milestones use #0's `Mxxx-<slug>.md` convention, or link an existing owning feature backlog. Replace the corresponding milestone title with a link to its actual backlog when created; record actual package/evidence links there and in #6. Do not create empty backlogs or package placeholders for this entire roadmap.
 
@@ -60,7 +58,7 @@ The exit column describes the increment's observable value. #8 supplies concrete
 | --- | --- | --- | --- | --- |
 | M001 | [Backend foundation](08-backlogs/M001-backend-foundation.md) | An agent can build and start the minimal backend and run an isolated meaningful smoke check with reproducible commands. | — | Architecture §2–3/5; V-009/V-012 (host portions only) |
 | M002 | [Published web shell](08-backlogs/M002-published-web-shell.md) | A user can open the basic SPA through the API host; navigation works and missing API/assets return proper errors. | M001 | FR-003; architecture §3; V-003/V-012 |
-| M003 | Durable storage foundation | A clean isolated store is created through migrations; persisted data survives a host restart and the storage checks are repeatable. | M001 | Architecture §6; V-005/V-016 |
+| M003 | [Durable storage foundation](08-backlogs/M003-durable-storage-foundation.md) | A clean isolated store is created through migrations; persisted data survives a host restart and the storage checks are repeatable. | M001 | Architecture §6; V-005/V-016 |
 | M004 | Independent AI development | An agent can exercise the shared AI boundary offline and inspect a synthetic prompt without starting API/UI or accessing secrets. | M001 | AI §2/9; V-007 |
 | M005 | Shared input and capability contract | An API consumer can discover the supported choices/limits; client and server agree on canonical input counts and validation fixtures. | M001 | FR-004/006/007/014/036; API §4/9; V-001/V-009 |
 
@@ -134,7 +132,7 @@ M035–M039 are deliberately **one bounded batch or journey group each**, not la
 
 ## 5. External dependencies and release checkpoints
 
-G1–G4 are **aggregate checkpoints, not executable 30-minute milestones**. They collect results over however many bounded milestones and external reviews are needed; they add no product scope or replacement thresholds. They cannot be marked complete just because a batch-producing milestone completed. Any corrective engineering becomes a new bounded milestone selected through #8.
+G1–G4 are **aggregate release checkpoints, not individual delivery increments**. They collect results over however many bounded milestones and external reviews are needed; they add no product scope or replacement thresholds. They cannot be marked complete just because a batch-producing milestone completed. Any corrective engineering becomes a new bounded milestone selected through #8.
 
 | Checkpoint | Evidence required from its owners | Relevant milestones / blockers |
 | --- | --- | --- |
@@ -167,14 +165,16 @@ Use milestone summary states **Candidate → Selected → In progress → Done**
 
 **Selection update — 2026-09-08:** Created M001 backlog/BI-001 and package 001 with six acceptance scenarios and six unchecked execution tasks. Added the initial/end human-step rule from #0 v1.6; no human action is required for M001 as scoped. Updated its check references to the actual host portions of V-009/V-012; independent AI verification remains M004.
 
-**M001 completion — 2026-09-08:** Implemented the pinned two-project backend scaffold, process-only liveness and absent-route boundary. Locked clean/repeated Release checks executed nine passing HTTP cases; successful and controlled-failure real-process smokes verified ephemeral loopback startup, nonzero propagation and cleanup. All package scenarios passed within the execution allowance; no product or release gate is claimed.
+**M001 completion — 2026-09-08:** Implemented the pinned two-project backend scaffold, process-only liveness and absent-route boundary. Locked clean/repeated Release checks executed nine passing HTTP cases; successful and controlled-failure real-process smokes verified ephemeral loopback startup, nonzero propagation and cleanup. All package scenarios passed; no product or release gate is claimed.
 
 **M002 selection — 2026-09-08:** Selected BI-002/package 002 after inspecting the completed M001 host, tests, commands and evidence. The increment adds a bounded signed-out informational shell, real static publication and focused navigation/asset-boundary verification; account forms and language features remain later milestones. Toolchain provisioning is explicitly front-loaded under #0.
 
-**M002 completion — 2026-09-08:** Implemented the pinned React/Vite shell, explicit ASP.NET static/fallback boundaries and clean single-artifact publication. Locked checks passed 8 component and 20 HTTP cases; 6 Chromium cases passed against an isolated published Kestrel host at desktop/390/320 widths, repeated publication removed stale assets, and backend-only checks passed without a webroot. All package scenarios passed, but the approximately 35-minute turn exceeded the 30-minute planning target; retain this overrun when sizing the next toolchain/publishing increment. No account/editor product capability or release gate is claimed.
+**M002 completion — 2026-09-08:** Implemented the pinned React/Vite shell, explicit ASP.NET static/fallback boundaries and clean single-artifact publication. Locked checks passed 8 component and 20 HTTP cases; 6 Chromium cases passed against an isolated published Kestrel host at desktop/390/320 widths, repeated publication removed stale assets, and backend-only checks passed without a webroot. All package scenarios passed. The recorded full turn took approximately 35 minutes; this is historical duration evidence, with no continuing time-limit requirement. No account/editor product capability or release gate is claimed.
+
+**M003 selection and policy update — 2026-09-09:** Selected BI-003/package 003 for explicit storage initialization, connection policy and isolated persistence/restart verification. Account/ledger schemas and production backup/recovery remain their own later outcomes. Applied #0 v1.7: the fixed milestone duration limit and associated time-based stop/split rules are removed. M001/M002 completion evidence is preserved.
 
 ## 7. Next applicable gate and validation
 
-M001 and M002 remain complete. No successor package is selected by this completion change; choose the next eligible outcome through #8 using the measured M002 evidence. M002 establishes only the signed-out hosting shell and does not make account, editor, language-operation or release acceptance complete.
+M001 and M002 remain complete. M003 / BI-003 is selected with its specification, implementation plan and ordered tasks prepared. At execution start, recheck the current code and tooling/access prerequisites; complete all selected migration, persistence, restart and regression checks before marking it done. M002 establishes only the signed-out hosting shell and does not make account, editor, language-operation or release acceptance complete.
 
-**Completion review:** Local source links, unique milestone IDs, dependency existence/order, check references and the separation of active/deferred/proposed scope were checked. M001/M002 runtime evidence is linked; all product milestones and release gates remain pending. Candidate feasibility must be established during #8 selection against the then-current implementation.
+**Planning consistency review:** Local source links, unique milestone IDs, dependency existence/order, check references and the separation of active/deferred/proposed scope were checked. M001/M002 runtime evidence is linked; all product milestones and release gates remain pending. Candidate feasibility must be established during #8 selection against the then-current implementation.
