@@ -75,7 +75,6 @@ run_codex() {
     output=$(codex exec \
         --ephemeral \
         --approve-for-me \
-        --sandbox workspace-write \
         --cd "$repository_root" \
         "$prompt") || codex_status=$?
 
