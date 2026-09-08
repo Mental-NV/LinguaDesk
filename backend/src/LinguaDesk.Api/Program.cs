@@ -1,10 +1,12 @@
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Routing;
+using LinguaDesk.Api.Infrastructure.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddHealthChecks();
 builder.Services.AddProblemDetails();
+builder.Services.AddLinguaDeskPersistence(builder.Configuration, builder.Environment);
 
 var app = builder.Build();
 

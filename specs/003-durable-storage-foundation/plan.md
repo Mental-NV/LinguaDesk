@@ -1,14 +1,16 @@
 # 003 — Durable Storage Foundation: Implementation Plan
 
-**Version:** 1.0 · **Updated:** 2026-09-09
-**State:** Prepared; implementation and verification pending
-**Inputs:** [spec.md](spec.md) v1.0; [BI-003](../../docs/08-backlogs/M003-durable-storage-foundation.md) v1.0
+**Version:** 1.1 · **Updated:** 2026-09-09
+**State:** Implemented and verified; runtime evidence recorded
+**Inputs:** [spec.md](spec.md) v1.1; [BI-003](../../docs/08-backlogs/M003-durable-storage-foundation.md) v1.1
 
 ## 1. Current state and tooling
 
 Baseline `003f355b4f9073e5d9ab6e3792c046a92e44a378` contains the .NET 10 API and MSTest project, central package management/lockfiles, the published React shell and backend/frontend/publish commands. SDK `10.0.302` is installed; the local dotnet tool list is empty. There is no DbContext, EF tool manifest, migration chain or application database. `Program.cs` currently registers only host services; preserve its explicit API/asset/health fallback boundaries.
 
-Use EF Core SQLite and Design **10.0.10**, with repository-local `dotnet-ef` **10.0.10**, aligned with the existing ASP.NET package patch. Add exact central pins, project references, a local tool manifest and regenerated locks; keep the Design package private to development tooling. Package existence was checked against the official [Design package](https://www.nuget.org/packages/Microsoft.EntityFrameworkCore.Design/10.0.10) and [EF tool package](https://www.nuget.org/packages/dotnet-ef/10.0.10). These are selected compatible pins, not a claim to use the newest release. Restore availability still needs execution preflight; cache inspection alone is not proof of a complete restore.
+Use EF Core SQLite and Design **10.0.10**, with repository-local `dotnet-ef` **10.0.10**, aligned with the existing ASP.NET package patch. Add exact central pins, project references, a local tool manifest and regenerated locks; keep the Design package private to development tooling. Package existence was checked against the official [Design package](https://www.nuget.org/packages/Microsoft.EntityFrameworkCore.Design/10.0.10) and [EF tool package](https://www.nuget.org/packages/dotnet-ef/10.0.10). These are selected compatible pins, not a claim to use the newest release; actual restore/build evidence is recorded in [tasks.md](tasks.md#3-completion-record).
+
+Execution verified those EF pins. NuGet audit rejected EF's transitive `SQLitePCLRaw.lib.e_sqlite3` 2.1.11 because of GHSA-2m69-gcr7-jv3q, so the implementation directly pins the compatible bundle to 2.1.12; locked restore resolves its core, provider and native library to 2.1.12 without changing the selected EF version.
 
 ## 2. Persistence and initialization design
 
@@ -60,4 +62,4 @@ Closeout records setup and locked check commands, counts/report locations, migra
 
 Main risks are accidental implicit creation, incorrect path/connection quoting, WAL or FK assumptions, test file collisions and publish cleanup deleting durable data. The selected explicit target, read/write mode separation and file-backed negative/restart checks address them. Shared production recovery and database-dependent serving readiness retain their later gates; they are not considered verified here.
 
-Review outcome: scope follows M003, all six scenarios map to tasks and concrete checks, human timing is explicit, no product behavior or threshold was added, and local design respects architecture/API/privacy boundaries. No unresolved design blocker. Execution preflight and runtime acceptance remain pending; there is no fixed duration gate.
+Review outcome: scope follows M003, all six scenarios map to tasks and passing checks, human timing is explicit, no product behavior or threshold was added, and the implementation respects architecture/API/privacy boundaries. Runtime evidence is recorded in [tasks.md](tasks.md#3-completion-record); there is no fixed duration gate.

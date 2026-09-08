@@ -1,7 +1,7 @@
 # M003 — Durable Storage Foundation Backlog
 
-**Document:** #8 · **Version:** 1.0 · **Updated:** 2026-09-09
-**State:** Selected; implementation and runtime evidence pending
+**Document:** #8 · **Version:** 1.1 · **Updated:** 2026-09-09
+**State:** Done; package AC-001–006 passed
 **Roadmap:** [M003 — Durable storage foundation](../07-roadmap.md#41-basic-infrastructure)
 
 ## 1. Outcome and authoritative inputs
@@ -16,7 +16,7 @@ M001, the formal dependency, is done. The user also confirmed M002 completion; i
 
 | Item ID | Outcome/title | Priority | Target milestone | Dependencies/blockers | State | Delivery package |
 | --- | --- | --- | --- | --- | --- | --- |
-| BI-003 | Initialize and verify durable local storage explicitly | Next / persistence enablement | M003 | M001 done; routine tooling/access preflight at execution start | selected | [003-durable-storage-foundation](../../specs/003-durable-storage-foundation/spec.md) |
+| BI-003 | Initialize and verify durable local storage explicitly | Next / persistence enablement | M003 | M001 done; no remaining blocker | done | [003-durable-storage-foundation](../../specs/003-durable-storage-foundation/spec.md) |
 
 ### BI-003 — Initialize and verify durable local storage
 
@@ -34,6 +34,6 @@ No planned end-of-milestone human action exists. Unexpected nonblocking human fo
 
 ## 4. Selection and completion
 
-The user requested M003 after M002 completion and removed the fixed milestone duration limit. BI-003 is selected as one coherent outcome; no successor is selected. The [specification](../../specs/003-durable-storage-foundation/spec.md), [plan](../../specs/003-durable-storage-foundation/plan.md) and [tasks](../../specs/003-durable-storage-foundation/tasks.md) are prepared. There is no duration gate or time-based stop/split requirement.
+The user requested M003 after M002 completion and removed the fixed milestone duration limit. BI-003 was delivered as one coherent outcome; no successor is selected. The [specification](../../specs/003-durable-storage-foundation/spec.md), [plan](../../specs/003-durable-storage-foundation/plan.md) and [tasks/evidence](../../specs/003-durable-storage-foundation/tasks.md#3-completion-record) record the verified implementation. There is no duration gate or time-based stop/split requirement.
 
-Done requires all six scenarios, applicable regressions, reproducible migration/restart evidence, verified operating instructions and consistent backlog/#6/#7/task states. Current status is **Selected — no implementation or passing M003 evidence claimed**.
+All six scenarios passed with locked backend checks, reproducible explicit migration and same-file restart evidence, passing published-shell regressions, verified README instructions and consistent backlog/#6/#7/task states. M003 remains enabling scope only and claims no complete product requirement or release gate.

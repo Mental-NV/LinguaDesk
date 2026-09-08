@@ -1,7 +1,7 @@
 # 003 — Durable Storage Foundation: Selected Specification
 
-**Version:** 1.0 · **Updated:** 2026-09-09
-**State:** Specified; ready for implementation preflight; runtime evidence pending
+**Version:** 1.1 · **Updated:** 2026-09-09
+**State:** Implemented and verified; AC-001–006 passed
 **Milestone/item:** [M003 / BI-003](../../docs/08-backlogs/M003-durable-storage-foundation.md)
 
 ## 1. Selection and authority
@@ -39,4 +39,4 @@ Use V-016's fresh migration/model drift portions and V-005's file-backed transac
 
 ## 5. Readiness
 
-Selected behavior, exclusions and dependencies are resolved. The plan and tasks cover all scenarios; no product decision blocks this foundation. Initial execution must recheck the current diff and restore/access prerequisites. No runtime acceptance is claimed by this review, and no fixed duration limit applies.
+Selected behavior, exclusions and dependencies remain resolved. Implementation and runtime evidence in [tasks.md](tasks.md#3-completion-record) supports all six scenarios; no product decision or human action blocks this foundation. Product/release gates outside this enabling package remain pending, and no fixed duration limit applies.

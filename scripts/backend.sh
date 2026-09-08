@@ -7,7 +7,7 @@ repository_root=$(CDPATH= cd -- "$script_directory/.." && pwd)
 solution="$repository_root/backend/LinguaDesk.slnx"
 api_project="$repository_root/backend/src/LinguaDesk.Api/LinguaDesk.Api.csproj"
 expected_sdk="10.0.302"
-expected_minimum_tests=20
+expected_minimum_tests=42
 configuration="Release"
 
 usage() {
