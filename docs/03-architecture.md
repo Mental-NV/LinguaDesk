@@ -1,6 +1,6 @@
 # LinguaDesk — Architecture and Engineering Principles
 
-**Document:** #3 · **Version:** 1.6 · **Status:** Ready for scoped implementation planning; contract and launch dependencies remain
+**Document:** #3 · **Version:** 1.7 · **Status:** Ready for scoped implementation planning; contract and launch dependencies remain
 **Updated:** 2026-09-08
 
 ## 1. Authority, Inputs, and Scope
@@ -214,44 +214,21 @@ Follow document #0 v1.3: `docs/05-api-design.md` owns shared behavior and `docs/
 
 Use pinned `openapi-typescript` for TypeScript definitions and a small `openapi-fetch` wrapper for transport/credentials/antiforgery/errors. This keeps transport generation independent from React state management. Commit generated schema/types, mark them generated, and regenerate in one command before frontend typechecking. CI fails on unexpected drift; do not hand-edit generated output. Generated shape alone does not prove status codes, authorization, accounting semantics, or compatibility; focused contract tests and review still do. P-006 remains proposed.
 
-## 9. Verification Strategy: Most Tests at the Bottom
+## 9. Verification Strategy
+
+The [verification plan #6](06-verification-plan.md) is the canonical execution owner. Architecture retains the selected MSTest/Vitest/Testing Library/Playwright stack, host-independent AI boundary, production database/migration guarantees and testability constraints in Sections 2–8. ADR-005/009/012 retain the rationale.
 
 ### 9.1 Layer ownership
 
-The broadest set of cases belongs to pure units, followed by focused DOM component tests. Integration suites are smaller and exercise real boundaries. Browser journeys are the smallest suite. This is a risk-based allocation, not a numeric coverage quota or an instruction to weaken data integrity checks.
-
-| Layer | Owns | Does not establish |
-| --- | --- | --- |
-| MSTest pure units | Count/limit boundaries, reservation and settlement decisions, cost arithmetic, two-family chain validation/order, failure classification, deadline policy with fake time | SQL atomicity, migrations, HTTP/auth wiring |
-| Vitest pure units | Reducers, explicit-dispatch/duplicate guards, no-auto-resume policy, stale-response and usage ordering, workspace/result-edit revisions | Browser editing/layout |
-| Vitest + Testing Library DOM components | Visible messages, forms, control state, effect request counts, usage rendering, semantic names/live-region mutations | Real clipboard, layout, bfcache, native IME, complete accessibility |
-| EF/SQLite integration | Queries, constraints, transaction rollback, concurrent admission/settlement, crash recovery metadata, migrations | Provider language quality or browser behavior |
-| MSTest HTTP integration (`WebApplicationFactory`) | Routing, validation, auth/antiforgery, error/usage serialization, independent API operations, unknown API paths | Actual socket/TLS/static publish behavior |
-| Playwright browser contracts | Small keyboard/focus/clipboard/editing/history/privacy/reflow set and curated visual baselines per UX #2 | Server accounting when API responses are intercepted |
-| Playwright integrated smoke | Published SPA → real API/auth → migrated SQLite → deterministic provider adapter; one explicit Translation and one full-Rewrite journey with local sign-in | Live email/provider service reliability |
-| Separate release evidence (#6) | Live local-account/email smoke, provider quality/performance/cost eligibility, manual browser/assistive-technology checks | Cannot be replaced by fixture success |
+Use [#6 Section 2](06-verification-plan.md#2-verification-layers-and-check-catalog) for the unit-heavy strategy and assertion allocation. This is risk-based verification, not a numeric coverage quota.
 
 ### 9.2 Deterministic integration harness
 
-Use `WebApplicationFactory`/in-process `TestServer` by default for HTTP boundary tests. Direct persistence tests can construct `DbContext` without an HTTP host. TestServer removes listening-port conflicts; determinism and parallel safety still require isolated database paths, users/configuration, fake time, and controlled external responses.
-
-Use the same EF SQLite provider and migrations as production. File-backed databases in unique temporary directories with WAL are required for concurrency, locking, crash/restart, and migration tests. Each concurrent request has its own context/connection; use barriers/deferred fakes rather than sleeps. SQLite in-memory may be used for focused relational cases without file/locking claims, with an explicitly owned connection lifetime; EF's InMemory provider and mocked `DbSet` are not substitutes. Tests may share helpers, not mutable cross-test state.
-
-Test fresh migration and upgrade from the last released schema with representative account/ledger data; before the first release, test fresh schema plus any data-transforming migration with its prior schema. Assert retained data and constraints and check pending model changes. Simulate failures at Section 7.2's commit boundaries; a small process-restart test verifies persistence survives beyond the host instance.
-
-Use fake provider/email adapters and sanitized transport fixtures for adapter parsing/error tests. Most authorization tests may use a controlled principal, but focused tests must use the real configured cookie/bearer handlers, antiforgery, verification gate, and token flows. A test-auth handler alone cannot prove authentication security.
-
-Browsers cannot connect to in-memory TestServer. Integrated smoke therefore launches an owned Kestrel process on an OS-assigned/discovered port, with isolated migrated storage and test-only external adapters. Seed a verified local test account and exercise the real cookie login; use loopback HTTPS with a test certificate trusted only by the harness when exercising Secure cookies. Check readiness, dispose the process on failure, and never replace the browser's `/api` calls in this suite. Test adapters must be inaccessible in production configuration. Fixture-only browser contracts remain distinct.
+Use [#6 Section 3](06-verification-plan.md#3-deterministic-backend-and-independent-ai-verification) for isolated SQLite/TestServer/Kestrel, migration/restart, fake-time and provider/email harnesses. The tests must prove this document's production integrity constraints.
 
 ### 9.3 Execution and traceability
 
-- **Inner loop:** Relevant pure unit/component checks, typecheck, and analyzers. Run focused integration checks for changed data/HTTP boundaries.
-- **PR gate:** All fast tests, backend build/integration, schema/client drift check, frontend production build, and the small integrated Chromium smoke. UI changes also run the affected browser contracts/curated visuals; harness/hosting/shared-style changes run the whole relevant browser set. If change selection is uncertain, run the relevant suite in full.
-- **Release gate:** Add UX #2's targeted engine/device checks, actual published-host behavior, migration/restore and process recovery, measured workloads and provider evaluations from #6. Paid/non-deterministic evaluations stay outside the ordinary PR loop and cannot substitute for deterministic tests.
-
-#6 maps every current-MVP requirement and active UX-AC ID to checks, layer, environment and evidence. Preserve Deferred/Retired IDs with their disposition instead of implementing them or reporting them as failed/missing/passing tests. A compound row with a deferred branch verifies only its active acceptance now. Split a compound scenario by assertion: e.g., UX-AC-106's ordering algorithm is a unit, its displayed usage a component check, and its server sequence fields an API check. Do not rerun the entire scenario in each layer. A screenshot or backend test does not discharge unrelated UI assertions. All 112 original UX IDs stay stable, but only active rows create current acceptance obligations. Curated screenshot scope is seven current baselines in UX Section 12.10; no sentence/Google/prefix/custom-tools matrix remains.
-
-No runtime tests have been executed for this spec-only repository. Document validation is not implementation evidence.
+[#6 Sections 7–8](06-verification-plan.md#7-execution-gates-and-evidence) own inner-loop/PR/release gates, canonical coverage and evidence status. Runtime verification remains pending.
 
 ## 10. Decision Records and Source Basis
 
@@ -278,7 +255,7 @@ Technical guidance checked on 2026-09-07; the choices above are LinguaDesk's app
 | Q-003/Q-006, #5 with #3 | Shared semantics selected in #5; exact operations/DTOs/headers, auth bootstrap/policy/delivery details and implementation evidence remain | Selected accounting/auth/recovery handlers and dependent clients; YAML itself is deferred to early implementation |
 | Q-004, account/privacy package with #3/#5/#10 | Recovery window/stamp rules in #5; backup/aggregate/unresolved-exposure retention, deletion and further logout guarantees/provider disclosure remain; external linking deferred DF-007 | Related account features and launch |
 | Q-007, #4 | Policy specified in #4; selected adapter/token bounds, executable prompt/validator fixtures and conformance evidence remain | Live provider orchestration readiness; offline policy work can proceed |
-| Q-005, #6 | Coverage mapping, evaluation workload, actual evidence | Release acceptance |
+| Q-005, #6 | Verification design and coverage specified in [#6](06-verification-plan.md); executable evidence remains pending | Release acceptance |
 | Q-008/Q-010, PRD then #3/#10 | P-005 safeguard scope and any additional operational thresholds | Adoption of proposed controls; no silent acceptance |
 
 The topology, engineering defaults, and test allocation are ready for **scoped planning**. Documents #4–#6 need only resolve the contracts required by the selected package before its implementation; unrelated future decisions do not block independent work. DF-001–DF-007 do not block MVP and create no speculative framework or testing work. This is not a claim of launch readiness or full resolution of privacy/cost questions.

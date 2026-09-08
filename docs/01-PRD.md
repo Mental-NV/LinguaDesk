@@ -1,6 +1,6 @@
 # LinguaDesk — Product Requirements Document
 
-**Version:** 0.5 · **Status:** Simplified MVP product baseline; API-design handoffs updated; deferred scope explicit; P-005/P-006 remain proposed · **Updated:** September 8, 2026 (UTC)
+**Version:** 0.6 · **Status:** Simplified MVP product baseline; verification ownership/handoffs updated; deferred scope explicit; P-005/P-006 remain proposed · **Updated:** September 8, 2026 (UTC)
 
 This document consolidates the discovery decisions. It specifies product outcomes for later UX, architecture, API, and feature specifications. It contains no implementation plan or development task breakdown.
 
@@ -238,7 +238,7 @@ Use a fixed multilingual test set, AI-assisted grading, and human checks in ever
 
 Score usefulness and preservation of meaning, grammar/spelling, requested style/tone, and supported language/script. When DF-001 is selected, its evaluation must additionally cover distinctness, context fit and option count. Critical failures include invented facts, material omissions, meaning reversal, changed numerical values, or the wrong output language. Oversized translation is tested as rejection with no provider transformation or charge; there is no partial-result quality gate in MVP.
 
-Apply the same criteria to every model/settings configuration on the routes it may serve. The Translation family candidate must pass all 12 directions and the Rewriting candidate all four languages and modes; assess a configured fallback to the same standard. Record per-route/language results rather than relying only on an aggregate score. Dataset size, grading rubric, human sample coverage, and reference-answer construction remain evaluation-specification decisions; the **90% threshold and human checks in every language are confirmed**.
+Apply the same criteria to every model/settings configuration on the routes it may serve. The Translation family candidate must pass all 12 directions and the Rewriting candidate all four languages and modes; assess a configured fallback to the same standard. Record per-route/language results rather than relying only on an aggregate score. Dataset size, grading rubric, human sample coverage, reference-answer construction and workload methodology are now specified in [verification plan #6](06-verification-plan.md); the **90% threshold and human checks in every language are confirmed**.
 
 ### Release gates
 
@@ -317,7 +317,7 @@ D-01–D-16 record the discovery baseline. Their automatic processing, alternati
 | Q-002 | **Resolved for MVP by D-17.** Targeted sentence-correspondence and toggle restoration are cut. No sentence metadata exists in MVP. Future assistance uses whole-result metadata invalidation on manual edits. | No MVP blocker. Future sentence/alternative association design belongs to DF-001; change review belongs to DF-002. |
 | Q-003 | **Shared design specified:** [API design Sections 4–7](05-api-design.md#4-complete-input-and-canonical-counting) resolve counting, retry identity, interruption/cancellation, period assignment and usage ordering. Exact wire fields, persistence/concurrency implementation and evidence remain | Selected API/accounting slices; shared behavior precedes handlers and generated wire review precedes client adoption |
 | Q-004 | Confirm per-tab memory teardown, metadata/backup retention, local-account deletion/revocation and provider disclosure. External-account linking is deferred with Google (DF-007). | Privacy/security and local-account specifications before launch; UX fixes observable workspace lifetime. |
-| Q-005 | Evaluation corpus size, grading rubric, human review coverage, critical-error examples, and performance-test workload composition | Evaluation specification, before model acceptance |
+| Q-005 | Design specified in [verification plan #6](06-verification-plan.md): corpus size, grading rubric, human coverage, critical-error examples and performance workloads. Executable corpus, reviews and measured evidence remain pending | Implement and execute the plan before model acceptance; product thresholds remain in Sections 7–8 |
 | Q-006 | **Partially resolved:** [API design](05-api-design.md) selects auth modes/lifecycle, identity and cancellation/recovery/error semantics. Exact operations/schemas/headers, auth bootstrap/policy/delivery details and schema version mechanics remain; P-006 compatibility guarantees are still proposed | Selected API/auth slices; generated OpenAPI begins early in implementation under #0, not as a prerequisite to finishing numbered planning documents |
 | Q-007 | Provider error/refusal classification, output validity, bounded attempt/deadline policy for the two simple chains, and owner diagnostics. Alternative context bounds are deferred DF-001. | LLM/architecture specifications before provider orchestration; no advanced routing prerequisite. |
 | Q-008 | Short-term abuse limits, operational alerts, provider-cost tracking/enforcement, and any additional availability SLO | Security/architecture/operations specifications, before launch; safeguard scope awaits P-005 review |

@@ -1,6 +1,6 @@
 # LinguaDesk — UX/UI Specification
 
-**Document:** #2 · **Version:** 1.4 · **Status:** Simplified MVP ready for scoped planning; runtime verification pending
+**Document:** #2 · **Version:** 1.5 · **Status:** Simplified MVP ready for scoped planning; verification methods consolidated in #6; runtime evidence pending
 **Updated:** September 8, 2026 (UTC)
 
 ## 1. Authority, inputs, and scope
@@ -290,24 +290,13 @@ Target [WCAG 2.2 AA](https://www.w3.org/TR/WCAG22/) with native semantics and ke
 
 At 200% zoom all actions remain available; at effective 400% / 320 CSS px there is no horizontal page overflow. Text-spacing overrides (1.5 line height, 2× paragraph spacing, .12em letter and .16em word spacing) cause no clipping. Reduced motion removes transitions/shimmer. Native Chinese composition, selection and undo/redo remain intact; explicit activation during composition is ignored without a delayed submission. Do not move focus on completion or scroll a background result into view.
 
-### 10.1 Supported browsers and automated allocation
+### 10.1 Supported browsers
 
-Support current and immediately previous stable major releases at each release candidate for Chrome, Edge, Firefox, desktop Safari, iOS Safari and Android Chrome. Record actual tested versions in #6. Bundled Playwright Chromium/WebKit represent engines, not branded/browser-version or physical-device proof. Previous-major support requires bounded actual-version smoke or an explicit evidence gap before release support is claimed.
+Support current and immediately previous stable major releases at each release candidate for Chrome, Edge, Firefox, desktop Safari, iOS Safari and Android Chrome. [Verification plan Section 4](06-verification-plan.md#4-frontend-browser-and-manual-verification) owns automated lane allocation, actual-version evidence and manual browser/device/assistive-technology procedures. Bundled engines alone do not establish this support contract.
 
-| Lane | Automated scope | Release/manual scope |
-| --- | --- | --- |
-| Chromium desktop 1440×900 | Core keyboard/focus/edit/copy/history/privacy subset, curated visuals per Section 12.10, small integrated smoke | Branded Chrome/Edge and keyboard/zoom smoke |
-| Chromium narrow 390×844 | Curated visuals and ordinary reflow/native-control geometry | Android Chrome/TalkBack at 360×800 |
-| Chromium 320×640 / 1024×768 | Small overflow/breakpoint checks, no extra screenshot matrix | Zoom and text-spacing checks |
-| Firefox desktop 1024×768 | Short native-editor/selector/keyboard/composition-event smoke when affected or at release | NVDA and actual supported Firefox versions |
-| WebKit desktop 1440×900 | Short focus/navigation/editor smoke when affected or at release | Actual macOS Safari/VoiceOver |
-| iOS Safari 390×844 | No separate full automated narrow-engine suite | VoiceOver, editing/copy, native selects and software keyboard |
+### 10.2 Verification ownership
 
-### 10.2 Manual evidence
-
-Before RG-006, check local registration/login/recovery, Translation, Rewriting mode selection, explicit submission, validation, copy and session expiry with NVDA/Firefox on Windows and VoiceOver/Safari on macOS. Include actual Simplified/Traditional Chinese IME on macOS. Check source/result editing, native selectors, copy and keyboard visibility with iOS Safari/VoiceOver and Android Chrome/TalkBack. Check keyboard-only Windows/macOS at 100%, 200% and effective 400%, forced colors, text spacing, and speech-control labels.
-
-Automated semantics, focus, contrast/reflow and live-region checks do not prove understandable screen-reader narration or native mobile keyboard behavior. Deferred sentence, comparison and custom-sheet journeys are excluded from current evidence, not reported as passing.
+The accessibility outcomes above remain UX contracts. Automated checks and required manual evidence are consolidated in [verification plan Sections 4.2–4.4](06-verification-plan.md#42-browser-lanes); deferred journeys create no MVP evidence requirement.
 
 ## 11. User stories and disposition
 
@@ -335,15 +324,7 @@ Automated semantics, focus, contrast/reflow and live-region checks do not prove 
 
 ### 12.1 Harness and fixtures
 
-Scenarios are layer-independent contracts. Use pure MSTest/Vitest units for policy/revisions and Vitest + Testing Library for visible components, explicit request counts and forms. Fake only external/transport boundaries appropriate to that layer. Integrated browser smoke uses real SPA/API/local auth/migrated SQLite and fake provider/email adapters; it never intercepts the application's `/api` calls. Deterministic tests never call live services or use arbitrary sleeps.
-
-Keep fixed time `2026-09-07T17:40:00Z`, UTC display assertions, controlled deferred responses and fake timers only for deadlines/cooldowns/notices. There is **no debounce timer**. Count logical transformations separately from auth, usage, eligibility and status reads. Default auth is a verified local `writer@example.test` with user usage 7,500 and available global/budget capacity; seed prior results explicitly and exclude seed operations from observed counts.
-
-Use T-OK-A: `Hello, the meeting starts at 14:30. Please go.` (46 ASCII chars), Romanian fixture `Bună, întâlnirea începe la 14:30. Te rog să mergi.`; T-OK-B: `The report is ready.` (20), Romanian `Raportul este gata.`. W-OK source: `The report is really ready. We sends it today.` (46); result: `The report is ready. We send it today.` (38). Result fixtures carry no sentence IDs. T-LONG is 5,312 `a` characters and must be rejected with excess 312, not accepted/truncated. Boundary fixtures are L−1/L/L+1 for both limits; #5 supplies exact Unicode expectations for emoji, combining marks, CRLF, tabs/spaces and Chinese. Use shared counting fixtures rather than JS string length assumptions.
-
-Supported direction fixtures cover all 12 pairs using short equivalent sentences in the four languages. Rewrite fixtures include Traditional input with Simplified output and all nine dropdown choices. Language correctness is evaluation evidence in #6; fixtures establish transport and presentation only. Auth policy fixture may use minimum 12 characters and `Maple!River2026`; that is not a production password policy. Use invalid/expired token fixtures and controlled known/unknown-email outcomes.
-
-Query by semantic role/name. Native selectors are asserted through value/options/disabled state and browser keyboard smoke, not custom menu internals. Do not preserve old sentence/boundary test IDs. Browser-only checks own actual clipboard, caret/selection, layout/history/storage and restoration; DOM emulators cannot prove them.
+Scenarios are layer-independent behavioral contracts. [Verification plan Section 4.1](06-verification-plan.md#41-shared-ui-fixtures) owns their canonical fixture text/counts, fixed time, account seeds and request-count conventions. Its Sections 2–4 allocate assertions to units, components, API/database and native browser evidence; scripted outputs do not establish language quality.
 
 ### 12.2–12.9 Scenario disposition and current acceptance
 
@@ -466,59 +447,15 @@ Query by semantic role/name. Native selectors are asserted through value/options
 
 ### 12.10 Curated visual regression
 
-Use **seven** initial Chromium baselines: Translation ready and oversize-error layouts (each 1440×900 and 390×844), Rewriting with inline mode and a plain edited result (390×844), local registration with long validation errors (1440×900), and workspace-reset dialog (390×844). Add a baseline only for an uncovered layout risk. No sentence, comparison, Google, prefix, custom-dropdown or tools-sheet baseline ships now. Remaining combinations use DOM assertions or targeted browser geometry, not screenshots of every scenario.
-
-Pin Noto Sans/Noto Sans SC, Chromium/container, scale factor 1 and deterministic synthetic content/time. Wait for fonts; hide caret; disable motion and control scrollbars. Native select popups are excluded from pixel capture. Start with per-pixel threshold 0.1 and max differing ratio 0.001; record measured reasons for adjustments and never automatically accept changed baselines. DOM emulators cannot prove layout. Keep structural/semantic checks independent of screenshots.
+Section 4 owns the visual design. [Verification plan Section 4.4](06-verification-plan.md#44-curated-visual-regression) owns the seven initial baselines, capture setup, comparison tolerances and review procedure.
 
 ## 13. Verification boundaries
 
-| Evidence | Owns | Cannot claim |
-| --- | --- | --- |
-| Pure units | Revision/response ordering, explicit-dispatch guards, count/limit/cost policy, no-auto-resume decisions | Browser/layout or database atomicity |
-| DOM components | Native-control options/values, messages/forms, request counts, live-region changes, visible usage | Native clipboard/IME/layout/history or real authentication |
-| SQLite/API integration | Local auth/verification/recovery, independent client, count/usage/error contracts, reservations/concurrency/idempotency and migrations | Provider quality or browser behavior |
-| Browser contracts | Native edit/caret/copy, keyboard/focus/history/privacy/reflow and curated visuals | Server behavior when API fixtures are used |
-| Integrated smoke | One Translation and one full-Rewrite path through real published frontend/API/local cookie auth/migrated SQLite, external adapters faked | Live email/provider delivery, language quality or native mobile AT |
-| Release evaluation/manual evidence | Quality/performance for two active operations, real email/provider/privacy/cost and supported browser/AT checks | Universal compatibility or a passing result for deferred scenarios |
-
-Most cases stay in pure units and focused DOM components, fewer in database/API integration, and the smallest suite in real browsers. #6 maps each active assertion to its lowest sufficient layer; it records inactive scenarios as Deferred/Retired, not missing/passing tests. No full Cartesian matrix across browsers, languages, modes and states is required.
+[Verification plan Sections 2–4](06-verification-plan.md#2-verification-layers-and-check-catalog) define the lowest sufficient evidence for each assertion and distinguish fixtures, integrated smoke and live/manual checks. The [local acceptance allocation](06-verification-plan.md#82-local-acceptance-allocation) preserves every UX-AC ID and its current disposition. No scenario here is a claim of a passing test.
 
 ## 14. MVP traceability
 
-| PRD scope | UX ownership / acceptance IDs | Status |
-| --- | --- | --- |
-| FR-001/002 | Section 9; AC-006–020, 101–104; Google AC-011/012 inactive | MVP local / DF-007 Google |
-| FR-003 | Section 3; AC-001–005/112 | MVP |
-| FR-004–006 | Sections 5–7; AC-025/027–029/043/088–091 | MVP explicit validation/detection |
-| FR-007 | Section 7/8; AC-030/032/045/109 | MVP blocking / DF-006 prefix |
-| FR-008–010 | Section 7; AC-022/033/091; #6 quality | MVP |
-| FR-011 | Sections 6/7; AC-022/024–037 | MVP explicit / DF-003 automatic timing |
-| FR-012–014 | Section 8; AC-038–040/090/110 | MVP single mode |
-| FR-015 | AC-041/042 | Retired toggle |
-| FR-016–018 | Sections 6/8; AC-039/043–047 | MVP explicit/protected |
-| FR-019 | AC-048–050/099/111 | DF-002 |
-| FR-020/021 | AC-052–057/061/080/097–099/111 | DF-001 |
-| FR-022/023 | Sections 6/8; AC-047/051/058–060/094/100 | MVP plain editing; AC-062–064 targeted preservation retired |
-| FR-024/026–028 | Sections 6/9; AC-032/035/065–076/105–108; API integrity | MVP; FR-024 prefix part DF-006 |
-| FR-025 | AC-052/055/056/105 alternatives branches | DF-001 |
-| FR-029/030/032–034 | No admin UI; AC-065/067/072–076; #3/#4/backend verification | MVP simple family chains |
-| FR-031 | No UX; advanced-routing verification deferred | DF-004 |
-| FR-035/036 | #5/#6 independent local-account API for Translation/Rewrite/usage | MVP; alternatives/IDs DF-001 |
-| FR-037 | Sections 6/9; AC-007–020/027–030/045/068–076/101–108 | MVP categories |
-| FR-038 | Sections 3/8; AC-001–003/038/084–087 | MVP memory/defaults |
-| NFR-001/002 | Section 13 and #6 | MVP quality/performance for two operations |
-| NFR-003 | Sections 6/13; AC-034–035/046–047/058–060/106–108; API integrity | MVP reliability |
-| NFR-004 | Section 3; AC-003/015–016/084–087 and #3/#6 | MVP privacy |
-| NFR-005/007 | Sections 4/5/10; active AC-077–095 and #6 | MVP native/responsive/accessible; DF-005 bespoke controls |
-| NFR-006 | Section 9; AC-070/071 and #3/#6 | MVP cost |
-| NFR-008 / P-005 | No newly accepted safeguard scope | Proposed |
-| RG-001 | All active functional rows above | MVP only |
-| RG-002/003 | #6 quality/performance for Translation/Rewrite | MVP only |
-| RG-004 | Accounting/recovery rows, server integrity tests | MVP only |
-| RG-005 | Local auth and independent API evidence | MVP; Google/alternatives deferred |
-| RG-006 | Section 10 current journeys/browser/AT | MVP only |
-| RG-007 | Privacy/cost rows and #3/#6 | MVP |
-| RG-008 | Section 15 dependency resolution | Current-scope blockers only |
+The sole cross-document [product and release coverage matrix](06-verification-plan.md#81-product-and-release-coverage) now lives in #6. This document retains UX behaviors, stories and scenario IDs; it does not maintain a second product-to-evidence table.
 
 ## 15. Decisions, handoffs, and deferred reactivation
 

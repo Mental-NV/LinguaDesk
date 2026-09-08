@@ -1,6 +1,6 @@
 # LinguaDesk — LLM Behavior and Routing Specification
 
-**Document:** #4 · **Version:** 1.2 · **Status:** Shared design for scoped planning; provider qualification and implementation evidence pending
+**Document:** #4 · **Version:** 1.3 · **Status:** Shared design for scoped planning; provider qualification and implementation evidence pending
 **Updated:** 2026-09-08
 
 ## 1. Authority, inputs, and scope
@@ -17,7 +17,7 @@
 
 This document owns prompts, provider settings/adapters, language eligibility, family chains, output checks, error classification, context and attempt bounds under Q-007. It supplies capability and cost evidence for Q-001; it does not certify a serving arrangement or select a monetary cap. The technical choices below exercise the design authority delegated by #0 and are recorded in ADR-012. They are not claims of product-owner approval of a new requirement.
 
-The repository contains specifications only. [API behavioral design #5](05-api-design.md) now supplies shared semantics. `docs/05-openapi.yaml` and `docs/06-verification-plan.md` do not exist and were not read: OpenAPI follows at the start of selected API implementation and #6 remains a future verification owner. These are not implemented contracts or passing evidence. Planned code, prompts, fixtures and commands are also not present yet.
+The repository contains specifications only. [API behavioral design #5](05-api-design.md) now supplies shared semantics. `docs/05-openapi.yaml` remains deferred to the start of selected API implementation. [Verification plan #6](06-verification-plan.md) now owns the independent workflows, corpus, rubric, human review, workloads and evidence mapping. These are not implemented contracts or passing evidence. Planned code, prompts, fixtures and commands are also not present yet.
 
 Scope is the current Translation and Rewriting MVP: FR-004–014, active FR-016–018/022–024, FR-026–030/032–038 and applicable NFR-001–006. Preserve the PRD's exact language/mode catalog, input limits, allowance values and performance/quality thresholds by reference to Sections 5–8. DF-001–DF-007, retired sentence preservation and the duplicate correction toggle create no work here. P-005/NFR-008 and P-006 remain proposed; this design does not select new abuse rates, content restrictions, API compatibility promises or provider privacy gates.
 
@@ -282,73 +282,46 @@ Provider-managed caching remains permitted. Do not install `UseDistributedCache`
 
 ## 9. Independent development and evaluation
 
-### 9.1 Workflows without API or UI
+### 9.1 Host-independent capability
 
-The standalone runner is a development tool, not another application service or public API. It must load a versioned case set and the same Ai composition/configuration validator used by production. No HTTP-server startup, migrations, account registration, frontend build, browser, Docker service or production data is needed.
+The standalone `LinguaDesk.Ai.Evaluation` runner remains a development tool with the shared composition/configuration validator from Section 2. It must work without Api, migrations, accounts, frontend or production data. Its required offline, prompt-inspection, adapter, live-candidate and chain workflows are specified in [verification plan Section 3.3](06-verification-plan.md#33-independent-ai-workflows). Actual noninteractive commands are documented in #10 when implemented.
 
-| Workflow | Inputs and effects | Completion evidence |
-| --- | --- | --- |
-| Build/fast AI tests | Ai/Core, scripted `IChatClient`, fake admission/time; no secrets/network | Deterministic MSTest results; failing assertions are nonzero exit |
-| Inspect prompt / validate configuration | Synthetic fixture plus bundle/profile | Exact serialized prompt/settings inspectable locally; no provider call; invalid config is nonzero exit |
-| Adapter conformance | Synthetic HTTP fixtures through real adapter and fake `HttpMessageHandler` | Request body/options, response mapping, bounded reads, cancellation and one-dispatch assertions |
-| Live candidate evaluation | Explicit live mode, allowlisted corpus, provider credentials and finite run budget | Machine-readable report identifying actual live calls, usage/exposure, errors and quality results |
-| Chain evaluation | Configured pair, same orchestrator; controlled primary failures plus live qualification separately | Fallback ordering/dispatch count and behavior with reused eligibility; primary success cannot hide an unqualified fallback |
-| API/UI integration | Owning suites in #3/#6 | Auth, durable accounting, wire errors, result application and end-to-end latency; separate from standalone AI evidence |
+### 9.2 Evaluation ownership and data boundary
 
-The implementation must supply noninteractive entry points for these workflows and document actual commands in #10 once they exist. Do not present hypothetical `dotnet` commands as runnable today. Offline tests are the ordinary development/PR default. Missing credentials must not turn a requested live run into a fake passing report; report it as blocked/non-success.
+[#6 Sections 5–7](06-verification-plan.md#5-llm-quality-and-candidate-qualification-q-005) own Q-005: corpus construction, grading/human review, API workloads, optional evaluation tooling and report requirements. Runner-only grading/report dependencies do not enter the serving library. Production text must never become an evaluation dataset or persistent report; Section 8 and #3 retain application privacy authority. Live evaluation requires bounded monetary admission including graders and unresolved exposure; #6 specifies execution and billing isolation.
 
-Live runs require a declared maximum spend, dispatch count and concurrency. Include generation, failed attempts and any paid graders in admission; reserve before each call, including parallel cases. Use separate evaluation credentials/billing scope where available. If sharing a serving billing scope, integrate with its global monetary admission; a standalone in-memory budget cannot protect concurrent production spend. Persist metadata-only unresolved evaluation exposure across restarts or require reconciliation before another live run. Development text may be inspected in active console memory; it must not become a hidden production-text collection feature.
+### 9.3 Candidate eligibility
 
-### 9.2 Evaluation tooling and artifact contract
-
-Use MSTest for deterministic behavior. `Microsoft.Extensions.AI.Evaluation` and its Quality evaluators are suitable optional runner dependencies for AI-assisted grading and custom `IEvaluator` implementations. Microsoft's reporting components can store responses, so do not adopt default caching/storage behavior without explicitly configuring the evaluation-only data boundary. These packages never become serving dependencies. [Microsoft evaluation libraries](https://learn.microsoft.com/en-us/dotnet/ai/evaluation/libraries)
-
-#6 owns the corpus size, rubric, human sample coverage and performance workload (Q-005); it must reference PRD NFR-001/002 and RG-002/003 without replacing their thresholds. The runner must support:
-
-- Stable case IDs, corpus revision/hash and provenance; operation, source/target or mode, source fixture, expected eligibility and fidelity assertions/reference notes. Include all directions/languages/modes, both Chinese scripts, ambiguity, short texts, mixed/unsupported content, corrections, names, numbers, URLs and paragraph/list structure.
-- A run manifest with code/SDK/package revision, prompt/validator/settings hashes, configured and observed model identity, provider endpoint profile, billing snapshot, case selection, concurrency, timestamps and live/fixture/cache disposition.
-- Per-case outcome, rejection/failure category, attempts by stage/candidate, full pipeline and stage durations, token usage/cache evidence, known spend/unresolved exposure, deterministic findings, grader/rubric revision and human review disposition. Never omit failed calls from latency/quality reporting or count failures as timely successful completions.
-- Per-route/language and operation aggregation with mode breakdowns and critical-error tracking. Grade both isolated candidates and configured-chain behavior; the same thresholds apply to fallback. AI grades assist human review and cannot satisfy the required human coverage alone.
-- Candidate-to-baseline comparisons on the same case IDs; no exact-output equality requirement for live rewriting/translation and no claim that low temperature makes runs reproducible byte for byte.
-
-Persist corpus text/reference answers and generated outputs only for intentionally authored synthetic or approved public evaluation fixtures, in explicitly designated evaluation artifacts. Never import real workspace submissions/results or production traces. Reports from ad hoc/private input contain metadata only and do not persist model text or grader explanations that quote it. Do not store hidden reasoning. Application response caching remains absent; disable runner response reuse for fresh qualification/performance evidence and mark any fixture replay clearly.
-
-Standalone latency exposes model/pipeline performance but does not prove NFR-002's API-submission-to-complete-response benchmark. #6 must also measure the real API, admissions/settlement and concurrency using the agreed workload. Report provider cache-hit/miss conditions, fallback, maximum input and timeout cases. A cached response replay or scripted client cannot establish live quality, cost or latency.
-
-### 9.3 Qualification and change control
-
-Each serving candidate must demonstrate adapter capability/settings, finite monetary/context bounds, full-family eligibility and transformation quality, runtime-validator behavior and applicable performance. The qualification manifest links those results to the exact candidate/bundle revisions. A fallback is optional; configure none until one qualifies. No per-route exception may hide a failure in a simple family chain.
-
-Model alias changes, provider/SDK updates, prompt/settings/checker changes and pricing changes require reassessment of the affected evidence. Compare returned model/fingerprint against recorded observations where available; an alias alone cannot prove the model is unchanged. Do not invent a monitoring interval or a new availability SLO here; #6/#10 own the verification/operating procedure. Qualification is evidence with limitations, not a guarantee of every future response.
+Every serving candidate must demonstrate adapter/settings capability, finite monetary/context bounds, full-family eligibility and transformation quality, runtime-validator behavior and applicable performance. Qualification binds evidence to the exact candidate/bundle revisions under [#6 Section 5.4](06-verification-plan.md#54-qualification-and-changes). A fallback is optional; configure none until one qualifies. No per-route exception may hide a failing candidate. Startup validation remains Section 5's runtime contract; qualification is evidence with limitations, not a guarantee of every future response.
 
 ## 10. Local acceptance scenarios and handoffs
 
-These IDs describe checks for #4, not a duplicate product coverage catalog or implementation task list. #6 must link them into its canonical requirement-to-evidence matrix. All runtime evidence is **pending**.
+These IDs describe checks for #4, not a duplicate product coverage catalog or implementation task list. [#6 Section 8](06-verification-plan.md#8-canonical-coverage-and-acceptance-allocation) links them to the canonical requirement-to-evidence matrix and allocates checks. All runtime evidence is **pending**.
 
-| Scenario | Observable acceptance / boundary | Upstream | Lowest sufficient evidence |
-| --- | --- | --- | --- |
-| LLM-AC-001 | Ai builds and offline cases run with Api/frontend absent, no credentials and provider network disabled | FR-035/036, #3, user request | Dependency/build check and deterministic Ai tests |
-| LLM-AC-002 | Every supported direction/language/mode uses its family chain; extra/repeated candidates, route rules and unsupported settings fail validation | FR-029/030/032 | Configuration/policy units |
-| LLM-AC-003 | Empty, oversized and locally same-language input make zero provider calls; manual choice cannot bypass unsupported/mixed eligibility | FR-004–007 | Policy/dispatch units; live labeled eligibility cases separately |
-| LLM-AC-004 | Uncertain/unsupported/mixed/mismatched eligibility ends without transformation/fallback/character success; malformed eligibility follows provider-failure policy | FR-004/005/026/033 | Scripted client tests; classification quality in #6 |
-| LLM-AC-005 | Prompt carries the original complete source as data; instructions in source are transformed; no previous result/history/tools enter context | FR-008–014, NFR-004 | Prompt/transport fixtures plus adversarial quality cases |
-| LLM-AC-006 | Correction only permits unchanged correct text; all other modes still correct; Chinese output is Simplified; facts and uncertainty remain | FR-006/008/010/012–014, RG-002 | Live fixed-set and human review; local checker fixtures |
-| LLM-AC-007 | Invalid envelope, empty/truncated/tool output and refusal never become success; legitimate refusal wording in source is not rejected by a keyword rule | FR-033/034 | Parser/adapter units and labeled output cases |
-| LLM-AC-008 | Both three-dispatch paths in Section 6 are bounded; accepted eligibility is reused; no same-candidate retry or hidden SDK dispatch | FR-032–034, NFR-006 | Scripted traversal plus real adapter transport request counts |
-| LLM-AC-009 | Fake time expires during admission, detection or fallback; no post-deadline dispatch/success; late responses cannot win | NFR-002/003, FR-026 | Fake-time/deferred-response tests; API settlement fencing separately |
-| LLM-AC-010 | Every paid call gets admission; denied budget stops traversal; cache miss/unknown usage/timeout retain correct conservative exposure | NFR-006, RG-004/007 | Cost/admission units; real SQLite concurrency and reconciliation in #3/#6 |
-| LLM-AC-011 | Wire request disables default thinking, sets JSON/output bounds, propagates cancellation and preserves usage/error classifications | FR-029/033, Q-001/Q-007 | Adapter HTTP fixtures; explicit live capability confirmation |
-| LLM-AC-012 | Logs/traces/errors contain only allowed metadata; provider cache hit never changes character charge or creates application response persistence | NFR-004, FR-024/026, D-18 | Export/log inspection and host privacy/accounting integration |
-| LLM-AC-013 | Runner reuses production bundle/pipeline; fixtures, live calls and missing credentials have distinct outcomes; grader cost counts toward run budget | NFR-001/002/006, Q-005 | Runner integration and report-manifest checks |
-| LLM-AC-014 | Each candidate and configured chain has route/mode evidence; failed calls stay in results; standalone timing is distinct from API benchmark | FR-009/012/034, RG-002/003 | #6 release evaluation and real API measurements |
-| LLM-AC-015 | Fallback success returns complete plain text only; API commits once; stale/manual-edit/unknown-delivery behavior follows owning contracts | FR-011/018/022–024/026–028/037 | AI outcome units plus focused API/UI integration from #3/#6 |
+| Scenario | Observable acceptance / boundary | Upstream |
+| --- | --- | --- |
+| LLM-AC-001 | Ai builds and offline cases run with Api/frontend absent, no credentials and provider network disabled | FR-035/036, #3, user request |
+| LLM-AC-002 | Every supported direction/language/mode uses its family chain; extra/repeated candidates, route rules and unsupported settings fail validation | FR-029/030/032 |
+| LLM-AC-003 | Empty, oversized and locally same-language input make zero provider calls; manual choice cannot bypass unsupported/mixed eligibility | FR-004–007 |
+| LLM-AC-004 | Uncertain/unsupported/mixed/mismatched eligibility ends without transformation/fallback/character success; malformed eligibility follows provider-failure policy | FR-004/005/026/033 |
+| LLM-AC-005 | Prompt carries the original complete source as data; instructions in source are transformed; no previous result/history/tools enter context | FR-008–014, NFR-004 |
+| LLM-AC-006 | Correction only permits unchanged correct text; all other modes still correct; Chinese output is Simplified; facts and uncertainty remain | FR-006/008/010/012–014, RG-002 |
+| LLM-AC-007 | Invalid envelope, empty/truncated/tool output and refusal never become success; legitimate refusal wording in source is not rejected by a keyword rule | FR-033/034 |
+| LLM-AC-008 | Both three-dispatch paths in Section 6 are bounded; accepted eligibility is reused; no same-candidate retry or hidden SDK dispatch | FR-032–034, NFR-006 |
+| LLM-AC-009 | Fake time expires during admission, detection or fallback; no post-deadline dispatch/success; late responses cannot win | NFR-002/003, FR-026 |
+| LLM-AC-010 | Every paid call gets admission; denied budget stops traversal; cache miss/unknown usage/timeout retain correct conservative exposure | NFR-006, RG-004/007 |
+| LLM-AC-011 | Wire request disables default thinking, sets JSON/output bounds, propagates cancellation and preserves usage/error classifications | FR-029/033, Q-001/Q-007 |
+| LLM-AC-012 | Logs/traces/errors contain only allowed metadata; provider cache hit never changes character charge or creates application response persistence | NFR-004, FR-024/026, D-18 |
+| LLM-AC-013 | Runner reuses production bundle/pipeline; fixtures, live calls and missing credentials have distinct outcomes; grader cost counts toward run budget | NFR-001/002/006, Q-005 |
+| LLM-AC-014 | Each candidate and configured chain has route/mode evidence; failed calls stay in results; standalone timing is distinct from API benchmark | FR-009/012/034, RG-002/003 |
+| LLM-AC-015 | Fallback success returns complete plain text only; API commits once; stale/manual-edit/unknown-delivery behavior follows owning contracts | FR-011/018/022–024/026–028/037 |
 
 | Question / owner | Decision status and remaining deliverable | Stage blocked |
 | --- | --- | --- |
 | Q-007, #4 with selected AI package | Eligibility/response contracts, error categories, traversal and deadline policy specified here. Commit executable prompts/checkers and prove selected adapter behavior/token bounds | Live provider orchestration readiness; offline policy development can proceed |
 | Q-001, #4/#6 with owner configuration | Direct DeepSeek capability/tariff documentation checked; provider/credentials, token/byte bounds, model/fallback qualification and actual monetary cap remain unset | Paid serving and launch |
 | Q-003/Q-006, #5 with #3 | Shared counting/recovery/auth/error/period semantics specified in #5; selected wire operations/fields and auth details remain | Selected accounting/API handlers and dependent clients; no YAML prerequisite for independent AI development |
-| Q-005, #6 | Corpus/rubric/human coverage, workload and evidence production remain to be specified | Candidate acceptance and release gates |
+| Q-005, #6 | Corpus/rubric/human coverage and workloads specified in [#6](06-verification-plan.md); actual cases, reviews and execution evidence pending | Candidate acceptance and release gates |
 | Q-004, #3/#5/#10 | Operational metadata retention/reconciliation windows, account lifecycle and provider disclosure; source/result storage policy remains unchanged | Related retention/account implementation and launch |
 | Q-008/Q-010, PRD then architecture/operations | P-005/P-006 disposition and any new operational controls | Adoption of proposed controls; not permission to add them here |
 

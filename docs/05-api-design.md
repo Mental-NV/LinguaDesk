@@ -1,6 +1,6 @@
 # LinguaDesk — API Behavioral Design
 
-**Document:** #5 · **Version:** 1.0 · **Status:** Shared design for scoped planning; wire contracts and implementation evidence pending
+**Document:** #5 · **Version:** 1.1 · **Status:** Shared design for scoped planning; wire contracts and implementation evidence pending
 **Updated:** 2026-09-08
 
 ## 1. Authority, sources, and artifact lifecycle
@@ -17,7 +17,7 @@
 
 This document owns shared observable API behavior under Q-003/Q-006, coordinated with #3 for identity, accounting and privacy. The technical choices below use #0's delegated design authority. They do not accept P-005/NFR-008, P-006, a new product feature or a provider privacy requirement. Product values remain canonical in PRD Sections 5–8; configuration exposes those values rather than creating independent defaults here.
 
-At authoring, there is no backend, selected delivery package, generated OpenAPI or verification plan. `docs/05-openapi.yaml` remains the prescribed generated artifact, not a file to create by hand. This document supplies cross-operation rules and behavioral examples, not endpoint signatures or a complete DTO catalog. #6 will own the requirement-to-test/evidence matrix. No behavior below is claimed implemented or verified.
+There is no backend, selected delivery package or generated OpenAPI. [Verification plan #6](06-verification-plan.md) now supplies shared verification methods and coverage. `docs/05-openapi.yaml` remains the prescribed generated artifact, not a file to create by hand. This document supplies cross-operation rules and behavioral examples, not endpoint signatures or a complete DTO catalog. #6 owns the requirement-to-test/evidence matrix. No behavior below is claimed implemented or verified.
 
 For each selected API slice:
 
@@ -241,24 +241,24 @@ P-006 remains proposed: this document does not introduce published-version compa
 
 ## 10. Acceptance scenarios and readiness
 
-These shared scenarios guide selected packages and #6's canonical coverage matrix. They are not an all-MVP implementation task list. Runtime evidence is pending.
+These shared scenarios guide selected packages; [#6 Section 8](06-verification-plan.md#8-canonical-coverage-and-acceptance-allocation) owns the canonical coverage matrix and check allocation. They are not an all-MVP implementation task list. Runtime evidence is pending.
 
-| ID | Observable outcome | Traceability / sufficient evidence |
+| ID | Observable outcome | Upstream |
 | --- | --- | --- |
-| API-AC-001 | The scalar fixtures and L−1/L/L+1 agree in C#/TypeScript; invalid Unicode and oversize input never reach a provider | FR-007/024; shared pure fixtures plus one HTTP validation boundary |
-| API-AC-002 | Both auth modes access the same API; invalid bearer cannot fall back to cookie; cookie mutations require antiforgery | FR-001/036, #3; real handler integration |
-| API-AC-003 | Unverified account can complete its verification journey but cannot invoke an LLM; reset/revocation invalidates subsequent protected access/refresh | FR-002, Q-004/Q-006; account integration |
-| API-AC-004 | Concurrent identical identity/payload claims dispatch one logical operation; changed payload conflicts; no extra charge | FR-026/027; real SQLite concurrent admission/settlement |
-| API-AC-005 | Equivalent JSON escapes match; changed newline/mode does not; expired UUID cannot re-dispatch after recovery metadata cleanup | FR-026/035, Q-003; pure matching/time fixtures plus persistence expiry boundary |
-| API-AC-006 | Success lost in transport is recovered as success/output unavailable with original charge; no result storage/regeneration | FR-026/028/037, NFR-004; process/HTTP failure-window integration |
-| API-AC-007 | Pre-commit crash is fenced as interrupted with zero character charge; unknown/missing status never falsely asserts zero | NFR-003, RG-004; restart/reconciliation evidence |
-| API-AC-008 | Disconnect/aborted fetch may still settle success; late output cannot resurrect terminal failure; status reads never call the model | FR-026, NFR-002/003; controlled disconnect/deadline tests |
-| API-AC-009 | Cross-midnight success charges the original day; current-day usage and stale-charge disclosure remain correct | FR-024/027/028; fake time plus real ledger integration, focused UI ordering |
-| API-AC-010 | Cross-month fallback has its own monetary period; unresolved old exposure survives rollover; no double counting on settlement | NFR-006; cost-policy and persistence tests |
-| API-AC-011 | Snapshot ordering rejects older same-day/global availability states, accepts a new UTC day and survives restart; current usage failure does not erase success | FR-028, NFR-003; consistent-read/ordering tests |
-| API-AC-012 | Known/unknown reset/resend acknowledgments reveal no account existence; no error/log contains source, result or secret | UX #2, NFR-004; focused account/log/trace checks |
-| API-AC-013 | Two independent-client operations work without SPA execution; one complete result, correct mode/language, usage and classified errors | FR-003/035–037, RG-005; authenticated API consumer integration |
-| API-AC-014 | Generated schema/client match actual contract metadata with no live effects; review/tests catch behavior drift despite clean generation | ADR-004, #0; contract command and semantic integration checks |
+| API-AC-001 | The scalar fixtures and L−1/L/L+1 agree in C#/TypeScript; invalid Unicode and oversize input never reach a provider | FR-007/024 |
+| API-AC-002 | Both auth modes access the same API; invalid bearer cannot fall back to cookie; cookie mutations require antiforgery | FR-001/036, #3 |
+| API-AC-003 | Unverified account can complete its verification journey but cannot invoke an LLM; reset/revocation invalidates subsequent protected access/refresh | FR-002, Q-004/Q-006 |
+| API-AC-004 | Concurrent identical identity/payload claims dispatch one logical operation; changed payload conflicts; no extra charge | FR-026/027 |
+| API-AC-005 | Equivalent JSON escapes match; changed newline/mode does not; expired UUID cannot re-dispatch after recovery metadata cleanup | FR-026/035, Q-003 |
+| API-AC-006 | Success lost in transport is recovered as success/output unavailable with original charge; no result storage/regeneration | FR-026/028/037, NFR-004 |
+| API-AC-007 | Pre-commit crash is fenced as interrupted with zero character charge; unknown/missing status never falsely asserts zero | NFR-003, RG-004 |
+| API-AC-008 | Disconnect/aborted fetch may still settle success; late output cannot resurrect terminal failure; status reads never call the model | FR-026, NFR-002/003 |
+| API-AC-009 | Cross-midnight success charges the original day; current-day usage and stale-charge disclosure remain correct | FR-024/027/028 |
+| API-AC-010 | Cross-month fallback has its own monetary period; unresolved old exposure survives rollover; no double counting on settlement | NFR-006 |
+| API-AC-011 | Snapshot ordering rejects older same-day/global availability states, accepts a new UTC day and survives restart; current usage failure does not erase success | FR-028, NFR-003 |
+| API-AC-012 | Known/unknown reset/resend acknowledgments reveal no account existence; no error/log contains source, result or secret | UX #2, NFR-004 |
+| API-AC-013 | Two independent-client operations work without SPA execution; one complete result, correct mode/language, usage and classified errors | FR-003/035–037, RG-005 |
+| API-AC-014 | Generated schema/client match actual contract metadata with no live effects; review/tests catch behavior drift despite clean generation | ADR-004, #0 |
 
 | Owner / question | Resolved here | Remaining decision and blocking stage |
 | --- | --- | --- |
@@ -266,9 +266,9 @@ These shared scenarios guide selected packages and #6's canonical coverage matri
 | Q-006, #5/#3 | Cookie plus Identity opaque bearer; auth precedence and lifecycle; recovery/error semantics; no public cancellation endpoint | Exact operations/DTOs/headers, antiforgery bootstrap, auth policy/delivery details and schema version mechanics before their selected handlers/clients |
 | Q-004, #3/account design/#10 | Bounded operation recovery window and stamp invalidation behavior | Account deletion, backup/aggregate/unresolved-exposure retention and any further logout guarantees before related features/launch |
 | Q-001, #4/#3 | Cost-month attribution and conservative unresolved carryover | Serving/billing bounds, attribution verification and actual cap before paid serving |
-| Q-005, #6 | Local acceptance scenarios and evidence responsibilities | Canonical coverage matrix, workloads and executable release evidence |
+| Q-005, #6 | Local acceptance scenarios retained here; [#6](06-verification-plan.md) specifies coverage and workloads | Executable release evidence |
 | Q-008/Q-010, PRD then #3/#10 | Proposal status preserved | No new abuse rate or compatibility obligation until its owning proposal is accepted |
 
 **Authoring review:** Local document links/anchors, requirement references, scenario IDs and the scalar examples were checked; no runtime tests or live authentication/accounting checks were run. Shared rules preserve whole-source processing, success-only charging, no saved text, simple LLM chains and the PRD's deferred/proposed distinctions.
 
-The shared design is ready for scoped planning. Selected-slice questions remain explicit; they must be resolved before the affected implementation/client work. The absence of generated YAML does not block verification planning, roadmap selection or independent AI work. The next numbered planning document is #6; API wire generation begins when an API slice is selected for implementation, as #0 now requires.
+The shared design is ready for scoped planning. Selected-slice questions remain explicit; they must be resolved before the affected implementation/client work. The absence of generated YAML does not block verification planning, roadmap selection or independent AI work. [Verification plan #6](06-verification-plan.md) is now available; roadmap selection follows #0, and API wire generation begins when an API slice is selected for implementation, as #0 now requires.

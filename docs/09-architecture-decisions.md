@@ -1,9 +1,9 @@
 # LinguaDesk — Architecture Decision Records
 
-**Document:** #9 · **Version:** 1.6 · **Status:** Reviewed technical decisions; implementation evidence pending
+**Document:** #9 · **Version:** 1.7 · **Status:** Reviewed technical decisions; implementation evidence pending
 **Updated:** 2026-09-08
 
-Updated from baseline `24ffe3b` with the user-approved API authoring workflow and [API behavioral design](05-api-design.md); architecture is v1.6 and document #0 is v1.3. Provider-policy review used baseline `b5c01a1`; ADR-012 uses baseline `1646094` and the 2026-09-08 LLM specification request and Infrastructure naming clarification. Current design is in the owning specifications; generated contract governance is in [document #0](00-SDD-Planning-Workflow.md). These technical decisions preserve P-005/P-006 proposal status. Amended decisions record the original choice and the correction; superseded text is historical.
+The API authoring revision used baseline `24ffe3b` and the user-approved [API behavioral design](05-api-design.md), producing architecture v1.6 and document #0 v1.3. This revision consolidates current verification procedures in [document #6](06-verification-plan.md), with architecture v1.7 and #0 v1.4. Provider-policy review used baseline `b5c01a1`; ADR-012 uses baseline `1646094` and the 2026-09-08 LLM specification request and Infrastructure naming clarification. Current design is in the owning specifications; generated contract governance is in [document #0](00-SDD-Planning-Workflow.md). These technical decisions preserve P-005/P-006 proposal status. Amended decisions record the original choice and the correction; superseded text is historical.
 
 ## ADR-001: Combined Hosting and SPA Fallback
 
@@ -65,7 +65,7 @@ Updated from baseline `24ffe3b` with the user-approved API authoring workflow an
 
 **Decision:** Use `WebApplicationFactory`/TestServer for HTTP integration by default. Test pure policy without a host and persistence directly where HTTP adds no evidence. Use unique migrated SQLite files, independent contexts, fake external adapters/time, and explicit response barriers. Allow an owned real Kestrel process on a discovered ephemeral port for browser/publish/process-boundary checks.
 
-**Consequences:** Most HTTP tests have no TCP dependency. Isolation is explicit; TestServer is not an in-memory database and cannot serve Playwright's browser. The small real-host exception catches wiring and lifecycle failures. See #3 Section 9.
+**Consequences:** Most HTTP tests have no TCP dependency. Isolation is explicit; TestServer is not an in-memory database and cannot serve Playwright's browser. The small real-host exception catches wiring and lifecycle failures. Current harness and execution details are in [verification plan #6](06-verification-plan.md#3-deterministic-backend-and-independent-ai-verification).
 
 ## ADR-006: Stateless Schema Iteration via EnsureCreated
 
@@ -116,7 +116,7 @@ Updated from baseline `24ffe3b` with the user-approved API authoring workflow an
 
 **Decision:** Most cases are pure MSTest/Vitest units and focused DOM components. Real SQLite/API tests cover integrity/contracts; Playwright covers browser-sensitive behavior, seven current curated visual baselines, and explicit Translation/full-Rewrite journeys with real frontend/API/local auth/database and fake external adapters. Preserve all UX IDs with active/deferred/retired status and manual evidence for current supported-browser/AT journeys. #6 maps compound scenarios by assertion, without replaying them at every layer.
 
-**Consequences:** Faster deterministic feedback and fewer fragile UI fixtures without losing key browser/SQL boundaries. Browser automation remains a small top layer; live-provider evaluation stays separate. No arbitrary percentage or line-coverage target replaces requirement/risk coverage. See #3 Section 9 and #2 Sections 12–14.
+**Consequences:** Faster deterministic feedback and fewer fragile UI fixtures without losing key browser/SQL boundaries. Browser automation remains a small top layer; live-provider evaluation stays separate. No arbitrary percentage or line-coverage target replaces requirement/risk coverage. Current allocation, browser scope and evidence are consolidated in [verification plan #6](06-verification-plan.md); #2 retains behavioral acceptance contracts.
 
 
 ## ADR-010: Explicit Whole-Text MVP with Deferred Assistance
