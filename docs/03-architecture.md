@@ -1,6 +1,6 @@
 # LinguaDesk — Architecture and Engineering Principles
 
-**Document:** #3 · **Version:** 1.3 · **Status:** Ready for scoped implementation planning; contract and launch dependencies remain
+**Document:** #3 · **Version:** 1.5 · **Status:** Ready for scoped implementation planning; contract and launch dependencies remain
 **Updated:** 2026-09-08
 
 ## 1. Authority, Inputs, and Scope
@@ -11,6 +11,8 @@
 | [Product Requirements Document](01-PRD.md) | v0.4, 2026-09-08 provider-policy amendment | Active product baseline and canonical DF-001–DF-007 register |
 | [UX/UI Specification](02-ux-specification.md) | v1.3, aligned provider-policy references | Native controls, explicit processing, active/inactive scenario allocation |
 | Architecture and ADR review baseline | Git commit `b5c01a1` | Architecture/ADRs v1.2 before provider-policy amendment |
+| LLM specification authoring | User request, 2026-09-08; repository baseline `1646094` | Host-independent AI development/validation and `Microsoft.Extensions.AI`; current behavior in [document #4](04-llm-specification.md) |
+| AI infrastructure naming | User clarification, 2026-09-08 | Place the AI library in Infrastructure as `LinguaDesk.Infrastructure.Ai`; retain independent development/validation |
 
 PRD D-17/D-18 and Section 3 define current scope. P-001–P-004 retain their **newly amended** dispositions; P-005/NFR-008 and P-006 remain proposed. This document does not claim to close Q-001/Q-004/Q-008 in full. Active UX IDs remain behavioral contracts, not a mandatory browser-test count; Deferred/Retired IDs require no MVP implementation/evidence.
 
@@ -62,12 +64,16 @@ LinguaDesk/
 │   ├── Directory.Build.props
 │   ├── src/
 │   │   ├── LinguaDesk.Core/           # Pure policy and value types
+│   │   ├── LinguaDesk.Infrastructure.Ai/ # AI infrastructure: prompts, orchestration, IChatClient adapters
 │   │   └── LinguaDesk.Api/
 │   │       ├── Features/             # Translation, Rewriting, Identity, Usage
-│   │       ├── Infrastructure/       # DbContext/migrations, provider/email adapters
+│   │       ├── Infrastructure/       # DbContext/migrations, durable AI admission, email adapters
 │   │       └── Program.cs            # Composition, middleware, route registration
+│   ├── tools/
+│   │   └── LinguaDesk.Ai.Evaluation/  # Standalone fixture/live evaluation runner
 │   └── tests/
 │       ├── LinguaDesk.Core.Tests/     # Policy units, no host/database
+│       ├── LinguaDesk.Infrastructure.Ai.Tests/ # Scripted IChatClient and provider transport fixtures
 │       └── LinguaDesk.Api.Tests/      # Focused units, persistence and HTTP integration
 └── frontend/
     ├── package.json / package-lock.json
@@ -86,18 +92,22 @@ This is a planned structure, not a claim that scaffolding or commands already ex
 
 ### 4.1 Boundaries
 
-- `LinguaDesk.Api` references `LinguaDesk.Core`; Core references neither ASP.NET Core nor EF Core. Core holds counting/allowance calculations, state transitions, and simple family-chain/output policies as they are specified. Time, configuration, and inputs are explicit arguments.
+- `LinguaDesk.Api` references `LinguaDesk.Core` and `LinguaDesk.Infrastructure.Ai`; the AI infrastructure library references Core, never Api. Core references neither ASP.NET Core, EF Core nor AI/provider packages. Core holds counting/allowance calculations, state transitions and shared value types. The AI infrastructure library holds family-chain policy, prompt composition, eligibility/output validation and provider calls behind `Microsoft.Extensions.AI.IChatClient`. Time, configuration, and inputs are explicit arguments.
+- AI integration belongs to the Infrastructure layer. Its separate library isolates provider dependencies and allows independent development and evaluation. The existing Api `Infrastructure/` folder retains host-specific persistence, admission and email integration; this naming does not require moving unrelated infrastructure into new projects. `LinguaDesk.Ai.Evaluation` remains a development tool that references `LinguaDesk.Infrastructure.Ai`.
+- The API and standalone evaluation runner use the same Ai composition and operation pipeline. Ai has no HTTP-server, Identity, database or frontend dependency. A narrow attempt-admission boundary obtains permission and records monetary exposure for each provider dispatch; the API supplies durable accounting, while offline tests and isolated evaluation supply explicit substitutes. Ai success is provisional until the API commits character settlement. See #4 Sections 2, 6 and 9; this adds a library and development tool, not a deployed service.
 - Endpoints handle transport, authentication/authorization, validation, and typed results. Simple CRUD can use `DbContext` directly. Multi-step paid operations use a small concrete feature coordinator so HTTP concerns do not swallow all testable policy.
-- Coordinators call pure policy and concrete persistence operations. Use narrow provider/email interfaces and .NET `TimeProvider` at effect boundaries; replace these in tests. Do not mock `DbSet`/LINQ queries or Identity internals.
+- Coordinators call pure policy and concrete persistence operations. Use `IChatClient` for the AI provider boundary, a narrow email adapter and .NET `TimeProvider` at effect boundaries; replace these in tests. Do not mock `DbSet`/LINQ queries or Identity internals.
 - Use built-in DI and typed `HttpClient` adapters. A scoped `DbContext` is never shared concurrently. Each independent transaction gets its own scope/context; awaited I/O remains asynchronous end to end.
 
 ### 4.2 Representative full rewrite
 
-1. On explicit Rewrite activation (or an independent API call), authenticate a verified local account. Validate complete input length, supported language, the single mode and request identity against #5. Reject oversized input; never truncate it. Resolve detection/eligibility within this requested operation, not via a typing-driven frontend pipeline.
+1. On explicit Rewrite activation (or an independent API call), authenticate a verified local account. Validate complete input length, supported selector values, the single mode and request identity against #5. Reject oversized input; never truncate it. Provider detection/eligibility follows admission within this requested operation, not via a typing-driven frontend pipeline.
 2. In a short database transaction, claim the account-scoped operation key and reserve user/global character capacity and the next provider attempt's monetary exposure. Commit before any network call.
 3. Execute provider HTTP and output validation outside the transaction, under the overall deadline and #4's bounded attempt policy.
 4. In a second short transaction, conditionally finalize the operation. Valid success converts character reservations into one charge; definitive failure releases character capacity. Settle or conservatively retain monetary exposure separately. Commit before returning success.
 5. Return the complete response and authoritative usage. The frontend reducer applies text only when workspace, input/settings, and result-edit revisions still match; outdated successes can update usage without replacing text.
+
+The Ai pipeline performs language eligibility before transformation, including for manual source selection. The initial reservation in step 2 covers the eligibility call; each later dispatch gets separate monetary admission. Invalid eligibility releases character capacity without transformation. The family chain and maximum dispatch count are defined once in #4 Section 6.
 
 ## 5. Identity, API Boundaries, and Configuration
 
@@ -190,6 +200,7 @@ Full-result replacement uses request/workspace revisions, not sentence/version a
 - Pin the .NET SDK in `global.json`, central package versions, local EF tool, Node version, npm lockfile, schema generator, and browser runtime. Set nullable reference types, TypeScript `strict`, and a fixed analyzer level. Apply recommended .NET/ESLint checks to owned code; generated output has explicit exclusions. Avoid unrelated analyzer or dependency upgrades during a feature.
 - Provide one documented entry point each for setup, fast checks, integration, contract generation, browser smoke, and publish. They must be noninteractive, work from a clean checkout, return useful exit codes, and clean up only owned processes/files. #10 records executable commands once implemented.
 - Ordinary unit/API checks need no browser install, Docker daemon, external account, paid credentials, or frontend dev server. Backend-only builds do not invoke npm. The explicit publish command builds the frontend once and packages it with the host.
+- Ai library builds, offline AI checks, prompt inspection and standalone evaluations do not start the API or require its database/authentication. Live evaluation is explicit, budgeted and separate from ordinary tests. It shares production AI code while leaving HTTP/accounting integration evidence to the owning suites; see #4 Section 9.
 - New edge cases default to pure unit tests. Add an integration/browser test only for a boundary that a lower test cannot establish. Use assertions on behavior and data, not private method calls or large DOM snapshots.
 
 ### 8.3 Generated API contract
@@ -241,7 +252,7 @@ No runtime tests have been executed for this spec-only repository. Document vali
 
 ## 10. Decision Records and Source Basis
 
-[Document #9](09-architecture-decisions.md) records ADR-001–ADR-005 as amended, ADR-006 as superseded, ADR-007–ADR-009 for migration parity, short reservations and pyramid ownership, ADR-010 for the approved simplified MVP, and ADR-011 for removal of provider retention/no-training gates. Earlier decision scopes follow PRD D-17.
+[Document #9](09-architecture-decisions.md) records ADR-001–ADR-005 as amended, ADR-006 as superseded, ADR-007–ADR-009 for migration parity, short reservations and pyramid ownership, ADR-010 for the approved simplified MVP, ADR-011 for removal of provider retention/no-training gates, and ADR-012 for the shared host-independent AI pipeline. Earlier decision scopes follow PRD D-17.
 
 Technical guidance checked on 2026-09-07; the choices above are LinguaDesk's application of it:
 
@@ -263,7 +274,7 @@ Technical guidance checked on 2026-09-07; the choices above are LinguaDesk's app
 | Q-002, PRD D-17 | Targeted matching and toggle restoration resolved by removal; future assistance association is DF-001/002 | No current-MVP blocker |
 | Q-003/Q-006, #5 with #3 | Unicode counts, quota/month rollover, operation/status/replay/output-unavailable semantics, bearer lifecycle, error fields | Accounting/auth and their dependent clients |
 | Q-004, account/privacy package with #3/#5/#10 | Metadata/replay/backup retention durations, local-account deletion/revocation, provider disclosure; external linking deferred DF-007 | Related account features and launch |
-| Q-007, #4 | Output validity, detection/eligibility, provider errors, bounded attempts/deadlines for the two simple chains | Active provider orchestration; advanced routing/context deferred |
+| Q-007, #4 | Policy specified in #4; selected adapter/token bounds, executable prompt/validator fixtures and conformance evidence remain | Live provider orchestration readiness; offline policy work can proceed |
 | Q-005, #6 | Coverage mapping, evaluation workload, actual evidence | Release acceptance |
 | Q-008/Q-010, PRD then #3/#10 | P-005 safeguard scope and any additional operational thresholds | Adoption of proposed controls; no silent acceptance |
 

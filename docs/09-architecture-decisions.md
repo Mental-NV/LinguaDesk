@@ -1,9 +1,9 @@
 # LinguaDesk — Architecture Decision Records
 
-**Document:** #9 · **Version:** 1.3 · **Status:** Reviewed technical decisions; implementation evidence pending
+**Document:** #9 · **Version:** 1.5 · **Status:** Reviewed technical decisions; implementation evidence pending
 **Updated:** 2026-09-08
 
-Updated against user-approved PRD v0.4 and architecture/UX v1.3, from provider-policy review baseline `b5c01a1`. The current design is in [architecture v1.3](03-architecture.md); generated contract governance is in [document #0](00-SDD-Planning-Workflow.md). These technical decisions preserve P-005/P-006 proposal status. Amended decisions record the original choice and the correction; superseded text is historical.
+Updated against user-approved PRD v0.4, UX v1.3 and architecture v1.5. Provider-policy review used baseline `b5c01a1`; ADR-012 uses baseline `1646094` and the 2026-09-08 LLM specification request and Infrastructure naming clarification. Current design is in [architecture](03-architecture.md) and [LLM specification](04-llm-specification.md); generated contract governance is in [document #0](00-SDD-Planning-Workflow.md). These technical decisions preserve P-005/P-006 proposal status. Amended decisions record the original choice and the correction; superseded text is historical.
 
 ## ADR-001: Combined Hosting and SPA Fallback
 
@@ -145,3 +145,19 @@ PRD DF-001–DF-007 record deferred alternatives, change review, automatic proce
 **Decision:** Provider selection and launch no longer require a no-training guarantee or a verified retention limit. Q-001 still resolves serving access/settings, quality/performance, provider-managed caching capabilities/pricing and the monetary cap. Align PRD NFR-004/RG-007 and UX/architecture handoffs. Do not make unsupported privacy claims about the chosen provider.
 
 **Consequences:** Low-cost models and provider-managed caching are permitted if they meet the remaining product criteria. LinguaDesk's no-text-logging, workspace teardown and current application-storage rules remain. The user clarified provider-managed caching: no LinguaDesk completed-response cache or new application cache-lifetime blocker is introduced. #4 verifies provider cache capabilities/pricing for cost bounds; successful-character accounting and current text-lifecycle behavior stay unchanged. No additional blocking provider-privacy review is introduced elsewhere.
+
+## ADR-012: Shared AI Infrastructure Library with IChatClient and Independent Evaluation
+
+**Status:** Selected technical design, 2026-09-08, under document #0's delegated shared-design authority; amended the same day for the user's Infrastructure-layer naming clarification. User requested consideration of `Microsoft.Extensions.AI` and AI development/validation independent of API/UI. Implementation and live qualification are pending.
+
+**Context:** Keeping prompts, provider transport and orchestration inside Api would make language experiments depend on its host/auth/database. A separate prototype with copied prompts would not validate serving behavior. Provider fallbacks and middleware can also hide paid requests from the durable cost coordinator.
+
+**Alternatives:** Provider SDK calls embedded in endpoints; an unrelated script/notebook for evaluation; a custom general provider abstraction; a deployed AI service or agent framework. These respectively couple feedback to the host, allow behavior drift, duplicate ecosystem interfaces, or add infrastructure beyond the two whole-text operations.
+
+**Decision:** Use the host-independent Infrastructure-layer library `LinguaDesk.Infrastructure.Ai` with `Microsoft.Extensions.AI.IChatClient` at the provider boundary. The API and standalone evaluation runner share its prompts, settings validation, eligibility, output validation and explicit family traversal. Provider-specific transport/settings stay in adapters; do not assume wire compatibility from the common interface. Keep Core independent of AI packages. A narrow attempt-admission boundary reserves each paid call through the API's durable accounting or an explicit isolated evaluation substitute.
+
+**Naming amendment:** The original proposed library name was `LinguaDesk.Ai`. The user clarified Infrastructure ownership, so the library and its tests are named `LinguaDesk.Infrastructure.Ai` and `LinguaDesk.Infrastructure.Ai.Tests`. `LinguaDesk.Ai.Evaluation` remains the standalone development runner. This refines project naming and layer ownership while preserving the shared implementation and host-independent testing boundary.
+
+Perform classification before transformation so invalid language input is not transformed. Each family visits its primary and at most one fallback; accepted eligibility is reused and abandoned candidates are never revisited. The bound is three provider dispatches including eligibility, with no hidden retries, repair calls or hedging. #4 owns the detailed prompt/output contracts, timeout policy, error classification and capability evidence.
+
+**Consequences:** One additional library and a development runner isolate a real dependency boundary without another deployed service. Fast tests use scripted clients, fake time/admission and synthetic transport fixtures; live evaluation is explicit and budgeted. Standalone success does not establish HTTP/auth, durable settlement, UI behavior or the API latency gate. Production prompt/result text is not persisted in logs or evaluation artifacts, and provider caching does not enable application response caching. Provider/model/token-bound qualification, #5's accounting/API semantics and #6's rubric/evidence remain scoped dependencies. See [#3 Sections 3–4 and 8–9](03-architecture.md) and [#4](04-llm-specification.md).
