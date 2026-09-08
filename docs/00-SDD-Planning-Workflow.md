@@ -1,6 +1,6 @@
 # LinguaDesk — SDD Planning Workflow
 
-**Version:** 1.4 · **Updated:** September 8, 2026
+**Version:** 1.5 · **Updated:** September 8, 2026
 
 **Role:** Document #0 — authoritative entry point and governance for specification-driven development (SDD).
 
@@ -47,6 +47,8 @@ Keep one editable source for wire structure in C# and one committed generated sc
 Keep diagrams and decision/checklist sections with their subject. Executable schemas, fixtures, configuration, and generated evidence may live beside code and be linked from specifications. Create supporting planning files only when they have a distinct purpose; avoid duplicate contracts, requirement lists, and status reports.
 
 **Verification ownership — clarified 2026-09-08:** #1 retains product acceptance thresholds and release gates; #2 retains observable UX/accessibility/browser-support contracts and UX scenario IDs; #3 retains stack, component/testability boundaries and production integrity constraints; #4 retains LLM runtime behavior and candidate eligibility requirements; #5 retains API behavior. Their acceptance scenario IDs stay stable in the owning documents. #6 owns how those assertions are tested, the shared harnesses and evidence, including evaluation methodology formerly detailed in #3/#4 and test allocation formerly detailed in #2. Replace moved execution guidance with links; keep migration, provider-call admission and text-lifecycle constraints with their design owners. ADRs retain rationale, not a second current test plan.
+
+**Milestone sizing and revision — user direction, 2026-09-08:** #7 stays at user-story, feature or necessary-enablement level, with basic infrastructure first. Concrete backlog items, selected specifications, implementation plans and tasks belong to #8 as a milestone approaches execution. Size each executable milestone for at most 30 minutes of full autonomous development by `GPT-5.6 Sol (high)`, including necessary package preparation, implementation, testing, review and documentation. This is a planning ceiling, not a measured model-speed guarantee. Resolve external prerequisites before execution; split any milestone that cannot credibly fit without weakening acceptance or verification. Keep larger release outcomes and human/live-service evidence gates distinct from executable milestones. Stable milestone IDs express identity, not order; reorder or split future scope with explicit dependency and history updates, preserving completed evidence and the PRD's scope authority.
 
 ## 3. Rules for authoring and generating specifications
 
