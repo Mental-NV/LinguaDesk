@@ -1,6 +1,6 @@
 # LinguaDesk — Roadmap and Milestone Plan
 
-**Document:** #7 · **Version:** 1.0 · **Status:** Provisional delivery roadmap; no milestone selected or implemented  
+**Document:** #7 · **Version:** 1.1 · **Status:** M001 selected and prepared; implementation not started
 **Updated:** 2026-09-08
 
 ## 1. Authority and planning basis
@@ -29,7 +29,7 @@ Each executable milestone must fit **at most 30 elapsed minutes of autonomous de
 
 At #8 selection, use current code and measured prior runs to assess feasibility. As an initial planning allowance, leave roughly half the envelope for preparation, verification and correction; this is a sizing heuristic, not a throughput claim. A row that cannot credibly fit is split into smaller milestones **before execution**. Its exit criterion is an outcome boundary, not permission to cram an entire feature into the time limit. The initial rows below are candidates, not certified duration estimates.
 
-Resolve necessary access, product decisions and external evidence dependencies before admitting a run that needs them. External human reviews, provider/email access and device availability have no assumed 30-minute completion time. Section 5 tracks their aggregate gates separately; bounded preparation and evidence-producing milestones can proceed without claiming those gates passed.
+Apply [#0's human-step timing](00-SDD-Planning-Workflow.md#selecting-work-and-creating-a-package): batch indispensable requests at the beginning; queue nonblocking human steps for the end with prepared instructions and pending evidence. M001 currently requires none. Resolve necessary access, product decisions and external evidence dependencies before admitting a run that needs them. External human reviews, provider/email access and device availability have no assumed 30-minute completion time. Section 5 tracks their aggregate gates separately; bounded preparation and evidence-producing milestones can proceed without claiming those gates passed.
 
 At the ceiling, record an honest incomplete/blocked outcome with the elapsed time and remaining work. Do not mark an unfinished milestone done or silently extend its budget. Preserve the work; revise/split the remaining outcome before another run. Unexpected overruns inform later sizing. There is no fixed calendar schedule or total-duration promise obtained by multiplying milestone count by 30 minutes.
 
@@ -37,7 +37,7 @@ A milestone is done only when its selected exit criteria, applicable #6 checks a
 
 ## 3. Priority, dependency and current milestone summary
 
-**Recommended next milestone: M001 — Backend foundation.** State: **Candidate / not selected**. No active or completed milestone exists. M001 has no product/provider prerequisite; #8 must inspect local tooling and settle its bounded scaffold acceptance before execution. Its small scope is the backend host and a meaningful feedback path. Frontend publishing, persistence and standalone AI follow as separate infrastructure outcomes.
+**Current milestone: [M001 — Backend foundation](08-backlogs/M001-backend-foundation.md).** State: **Selected / package prepared; implementation not started**. [Package 001](../specs/001-backend-foundation/spec.md) selects BI-001 and supplies its specification, plan and unchecked tasks. Local SDK inspection found .NET 10; execution still requires restore/process preflight and the full 30-minute feasibility check. No human action is presently required. Frontend publishing, persistence and standalone AI remain separate infrastructure outcomes. No milestone is complete.
 
 The numbered sections below group related outcomes; **M IDs are identities, not execution positions**. The current priority policy is:
 
@@ -46,9 +46,9 @@ The numbered sections below group related outcomes; **M IDs are identities, not 
 3. Enable a verified independent API operation with durable limits and recovery, then connect its web journey. Prefer demonstrated Translation followed by Rewriting over polishing all account screens or all visuals first.
 4. Integrate accessibility, privacy and failure checks with each feature. Begin bounded corpus/evaluation and operational preparation as soon as inputs are available; do not leave qualification risk until the final release review.
 
-Dependencies in Section 4 are the minimum named prerequisites, not substitutes for #8's code/design readiness check. Satisfy transitive dependencies and the applicable Section 5 blockers too. Choose the highest-value eligible milestone; a blocked independent track need not stop another eligible one. All listed milestones are initially **Candidate**. Each has **Backlog: not created; Package: none; Evidence: pending**. These shared values are stated once instead of repeating empty columns.
+Dependencies in Section 4 are the minimum named prerequisites, not substitutes for #8's code/design readiness check. Satisfy transitive dependencies and the applicable Section 5 blockers too. Choose the highest-value eligible milestone; a blocked independent track need not stop another eligible one. M001 is selected as linked above. All other listed milestones remain **Candidate**, with **Backlog: not created; Package: none; Evidence: pending**. No runtime evidence exists for M001 either. These shared values are stated once instead of repeating empty columns.
 
-When M001 is selected, its prescribed backlog destination is `docs/08-backlogs/M001-backend-foundation.md`; this is not an existing file or a hyperlink. Later milestones use #0's `Mxxx-<slug>.md` convention, or link an existing owning feature backlog. Replace the corresponding milestone title with a link to its actual backlog when created; record actual package/evidence links there and in #6. Do not create empty backlogs or package placeholders for this entire roadmap.
+M001 now has its [owning backlog](08-backlogs/M001-backend-foundation.md) and [selected package](../specs/001-backend-foundation/spec.md). Later milestones use #0's `Mxxx-<slug>.md` convention, or link an existing owning feature backlog. Replace the corresponding milestone title with a link to its actual backlog when created; record actual package/evidence links there and in #6. Do not create empty backlogs or package placeholders for this entire roadmap.
 
 ## 4. Provisional milestone outcomes
 
@@ -58,7 +58,7 @@ The exit column describes the increment's observable value. #8 supplies concrete
 
 | ID | Outcome | Exit criterion | Prerequisites | Basis / verification |
 | --- | --- | --- | --- | --- |
-| M001 | Backend foundation | An agent can build and start the minimal backend and run an isolated meaningful smoke check with reproducible commands. | — | Architecture §2–3; V-007/V-009 |
+| M001 | [Backend foundation](08-backlogs/M001-backend-foundation.md) | An agent can build and start the minimal backend and run an isolated meaningful smoke check with reproducible commands. | — | Architecture §2–3/5; V-009/V-012 (host portions only) |
 | M002 | Published web shell | A user can open the basic SPA through the API host; navigation works and missing API/assets return proper errors. | M001 | FR-003; architecture §3; V-003/V-012 |
 | M003 | Durable storage foundation | A clean isolated store is created through migrations; persisted data survives a host restart and the storage checks are repeatable. | M001 | Architecture §6; V-005/V-016 |
 | M004 | Independent AI development | An agent can exercise the shared AI boundary offline and inspect a synthetic prompt without starting API/UI or accessing secrets. | M001 | AI §2/9; V-007 |
@@ -165,8 +165,10 @@ Use milestone summary states **Candidate → Selected → In progress → Done**
 
 **Initial change record — 2026-09-08:** Created M001–M042 as provisional small outcome boundaries. M001 is recommended first; no backlog item/package was selected. G1–G4 distinguish aggregate external/release evidence from bounded engineering execution. New successor IDs will be allocated as evidence batches and actual scope become known.
 
+**Selection update — 2026-09-08:** Created M001 backlog/BI-001 and package 001 with six acceptance scenarios and six unchecked execution tasks. Added the initial/end human-step rule from #0 v1.6; no human action is required for M001 as scoped. Updated its check references to the actual host portions of V-009/V-012; independent AI verification remains M004.
+
 ## 7. Next applicable gate and validation
 
-The next action is to author only M001's #8 backlog, select its bounded outcome and establish the corresponding delivery package under #0. Inspect the current toolchain/repository and account for package preparation and required checks in its 30-minute envelope. If it does not fit, split it before coding. This document does not create that backlog, implementation plan, task list or scaffold.
+M001's #8 backlog and package are now prepared. The next action is its [T001 execution preflight](../specs/001-backend-foundation/tasks.md#1-ordered-tasks), followed by implementation when the environment and 30-minute feasibility checks hold. No coding task has been executed by this authoring change; no other milestone is selected.
 
 **Authoring review:** Local source links, unique milestone IDs, dependency existence/order, check references and the separation of active/deferred/proposed scope were checked. The roadmap covers infrastructure, access, independent AI, accounting/recovery, both API/web operations, evaluation and release preparation without copying #6's full product matrix. No milestone duration has been measured and no runtime or release check has passed. Candidate feasibility must be established during #8 selection against the then-current implementation.

@@ -1,6 +1,6 @@
 # LinguaDesk — Architecture and Engineering Principles
 
-**Document:** #3 · **Version:** 1.7 · **Status:** Ready for scoped implementation planning; contract and launch dependencies remain
+**Document:** #3 · **Version:** 1.8 · **Status:** Ready for scoped implementation planning; contract and launch dependencies remain
 **Updated:** 2026-09-08
 
 ## 1. Authority, Inputs, and Scope
@@ -127,6 +127,8 @@ Bind validated typed options from configuration, environment variables, and loca
 Translation uses the same configured chain for all 12 directions; Rewriting uses its configured chain for all four languages and nine single-dropdown modes. Each configured candidate must qualify for every route/mode it serves. Preserve the PRD default-model preference subject to quality/performance/cost eligibility. Low-cost providers/models and provider-managed caching are allowed; no provider retention/no-training certification is required. Per-route rules, priorities and arbitrary-length candidate lists are deferred as DF-004. #4 specifies the simple primary/fallback policy first; it needs no generic rule DSL.
 
 Use structured logs with an allowlist: opaque operation ID, operation type, duration, classified outcome, attempt number, and numeric usage/cost metadata. Disable request/response body logging and redact cookies, tokens, email-link queries, and provider error bodies. Do not attach submitted text to exceptions or traces. Health checks establish process/storage readiness without paid provider calls. Track failures, DB contention, outstanding monetary exposure, and cap suspension; exact operational alert thresholds remain with #6/#10, not an invented uptime SLA.
+
+M001 introduces only process liveness at `GET /health/live`, with no dependency probes or product-readiness claim; storage readiness follows with persistence. Its scaffold can run over loopback HTTP without credentials or a certificate because it exposes no account/text operation. This does not relax HTTPS, Secure cookies or production serving validation for later features. The [M001 package](../specs/001-backend-foundation/spec.md) specifies the bounded behavior; product OpenAPI still begins with the first selected product API slice.
 
 ## 6. Data Classification and Lifecycle
 

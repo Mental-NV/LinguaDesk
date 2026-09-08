@@ -1,6 +1,6 @@
 # LinguaDesk — SDD Planning Workflow
 
-**Version:** 1.5 · **Updated:** September 8, 2026
+**Version:** 1.6 · **Updated:** September 8, 2026
 
 **Role:** Document #0 — authoritative entry point and governance for specification-driven development (SDD).
 
@@ -106,6 +106,8 @@ Each backlog contains:
 Backlog items are testable increments of value or explicitly justified prerequisites, not a list of files to edit. They do not contain an implementation approach or coding task breakdown. Future items can remain coarse candidates. Refine only those approaching selection, favoring small slices that can be demonstrated and verified after their explicit prerequisites are satisfied. This uses the emphasis on prioritized, independently testable stories and observable scenarios in [Spec Kit's specification template](https://github.com/github/spec-kit/blob/main/templates/spec-template.md).
 
 ### Selecting work and creating a package
+
+**Human steps — user direction, 2026-09-08:** Each milestone backlog and selected package records anticipated human actions, their owner, when they are needed, and what they block; write “None required” when applicable. At the beginning, inspect available tooling/access and batch requests for indispensable inputs or actions (for example, certificate provisioning, credentials, an email-link click or device review). Use existing authorization and routine autonomous setup where sufficient; do not ask again merely because a checklist exists. Do not start dependent execution while required input is missing. Human steps that do not block implementation or its autonomous checks are queued for the end, with a concrete prepared result/procedure and explicit pending evidence. Prefer a deterministic adapter or locally generated test material where it proves the selected assertion; it must not replace required live/production evidence. Do not interrupt the middle of execution for foreseeable human steps. If an unexpected human dependency appears, continue independent authorized work and surface it at the end; if no safe independent work remains, stop with the blocker rather than inventing input, bypassing approval or claiming completion. Required end-of-milestone human verification still blocks the applicable completion/release gate. Record this timing in `spec.md` and carry it into `plan.md`/`tasks.md`; human waiting does not silently expand the 30-minute development budget.
 
 Select one item or a cohesive subset from the backlog when there is intent to implement it next. Confirm dependencies are satisfied or explicitly included. Record the selected item IDs, their source revision, and links in a new `specs/<sequence>-<slug>/spec.md`; link the package from each selected item. A package may deliver an entire small milestone or one feature slice. Avoid combining unrelated items simply because they share a milestone.
 

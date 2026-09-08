@@ -1,6 +1,6 @@
 # LinguaDesk — Verification Plan
 
-**Document:** #6 · **Version:** 1.0 · **Status:** Verification design specified; implementation and release evidence pending  
+**Document:** #6 · **Version:** 1.1 · **Status:** Verification design specified; implementation and release evidence pending
 **Updated:** 2026-09-08
 
 ## 1. Authority, ownership and scope
@@ -20,7 +20,7 @@ The authoring baseline is Git `0ac27aef9641e3bf8a23649268a513a0198b7332`: #0 v1.
 
 Only active MVP acceptance is tested for release. Preserve deferred/retired IDs without placeholder tests. A compound requirement creates work only for its active branch. NFR-007 remains Should; P-005/NFR-008 and P-006 remain proposed. Test already accepted authentication, isolation, credentials, privacy and instruction-as-content contracts without inventing abuse limits or compatibility obligations. Provider retention/no-training certification is not a gate under D-18; application text privacy and monetary admission remain required.
 
-There is no application, selected delivery package, test harness, corpus, generated OpenAPI, run report or passing runtime evidence yet. Names below identify planned checks, not existing commands or files. #10 will document executable commands once implemented. Document review cannot discharge a release gate.
+There is no application, test harness, corpus, generated OpenAPI, run report or passing runtime evidence yet. [M001 / package 001](../specs/001-backend-foundation/spec.md) is now selected for backend enablement only; its tasks have not run. Names below identify planned checks, not existing commands or files. #10 will document executable commands once implemented. Document review cannot discharge a release gate.
 
 ## 2. Verification layers and check catalog
 
@@ -253,7 +253,7 @@ On failure, retain the original result, classify defect versus harness/environme
 
 ### 8.1 Product and release coverage
 
-This is the sole cross-document product coverage matrix; the source documents retain their behavioral acceptance IDs. Every active row's package is **Unselected** and evidence is **Pending — no run**. Once selected, replace the package cell with the actual #8 backlog/delivery-package and test/report links; do not invent a package ID. Deferred, retired and proposed rows are intentionally not current test gaps or passing gates. Design references plus Section 8.2 connect product rows to local scenario checks without copying their full acceptance prose.
+This is the sole cross-document product coverage matrix; the source documents retain their behavioral acceptance IDs. Every active product row's package is **Unselected** and evidence is **Pending — no run**. The separately identified M001 enabling row links the first selected package; it does not satisfy any complete product requirement or release gate. Once selected, replace the package cell with the actual #8 backlog/delivery-package and test/report links; do not invent a package ID. Deferred, retired and proposed rows are intentionally not current test gaps or passing gates. Design references plus Section 8.2 connect product rows to local scenario checks without copying their full acceptance prose.
 
 | Requirement / gate | Shared design / acceptance owner | Checks | Backlog/package → evidence/status |
 | --- | --- | --- | --- |
@@ -311,6 +311,7 @@ This is the sole cross-document product coverage matrix; the source documents re
 | RG-006 | UX §10; Section 4 | V-010, V-011 | Unselected → Pending |
 | RG-007 | architecture §6–7; AI §5/8–9 | V-015, V-006, V-008, V-013, V-014 | Unselected → Pending |
 | RG-008 | PRD §11; Section 9 | V-016 | Unselected → Pending |
+| M001 / BI-001 — enabling scope | Architecture §2–3/5; backend build/process and absent-route boundary; prerequisite for FR-035/036, no product acceptance claimed | V-009 HTTP-host portion; V-012 process-lifecycle portion | [BI-001](08-backlogs/M001-backend-foundation.md) → [package AC-001–006](../specs/001-backend-foundation/spec.md#3-selected-acceptance) → [tasks/evidence](../specs/001-backend-foundation/tasks.md#3-completion-record); Selected / Pending — no run |
 
 ### 8.2 Local acceptance allocation
 
@@ -470,7 +471,7 @@ The UX index contains 86 active scenarios (29 MVP, 57 Amended), 21 Deferred and 
 
 ## 9. Readiness and remaining dependencies
 
-Q-005 is **specified at design level** by Sections 5–6. The corpus, implementation, reviewers and measurements are still pending; specifying counts is not qualifying a candidate. Next select work through #0's roadmap/backlog/delivery-package process and implement only that scope's fixtures/harness and acceptance checks.
+Q-005 is **specified at design level** by Sections 5–6. The corpus, implementation, reviewers and measurements are still pending; specifying counts is not qualifying a candidate. M001 is the first selected enabling package; implement only its scoped host checks after preflight. Later work continues through #0's roadmap/backlog/delivery-package process.
 
 | Dependency | Required before claiming readiness |
 | --- | --- |
