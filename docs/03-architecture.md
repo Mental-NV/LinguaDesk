@@ -1,6 +1,6 @@
 # LinguaDesk — Architecture and Engineering Principles
 
-**Document:** #3 · **Version:** 1.5 · **Status:** Ready for scoped implementation planning; contract and launch dependencies remain
+**Document:** #3 · **Version:** 1.6 · **Status:** Ready for scoped implementation planning; contract and launch dependencies remain
 **Updated:** 2026-09-08
 
 ## 1. Authority, Inputs, and Scope
@@ -13,6 +13,7 @@
 | Architecture and ADR review baseline | Git commit `b5c01a1` | Architecture/ADRs v1.2 before provider-policy amendment |
 | LLM specification authoring | User request, 2026-09-08; repository baseline `1646094` | Host-independent AI development/validation and `Microsoft.Extensions.AI`; current behavior in [document #4](04-llm-specification.md) |
 | AI infrastructure naming | User clarification, 2026-09-08 | Place the AI library in Infrastructure as `LinguaDesk.Infrastructure.Ai`; retain independent development/validation |
+| API behavior and generation timing | User approval, 2026-09-08; baseline `24ffe3b`; #0 v1.3 | [API design #5](05-api-design.md) owns shared semantics; generate OpenAPI early in selected implementation slices |
 
 PRD D-17/D-18 and Section 3 define current scope. P-001–P-004 retain their **newly amended** dispositions; P-005/NFR-008 and P-006 remain proposed. This document does not claim to close Q-001/Q-004/Q-008 in full. Active UX IDs remain behavioral contracts, not a mandatory browser-test count; Deferred/Retired IDs require no MVP implementation/evidence.
 
@@ -115,7 +116,7 @@ The Ai pipeline performs language eligibility before transformation, including f
 
 Use ASP.NET Core Identity for local accounts, password hashing and verification/reset tokens. LLM routes enforce verified-account authorization server-side. Google/external sign-in is DF-007: no OAuth callback, credentials, handler, linking flow or Google smoke requirement in MVP. Do not customize or fork Identity merely to remove unused framework-provided tables.
 
-The SPA uses Secure, HttpOnly cookies with appropriate SameSite settings and antiforgery validation for cookie-authenticated state changes, including logout. Independent clients use the explicitly selected bearer scheme in #5; do not build an OAuth server or assume Identity's built-in opaque bearer tokens are JWT/OIDC tokens. Before the account slice is ready, #5 must fix issuance, expiry/refresh, revocation, and API 401/403 behavior for both schemes. A separate API client must work without loading the SPA.
+The SPA uses Secure, HttpOnly cookies and antiforgery validation; independent clients use Identity's protected opaque bearer tokens. [API design #5 Section 3](05-api-design.md#3-authentication-verification-and-account-lifecycle) selects credential precedence, expiry/refresh and security-stamp checks for both schemes; the auth slice must implement these explicitly rather than assuming framework defaults satisfy them. Do not build an OAuth server or describe the tokens as JWT/OIDC. Unverified accounts can complete the verification journey but cannot invoke LLM operations. Fix exact auth endpoints, antiforgery bootstrap and remaining account-policy/delivery details before their handlers/clients. A separate API client must work without loading the SPA.
 
 Persist Data Protection keys outside the deployment directory with restricted filesystem access and a stable application identity. Back them up with account data. Local-account deletion and cookie/bearer session revocation need the Q-004 account design before implementation. External-account linking is a DF-007 dependency, not a current blocker; when selected it must not link solely by matching email. Real email delivery is an adapter; deterministic tests use a capturing fake.
 
@@ -144,7 +145,7 @@ For deployment, stop/drain the single instance, take a consistent backup, run th
 | Data | Location | Lifecycle |
 | --- | --- | --- |
 | Local accounts, Data Protection keys | Durable backend storage | Account lifecycle; exact deletion/backup retention remains Q-004 |
-| Operation status, reservations, usage and cost metadata | SQLite; no text bodies | Bounded replay/reconciliation window, then required aggregates only; exact durations remain Q-004/#5 |
+| Operation status, reservations, usage and cost metadata | SQLite; no text bodies | #5 Section 5 defines identity/replay expiry and fingerprint removal; aggregate, backup and unresolved-exposure retention remains Q-004 |
 | Source/result and single-mode/language workspace settings | Per-tab browser memory | Cleared on UX #2 Section 3.4 boundaries |
 | Provider request/response bodies | Backend transient memory | Only bounded active processing/delivery; no persistent result cache, queue payload, logs, or analytics |
 
@@ -164,7 +165,7 @@ The user clarified that caching is **provider-managed**. #4 records the selected
 - Persist metadata-only states such as reserved/in-flight, succeeded, failed, and interrupted/unknown. State transitions and any usage-ledger entry occur atomically; a unique operation charge and conditional finalization prevent double settlement. An in-flight duplicate observes status rather than dispatching another paid call. Status/replay reads enforce authenticated account ownership.
 - Before each retry/fallback, reserve its own bounded cost. Character charging occurs once for a validated overall success; failed attempts do not consume character allowance. No generic HTTP retry/hedging policy may silently replay paid POSTs outside #4's coordinator.
 - Use a server-controlled deadline and injected clock. A client disconnect is not proof of failure: bounded processing may finish and commit success. Confirmed overall failure/deadline expiry commits no character charge, and late provider responses cannot turn a terminal failure into success. Status reads never dispatch work.
-- #5 must fix replay expiry, payload mismatch behavior, cancellation, quota-period assignment for operations crossing midnight, and ordered usage snapshots before accounting implementation. Store the chosen period with reservations and settlement; never move or reset a reservation implicitly with the wall clock. These are contract dependencies, not permission for each slice to choose differently.
+- Follow #5 Sections 5–7 for identity/replay expiry, payload matching, cancellation, admission-day character settlement, per-attempt monetary month and ordered usage snapshots. Store the chosen period with reservations and settlement; never move or reset a reservation implicitly with the wall clock. Exact wire representation and persistence/concurrency evidence remain selected-slice work; slices cannot choose conflicting semantics.
 
 ### 7.2 Failure windows and limits of idempotency
 
@@ -175,7 +176,7 @@ The user clarified that caching is **provider-managed**. #4 records the selected
 | Provider completes before success commit | Database cannot prove success. Reconcile metadata where the provider supports it; otherwise treat the interrupted operation as non-success for character charging and conservatively account for possible provider cost |
 | Success commits before HTTP response reaches client | Repeated key/status reads report existing success/usage without another charge or dispatch. Result delivery is not guaranteed after transient text is lost |
 
-A local DB transaction cannot make an external provider call exactly once. Do not claim that an idempotency key recovers rolled-back state or lost result text. With no persisted output, #5 must define the recoverable status and output-unavailable response, and map it to UX #2's interruption behavior before implementation. A new user-requested operation is distinct from retrying the existing key and may incur a new charge; recovery must not create it silently. Reuse the original key after ambiguous transport failure.
+A local DB transaction cannot make an external provider call exactly once. Do not claim that an idempotency key recovers rolled-back state or lost result text. #5 Section 6 defines metadata-only status/replay, including succeeded with output unavailable, terminal interrupted and unknown outcomes; the selected recovery slice supplies the precise wire/UI mapping. A new user-requested operation is distinct from retrying the existing key and may incur a new charge; recovery must not create it silently. Reuse the original key after ambiguous transport failure within its validity window; expiry never permits redispatch under that key.
 
 Recovery uses the durable metadata and a bounded in-process reconciliation service; it does not need a persistent text queue or distributed job platform. Only the current operation owner may settle it. Recovery and timeout finalization must fence off late callbacks with the same conditional transitions used for success.
 
@@ -183,7 +184,7 @@ Recovery uses the durable metadata and a bounded in-process reconciliation servi
 
 Admission enforces `known spend + unresolved exposure + new attempt upper bound <= configured cap` atomically across requests. The estimate covers all billable input, bounded output/reasoning tokens, and provider-specific charges for the two active operations. Any paid eligibility/detection attempt also needs cost admission even when no character charge results. Alternative context is deferred with DF-001; it adds no MVP accounting branch. An unknown price or unbounded billable attempt makes that configuration ineligible for paid dispatch. Release unused exposure only on authoritative evidence; a timeout can still cost money. Provider-side hard budgets, when available, are an additional backstop.
 
-#4 must supply eligible price/billing bounds and fallback attempt budgets; #5 defines month-boundary reservation assignment; Q-001 still owns the actual cap amount and serving arrangement. This is a conservative application admission guarantee under those verified bounds, not a promise to control unrelated account spend or provider billing changes. Suspensions preserve the workspace and return #5's budget category.
+#4 must supply eligible price/billing bounds and fallback attempt budgets. #5 Section 7 assigns each attempt to its cost-admission UTC month and conservatively carries unresolved prior-month exposure into new-month admission; Q-001 still owns the actual cap amount, serving arrangement and verified billing attribution. This is a conservative application admission guarantee under those verified bounds, not a promise to control unrelated account spend or provider billing changes. Suspensions preserve the workspace and return #5's budget category.
 
 ## 8. Frontend and Agent Development Rules
 
@@ -203,11 +204,13 @@ Full-result replacement uses request/workspace revisions, not sentence/version a
 - Ai library builds, offline AI checks, prompt inspection and standalone evaluations do not start the API or require its database/authentication. Live evaluation is explicit, budgeted and separate from ordinary tests. It shares production AI code while leaving HTTP/accounting integration evidence to the owning suites; see #4 Section 9.
 - New edge cases default to pure unit tests. Add an integration/browser test only for a boundary that a lower test cannot establish. Use assertions on behavior and data, not private method calls or large DOM snapshots.
 
-### 8.3 Generated API contract
+### 8.3 API behavioral design and generated contract
 
-Generate only active local-account authentication, language/mode/usage, Translation and Rewriting operations and their errors/status recovery. Do not emit speculative alternatives/sentence schemas or Google flows. Cookie **and** independent-client bearer lifecycle remain current contracts; simplifying sign-in providers does not remove API access.
+Design shared API behavior in [#5](05-api-design.md), then specify each selected slice's operations and acceptance before its handlers. Do not create a backend or provisional YAML solely to finish planning documents. At the start of an API implementation slice, add its actual C# contracts/endpoint metadata, generate and review the OpenAPI shape, then implement handlers against it. Generate dependent client types before client adoption. Incomplete contracts/handlers remain explicitly under construction and must not ship as working APIs.
 
-Follow document #0's amended ownership rule: `docs/05-openapi.yaml` remains the reviewed contract artifact. Use .NET's `Microsoft.AspNetCore.OpenApi` plus `Microsoft.Extensions.ApiDescription.Server` for build-time generation, with explicit operation IDs, typed success/error DTOs, auth metadata, and semantic descriptions. Pin OpenAPI 3.1 for client-tool compatibility. Build-time generation emits JSON; the same contract command deterministically serializes it to the canonical YAML file using a pinned serializer, with no schema edits or second schema source. Generate without a live database, migrations, external network, or production secrets; build-time host startup must be side-effect free.
+Generate only the selected subset of active local-account authentication, language/mode/usage, Translation and Rewriting operations and their errors/status recovery. Do not emit speculative alternatives/sentence schemas or Google flows. Cookie **and** independent-client bearer lifecycle remain current contracts; simplifying sign-in providers does not remove API access. The first generated artifact is not a claim that all MVP operations exist.
+
+Follow document #0 v1.3: `docs/05-api-design.md` owns shared behavior and `docs/05-openapi.yaml` is the reviewed generated wire artifact. C# DTOs/metadata own editable wire structure; selected specifications refine operation behavior without duplicating the full schema. Use .NET's `Microsoft.AspNetCore.OpenApi` plus `Microsoft.Extensions.ApiDescription.Server` for build-time generation, with explicit operation IDs, typed success/error DTOs, auth metadata, semantic descriptions and client-facing examples. Pin OpenAPI 3.1 for client-tool compatibility. Build-time generation emits JSON; the same contract command deterministically serializes it to the canonical YAML file using a pinned serializer, with no schema edits or second schema source. Generate without a live database, migrations, external network, or production secrets; build-time host startup must be side-effect free while preserving actual route registrations.
 
 Use pinned `openapi-typescript` for TypeScript definitions and a small `openapi-fetch` wrapper for transport/credentials/antiforgery/errors. This keeps transport generation independent from React state management. Commit generated schema/types, mark them generated, and regenerate in one command before frontend typechecking. CI fails on unexpected drift; do not hand-edit generated output. Generated shape alone does not prove status codes, authorization, accounting semantics, or compatibility; focused contract tests and review still do. P-006 remains proposed.
 
@@ -272,8 +275,8 @@ Technical guidance checked on 2026-09-07; the choices above are LinguaDesk's app
 | --- | --- | --- |
 | Q-001, #4/#6 and owner configuration | Serving/provider-managed caching capabilities, models/settings meeting quality/performance/cost criteria, monetary cap amount; no retention/no-training gate | Paid serving and launch |
 | Q-002, PRD D-17 | Targeted matching and toggle restoration resolved by removal; future assistance association is DF-001/002 | No current-MVP blocker |
-| Q-003/Q-006, #5 with #3 | Unicode counts, quota/month rollover, operation/status/replay/output-unavailable semantics, bearer lifecycle, error fields | Accounting/auth and their dependent clients |
-| Q-004, account/privacy package with #3/#5/#10 | Metadata/replay/backup retention durations, local-account deletion/revocation, provider disclosure; external linking deferred DF-007 | Related account features and launch |
+| Q-003/Q-006, #5 with #3 | Shared semantics selected in #5; exact operations/DTOs/headers, auth bootstrap/policy/delivery details and implementation evidence remain | Selected accounting/auth/recovery handlers and dependent clients; YAML itself is deferred to early implementation |
+| Q-004, account/privacy package with #3/#5/#10 | Recovery window/stamp rules in #5; backup/aggregate/unresolved-exposure retention, deletion and further logout guarantees/provider disclosure remain; external linking deferred DF-007 | Related account features and launch |
 | Q-007, #4 | Policy specified in #4; selected adapter/token bounds, executable prompt/validator fixtures and conformance evidence remain | Live provider orchestration readiness; offline policy work can proceed |
 | Q-005, #6 | Coverage mapping, evaluation workload, actual evidence | Release acceptance |
 | Q-008/Q-010, PRD then #3/#10 | P-005 safeguard scope and any additional operational thresholds | Adoption of proposed controls; no silent acceptance |

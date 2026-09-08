@@ -1,11 +1,11 @@
 # LinguaDesk — UX/UI Specification
 
-**Document:** #2 · **Version:** 1.3 · **Status:** Simplified MVP ready for scoped planning; runtime verification pending
+**Document:** #2 · **Version:** 1.4 · **Status:** Simplified MVP ready for scoped planning; runtime verification pending
 **Updated:** September 8, 2026 (UTC)
 
 ## 1. Authority, inputs, and scope
 
-[Document #0](00-SDD-Planning-Workflow.md) owns process; [PRD v0.4](01-PRD.md) owns product scope and the seven DF-* deferred groups. The original simplification inputs were Git revision `54343c3` and the user's ten approvals on 2026-09-08, previously incorporated into PRD v0.3. Provider-policy amendment D-18 is based on `b5c01a1` and incorporated with PRD v0.4 / architecture v1.3. Active UI behavior and scenario dispositions are unchanged by that amendment. No runtime implementation has been inspected or verified.
+[Document #0](00-SDD-Planning-Workflow.md) owns process; [PRD](01-PRD.md) owns product scope and the seven DF-* deferred groups. The original simplification inputs were Git revision `54343c3` and the user's ten approvals on 2026-09-08, previously incorporated into PRD v0.3. Provider-policy amendment D-18 is based on `b5c01a1` and incorporated with PRD v0.4 / architecture v1.3. The v1.4 handoff amendment follows the approved API-design workflow at baseline `24ffe3b`; current shared API behavior is in [#5](05-api-design.md). Existing UI scenario dispositions remain. No runtime implementation has been inspected or verified.
 
 This document owns current routes, layout, controls, messages, state transitions and acceptance contracts. `Must` is binding for the **active MVP**; rows marked **Deferred** or **Retired** impose no current implementation/test gate. The 17 UX-US, 112 UX-AC, and original 44 UX-MSG IDs remain traceable; some are amended and some inactive. In compact references, AC/US/MSG mean UX-AC/UX-US/UX-MSG. IDs are never reused for unrelated behavior.
 
@@ -13,7 +13,7 @@ No sentence alternatives, sentence identities, comparison/highlighting, Show cha
 
 Automatic **source detection remains**; automatic **submission does not**. A workspace is one verified tab's in-memory source, settings, result and operation state. A current response must match its workspace generation, feature, submitted source/settings revision and result-edit revision. Source/settings edits, manual result edits, reset and session teardown can make a response outdated.
 
-API schemas/counting/identity/recovery stay with #5; model eligibility/output checks with #4; full verification/evaluation with #6. Only current-scope dependencies block selected implementation.
+API counting/identity/recovery and auth/error semantics are owned by [#5's behavioral design](05-api-design.md); the generated wire contract follows during selected implementation. Model eligibility/output checks stay with #4; full verification/evaluation with #6. Only current-scope dependencies block selected implementation.
 
 ## 2. Historical reference research (non-normative)
 
@@ -191,7 +191,7 @@ Manual result edits are local and uncharged in both features. They do not mutate
 
 ### 6.2 Response ordering and recovery
 
-Usage snapshots need a server ordering/reset-period contract in #5. Older responses cannot reduce newer usage; a new UTC period can legitimately reset it. If order is ambiguous, perform one fresh usage read. Text application and accounting are independent: stale success can charge without replacing text. Display only reconciled authoritative counts; no client-calculated deductions.
+Usage snapshots follow #5 Section 7's UTC-day and durable revision ordering. Older snapshots cannot replace newer consumed/reserved/availability state; releases can legitimately increase available capacity, and a new UTC day resets current-day usage. If order is ambiguous, perform one fresh usage read. Text application and accounting are independent: stale success can charge its admission day without replacing text. Display only reconciled authoritative counts; no client-calculated deductions.
 
 `Try again` applies only to definitive failure and captures the current fields. `Check status` uses the original operation identity; it never calls the provider. Unknown-outcome message: `We couldn’t confirm whether this request completed. Your text is safe. Check its status before trying again.` A recorded success with lost output must disclose that the result is unavailable and any confirmed usage; #5 supplies the concrete outcome/category before recovery implementation. A new paid operation must always require explicit action and must not masquerade as replay of the old key.
 
@@ -535,7 +535,7 @@ UX-D-001–UX-D-007 remain stable historical decision IDs. Their current disposi
 | UX-D-007 | Retained: server-authoritative usage and explicit stale-success disclosure, no provider/global/budget amounts |
 | UX-D-008 | Accepted 2026-09-08: PRD D-17 replaces affected prior UX; DF register controls later scope, no dormant MVP widgets/tests |
 
-Before dependent implementation, #5 must define canonical Unicode counting, single-mode values, operation/status identity and ordering, local cookie/bearer lifecycle, verification/password policy, errors, cancellation/replay/rollover and lost-output status. #3/#4 must define serving capability, cost bounds and the simple family chains' quality/output/deadline checks; provider retention/no-training certification is not a prerequisite. Provider-managed caching changes no current UI, character accounting or application text-lifecycle contract. #6 supplies current-scope evidence mapping. Q-002 targeted matching and Google linking no longer block MVP. Advanced routing and sentence context are deferred dependencies only.
+API design #5 now defines canonical scalar counting, operation identity/recovery, ordered usage, cookie/bearer lifecycle, error semantics, cancellation and rollover. Selected slices still fix exact wire operations/fields, auth policy/bootstrap/delivery details and the concrete recovery UI mapping before dependent handlers/clients. OpenAPI is generated and reviewed early in implementation, not hand-authored during planning. #3/#4 own serving capability, cost bounds and the simple family chains' quality/output/deadline checks; provider retention/no-training certification is not a prerequisite. Provider-managed caching changes no current UI, character accounting or application text-lifecycle contract. #6 supplies current-scope evidence mapping. Q-002 targeted matching and Google linking no longer block MVP. Advanced routing and sentence context are deferred dependencies only.
 
 Deferred work is selected through PRD Section 3.1 and the existing #8 package workflow; no new full deferred implementation spec is authored now. At reactivation, refine only the selected capability, reassess affected historical UX IDs, and update its owning contracts/tests. Custom visual tools do not restore obsolete toggles or targeted sentence preservation.
 

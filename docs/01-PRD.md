@@ -1,6 +1,6 @@
 # LinguaDesk — Product Requirements Document
 
-**Version:** 0.4 · **Status:** Simplified MVP product baseline; deferred scope explicit; P-005/P-006 remain proposed · **Updated:** September 8, 2026 (UTC)
+**Version:** 0.5 · **Status:** Simplified MVP product baseline; API-design handoffs updated; deferred scope explicit; P-005/P-006 remain proposed · **Updated:** September 8, 2026 (UTC)
 
 This document consolidates the discovery decisions. It specifies product outcomes for later UX, architecture, API, and feature specifications. It contains no implementation plan or development task breakdown.
 
@@ -113,7 +113,7 @@ Unmarked requirements in this section are **MVP / C / Must**. Explicit **Deferre
 | FR-004 | Source-language selection | **MVP / Must.** Both features default to automatic detection and permit manual override. Detection/eligibility runs as part of explicit submission; uncertain source, substantially unsupported input, or same-language translation produces validation with no transformation or character charge. Translation requires an explicitly selected different target. Correcting input/settings reenables submission; the user activates the button again. A server may receive a validation request; this is not a successful paid transformation. |
 | FR-005 | Supported input languages | Accept one main language from English, Russian, Romanian, or Chinese. Foreign names, technical terms, and short foreign phrases are allowed. Substantially mixed passages or substantial unsupported-language content produce validation feedback and no allowance deduction. |
 | FR-006 | Chinese scripts | Accept Simplified and Traditional Chinese input. Chinese output is Simplified, for both translation and rewriting. The script conversion is an explicit exception to preserving a Chinese input’s script. |
-| FR-007 | Input eligibility and length limits | **MVP / Must.** Empty/whitespace-only input starts no operation and incurs no charge. Translation accepts at most **5,000 characters** and full rewriting at most **2,000**; oversized input remains editable, is blocked without processing/charge, and shows the excess count. The API enforces the same limits. Correcting input never submits automatically. Prefix translation is **deferred (DF-006)**. Exact Unicode counting remains Q-003. |
+| FR-007 | Input eligibility and length limits | **MVP / Must.** Empty/whitespace-only input starts no operation and incurs no charge. Translation accepts at most **5,000 characters** and full rewriting at most **2,000**; oversized input remains editable, is blocked without processing/charge, and shows the excess count. The API enforces the same limits. Correcting input never submits automatically. Prefix translation is **deferred (DF-006)**. Q-003's technical counting rule is specified in [API design Section 4](05-api-design.md#4-complete-input-and-canonical-counting). |
 | FR-008 | Plain-text fidelity | Within the text submitted under FR-007, preserve paragraph/list structure, factual meaning, numerical values, names’ identities, and URLs. Transliteration may preserve a name’s identity without preserving its spelling. Markdown-specific syntax preservation is not promised. |
 
 ### 5.2 Translation
@@ -168,7 +168,7 @@ The single **Writing mode** dropdown contains exactly one selection from:
 | --- | --- | --- |
 | FR-024 | Character-based usage | **MVP / Must.** A successful full translation/rewrite charges the complete submitted text length once. A new successful submission charges the full length even after a small edit. Oversized input is rejected and charged zero; prefix charging is **deferred (DF-006)**. |
 | FR-025 | Alternatives accounting — deferred | **Deferred (DF-001).** Later intent: one selected-sentence-length charge per successful generated option set, no character charge for context/options or local selection. No alternatives ledger branch is required now. |
-| FR-026 | Success-only, single-operation charging | Failed operations and retry attempts add no charge. One logical operation is charged at most once when it succeeds, including success after retries/fallback. Successful responses discarded as outdated still count. Retry identity and interruption edge cases are deferred to the API specification. |
+| FR-026 | Success-only, single-operation charging | Failed operations and retry attempts add no charge. One logical operation is charged at most once when it succeeds, including success after retries/fallback. Successful responses discarded as outdated still count. Retry identity and interruption behavior are specified in [API design Sections 5–6](05-api-design.md#5-submission-identity-duplicates-and-replay); wire details and verification follow in selected implementation slices. |
 | FR-027 | Enforce shared daily allowances | Server-side accounting enforces the user and global limits across clients and resets both at midnight UTC. Concurrent operations must not create duplicate deductions or successful usage beyond either allowance. |
 | FR-028 | Report usage to clients | The server calculates usage and returns it to clients. Clients can reflect consumption and allowance-related failures consistently; exact response fields belong to the API contract. |
 
@@ -315,16 +315,18 @@ D-01–D-16 record the discovery baseline. Their automatic processing, alternati
 | --- | --- | --- |
 | Q-001 | Hosting/provider arrangement, model/fallback settings meeting quality/performance/cost criteria, provider-managed caching capabilities/pricing and monetary cap amount. Provider retention/no-training eligibility checks are removed by D-18 | Model/provider evaluation and cost specification, before launch |
 | Q-002 | **Resolved for MVP by D-17.** Targeted sentence-correspondence and toggle restoration are cut. No sentence metadata exists in MVP. Future assistance uses whole-result metadata invalidation on manual edits. | No MVP blocker. Future sentence/alternative association design belongs to DF-001; change review belongs to DF-002. |
-| Q-003 | Exact Unicode/whitespace/newline counting; retry identity; interrupted/cancelled operations; operation crossing midnight; usage fields and concurrent allowance enforcement semantics | API/feature specification and architecture, before implementation of accounting |
+| Q-003 | **Shared design specified:** [API design Sections 4–7](05-api-design.md#4-complete-input-and-canonical-counting) resolve counting, retry identity, interruption/cancellation, period assignment and usage ordering. Exact wire fields, persistence/concurrency implementation and evidence remain | Selected API/accounting slices; shared behavior precedes handlers and generated wire review precedes client adoption |
 | Q-004 | Confirm per-tab memory teardown, metadata/backup retention, local-account deletion/revocation and provider disclosure. External-account linking is deferred with Google (DF-007). | Privacy/security and local-account specifications before launch; UX fixes observable workspace lifetime. |
 | Q-005 | Evaluation corpus size, grading rubric, human review coverage, critical-error examples, and performance-test workload composition | Evaluation specification, before model acceptance |
-| Q-006 | API schemas, auth token/protocol choices, versioning/compatibility, error taxonomy, cancellation, and identifier formats | API/security specifications; product capabilities remain as defined here |
+| Q-006 | **Partially resolved:** [API design](05-api-design.md) selects auth modes/lifecycle, identity and cancellation/recovery/error semantics. Exact operations/schemas/headers, auth bootstrap/policy/delivery details and schema version mechanics remain; P-006 compatibility guarantees are still proposed | Selected API/auth slices; generated OpenAPI begins early in implementation under #0, not as a prerequisite to finishing numbered planning documents |
 | Q-007 | Provider error/refusal classification, output validity, bounded attempt/deadline policy for the two simple chains, and owner diagnostics. Alternative context bounds are deferred DF-001. | LLM/architecture specifications before provider orchestration; no advanced routing prerequisite. |
 | Q-008 | Short-term abuse limits, operational alerts, provider-cost tracking/enforcement, and any additional availability SLO | Security/architecture/operations specifications, before launch; safeguard scope awaits P-005 review |
 | Q-009 | Update browser/accessibility criteria, native controls, explicit-button/validation/processing/error behavior, oversize blocking, manual-edit protection and workspace teardown. | UX v1.2 resolves active presentation. Deferred surfaces/boundaries are not MVP blockers. |
 | Q-010 | Acceptance or amendment of P-005 and P-006; any optional adoption/pilot success measure | PRD review; P-001 through P-004 are resolved, and no additional feature or adoption target is silently assumed |
 
 ## 12. References and review status
+
+The v0.5 amendment links Q-003/Q-006 to their downstream technical design and the user-approved API authoring workflow. It changes no product scope, limits, quality/performance targets or proposal dispositions.
 
 The primary source is the confirmed discovery conversation. External verification was limited to decisions that depended on current model information:
 

@@ -1,9 +1,9 @@
 # LinguaDesk — Architecture Decision Records
 
-**Document:** #9 · **Version:** 1.5 · **Status:** Reviewed technical decisions; implementation evidence pending
+**Document:** #9 · **Version:** 1.6 · **Status:** Reviewed technical decisions; implementation evidence pending
 **Updated:** 2026-09-08
 
-Updated against user-approved PRD v0.4, UX v1.3 and architecture v1.5. Provider-policy review used baseline `b5c01a1`; ADR-012 uses baseline `1646094` and the 2026-09-08 LLM specification request and Infrastructure naming clarification. Current design is in [architecture](03-architecture.md) and [LLM specification](04-llm-specification.md); generated contract governance is in [document #0](00-SDD-Planning-Workflow.md). These technical decisions preserve P-005/P-006 proposal status. Amended decisions record the original choice and the correction; superseded text is historical.
+Updated from baseline `24ffe3b` with the user-approved API authoring workflow and [API behavioral design](05-api-design.md); architecture is v1.6 and document #0 is v1.3. Provider-policy review used baseline `b5c01a1`; ADR-012 uses baseline `1646094` and the 2026-09-08 LLM specification request and Infrastructure naming clarification. Current design is in the owning specifications; generated contract governance is in [document #0](00-SDD-Planning-Workflow.md). These technical decisions preserve P-005/P-006 proposal status. Amended decisions record the original choice and the correction; superseded text is historical.
 
 ## ADR-001: Combined Hosting and SPA Fallback
 
@@ -43,15 +43,17 @@ Updated against user-approved PRD v0.4, UX v1.3 and architecture v1.5. Provider-
 
 ## ADR-004: Generated and Reviewed OpenAPI Contract
 
-**Status:** Accepted; amended 2026-09-07 with document #0 Section 2 updated first.
+**Status:** Accepted; amended 2026-09-07 for contract ownership, then 2026-09-08 with user approval of behavioral design now and generation during selected implementation. Document #0 Section 2 was updated first in both amendments.
 
 **Context:** Manual synchronization of C#, YAML, and client types creates drift. The original decision also removed document #5's canonical path and made runtime code the authority for behavior, contradicting document #0.
 
-**Alternatives:** Hand-maintained schema plus DTOs; a contract-first server generator; runtime-only schema with no reviewed artifact.
+**Alternatives:** Hand-maintained schema plus DTOs; schema-first server-contract generation; an early contract-only C# host; runtime-only schema; shared behavioral design followed by generation during each selected implementation slice. Schema-first generation is valid but adds server-generator conventions to the selected Minimal API stack. A contract-only host creates scaffolding work before a slice needs it. Generation during implementation retains compiler feedback and one editable wire source, with deliberate behavior review preceding handlers.
 
-**Decision:** Generate version-controlled `docs/05-openapi.yaml` from C# metadata with native ASP.NET Core build-time OpenAPI 3.1 JSON generation and deterministic YAML serialization in one command. Generate TypeScript definitions with pinned `openapi-typescript`; use a small `openapi-fetch` wrapper. Keep selected behavior design and schema diff review before client adoption. Generation starts no real services or migrations; CI rejects schema/client drift.
+**Decision:** Write shared counting, auth, operation lifecycle, recovery, usage and error behavior in `docs/05-api-design.md`. Resolve each selected slice's applicable operation behavior and acceptance before its handlers. Generate version-controlled `docs/05-openapi.yaml` from actual C# DTOs/endpoint metadata at the start of that API implementation slice, then review the shape before dependent clients consume it. Do not scaffold a host solely for planning, handwrite provisional YAML or duplicate a full DTO catalog in Markdown. Use native ASP.NET Core build-time OpenAPI 3.1 JSON generation and deterministic YAML serialization in one command. Generate TypeScript definitions with pinned `openapi-typescript`; use a small `openapi-fetch` wrapper. Generation starts no real services or migrations; CI rejects schema/client drift and separate tests establish behavioral correctness.
 
-**Consequences:** One editable schema source and a reviewable contract artifact; no mandatory runtime server or React state library for code generation. Typed schemas still need semantic descriptions and contract tests. P-006 compatibility guarantees are not accepted by this tooling decision. See #3 Section 8.3.
+**Amendment history:** The 2026-09-07 version retained a canonical generated YAML artifact and permitted contract-only C# scaffolding during planning. The 2026-09-08 review keeps generation, introduces #5's behavioral design companion and moves the normal first generation gate into selected implementation. This changes authoring timing and ownership detail, not the independent API commitment or accepted product scope.
+
+**Consequences:** One editable wire-structure source and a reviewable generated artifact, with shared behavior available before code. The YAML may be absent during planning and initially cover only selected API slices; incomplete handlers must not ship as working functionality. Descriptions/examples flow from C# metadata into OpenAPI; behavioral examples stay with the design. Reproducible generation alone cannot detect an incorrect implementation that regenerates its own mistake. Typed schemas still need semantic review and independent behavior tests. P-006 compatibility guarantees are not accepted by this tooling decision. See #3 Section 8.3 and #5 Section 1.
 
 ## ADR-005: In-Process HTTP Integration with Explicit Isolation
 
@@ -102,7 +104,7 @@ Updated against user-approved PRD v0.4, UX v1.3 and architecture v1.5. Provider-
 
 **Decision:** Commit metadata-only operation claims and user/global/cost reservations before dispatch. Execute HTTP outside transactions; conditionally finalize and charge once afterward. Enforce unique operation charges and include outstanding reservations in admission. Fence late completion and reconcile crash windows conservatively. No automatic redispatch of ambiguous paid attempts or persisted text for replay.
 
-**Consequences:** A small durable operation state machine is necessary integrity work. Capacity may remain conservatively reserved while outcome/cost is unknown. Exactly-once provider execution and lost-result recovery are not promised. #5 must settle replay, rollover, cancellation, and output-unavailable UX mapping before dependent implementation. See #3 Section 7.
+**Consequences:** A small durable operation state machine is necessary integrity work. Capacity may remain conservatively reserved while outcome/cost is unknown. Exactly-once provider execution and lost-result recovery are not promised. The original replay/rollover/cancellation dependency is now specified in #5's behavioral design; exact wire/UI mapping and implementation evidence remain selected-slice work. See #3 Section 7.
 
 ## ADR-009: Unit-Heavy Pyramid with Focused Boundary Evidence
 

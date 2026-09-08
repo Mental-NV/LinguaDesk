@@ -1,6 +1,6 @@
 # LinguaDesk — LLM Behavior and Routing Specification
 
-**Document:** #4 · **Version:** 1.1 · **Status:** Shared design for scoped planning; provider qualification and implementation evidence pending
+**Document:** #4 · **Version:** 1.2 · **Status:** Shared design for scoped planning; provider qualification and implementation evidence pending
 **Updated:** 2026-09-08
 
 ## 1. Authority, inputs, and scope
@@ -13,10 +13,11 @@
 | [Architecture](03-architecture.md) | v1.3 at the same commit; aligned to v1.5 with this document and naming clarification | Component boundaries, durable accounting, privacy, deadlines and testing |
 | [Architecture decisions](09-architecture-decisions.md) | v1.3 at the same commit; ADR-012 added with this document | Decision rationale; current design remains in its owning specification |
 | User request and clarification | 2026-09-08 | Generate #4; consider `Microsoft.Extensions.AI` and independent AI development/validation; name the Infrastructure library `LinguaDesk.Infrastructure.Ai` |
+| [API behavioral design](05-api-design.md) and #0 v1.3 | 2026-09-08 workflow approval, baseline `24ffe3b` | Shared counting/recovery/accounting semantics now specified; OpenAPI generation deferred to early selected implementation |
 
 This document owns prompts, provider settings/adapters, language eligibility, family chains, output checks, error classification, context and attempt bounds under Q-007. It supplies capability and cost evidence for Q-001; it does not certify a serving arrangement or select a monetary cap. The technical choices below exercise the design authority delegated by #0 and are recorded in ADR-012. They are not claims of product-owner approval of a new requirement.
 
-At authoring, the repository contains specifications only. `docs/05-openapi.yaml` and `docs/06-verification-plan.md` do not exist and were not read. References to #5/#6 below name future owners, not implemented contracts or passing evidence. Planned code, prompts, fixtures and commands are also not present yet.
+The repository contains specifications only. [API behavioral design #5](05-api-design.md) now supplies shared semantics. `docs/05-openapi.yaml` and `docs/06-verification-plan.md` do not exist and were not read: OpenAPI follows at the start of selected API implementation and #6 remains a future verification owner. These are not implemented contracts or passing evidence. Planned code, prompts, fixtures and commands are also not present yet.
 
 Scope is the current Translation and Rewriting MVP: FR-004–014, active FR-016–018/022–024, FR-026–030/032–038 and applicable NFR-001–006. Preserve the PRD's exact language/mode catalog, input limits, allowance values and performance/quality thresholds by reference to Sections 5–8. DF-001–DF-007, retired sentence preservation and the duplicate correction toggle create no work here. P-005/NFR-008 and P-006 remain proposed; this design does not select new abuse rates, content restrictions, API compatibility promises or provider privacy gates.
 
@@ -26,7 +27,7 @@ Scope is the current Translation and Rewriting MVP: FR-004–014, active FR-016�
 
 Use `Microsoft.Extensions.AI.IChatClient` as the provider-call abstraction. Microsoft supplies exchange types in `Microsoft.Extensions.AI.Abstractions` and optional composition utilities in `Microsoft.Extensions.AI`; a provider can implement the interface. This supports a shared call boundary with scripted substitutes in tests. [Microsoft library overview](https://learn.microsoft.com/en-us/dotnet/ai/microsoft-extensions-ai)
 
-LinguaDesk's application of that abstraction is the Infrastructure-layer .NET class library `LinguaDesk.Infrastructure.Ai`, referenced by the API and a standalone `LinguaDesk.Ai.Evaluation` console runner. The library references Core for shared value types and pure accounting/cost policies; neither Core nor the AI infrastructure library references Api. The library has no ASP.NET Core, EF Core, Identity, React or database dependency. Infrastructure ownership therefore preserves the independent development/validation boundary. Architecture #3 v1.5 owns the repository structure; corresponding tests are `LinguaDesk.Infrastructure.Ai.Tests`, while the evaluation runner remains a development tool. “Ai” below refers to this infrastructure component.
+LinguaDesk's application of that abstraction is the Infrastructure-layer .NET class library `LinguaDesk.Infrastructure.Ai`, referenced by the API and a standalone `LinguaDesk.Ai.Evaluation` console runner. The library references Core for shared value types and pure accounting/cost policies; neither Core nor the AI infrastructure library references Api. The library has no ASP.NET Core, EF Core, Identity, React or database dependency. Infrastructure ownership therefore preserves the independent development/validation boundary. Architecture #3 owns the repository structure; corresponding tests are `LinguaDesk.Infrastructure.Ai.Tests`, while the evaluation runner remains a development tool. “Ai” below refers to this infrastructure component.
 
 ```mermaid
 flowchart TD
@@ -71,7 +72,7 @@ One composition function builds Ai for both hosts. Request messages and response
 
 ### 3.1 Validation before generation
 
-The API checks authentication/verification, request shape, supported selector values, complete-source length and empty/whitespace-only input before any provider call. Ai validates its internal inputs defensively using the same policies. Exact Unicode/whitespace/newline counting remains Q-003/#5; Ai must not adopt `.Length` or a different normalization as a competing character contract. Count/validation fixtures can be developed once that policy is selected.
+The API checks authentication/verification, request shape, supported selector values, complete-source length and empty/whitespace-only input before any provider call. Ai validates its internal inputs defensively using #5 Section 4's `unicode-scalar-v1` counting, fixed whitespace set and no-normalization policy. Ai must not adopt `.Length` or a different normalization as a competing character contract. Shared count/validation fixtures are now specified; their implementation and evidence remain pending.
 
 Reject oversized input before paid detection as well as transformation. Do not truncate, summarize, normalize away content, or generate a valid-looking prefix. An explicitly selected equal source/target is locally invalid. Other eligibility is checked in a separate bounded model call before transformation, using the current family candidate. This stage separation implements FR-004/005's requirement that uncertain, unsupported, substantially mixed or same-language input receives no transformation.
 
@@ -211,7 +212,7 @@ Before every network dispatch, the attempt-admission implementation atomically r
 
 The billing profile defines whether reasoning is included in or additional to completion usage, avoiding double counting. Reserve at cache-miss and highest applicable rates unless stronger billing evidence applies. The architecture's global ceiling equation includes known spend and unresolved exposure; use fixed-point arithmetic rounded conservatively. Failed detection, rejected output, fallback, timeouts and potentially billed cancelled calls all contribute exposure. Never infer zero provider cost from zero character charge.
 
-Record normalized usage and settle exposure only against authoritative billing evidence. Retain the conservative reservation when usage/tariff evidence is missing or inconsistent; do not turn a useful validated output into a language error merely because usage is absent. Evidence of a breached bound invalidates the profile for subsequent paid dispatch and requires reconciliation. The operation's character charge still follows its durable terminal state. Month/period assignment remains Q-003/#5; Ai uses the admission context rather than rolling its own period.
+Record normalized usage and settle exposure only against authoritative billing evidence. Retain the conservative reservation when usage/tariff evidence is missing or inconsistent; do not turn a useful validated output into a language error merely because usage is absent. Evidence of a breached bound invalidates the profile for subsequent paid dispatch and requires reconciliation. The operation's character charge still follows its durable terminal state. Period assignment and unresolved-exposure carryover follow #5 Section 7; Ai uses the admission context rather than rolling its own period.
 
 ## 6. Routing, attempts, and time bounds
 
@@ -246,7 +247,7 @@ At each stage compute `effective call timeout = min(stage timeout, remaining ove
 
 Cancel transport at its deadline, fence that attempt's output and advance only within remaining bounds. Cancellation is not proof the provider stopped billing. Ignore late output from abandoned attempts. The owning coordinator conditionally commits success only while the operation can still succeed; terminal deadline/failure can never be resurrected. If persistence/delivery fails after provisional AI success, #3/#5's unknown/interrupted semantics apply rather than returning an uncommitted success.
 
-Do not map an HTTP disconnect directly to definitive failure. The backend may complete bounded processing and settle success under #3. Explicit cancellation semantics/transport remain Q-006/#5; once cancellation is accepted by the operation owner, Ai starts no new stage and returns no success. The browser's manual edits and workspace teardown govern whether returned text is applied, not whether already successful work charges once.
+Do not map an HTTP disconnect directly to definitive failure. The backend may complete bounded processing and settle success under #3. #5 Section 6 selects no public operation-cancellation endpoint for MVP. Internal timeout/shutdown/recovery cancellation remains operation-owned; once accepted by that owner, Ai starts no new stage and returns no success. The browser's manual edits and workspace teardown govern whether returned text is applied, not whether already successful work charges once.
 
 ## 7. Error classification and recovery
 
@@ -346,7 +347,7 @@ These IDs describe checks for #4, not a duplicate product coverage catalog or im
 | --- | --- | --- |
 | Q-007, #4 with selected AI package | Eligibility/response contracts, error categories, traversal and deadline policy specified here. Commit executable prompts/checkers and prove selected adapter behavior/token bounds | Live provider orchestration readiness; offline policy development can proceed |
 | Q-001, #4/#6 with owner configuration | Direct DeepSeek capability/tariff documentation checked; provider/credentials, token/byte bounds, model/fallback qualification and actual monetary cap remain unset | Paid serving and launch |
-| Q-003/Q-006, #5 with #3 | Canonical counts, retry/status/output-unavailable contract, cancellation, public errors, period assignment and usage ordering | Accounting/API integration and dependent clients |
+| Q-003/Q-006, #5 with #3 | Shared counting/recovery/auth/error/period semantics specified in #5; selected wire operations/fields and auth details remain | Selected accounting/API handlers and dependent clients; no YAML prerequisite for independent AI development |
 | Q-005, #6 | Corpus/rubric/human coverage, workload and evidence production remain to be specified | Candidate acceptance and release gates |
 | Q-004, #3/#5/#10 | Operational metadata retention/reconciliation windows, account lifecycle and provider disclosure; source/result storage policy remains unchanged | Related retention/account implementation and launch |
 | Q-008/Q-010, PRD then architecture/operations | P-005/P-006 disposition and any new operational controls | Adoption of proposed controls; not permission to add them here |
