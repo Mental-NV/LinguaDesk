@@ -1,7 +1,7 @@
 # LinguaDesk — LLM Behavior and Routing Specification
 
-**Document:** #4 · **Version:** 1.3 · **Status:** Shared design for scoped planning; provider qualification and implementation evidence pending
-**Updated:** 2026-09-08
+**Document:** #4 · **Version:** 1.4 · **Status:** Shared design; M004 package selected; implementation and provider qualification evidence pending
+**Updated:** 2026-09-09
 
 ## 1. Authority, inputs, and scope
 
@@ -17,7 +17,7 @@
 
 This document owns prompts, provider settings/adapters, language eligibility, family chains, output checks, error classification, context and attempt bounds under Q-007. It supplies capability and cost evidence for Q-001; it does not certify a serving arrangement or select a monetary cap. The technical choices below exercise the design authority delegated by #0 and are recorded in ADR-012. They are not claims of product-owner approval of a new requirement.
 
-The repository contains specifications only. [API behavioral design #5](05-api-design.md) now supplies shared semantics. `docs/05-openapi.yaml` remains deferred to the start of selected API implementation. [Verification plan #6](06-verification-plan.md) now owns the independent workflows, corpus, rubric, human review, workloads and evidence mapping. These are not implemented contracts or passing evidence. Planned code, prompts, fixtures and commands are also not present yet.
+At this document's original authoring baseline, the repository contained specifications only. M001–M003 have since implemented the backend host, published shell and durable-storage foundation. [M004 / BI-004](08-backlogs/M004-independent-ai-development.md) now selects the host-independent AI project boundary, an executable/inspectable `eligibility.v1` prompt snapshot and one scripted complete-response call; implementation evidence remains pending. Eligibility decisions/parsing, Translation, Rewriting, fallback/deadline orchestration, adapters and evaluation stay with M015–M020. [API behavioral design #5](05-api-design.md) supplies shared semantics, and `docs/05-openapi.yaml` remains deferred to the start of selected API implementation. [Verification plan #6](06-verification-plan.md) owns the independent workflows, corpus, rubric, human review, workloads and evidence mapping.
 
 Scope is the current Translation and Rewriting MVP: FR-004–014, active FR-016–018/022–024, FR-026–030/032–038 and applicable NFR-001–006. Preserve the PRD's exact language/mode catalog, input limits, allowance values and performance/quality thresholds by reference to Sections 5–8. DF-001–DF-007, retired sentence preservation and the duplicate correction toggle create no work here. P-005/NFR-008 and P-006 remain proposed; this design does not select new abuse rates, content restrictions, API compatibility promises or provider privacy gates.
 
@@ -27,7 +27,7 @@ Scope is the current Translation and Rewriting MVP: FR-004–014, active FR-016�
 
 Use `Microsoft.Extensions.AI.IChatClient` as the provider-call abstraction. Microsoft supplies exchange types in `Microsoft.Extensions.AI.Abstractions` and optional composition utilities in `Microsoft.Extensions.AI`; a provider can implement the interface. This supports a shared call boundary with scripted substitutes in tests. [Microsoft library overview](https://learn.microsoft.com/en-us/dotnet/ai/microsoft-extensions-ai)
 
-LinguaDesk's application of that abstraction is the Infrastructure-layer .NET class library `LinguaDesk.Infrastructure.Ai`, referenced by the API and a standalone `LinguaDesk.Ai.Evaluation` console runner. The library references Core for shared value types and pure accounting/cost policies; neither Core nor the AI infrastructure library references Api. The library has no ASP.NET Core, EF Core, Identity, React or database dependency. Infrastructure ownership therefore preserves the independent development/validation boundary. Architecture #3 owns the repository structure; corresponding tests are `LinguaDesk.Infrastructure.Ai.Tests`, while the evaluation runner remains a development tool. “Ai” below refers to this infrastructure component.
+LinguaDesk's application of that abstraction is the Infrastructure-layer .NET class library `LinguaDesk.Infrastructure.Ai`, ultimately referenced by the API and immediately by a standalone `LinguaDesk.Ai.Evaluation` console runner. The library references Core when selected shared value types or pure accounting/cost policies exist; M004 does not create an empty Core project or an unused API reference. Neither Core nor the AI infrastructure library references Api. The library has no ASP.NET Core, EF Core, Identity, React or database dependency. Infrastructure ownership therefore preserves the independent development/validation boundary. Architecture #3 owns the staged repository structure; corresponding tests are `LinguaDesk.Infrastructure.Ai.Tests`, while the evaluation runner remains a development tool. “Ai” below refers to this infrastructure component.
 
 ```mermaid
 flowchart TD
@@ -318,11 +318,11 @@ These IDs describe checks for #4, not a duplicate product coverage catalog or im
 
 | Question / owner | Decision status and remaining deliverable | Stage blocked |
 | --- | --- | --- |
-| Q-007, #4 with selected AI package | Eligibility/response contracts, error categories, traversal and deadline policy specified here. Commit executable prompts/checkers and prove selected adapter behavior/token bounds | Live provider orchestration readiness; offline policy development can proceed |
+| Q-007, #4 with selected AI package | Eligibility/response contracts, error categories, traversal and deadline policy specified here. M004 selects only the executable `eligibility.v1` snapshot and scripted call boundary; parsers/checkers, remaining prompts and selected adapter/token-bound proof remain later deliverables | Live provider orchestration readiness; M004 offline infrastructure can proceed |
 | Q-001, #4/#6 with owner configuration | Direct DeepSeek capability/tariff documentation checked; provider/credentials, token/byte bounds, model/fallback qualification and actual monetary cap remain unset | Paid serving and launch |
 | Q-003/Q-006, #5 with #3 | Shared counting/recovery/auth/error/period semantics specified in #5; selected wire operations/fields and auth details remain | Selected accounting/API handlers and dependent clients; no YAML prerequisite for independent AI development |
 | Q-005, #6 | Corpus/rubric/human coverage and workloads specified in [#6](06-verification-plan.md); actual cases, reviews and execution evidence pending | Candidate acceptance and release gates |
 | Q-004, #3/#5/#10 | Operational metadata retention/reconciliation windows, account lifecycle and provider disclosure; source/result storage policy remains unchanged | Related retention/account implementation and launch |
 | Q-008/Q-010, PRD then architecture/operations | P-005/P-006 disposition and any new operational controls | Adoption of proposed controls; not permission to add them here |
 
-**Authoring review:** This document preserves the two family chains, whole-input processing, success-only character charging, invisible fallback, provider-managed caching and deferred/proposed distinctions. Architecture and ADR-012 are aligned with the shared AI boundary. Document checks are not runtime verification. The next gate is a selected delivery specification under #0, resolving only its applicable dependencies; no full-roadmap plan or task list is generated here.
+**Authoring review:** This document preserves the two family chains, whole-input processing, success-only character charging, invisible fallback, provider-managed caching and deferred/proposed distinctions. Architecture, ADR-012 and [package 004](../specs/004-independent-ai-development/spec.md) are aligned on the staged shared AI boundary. Document checks are not runtime verification. M004's next gate is implementation of its selected offline subset; later AI behavior and live/provider gates remain pending.

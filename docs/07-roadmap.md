@@ -1,6 +1,6 @@
 # LinguaDesk — Roadmap and Milestone Plan
 
-**Document:** #7 · **Version:** 1.6 · **Status:** M001–M003 done; M004 recommended candidate
+**Document:** #7 · **Version:** 1.7 · **Status:** M001–M003 done; M004 selected and ready for implementation
 **Updated:** 2026-09-09
 
 ## 1. Authority and planning basis
@@ -35,7 +35,7 @@ A milestone is done only when its selected exit criteria, applicable #6 checks a
 
 ## 3. Priority, dependency and current milestone summary
 
-**Most recently completed milestone: [M003 — Durable storage foundation](08-backlogs/M003-durable-storage-foundation.md).** State: **Done**. [Package 003](../specs/003-durable-storage-foundation/spec.md) delivered BI-003 with all six scenarios passed; its [completion record](../specs/003-durable-storage-foundation/tasks.md#3-completion-record) records 42 backend cases, explicit repeat migration, same-file two-process restart and retained backend/published-shell regressions. M001/M002 remain complete with their history preserved. **Next recommended eligible milestone: M004 — Independent AI development.** It remains a candidate with no backlog/package selected.
+**Most recently completed milestone: [M003 — Durable storage foundation](08-backlogs/M003-durable-storage-foundation.md).** State: **Done**. [Package 003](../specs/003-durable-storage-foundation/spec.md) delivered BI-003 with all six scenarios passed; its [completion record](../specs/003-durable-storage-foundation/tasks.md#3-completion-record) records 42 backend cases, explicit repeat migration, same-file two-process restart and retained backend/published-shell regressions. M001/M002 remain complete with their history preserved. **Current milestone: [M004 — Independent AI development](08-backlogs/M004-independent-ai-development.md).** State: **Selected**. [Package 004](../specs/004-independent-ai-development/spec.md) selects BI-004 with seven pending scenarios and no implementation blocker.
 
 The numbered sections below group related outcomes; **M IDs are identities, not execution positions**. The current priority policy is:
 
@@ -44,7 +44,7 @@ The numbered sections below group related outcomes; **M IDs are identities, not 
 3. Enable a verified independent API operation with durable limits and recovery, then connect its web journey. Prefer demonstrated Translation followed by Rewriting over polishing all account screens or all visuals first.
 4. Integrate accessibility, privacy and failure checks with each feature. Begin bounded corpus/evaluation and operational preparation as soon as inputs are available; do not leave qualification risk until the final release review.
 
-Dependencies in Section 4 are the minimum named prerequisites, not substitutes for #8's code/design readiness check. Satisfy transitive dependencies and the applicable Section 5 blockers too. Choose the highest-value eligible milestone; a blocked independent track need not stop another eligible one. M001–M003 are done as linked above. All other remaining listed milestones are **Candidate**, with **Backlog: not created; Package: none; Evidence: pending**. These shared values are stated once instead of repeating empty columns.
+Dependencies in Section 4 are the minimum named prerequisites, not substitutes for #8's code/design readiness check. Satisfy transitive dependencies and the applicable Section 5 blockers too. Choose the highest-value eligible milestone; a blocked independent track need not stop another eligible one. M001–M003 are done and M004 is selected as linked above. All remaining milestones other than M004 are **Candidate**, with **Backlog: not created; Package: none; Evidence: pending**. These shared values are stated once instead of repeating empty columns.
 
 M001 now has its [owning backlog](08-backlogs/M001-backend-foundation.md) and [selected package](../specs/001-backend-foundation/spec.md). Later milestones use #0's `Mxxx-<slug>.md` convention, or link an existing owning feature backlog. Replace the corresponding milestone title with a link to its actual backlog when created; record actual package/evidence links there and in #6. Do not create empty backlogs or package placeholders for this entire roadmap.
 
@@ -59,7 +59,7 @@ The exit column describes the increment's observable value. #8 supplies concrete
 | M001 | [Backend foundation](08-backlogs/M001-backend-foundation.md) | An agent can build and start the minimal backend and run an isolated meaningful smoke check with reproducible commands. | — | Architecture §2–3/5; V-009/V-012 (host portions only) |
 | M002 | [Published web shell](08-backlogs/M002-published-web-shell.md) | A user can open the basic SPA through the API host; navigation works and missing API/assets return proper errors. | M001 | FR-003; architecture §3; V-003/V-012 |
 | M003 | [Durable storage foundation](08-backlogs/M003-durable-storage-foundation.md) | A clean isolated store is created through migrations; persisted data survives a host restart and the storage checks are repeatable. | M001 | Architecture §6; V-005/V-016 |
-| M004 | Independent AI development | An agent can exercise the shared AI boundary offline and inspect a synthetic prompt without starting API/UI or accessing secrets. | M001 | AI §2/9; V-007 |
+| M004 | [Independent AI development](08-backlogs/M004-independent-ai-development.md) | An agent can exercise the shared AI boundary offline and inspect a synthetic prompt without starting API/UI or accessing secrets. | M001 | AI §2/9; V-007 |
 | M005 | Shared input and capability contract | An API consumer can discover the supported choices/limits; client and server agree on canonical input counts and validation fixtures. | M001 | FR-004/006/007/014/036; API §4/9; V-001/V-009 |
 
 ### 4.2 Local access
@@ -175,8 +175,10 @@ Use milestone summary states **Candidate → Selected → In progress → Done**
 
 **M003 completion — 2026-09-09:** Implemented EF Core SQLite migration and lazy runtime boundaries with explicit safe paths, WAL, per-connection foreign keys and finite lock waiting. Locked checks passed 42 backend cases; the documented path-with-spaces migration was repeatable, same-file data/history survived two real host processes, invalid targets failed without fallback and published-shell regressions remained green. The initial production schema contains framework migration metadata only. No account/ledger, backup/restore, storage-readiness or product/release acceptance is claimed.
 
+**M004 selection — 2026-09-09:** Selected BI-004/package 004 after confirming M001 and the current SDK/solution/package baseline. The increment adds only the host-independent Infrastructure.Ai library, focused tests and standalone development runner needed to inspect `eligibility.v1` with fixed synthetic data and exercise one scripted `IChatClient` call. Eligibility decisions, transformations, fallback, adapters, live evaluation, API/UI composition and product/release evidence remain later milestones. No human action or blocking planning question remains.
+
 ## 7. Next applicable gate and validation
 
-M001–M003 are complete with linked evidence. M004 is the next recommended eligible candidate under the independent-AI risk policy; selecting it requires its own #8 backlog/package and then-current code/tooling review. M003 establishes only the durable-storage foundation and does not make account, accounting, backup/restore, editor, language-operation or release acceptance complete.
+M001–M003 are complete with linked evidence. M004's BI-004 and package 004 are selected and pass document #0's ready-for-implementation gate: its M001 dependency is done, selected behavior/exclusions and seven verification scenarios are explicit, the compatible AI abstraction/package layout is planned, tasks are ordered and no human action or blocking question remains. Runtime evidence is pending. M003 remains only a durable-storage foundation, and M004 will remain only independent AI enablement; neither makes account, accounting, backup/restore, editor, language-operation or release acceptance complete.
 
-**Planning consistency review:** Local source links, unique milestone IDs, dependency existence/order, check references and the separation of active/deferred/proposed scope were checked. M001–M003 runtime evidence is linked; all product milestones and release gates remain pending. Candidate feasibility must be established during #8 selection against the then-current implementation.
+**Planning consistency review:** Local source links, unique milestone/item/package IDs, dependency evidence, check/task mappings, package versions, human-step timing and the separation of active/deferred/proposed scope were checked against Git `6f86f9f`. M004's backlog/spec/plan/tasks and #4/#6/#7 agree; no production code or test was created during planning. M001–M003 runtime evidence remains linked; M004 runtime evidence and all product/release gates remain pending.

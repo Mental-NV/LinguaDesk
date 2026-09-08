@@ -1,6 +1,6 @@
 # LinguaDesk — Architecture and Engineering Principles
 
-**Document:** #3 · **Version:** 1.9 · **Status:** Ready for scoped implementation planning; contract and launch dependencies remain
+**Document:** #3 · **Version:** 1.10 · **Status:** Ready for scoped implementation planning; contract and launch dependencies remain
 **Updated:** 2026-09-09
 
 ## 1. Authority, Inputs, and Scope
@@ -93,7 +93,7 @@ This is a planned structure, not a claim that scaffolding or commands already ex
 
 ### 4.1 Boundaries
 
-- `LinguaDesk.Api` references `LinguaDesk.Core` and `LinguaDesk.Infrastructure.Ai`; the AI infrastructure library references Core, never Api. Core references neither ASP.NET Core, EF Core nor AI/provider packages. Core holds counting/allowance calculations, state transitions and shared value types. The AI infrastructure library holds family-chain policy, prompt composition, eligibility/output validation and provider calls behind `Microsoft.Extensions.AI.IChatClient`. Time, configuration, and inputs are explicit arguments.
+- In the integrated design, `LinguaDesk.Api` references `LinguaDesk.Core` and `LinguaDesk.Infrastructure.Ai`; the AI infrastructure library references Core, never Api. Stage these edges with selected behavior: M004 may establish the nonempty Ai library before Core exists, and the API must not take an unused Ai reference. Add Core and the Ai→Core/API→Ai edges only when a selected shared value or consuming feature needs them; do not create an empty layer to satisfy the planned tree. Core references neither ASP.NET Core, EF Core nor AI/provider packages. Core holds counting/allowance calculations, state transitions and shared value types. The AI infrastructure library holds family-chain policy, prompt composition, eligibility/output validation and provider calls behind `Microsoft.Extensions.AI.IChatClient`. Time, configuration, and inputs are explicit arguments.
 - AI integration belongs to the Infrastructure layer. Its separate library isolates provider dependencies and allows independent development and evaluation. The existing Api `Infrastructure/` folder retains host-specific persistence, admission and email integration; this naming does not require moving unrelated infrastructure into new projects. `LinguaDesk.Ai.Evaluation` remains a development tool that references `LinguaDesk.Infrastructure.Ai`.
 - The API and standalone evaluation runner use the same Ai composition and operation pipeline. Ai has no HTTP-server, Identity, database or frontend dependency. A narrow attempt-admission boundary obtains permission and records monetary exposure for each provider dispatch; the API supplies durable accounting, while offline tests and isolated evaluation supply explicit substitutes. Ai success is provisional until the API commits character settlement. See #4 Sections 2, 6 and 9; this adds a library and development tool, not a deployed service.
 - Endpoints handle transport, authentication/authorization, validation, and typed results. Simple CRUD can use `DbContext` directly. Multi-step paid operations use a small concrete feature coordinator so HTTP concerns do not swallow all testable policy.
