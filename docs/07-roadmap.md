@@ -1,6 +1,6 @@
 # LinguaDesk — Roadmap and Milestone Plan
 
-**Document:** #7 · **Version:** 1.3 · **Status:** M001 done; M002 selected and prepared
+**Document:** #7 · **Version:** 1.4 · **Status:** M001 and M002 done; next milestone unselected
 **Updated:** 2026-09-08
 
 ## 1. Authority and planning basis
@@ -37,7 +37,7 @@ A milestone is done only when its selected exit criteria, applicable #6 checks a
 
 ## 3. Priority, dependency and current milestone summary
 
-**Most recently completed milestone: [M001 — Backend foundation](08-backlogs/M001-backend-foundation.md).** State: **Done**. [Package 001](../specs/001-backend-foundation/spec.md) delivered BI-001 with all six scenarios passed; its [completion record](../specs/001-backend-foundation/tasks.md#3-completion-record) records locked setup/build, nine HTTP tests and real-process smoke evidence. **Current selected milestone: [M002 — Published web shell](08-backlogs/M002-published-web-shell.md).** [Package 002](../specs/002-published-web-shell/spec.md) prepares BI-002; implementation has not started. Node/npm/Chromium provisioning and the full 30-minute feasibility check remain initial execution prerequisites. Persistence and standalone AI remain separate candidate outcomes.
+**Most recently completed milestone: [M002 — Published web shell](08-backlogs/M002-published-web-shell.md).** State: **Done**. [Package 002](../specs/002-published-web-shell/spec.md) delivered BI-002 with all eight scenarios passed; its [completion record](../specs/002-published-web-shell/tasks.md#3-completion-record) records locked frontend checks, 20 HTTP cases, isolated published-host Chromium smoke and stale-asset cleanup. M001 remains complete with its history preserved. No next milestone is selected; persistence and standalone AI remain separate candidates.
 
 The numbered sections below group related outcomes; **M IDs are identities, not execution positions**. The current priority policy is:
 
@@ -46,7 +46,7 @@ The numbered sections below group related outcomes; **M IDs are identities, not 
 3. Enable a verified independent API operation with durable limits and recovery, then connect its web journey. Prefer demonstrated Translation followed by Rewriting over polishing all account screens or all visuals first.
 4. Integrate accessibility, privacy and failure checks with each feature. Begin bounded corpus/evaluation and operational preparation as soon as inputs are available; do not leave qualification risk until the final release review.
 
-Dependencies in Section 4 are the minimum named prerequisites, not substitutes for #8's code/design readiness check. Satisfy transitive dependencies and the applicable Section 5 blockers too. Choose the highest-value eligible milestone; a blocked independent track need not stop another eligible one. M001 is done and M002 is selected as linked above. All remaining listed milestones are **Candidate**, with **Backlog: not created; Package: none; Evidence: pending**. These shared values are stated once instead of repeating empty columns.
+Dependencies in Section 4 are the minimum named prerequisites, not substitutes for #8's code/design readiness check. Satisfy transitive dependencies and the applicable Section 5 blockers too. Choose the highest-value eligible milestone; a blocked independent track need not stop another eligible one. M001 and M002 are done as linked above. All remaining listed milestones are **Candidate**, with **Backlog: not created; Package: none; Evidence: pending**. These shared values are stated once instead of repeating empty columns.
 
 M001 now has its [owning backlog](08-backlogs/M001-backend-foundation.md) and [selected package](../specs/001-backend-foundation/spec.md). Later milestones use #0's `Mxxx-<slug>.md` convention, or link an existing owning feature backlog. Replace the corresponding milestone title with a link to its actual backlog when created; record actual package/evidence links there and in #6. Do not create empty backlogs or package placeholders for this entire roadmap.
 
@@ -171,8 +171,10 @@ Use milestone summary states **Candidate → Selected → In progress → Done**
 
 **M002 selection — 2026-09-08:** Selected BI-002/package 002 after inspecting the completed M001 host, tests, commands and evidence. The increment adds a bounded signed-out informational shell, real static publication and focused navigation/asset-boundary verification; account forms and language features remain later milestones. Toolchain provisioning is explicitly front-loaded under #0.
 
+**M002 completion — 2026-09-08:** Implemented the pinned React/Vite shell, explicit ASP.NET static/fallback boundaries and clean single-artifact publication. Locked checks passed 8 component and 20 HTTP cases; 6 Chromium cases passed against an isolated published Kestrel host at desktop/390/320 widths, repeated publication removed stale assets, and backend-only checks passed without a webroot. All package scenarios passed, but the approximately 35-minute turn exceeded the 30-minute planning target; retain this overrun when sizing the next toolchain/publishing increment. No account/editor product capability or release gate is claimed.
+
 ## 7. Next applicable gate and validation
 
-M001 remains complete. M002's backlog and package are prepared; the next action is [package 002 T001](../specs/002-published-web-shell/tasks.md#1-ordered-tasks), which resolves supported tooling and checks whole-milestone feasibility before coding. No M002 implementation or runtime evidence is claimed by this authoring change.
+M001 and M002 remain complete. No successor package is selected by this completion change; choose the next eligible outcome through #8 using the measured M002 evidence. M002 establishes only the signed-out hosting shell and does not make account, editor, language-operation or release acceptance complete.
 
-**Completion review:** Local source links, unique milestone IDs, dependency existence/order, check references and the separation of active/deferred/proposed scope were checked. M001 runtime evidence is linked; all later milestones and release gates remain pending. Candidate feasibility must be established during #8 selection against the then-current implementation.
+**Completion review:** Local source links, unique milestone IDs, dependency existence/order, check references and the separation of active/deferred/proposed scope were checked. M001/M002 runtime evidence is linked; all product milestones and release gates remain pending. Candidate feasibility must be established during #8 selection against the then-current implementation.

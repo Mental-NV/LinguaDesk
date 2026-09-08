@@ -3,6 +3,13 @@
 **/obj/
 artifacts/
 
+# Frontend
+node_modules/
+frontend/dist/
+frontend/playwright-report/
+frontend/test-results/
+backend/src/LinguaDesk.Api/wwwroot/
+
 # Local IDE and operating-system files
 .vs/
 .idea/

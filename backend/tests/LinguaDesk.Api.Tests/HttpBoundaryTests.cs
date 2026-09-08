@@ -70,6 +70,78 @@ public sealed class HttpBoundaryTests
     }
 
     [TestMethod]
+    [DataRow("/")]
+    [DataRow("/login")]
+    [DataRow("/register")]
+    [DataRow("/unknown-client-page")]
+    public async Task EligibleNavigationUsesPopulatedSpaDocument(string path)
+    {
+        await using var factory = CreateFactory(PopulateWebRoot);
+        using var client = factory.CreateClient();
+
+        using var response = await client.GetAsync(path);
+
+        Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+        Assert.AreEqual("text/html", response.Content.Headers.ContentType?.MediaType);
+        StringAssert.Contains(await response.Content.ReadAsStringAsync(), "published-shell-fixture");
+    }
+
+    [TestMethod]
+    public async Task EligibleHeadNavigationUsesSpaDocumentWithoutBody()
+    {
+        await using var factory = CreateFactory(PopulateWebRoot);
+        using var client = factory.CreateClient();
+
+        using var request = new HttpRequestMessage(HttpMethod.Head, "/register");
+        using var response = await client.SendAsync(request);
+
+        Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+        Assert.AreEqual("text/html", response.Content.Headers.ContentType?.MediaType);
+        Assert.IsEmpty(await response.Content.ReadAsByteArrayAsync());
+    }
+
+    [TestMethod]
+    [DataRow("/assets/missing")]
+    [DataRow("/assets/missing.js")]
+    [DataRow("/missing.js")]
+    [DataRow("/health/missing")]
+    public async Task ReservedAndFileLikePathsNeverUseSpaDocument(string path)
+    {
+        await using var factory = CreateFactory(PopulateWebRoot);
+        using var client = factory.CreateClient();
+
+        using var response = await client.GetAsync(path);
+
+        Assert.AreEqual(HttpStatusCode.NotFound, response.StatusCode);
+        Assert.AreNotEqual("text/html", response.Content.Headers.ContentType?.MediaType);
+    }
+
+    [TestMethod]
+    public async Task NonNavigationMethodNeverUsesSpaDocument()
+    {
+        await using var factory = CreateFactory(PopulateWebRoot);
+        using var client = factory.CreateClient();
+
+        using var response = await client.PostAsync("/register", content: null);
+
+        Assert.AreEqual(HttpStatusCode.MethodNotAllowed, response.StatusCode);
+        Assert.AreNotEqual("text/html", response.Content.Headers.ContentType?.MediaType);
+    }
+
+    [TestMethod]
+    public async Task ExistingStaticAssetUsesItsOwnContentType()
+    {
+        await using var factory = CreateFactory(PopulateWebRoot);
+        using var client = factory.CreateClient();
+
+        using var response = await client.GetAsync("/assets/app.js");
+
+        Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+        Assert.AreEqual("text/javascript", response.Content.Headers.ContentType?.MediaType);
+        Assert.AreEqual("console.log('fixture');", await response.Content.ReadAsStringAsync());
+    }
+
+    [TestMethod]
     public async Task IndependentlyOwnedFactoriesCanRunConcurrently()
     {
         await using var firstFactory = CreateFactory();
@@ -87,7 +159,40 @@ public sealed class HttpBoundaryTests
         Assert.AreEqual(HttpStatusCode.NotFound, secondResponse.StatusCode);
     }
 
-    private static WebApplicationFactory<Program> CreateFactory() =>
-        new WebApplicationFactory<Program>()
-            .WithWebHostBuilder(builder => builder.UseEnvironment("Testing"));
+    private static OwnedWebApplicationFactory CreateFactory(Action<string>? populateWebRoot = null) =>
+        new(populateWebRoot);
+
+    private static void PopulateWebRoot(string webRoot)
+    {
+        File.WriteAllText(
+            Path.Combine(webRoot, "index.html"),
+            "<!doctype html><html><body>published-shell-fixture</body></html>");
+        var assets = Directory.CreateDirectory(Path.Combine(webRoot, "assets"));
+        File.WriteAllText(Path.Combine(assets.FullName, "app.js"), "console.log('fixture');");
+    }
+
+    private sealed class OwnedWebApplicationFactory : WebApplicationFactory<Program>
+    {
+        private readonly string webRoot = Directory.CreateTempSubdirectory("linguadesk-webroot-").FullName;
+
+        public OwnedWebApplicationFactory(Action<string>? populateWebRoot)
+        {
+            populateWebRoot?.Invoke(webRoot);
+        }
+
+        protected override void ConfigureWebHost(IWebHostBuilder builder)
+        {
+            builder.UseEnvironment("Testing");
+            builder.UseWebRoot(webRoot);
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            base.Dispose(disposing);
+            if (disposing && Directory.Exists(webRoot))
+            {
+                Directory.Delete(webRoot, recursive: true);
+            }
+        }
+    }
 }

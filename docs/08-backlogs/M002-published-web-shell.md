@@ -1,7 +1,7 @@
 # M002 — Published Web Shell Backlog
 
-**Document:** #8 · **Version:** 1.0 · **Updated:** 2026-09-08
-**State:** Selected; package prepared; implementation not started
+**Document:** #8 · **Version:** 1.1 · **Updated:** 2026-09-08
+**State:** Done; package AC-001–008 passed
 **Roadmap:** [M002 — Published web shell](../07-roadmap.md#41-basic-infrastructure)
 
 ## 1. Outcome and authoritative inputs
@@ -16,7 +16,7 @@ M001 is done: [its completion record](../../specs/001-backend-foundation/tasks.m
 
 | Item ID | Outcome/title | Priority | Target milestone | Dependencies/blockers | State | Delivery package |
 | --- | --- | --- | --- | --- | --- | --- |
-| BI-002 | Open and navigate the signed-out shell from one published artifact | Next / hosting enablement | M002 | M001 done; Node/package/browser provisioning and size check at execution preflight | selected | [002-published-web-shell](../../specs/002-published-web-shell/spec.md) |
+| BI-002 | Open and navigate the signed-out shell from one published artifact | Delivered / hosting enablement | M002 | M001 done; no remaining blocker | done | [002-published-web-shell](../../specs/002-published-web-shell/spec.md) |
 
 ### BI-002 — Open and navigate the published shell
 
@@ -36,4 +36,4 @@ Use autonomous setup within existing authorization. If an installation/download 
 
 The user requested M002 generation after confirming M001 completion. BI-002 is selected as one cohesive small package; no other milestone is selected. The shell's narrow content keeps focus on publishing/navigation. The executor must assess the complete 30-minute envelope, including setup, regression checks and package revision; split before coding if those prerequisites or the implementation cannot fit. M001's duration is calibration evidence, not a promise about M002.
 
-Completion requires AC-001–008, recorded real-published-host/browser results, scoped regression evidence, working README instructions and consistent #6/#7/backlog/task states. Current status: **Pending — no M002 implementation or runtime evidence**.
+Completion required AC-001–008, recorded real-published-host/browser results, scoped regression evidence, working README instructions and consistent #6/#7/backlog/task states. Current status: **Done — AC-001–008 passed.** The [completion record](../../specs/002-published-web-shell/tasks.md#3-completion-record) records 8 component, 20 HTTP and 6 published Chromium cases, repeated stale-asset cleanup, isolated artifact serving, backend-only regression checks and inspected narrow screenshots. No product or release gate is claimed.

@@ -1,7 +1,7 @@
 # 002 — Published Web Shell: Selected Specification
 
-**Version:** 1.0 · **Updated:** 2026-09-08
-**State:** Selected behavior reviewed; implementation and runtime evidence pending
+**Version:** 1.1 · **Updated:** 2026-09-08
+**State:** Implemented and verified; AC-001–008 passed
 **Milestone/item:** [M002 / BI-002](../../docs/08-backlogs/M002-published-web-shell.md)
 
 ## 1. Selection and authority
@@ -51,4 +51,4 @@ Use V-003 for DOM semantics, V-009 for HTTP errors, V-010 for history/focus/refl
 
 ## 5. Readiness
 
-M001 dependency is complete and the selected behavior is specified. [plan.md](plan.md) and [tasks.md](tasks.md) prepare the next increment. Toolchain provisioning, compatibility checks and the complete 30-minute feasibility assessment are required before implementation. If they reveal oversized scope, split before coding without deleting acceptance or weakening verification. All AC-001–008 are **Pending**.
+M001 remains complete and the selected behavior was implemented without expanding into account or editor scope. Toolchain compatibility, publication, regressions and the bounded browser suite passed. All AC-001–008 are **Passed** with commands, counts, artifacts and limitations recorded in [tasks.md](tasks.md#3-completion-record).

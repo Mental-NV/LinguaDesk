@@ -1,18 +1,18 @@
 # 002 — Published Web Shell: Implementation Plan
 
-**Version:** 1.0 · **Updated:** 2026-09-08
-**State:** Planned; tooling and execution-size preflight pending
-**Inputs:** [spec.md](spec.md) v1.0 and [BI-002](../../docs/08-backlogs/M002-published-web-shell.md) v1.0
+**Version:** 1.1 · **Updated:** 2026-09-08
+**State:** Implemented and verified; runtime evidence recorded
+**Inputs:** [spec.md](spec.md) v1.1 and [BI-002](../../docs/08-backlogs/M002-published-web-shell.md) v1.1
 
 ## 1. Current state and tooling
 
 At baseline `ac1552780a0a4114308c39385c67d2a9bec7d446`, Program.cs maps liveness and API Problem Details catch-alls only. The Web SDK project targets net10.0. `HttpBoundaryTests.cs` has nine cases, including bare-host `/`, `/weatherforecast` and `/sample` 404s. `scripts/backend.sh` owns locked setup/build/test, a minimum-test guard and a 30-second backend smoke. Reuse these boundaries; do not replace the working backend or its dependency pins.
 
-Inspection found Node **25.8.1**, npm **11.11.0**, and cached Chromium revision 1228. Node 25 is EOL according to the [official release table](https://nodejs.org/en/about/previous-releases); choose **Node 24.20.0 LTS**, verified in its [release announcement](https://nodejs.org/en/blog/release/v24.20.0), and npm **11.11.0** for the new frontend lockfile. Pin both in repository configuration and verify them before install. Node 24 and the chosen browser runtime are not verified locally; the executor must provision them at the beginning, preferably through an existing version manager or isolated tool directory without replacing global tools.
+Authoring inspection found Node **25.8.1**, npm **11.11.0**, and cached Chromium revision 1228. Execution selected and verified **Node 24.20.0 LTS**, npm **11.11.0**, Playwright **1.63.0** and its Chromium revision 1243 without replacing global tooling. Node/npm are pinned in repository configuration and the installed dependency graph is locked.
 
-Starting dependency choices, observed in the local npm cache: React/react-dom 19.2.4, react-router-dom 7.13.2, Vite 8.0.3 with plugin-react 6.0.1, TypeScript 5.9.3, Vitest 4.1.2, Testing Library React 16.3.2/user-event 14.6.1, jsdom 27.4.0, @types/react 19.2.17 and @types/react-dom 19.2.3. Pin Playwright Test **1.63.0**, verified in [publisher registry metadata](https://registry.npmjs.org/@playwright/test/1.63.0), and install the matching Chromium runtime rather than assuming the existing cache matches. Use ESLint 9.39.4/typescript-eslint 8.58.0 and pin any required direct config/type dependencies during initial manifest validation. These are candidate compatible pins, not a verified installed graph; resolve peer/engine compatibility and exact remaining direct pins before dependent coding, then commit package-lock.json and use npm ci. Do not use `latest`, floating direct ranges or an interactive generator as the implementation specification.
+Verified dependency pins include React/react-dom 19.2.4, react-router-dom 7.13.2, Vite 8.0.3 with plugin-react 6.0.1, TypeScript 5.9.3, Vitest 4.1.2, Testing Library React 16.3.2/user-event 14.6.1, jsdom 27.4.0, Playwright Test 1.63.0, ESLint 9.39.4 and typescript-eslint 8.58.0. Remaining direct pins are recorded in the manifest; `package-lock.json` and `npm ci` provide the verified graph.
 
-No tool installation or dependency restore is performed by this authoring change. Source-document web checks used the official [Vite guide](https://vite.dev/guide/) and [ASP.NET static file documentation](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/static-files?view=aspnetcore-10.0), checked 2026-09-08. Runtime install/build/browser evidence is still pending.
+Locked dependency restore, frontend build and browser execution completed during implementation. Runtime results are recorded in [tasks.md](tasks.md#3-completion-record).
 
 ## 2. Changes and implementation boundaries
 
@@ -78,4 +78,4 @@ No deployment, persistent data migration, credentials or paid calls are involved
 
 ## 5. Review and handoff
 
-Behavior, boundaries, tasks and scope references are aligned; no new product feature or generated wire schema is introduced. The signed-out transitional content is recorded in the owning UX document. Toolchain installation/compatibility, timing feasibility and all M002 runtime checks remain pending. At execution closeout, tasks.md records actual commands/counts/reports, published/browser outcomes and elapsed time; #6/#7 and BI-002 link those results. README changes occur only alongside verified implementation.
+Behavior, boundaries, tasks and scope references are aligned; no new product feature or generated wire schema was introduced. Toolchain compatibility and all selected runtime checks passed. [tasks.md](tasks.md#3-completion-record) records actual commands/counts/reports and published/browser outcomes; #6/#7, BI-002 and README link the verified result.
