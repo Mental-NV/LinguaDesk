@@ -1,6 +1,6 @@
 # LinguaDesk — UX/UI Specification
 
-**Document:** #2 · **Version:** 1.5 · **Status:** Simplified MVP ready for scoped planning; verification methods consolidated in #6; runtime evidence pending
+**Document:** #2 · **Version:** 1.6 · **Status:** Simplified MVP ready for scoped planning; verification methods consolidated in #6; runtime evidence pending
 **Updated:** September 8, 2026 (UTC)
 
 ## 1. Authority, inputs, and scope
@@ -65,6 +65,8 @@ Research was conducted on September 7, 2026 in an anonymous, signed-out browser.
 | `/verify-email` | Verification/link/resend/status UI; signed-out success offers Sign in to continue | Success offers explicit continuation to the last protected route |
 | `/forgot-password`, `/reset-password` | Local recovery forms; no automatic login after reset | Same recovery result behavior |
 | Unknown path | Page not found; Go to sign in / Verify email | Page not found; Go to Translation |
+
+**M002 staged shell — selected 2026-09-08:** Before account functionality exists, [package 002](../specs/002-published-web-shell/spec.md#2-selected-story-and-staged-route-behavior) implements only signed-out informational navigation: root/protected feature routes lead to `/login`; `/login` and `/register` clearly state that their functionality is unavailable and expose no credential fields or submission. Unknown client pages offer Go to sign in. This is a bounded pre-account delivery state, not fake authentication, an accessible protected workspace or completed UX account acceptance. M011–M013 replace these informational states with the existing account contracts; the route table above remains the complete intended behavior. Shell links, heading focus, visual tokens and responsive access already apply.
 
 Only a verified local account may process text. Errors must not reveal whether an email belongs to an account. Form fields, password checklist, links, cooldowns and server categories come from the account contract, with UX states in Section 9. There is no Google callback route in the active UX.
 

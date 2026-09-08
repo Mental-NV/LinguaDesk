@@ -1,6 +1,6 @@
 # LinguaDesk — Verification Plan
 
-**Document:** #6 · **Version:** 1.2 · **Status:** Verification design specified; M001 enabling evidence passed; product/release evidence pending
+**Document:** #6 · **Version:** 1.3 · **Status:** Verification design specified; M001 enabling evidence passed; product/release evidence pending
 **Updated:** 2026-09-08
 
 ## 1. Authority, ownership and scope
@@ -20,7 +20,7 @@ The authoring baseline is Git `0ac27aef9641e3bf8a23649268a513a0198b7332`: #0 v1.
 
 Only active MVP acceptance is tested for release. Preserve deferred/retired IDs without placeholder tests. A compound requirement creates work only for its active branch. NFR-007 remains Should; P-005/NFR-008 and P-006 remain proposed. Test already accepted authentication, isolation, credentials, privacy and instruction-as-content contracts without inventing abuse limits or compatibility obligations. Provider retention/no-training certification is not a gate under D-18; application text privacy and monetary admission remain required.
 
-The [M001 / package 001](../specs/001-backend-foundation/spec.md) backend-enabling host, HTTP harness and real-process smoke are implemented; its scoped V-009/V-012 portions passed as recorded in the [package evidence](../specs/001-backend-foundation/tasks.md#3-completion-record). There is still no product capability, corpus, generated OpenAPI or passing release evidence. Names outside M001 below identify planned checks, not necessarily existing commands or files. Document review cannot discharge a release gate.
+The [M001 / package 001](../specs/001-backend-foundation/spec.md) backend-enabling host, HTTP harness and real-process smoke are implemented; its scoped V-009/V-012 portions passed as recorded in the [package evidence](../specs/001-backend-foundation/tasks.md#3-completion-record). [M002 / package 002](../specs/002-published-web-shell/spec.md) is selected for the published signed-out shell; its implementation and checks are pending. There is still no product capability, corpus, generated OpenAPI or passing release evidence. Names outside M001 below identify planned checks, not necessarily existing commands or files. Document review cannot discharge a release gate.
 
 ## 2. Verification layers and check catalog
 
@@ -253,7 +253,7 @@ On failure, retain the original result, classify defect versus harness/environme
 
 ### 8.1 Product and release coverage
 
-This is the sole cross-document product coverage matrix; the source documents retain their behavioral acceptance IDs. Every active product row's package is **Unselected** and evidence is **Pending — no run**. The separately identified M001 enabling row links the first selected package; it does not satisfy any complete product requirement or release gate. Once selected, replace the package cell with the actual #8 backlog/delivery-package and test/report links; do not invent a package ID. Deferred, retired and proposed rows are intentionally not current test gaps or passing gates. Design references plus Section 8.2 connect product rows to local scenario checks without copying their full acceptance prose.
+This is the sole cross-document product coverage matrix; the source documents retain their behavioral acceptance IDs. Every active product row's package is **Unselected** and evidence is **Pending — no run**. The separately identified M001/M002 enabling rows link their packages; neither satisfies a complete product requirement or release gate. Once selected, replace the package cell with the actual #8 backlog/delivery-package and test/report links; do not invent a package ID. Deferred, retired and proposed rows are intentionally not current test gaps or passing gates. Design references plus Section 8.2 connect product rows to local scenario checks without copying their full acceptance prose.
 
 | Requirement / gate | Shared design / acceptance owner | Checks | Backlog/package → evidence/status |
 | --- | --- | --- | --- |
@@ -312,6 +312,7 @@ This is the sole cross-document product coverage matrix; the source documents re
 | RG-007 | architecture §6–7; AI §5/8–9 | V-015, V-006, V-008, V-013, V-014 | Unselected → Pending |
 | RG-008 | PRD §11; Section 9 | V-016 | Unselected → Pending |
 | M001 / BI-001 — enabling scope | Architecture §2–3/5; backend build/process and absent-route boundary; prerequisite for FR-035/036, no product acceptance claimed | V-009 HTTP-host portion; V-012 process-lifecycle portion | [BI-001](08-backlogs/M001-backend-foundation.md) → [package AC-001–006](../specs/001-backend-foundation/spec.md#3-selected-acceptance) → [tasks/evidence](../specs/001-backend-foundation/tasks.md#3-completion-record); Done / Passed — 9 HTTP tests plus successful and controlled-failure process smoke |
+| M002 / BI-002 — enabling scope | Architecture §3.1; UX §3–5 staged shell; partial enablement for FR-003/NFR-005/007, no full product acceptance claimed | V-003 shell components; V-009 API/static boundaries; V-010 navigation/reflow; V-011 visual inspection; V-012 published-shell portion | [BI-002](08-backlogs/M002-published-web-shell.md) → [package AC-001–008](../specs/002-published-web-shell/spec.md#3-selected-acceptance) → [tasks/evidence](../specs/002-published-web-shell/tasks.md#3-completion-record); Selected / Pending — no run |
 
 ### 8.2 Local acceptance allocation
 

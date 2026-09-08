@@ -1,6 +1,6 @@
 # LinguaDesk — Roadmap and Milestone Plan
 
-**Document:** #7 · **Version:** 1.2 · **Status:** M001 done; next milestone not selected
+**Document:** #7 · **Version:** 1.3 · **Status:** M001 done; M002 selected and prepared
 **Updated:** 2026-09-08
 
 ## 1. Authority and planning basis
@@ -29,7 +29,7 @@ Each executable milestone must fit **at most 30 elapsed minutes of autonomous de
 
 At #8 selection, use current code and measured prior runs to assess feasibility. As an initial planning allowance, leave roughly half the envelope for preparation, verification and correction; this is a sizing heuristic, not a throughput claim. A row that cannot credibly fit is split into smaller milestones **before execution**. Its exit criterion is an outcome boundary, not permission to cram an entire feature into the time limit. The initial rows below are candidates, not certified duration estimates.
 
-Apply [#0's human-step timing](00-SDD-Planning-Workflow.md#selecting-work-and-creating-a-package): batch indispensable requests at the beginning; queue nonblocking human steps for the end with prepared instructions and pending evidence. M001 currently requires none. Resolve necessary access, product decisions and external evidence dependencies before admitting a run that needs them. External human reviews, provider/email access and device availability have no assumed 30-minute completion time. Section 5 tracks their aggregate gates separately; bounded preparation and evidence-producing milestones can proceed without claiming those gates passed.
+Apply [#0's human-step timing](00-SDD-Planning-Workflow.md#selecting-work-and-creating-a-package): batch indispensable requests at the beginning; queue nonblocking human steps for the end with prepared instructions and pending evidence. M002 has no feature-specific human action; toolchain/access prerequisites are checked at the beginning. Resolve necessary access, product decisions and external evidence dependencies before admitting a run that needs them. External human reviews, provider/email access and device availability have no assumed 30-minute completion time. Section 5 tracks their aggregate gates separately; bounded preparation and evidence-producing milestones can proceed without claiming those gates passed.
 
 At the ceiling, record an honest incomplete/blocked outcome with the elapsed time and remaining work. Do not mark an unfinished milestone done or silently extend its budget. Preserve the work; revise/split the remaining outcome before another run. Unexpected overruns inform later sizing. There is no fixed calendar schedule or total-duration promise obtained by multiplying milestone count by 30 minutes.
 
@@ -37,7 +37,7 @@ A milestone is done only when its selected exit criteria, applicable #6 checks a
 
 ## 3. Priority, dependency and current milestone summary
 
-**Most recently completed milestone: [M001 — Backend foundation](08-backlogs/M001-backend-foundation.md).** State: **Done**. [Package 001](../specs/001-backend-foundation/spec.md) delivered BI-001 with all six scenarios passed; its [completion record](../specs/001-backend-foundation/tasks.md#3-completion-record) records locked setup/build, nine HTTP tests and real-process smoke evidence. No next milestone is selected. Frontend publishing, persistence and standalone AI remain separate candidate infrastructure outcomes.
+**Most recently completed milestone: [M001 — Backend foundation](08-backlogs/M001-backend-foundation.md).** State: **Done**. [Package 001](../specs/001-backend-foundation/spec.md) delivered BI-001 with all six scenarios passed; its [completion record](../specs/001-backend-foundation/tasks.md#3-completion-record) records locked setup/build, nine HTTP tests and real-process smoke evidence. **Current selected milestone: [M002 — Published web shell](08-backlogs/M002-published-web-shell.md).** [Package 002](../specs/002-published-web-shell/spec.md) prepares BI-002; implementation has not started. Node/npm/Chromium provisioning and the full 30-minute feasibility check remain initial execution prerequisites. Persistence and standalone AI remain separate candidate outcomes.
 
 The numbered sections below group related outcomes; **M IDs are identities, not execution positions**. The current priority policy is:
 
@@ -46,7 +46,7 @@ The numbered sections below group related outcomes; **M IDs are identities, not 
 3. Enable a verified independent API operation with durable limits and recovery, then connect its web journey. Prefer demonstrated Translation followed by Rewriting over polishing all account screens or all visuals first.
 4. Integrate accessibility, privacy and failure checks with each feature. Begin bounded corpus/evaluation and operational preparation as soon as inputs are available; do not leave qualification risk until the final release review.
 
-Dependencies in Section 4 are the minimum named prerequisites, not substitutes for #8's code/design readiness check. Satisfy transitive dependencies and the applicable Section 5 blockers too. Choose the highest-value eligible milestone; a blocked independent track need not stop another eligible one. M001 is done as linked above. All other listed milestones remain **Candidate**, with **Backlog: not created; Package: none; Evidence: pending**. These shared values are stated once instead of repeating empty columns.
+Dependencies in Section 4 are the minimum named prerequisites, not substitutes for #8's code/design readiness check. Satisfy transitive dependencies and the applicable Section 5 blockers too. Choose the highest-value eligible milestone; a blocked independent track need not stop another eligible one. M001 is done and M002 is selected as linked above. All remaining listed milestones are **Candidate**, with **Backlog: not created; Package: none; Evidence: pending**. These shared values are stated once instead of repeating empty columns.
 
 M001 now has its [owning backlog](08-backlogs/M001-backend-foundation.md) and [selected package](../specs/001-backend-foundation/spec.md). Later milestones use #0's `Mxxx-<slug>.md` convention, or link an existing owning feature backlog. Replace the corresponding milestone title with a link to its actual backlog when created; record actual package/evidence links there and in #6. Do not create empty backlogs or package placeholders for this entire roadmap.
 
@@ -59,7 +59,7 @@ The exit column describes the increment's observable value. #8 supplies concrete
 | ID | Outcome | Exit criterion | Prerequisites | Basis / verification |
 | --- | --- | --- | --- | --- |
 | M001 | [Backend foundation](08-backlogs/M001-backend-foundation.md) | An agent can build and start the minimal backend and run an isolated meaningful smoke check with reproducible commands. | — | Architecture §2–3/5; V-009/V-012 (host portions only) |
-| M002 | Published web shell | A user can open the basic SPA through the API host; navigation works and missing API/assets return proper errors. | M001 | FR-003; architecture §3; V-003/V-012 |
+| M002 | [Published web shell](08-backlogs/M002-published-web-shell.md) | A user can open the basic SPA through the API host; navigation works and missing API/assets return proper errors. | M001 | FR-003; architecture §3; V-003/V-012 |
 | M003 | Durable storage foundation | A clean isolated store is created through migrations; persisted data survives a host restart and the storage checks are repeatable. | M001 | Architecture §6; V-005/V-016 |
 | M004 | Independent AI development | An agent can exercise the shared AI boundary offline and inspect a synthetic prompt without starting API/UI or accessing secrets. | M001 | AI §2/9; V-007 |
 | M005 | Shared input and capability contract | An API consumer can discover the supported choices/limits; client and server agree on canonical input counts and validation fixtures. | M001 | FR-004/006/007/014/036; API §4/9; V-001/V-009 |
@@ -169,8 +169,10 @@ Use milestone summary states **Candidate → Selected → In progress → Done**
 
 **M001 completion — 2026-09-08:** Implemented the pinned two-project backend scaffold, process-only liveness and absent-route boundary. Locked clean/repeated Release checks executed nine passing HTTP cases; successful and controlled-failure real-process smokes verified ephemeral loopback startup, nonzero propagation and cleanup. All package scenarios passed within the execution allowance; no product or release gate is claimed.
 
+**M002 selection — 2026-09-08:** Selected BI-002/package 002 after inspecting the completed M001 host, tests, commands and evidence. The increment adds a bounded signed-out informational shell, real static publication and focused navigation/asset-boundary verification; account forms and language features remain later milestones. Toolchain provisioning is explicitly front-loaded under #0.
+
 ## 7. Next applicable gate and validation
 
-M001's #8 backlog and package are complete. The next action is to select the highest-value eligible candidate through #0/#8; M002–M005 are now dependency-eligible, but none is selected by this completion update.
+M001 remains complete. M002's backlog and package are prepared; the next action is [package 002 T001](../specs/002-published-web-shell/tasks.md#1-ordered-tasks), which resolves supported tooling and checks whole-milestone feasibility before coding. No M002 implementation or runtime evidence is claimed by this authoring change.
 
 **Completion review:** Local source links, unique milestone IDs, dependency existence/order, check references and the separation of active/deferred/proposed scope were checked. M001 runtime evidence is linked; all later milestones and release gates remain pending. Candidate feasibility must be established during #8 selection against the then-current implementation.
