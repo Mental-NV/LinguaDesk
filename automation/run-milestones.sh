@@ -171,6 +171,9 @@ for ((i=start_milestone; i<=end_milestone; i++)); do
     echo "Testing $milestone..."
     ./scripts/backend.sh check
     ./scripts/backend.sh smoke
+    ./scripts/contract.sh check
+    ./scripts/ai.sh check
+    ./scripts/ai.sh probe
     ./scripts/frontend.sh check
     ./scripts/frontend.sh smoke
 
