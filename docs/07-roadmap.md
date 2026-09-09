@@ -1,6 +1,6 @@
 # LinguaDesk — Roadmap and Milestone Plan
 
-**Document:** #7 · **Version:** 1.8 · **Status:** M001–M004 done; no successor selected
+**Document:** #7 · **Version:** 1.9 · **Status:** M001–M004 done; M005 selected and ready for implementation
 **Updated:** 2026-09-09
 
 ## 1. Authority and planning basis
@@ -35,7 +35,9 @@ A milestone is done only when its selected exit criteria, applicable #6 checks a
 
 ## 3. Priority, dependency and current milestone summary
 
-**Most recently completed milestone: [M004 — Independent AI development](08-backlogs/M004-independent-ai-development.md).** State: **Done**. [Package 004](../specs/004-independent-ai-development/spec.md) delivered BI-004 with all seven scenarios passed; its [completion record](../specs/004-independent-ai-development/tasks.md#3-completion-record) records 10 focused AI cases, 42 retained API/storage cases, deterministic prompt inspection, controlled failures and retained backend/published-shell regressions. M001–M003 remain complete with their history preserved. No successor milestone is selected.
+**Current milestone: [M005 — Shared input and capability contract](08-backlogs/M005-shared-input-capability-contract.md).** State: **Selected; ready for implementation**. [Package 005](../specs/005-shared-input-capability-contract/spec.md) selects BI-005 with eight pending scenarios for public capability discovery, shared C#/TypeScript scalar/validation fixtures and the first generated OpenAPI/type slice. M001, its formal dependency, is complete; current baseline checks passed 42 API/storage, 10 AI and 8 frontend component cases. No M005 runtime evidence is claimed.
+
+Most recently completed remains [M004](08-backlogs/M004-independent-ai-development.md), whose [completion record](../specs/004-independent-ai-development/tasks.md#3-completion-record) preserves its seven passed scenarios and retained regressions. M001–M003 remain complete with their history preserved.
 
 The numbered sections below group related outcomes; **M IDs are identities, not execution positions**. The current priority policy is:
 
@@ -44,9 +46,9 @@ The numbered sections below group related outcomes; **M IDs are identities, not 
 3. Enable a verified independent API operation with durable limits and recovery, then connect its web journey. Prefer demonstrated Translation followed by Rewriting over polishing all account screens or all visuals first.
 4. Integrate accessibility, privacy and failure checks with each feature. Begin bounded corpus/evaluation and operational preparation as soon as inputs are available; do not leave qualification risk until the final release review.
 
-Dependencies in Section 4 are the minimum named prerequisites, not substitutes for #8's code/design readiness check. Satisfy transitive dependencies and the applicable Section 5 blockers too. Choose the highest-value eligible milestone; a blocked independent track need not stop another eligible one. M001–M004 are done as linked above. All remaining milestones are **Candidate**, with **Backlog: not created; Package: none; Evidence: pending**. These shared values are stated once instead of repeating empty columns.
+Dependencies in Section 4 are the minimum named prerequisites, not substitutes for #8's code/design readiness check. Satisfy transitive dependencies and the applicable Section 5 blockers too. Choose the highest-value eligible milestone; a blocked independent track need not stop another eligible one. M001–M004 are done as linked above; M005 is selected with evidence pending. All milestones after M005 remain **Candidate**, with **Backlog: not created; Package: none; Evidence: pending**. These shared values are stated once instead of repeating empty columns.
 
-M001 now has its [owning backlog](08-backlogs/M001-backend-foundation.md) and [selected package](../specs/001-backend-foundation/spec.md). Later milestones use #0's `Mxxx-<slug>.md` convention, or link an existing owning feature backlog. Replace the corresponding milestone title with a link to its actual backlog when created; record actual package/evidence links there and in #6. Do not create empty backlogs or package placeholders for this entire roadmap.
+M001–M005 now have owning backlogs and delivery packages linked from their rows. Later milestones use #0's `Mxxx-<slug>.md` convention, or link an existing owning feature backlog. Replace the corresponding milestone title with a link to its actual backlog when created; record actual package/evidence links there and in #6. Do not create empty backlogs or package placeholders for this entire roadmap.
 
 ## 4. Provisional milestone outcomes
 
@@ -60,7 +62,7 @@ The exit column describes the increment's observable value. #8 supplies concrete
 | M002 | [Published web shell](08-backlogs/M002-published-web-shell.md) | A user can open the basic SPA through the API host; navigation works and missing API/assets return proper errors. | M001 | FR-003; architecture §3; V-003/V-012 |
 | M003 | [Durable storage foundation](08-backlogs/M003-durable-storage-foundation.md) | A clean isolated store is created through migrations; persisted data survives a host restart and the storage checks are repeatable. | M001 | Architecture §6; V-005/V-016 |
 | M004 | [Independent AI development](08-backlogs/M004-independent-ai-development.md) | An agent can exercise the shared AI boundary offline and inspect a synthetic prompt without starting API/UI or accessing secrets. | M001 | AI §2/9; V-007 |
-| M005 | Shared input and capability contract | An API consumer can discover the supported choices/limits; client and server agree on canonical input counts and validation fixtures. | M001 | FR-004/006/007/014/036; API §4/9; V-001/V-009 |
+| M005 | [Shared input and capability contract](08-backlogs/M005-shared-input-capability-contract.md) | An API consumer can discover the supported choices/limits; client and server agree on canonical input counts and validation fixtures. | M001 | FR-004/006/007/014/036; API §4/9; V-001/V-009 |
 
 ### 4.2 Local access
 
@@ -179,8 +181,14 @@ Use milestone summary states **Candidate → Selected → In progress → Done**
 
 **M004 completion — 2026-09-09:** Implemented the host-independent Infrastructure.Ai library, shared embedded `eligibility.v1` composition, exactly-one-call complete-response boundary, focused MSTest suite and fixed-only inspect/probe runner. Locked warning-free checks passed 10 AI plus 42 retained API/storage cases; backend smoke, 8 component cases and 6 isolated published Chromium cases passed. Offline execution used no credentials/provider/database/API host and left no process or persistent evaluation report. This is synthetic boundary evidence only: eligibility decisions, transformations, fallback, adapters, live evaluation and all product/release gates remain pending.
 
+**M005 selection — 2026-09-09:** Selected BI-005/package 005 after confirming M001 in Git/evidence and rerunning the clean current baseline. The slice adds one anonymous read-only capabilities operation, the first nonempty Core count/catalog policy, shared C#/TypeScript scalar/validation fixtures, and deterministic OpenAPI 3.1/TypeScript type generation from actual endpoint metadata. It excludes text submission, semantic eligibility, auth, usage/accounting, persistence changes, AI/provider work, UI adoption and compatibility promises. No human action or blocking planning question remains; all eight scenarios and seven tasks are pending implementation.
+
 ## 7. Next applicable gate and validation
 
-M001–M004 are complete with linked evidence, and no successor is selected. M004 remains only independent AI enablement; together with M003's durable-storage foundation it does not make account, accounting, backup/restore, editor, eligibility/language-operation or release acceptance complete. The next milestone must be selected through its own #8 readiness review; this closeout does not start M005 or M015.
+M001–M004 are complete with linked evidence. M005 is selected and ready for implementation through [BI-005](08-backlogs/M005-shared-input-capability-contract.md), [package 005](../specs/005-shared-input-capability-contract/spec.md), its [plan](../specs/005-shared-input-capability-contract/plan.md) and [ordered tasks](../specs/005-shared-input-capability-contract/tasks.md). Its first implementation gate creates actual C# route/DTO metadata, generates/reviews the selected OpenAPI 3.1 artifact and generates TypeScript declarations before dependent client adoption. No handwritten YAML exists or is required at planning time.
+
+M004 remains only independent AI enablement; together with M003 and planned M005 it does not make account, accounting, backup/restore, editor, semantic eligibility/language-operation or release acceptance complete. M015 remains blocked on implemented M005 even though its separate M004 dependency is done.
 
 **M004 consistency and evidence review:** The planning comparison against Git `6f86f9f` remains historical. Implementation started from clean planning HEAD `762a0acd`, and the complete working-tree diff was reviewed against #0, BI-004, package acceptance and the shared designs. Package, lock, command, test/report, prompt-hash, no-effect, security/privacy and limitation evidence is linked from [tasks.md](../specs/004-independent-ai-development/tasks.md#3-completion-record). M001–M003 evidence remains linked; all active product requirements and release gates remain pending.
+
+**M005 readiness review:** Planning used clean Git `a257cd1f`; inspected current code, package/lock graphs, commands and M001–M004 history/evidence; and reran baseline backend/frontend checks successfully. #5 v1.2, #6 v1.9, the backlog, spec, plan and tasks agree on exact selected scope, cross-runtime checks, generated-artifact ordering, no-effect boundary, risks, exclusions and proposal status. No M005 implementation test or release evidence is claimed, and no blocker remains.
