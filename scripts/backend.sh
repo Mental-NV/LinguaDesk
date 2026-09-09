@@ -10,7 +10,7 @@ api_test_project="$repository_root/backend/tests/LinguaDesk.Api.Tests/LinguaDesk
 core_test_project="$repository_root/backend/tests/LinguaDesk.Core.Tests/LinguaDesk.Core.Tests.csproj"
 ai_test_project="$repository_root/backend/tests/LinguaDesk.Infrastructure.Ai.Tests/LinguaDesk.Infrastructure.Ai.Tests.csproj"
 expected_sdk="10.0.302"
-expected_minimum_api_tests=47
+expected_minimum_api_tests=67
 expected_minimum_core_tests=8
 configuration="Release"
 
@@ -81,6 +81,7 @@ restore_locked() {
 
 setup() {
     check_sdk
+    dotnet tool restore
     restore_locked
 }
 
@@ -121,6 +122,9 @@ check() {
         --results-directory "$results_directory"
 
     validate_report "$api_report" "API/storage" "$expected_minimum_api_tests"
+    validate_class_count "$api_report" "LinguaDesk.Api.Tests.AccountRegistrationTests" 10 "account registration"
+    validate_class_count "$api_report" "LinguaDesk.Api.Tests.AccountReadinessTests" 9 "account readiness"
+    validate_class_count "$api_report" "LinguaDesk.Api.Tests.StorageMigrationTests" 7 "storage migration"
     validate_report "$core_report" "Core input policy" "$expected_minimum_core_tests"
     validate_report "$ai_report" "independent AI" 1
 
@@ -146,6 +150,18 @@ check() {
     echo "API/storage report ($api_total tests): $api_report"
     echo "Core input policy report ($core_total tests): $core_report"
     echo "Independent AI report ($ai_total tests): $ai_report"
+}
+
+validate_class_count() {
+    report=$1
+    class_name=$2
+    minimum_tests=$3
+    suite_name=$4
+    class_total=$(grep -c "className=\"$class_name\"" "$report" || true)
+    if [ "$class_total" -lt "$minimum_tests" ]; then
+        echo "Backend check expected at least $minimum_tests $suite_name tests, but the report recorded $class_total." >&2
+        exit 1
+    fi
 }
 
 counter_value() {
@@ -196,8 +212,49 @@ validate_report() {
 run() {
     check_sdk
     restore_locked
+    development_data_directory=${LINGUADESK_DEVELOPMENT_DATA_PATH:-"$repository_root/../.linguadesk-development"}
+    case "$development_data_directory" in
+        /*) ;;
+        *)
+            echo "LINGUADESK_DEVELOPMENT_DATA_PATH must be an absolute directory path." >&2
+            exit 2
+            ;;
+    esac
+
+    database_path=${Storage__DatabasePath:-"$development_data_directory/linguadesk.db"}
+    keys_path=${Security__DataProtectionKeysPath:-"$development_data_directory/keys"}
+    using_default_database=false
+    using_default_keys=false
+
+    if [ -z "${Storage__DatabasePath:-}" ]; then
+        using_default_database=true
+        mkdir -p "$development_data_directory"
+        chmod 700 "$development_data_directory"
+        dotnet tool restore
+        dotnet build "$api_project" --configuration "$configuration" --no-restore
+        dotnet ef database update \
+            --project "$api_project" \
+            --startup-project "$api_project" \
+            --configuration "$configuration" \
+            --no-build \
+            -- \
+            --database-path "$database_path"
+    fi
+
+    if [ -z "${Security__DataProtectionKeysPath:-}" ]; then
+        using_default_keys=true
+        mkdir -p "$keys_path"
+        chmod 700 "$keys_path"
+    fi
+
+    if [ "$using_default_database" = true ] || [ "$using_default_keys" = true ]; then
+        echo "Prepared persistent local-development storage in $development_data_directory"
+    fi
+
     listen_url=${LINGUADESK_URL:-http://127.0.0.1:5080}
     echo "Starting LinguaDesk.Api on $listen_url"
+    Storage__DatabasePath="$database_path" \
+    Security__DataProtectionKeysPath="$keys_path" \
     exec dotnet run \
         --project "$api_project" \
         --configuration "$configuration" \
@@ -233,12 +290,26 @@ smoke() {
     trap 'exit 129' HUP
 
     run_before_deadline "$smoke_deadline" restore dotnet restore "$solution" --locked-mode
+    run_before_deadline "$smoke_deadline" tool-restore dotnet tool restore
     run_before_deadline "$smoke_deadline" build dotnet build "$api_project" --configuration "$configuration" --no-restore
+
+    smoke_database="$smoke_directory/linguadesk.db"
+    smoke_keys="$smoke_directory/keys"
+    mkdir -p "$smoke_keys"
+    run_before_deadline "$smoke_deadline" migration dotnet ef database update \
+        --project "$api_project" \
+        --startup-project "$api_project" \
+        --configuration "$configuration" \
+        --no-build \
+        -- \
+        --database-path "$smoke_database"
 
     api_dll="$repository_root/backend/src/LinguaDesk.Api/bin/$configuration/net10.0/LinguaDesk.Api.dll"
     smoke_instance_id=${LINGUADESK_SMOKE_INSTANCE_ID:-linguadesk-smoke-$$}
     ASPNETCORE_ENVIRONMENT=Smoke \
         ASPNETCORE_URLS=http://127.0.0.1:0 \
+        Storage__DatabasePath="$smoke_database" \
+        Security__DataProtectionKeysPath="$smoke_keys" \
         dotnet "$api_dll" --LinguaDeskSmokeInstanceId="$smoke_instance_id" >"$smoke_log" 2>&1 &
     smoke_process_id=$!
 
@@ -263,21 +334,23 @@ smoke() {
         return 1
     fi
 
-    probe_path=${LINGUADESK_SMOKE_PROBE_PATH:-/health/live}
-    http_code=$(curl \
-        --silent \
-        --show-error \
-        --max-time 2 \
-        --output "$smoke_body" \
-        --write-out '%{http_code}' \
-        "$listen_url$probe_path" || true)
+    probe_paths=${LINGUADESK_SMOKE_PROBE_PATH:-"/health/live /health/ready"}
+    for probe_path in $probe_paths; do
+        http_code=$(curl \
+            --silent \
+            --show-error \
+            --max-time 2 \
+            --output "$smoke_body" \
+            --write-out '%{http_code}' \
+            "$listen_url$probe_path" || true)
 
-    if [ "$http_code" != "200" ] || [ "$(cat "$smoke_body")" != "Healthy" ]; then
-        echo "Backend smoke probe failed: expected HTTP 200 with body 'Healthy', received HTTP $http_code." >&2
-        return 1
-    fi
+        if [ "$http_code" != "200" ] || [ "$(cat "$smoke_body")" != "Healthy" ]; then
+            echo "Backend smoke probe $probe_path failed: expected HTTP 200 with body 'Healthy', received HTTP $http_code." >&2
+            return 1
+        fi
+    done
 
-    echo "Backend smoke passed on an OS-assigned loopback port."
+    echo "Backend liveness/readiness smoke passed on an OS-assigned loopback port."
 }
 
 if [ "$#" -ne 1 ]; then

@@ -1,7 +1,7 @@
 # 006 — Register a Local API Account: Selected Specification
 
-**Version:** 1.0 · **Updated:** 2026-09-09
-**State:** Specified; ready for implementation preflight; runtime evidence pending
+**Version:** 1.1 · **Updated:** 2026-09-09
+**State:** Implemented and verified; AC-001–008 passed
 **Milestone/item:** [M006 / BI-006](../../docs/08-backlogs/M006-register-local-api-account.md)
 
 ## 1. Selection and authority
@@ -83,4 +83,4 @@ Use V-004 for real Identity registration/policy state and non-enumerating HTTP b
 
 The accepted PRD already requires local email/password registration and an unverified LLM gate. The shared-owner updates resolve the necessary password/email, duplicate, response/delivery, Identity schema, Data Protection and readiness details without changing product scope. The selected policy is explicit rather than inferred from framework defaults or #6's former nonbinding fixture note.
 
-Q-006 is resolved only for this operation. Q-004 deletion/backup retention and further revocation guarantees block their later features/launch, not creation; the absence of an M006 deletion promise is explicit. P-005/P-006 remain unaccepted. M007/M008/M009/M011/M034 own the excluded verification, auth, UI and live-email work. Requirements review and consistency analysis pass: every story and acceptance row is bounded, every applicable failure/privacy/migration/generation boundary has planned evidence and task coverage, and no unresolved planning blocker remains. Runtime acceptance remains pending.
+Q-006 is resolved only for this operation. Q-004 deletion/backup retention and further revocation guarantees block their later features/launch, not creation; the absence of an M006 deletion promise is explicit. P-005/P-006 remain unaccepted. M007/M008/M009/M011/M034 own the excluded verification, auth, UI and live-email work. Requirements, implementation and consistency reviews pass: every story and acceptance row is bounded and every applicable failure/privacy/migration/generation boundary has passing evidence in [tasks.md](tasks.md#3-completion-record). No M006 blocker remains.

@@ -24,6 +24,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/accounts/register": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Register a local account
+         * @description Creates an unverified local account when the normalized email is new and always returns the same verification-required acknowledgment for a valid duplicate. No authentication credential is issued.
+         */
+        post: operations["registerLocalAccount"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -136,6 +156,48 @@ export interface components {
          * @enum {string}
          */
         OversizeHandling: "rejectWhole";
+        RegistrationAccepted: {
+            /** @description Always `verificationRequired` for an accepted new or existing normalized email. */
+            status: components["schemas"]["RegistrationStatus"];
+        };
+        RegistrationProblemDetails: {
+            /** @description RFC 9457 problem type reference. */
+            type?: null | string;
+            /** @description Short, stable problem summary. */
+            title: string;
+            /**
+             * Format: int32
+             * @description HTTP status code for this occurrence.
+             */
+            status: number;
+            /** @description Safe explanation that never echoes submitted account values. */
+            detail: string;
+            /** @description LinguaDesk error category: `invalidRequest` or `availability`. */
+            category: string;
+            /** @description Opaque request correlation identifier. */
+            correlationId: string;
+            /** @description Field messages keyed only by `email` or `password`; present for field validation failures. */
+            errors?: null | {
+                [key: string]: string[];
+            };
+        };
+        RegistrationRequest: {
+            /**
+             * Format: email
+             * @description Local account email address. Maximum 254 Unicode scalar values; surrounding whitespace is invalid.
+             */
+            email: string;
+            /**
+             * Format: password
+             * @description Write-only password containing 15 to 128 well-formed Unicode scalar values.
+             */
+            password: string;
+        };
+        /**
+         * @description Always `verificationRequired` for an accepted new or existing normalized email.
+         * @enum {string}
+         */
+        RegistrationStatus: "verificationRequired";
         /** @description Exclusive rewriting modes, whole-input limit, and overall deadline. */
         RewritingCapability: {
             /**
@@ -237,6 +299,65 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["CapabilitiesResponse"];
+                };
+            };
+        };
+    };
+    registerLocalAccount: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RegistrationRequest"];
+            };
+        };
+        responses: {
+            /** @description Accepted */
+            202: {
+                headers: {
+                    /** @description Always `no-store` for registration responses. */
+                    "Cache-Control": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RegistrationAccepted"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    /** @description Always `no-store` for registration responses. */
+                    "Cache-Control": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["RegistrationProblemDetails"];
+                };
+            };
+            /** @description Unsupported Media Type */
+            415: {
+                headers: {
+                    /** @description Always `no-store` for registration responses. */
+                    "Cache-Control": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["RegistrationProblemDetails"];
+                };
+            };
+            /** @description Service Unavailable */
+            503: {
+                headers: {
+                    /** @description Always `no-store` for registration responses. */
+                    "Cache-Control": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["RegistrationProblemDetails"];
                 };
             };
         };

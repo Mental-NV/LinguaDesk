@@ -215,6 +215,7 @@ public sealed class CapabilitiesEndpointTests
     {
         private readonly string webRoot;
         private readonly string? databasePath;
+        private readonly string keysPath = Directory.CreateTempSubdirectory("linguadesk-capability-keys-").FullName;
 
         public CapabilityWebApplicationFactory(string? webRoot = null, string? databasePath = null)
         {
@@ -227,11 +228,12 @@ public sealed class CapabilitiesEndpointTests
             builder.UseEnvironment("Testing");
             builder.UseWebRoot(webRoot);
             builder.ConfigureServices(services => services.AddSingleton<TimeProvider>(new FixedTimeProvider(FixedNow)));
-            if (databasePath is not null)
-            {
-                builder.ConfigureAppConfiguration(configuration => configuration.AddInMemoryCollection(
-                    new Dictionary<string, string?> { ["Storage:DatabasePath"] = databasePath }));
-            }
+            builder.ConfigureAppConfiguration(configuration => configuration.AddInMemoryCollection(
+                new Dictionary<string, string?>
+                {
+                    ["Storage:DatabasePath"] = databasePath,
+                    ["Security:DataProtectionKeysPath"] = keysPath,
+                }));
         }
 
         protected override void Dispose(bool disposing)
@@ -240,6 +242,10 @@ public sealed class CapabilitiesEndpointTests
             if (disposing && Directory.Exists(webRoot))
             {
                 Directory.Delete(webRoot, recursive: true);
+            }
+            if (disposing && Directory.Exists(keysPath))
+            {
+                Directory.Delete(keysPath, recursive: true);
             }
         }
     }

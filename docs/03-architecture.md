@@ -1,6 +1,6 @@
 # LinguaDesk — Architecture and Engineering Principles
 
-**Document:** #3 · **Version:** 1.11 · **Status:** M006 account persistence/readiness selected; later auth and launch dependencies remain
+**Document:** #3 · **Version:** 1.12 · **Status:** M006 account persistence/readiness verified; later auth and launch dependencies remain
 **Updated:** 2026-09-09
 
 ## 1. Authority, Inputs, and Scope
@@ -120,7 +120,7 @@ The SPA uses Secure, HttpOnly cookies and antiforgery validation; independent cl
 
 Persist Data Protection keys outside the deployment directory with restricted filesystem access and a stable application identity. Back them up with account data. Local-account deletion and cookie/bearer session revocation need the Q-004 account design before implementation. External-account linking is a DF-007 dependency, not a current blocker; when selected it must not link solely by matching email. Real email delivery is an adapter; deterministic tests use a capturing fake.
 
-**M006 staging — selected 2026-09-09:** [Package 006](../specs/006-register-local-api-account/spec.md) adds only the standard durable Identity account/store, one anonymous registration operation, a narrow confirmation-delivery intent and the named current-state `VerifiedAccount` authorization policy. Use Identity's standard string key and normalized unique email; do not add roles, a custom profile, authentication schemes or the rest of `MapIdentityApi`. The account starts unconfirmed and no cookie/bearer credential is issued. Persist Data Protection keys in the explicit absolute existing `Security:DataProtectionKeysPath`, default `/var/lib/linguadesk/keys`, with application name `LinguaDesk`; the path is outside publish/static content and key values are never exposed or logged. Capturing/failing delivery adapters are injected by deterministic tests and cannot be selected for production serving. M007/M034 retain confirmation completion/resend and live-email evidence.
+**M006 implementation — verified 2026-09-09:** [Package 006](../specs/006-register-local-api-account/spec.md) adds only the standard durable Identity account/store, one anonymous registration operation, a narrow confirmation-delivery intent and the named current-state `VerifiedAccount` authorization policy. It uses Identity's standard string key and normalized unique email without roles, a custom profile, authentication schemes or the rest of `MapIdentityApi`. The account starts unconfirmed and no cookie/bearer credential is issued. Data Protection keys use the explicit absolute existing `Security:DataProtectionKeysPath`, default `/var/lib/linguadesk/keys`, with application name `LinguaDesk`; the path is outside publish/static content and key values are never exposed or logged. Capturing/failing delivery adapters are injected only by deterministic tests; the runtime default cannot perform live delivery. M007/M034 retain confirmation completion/resend and live-email evidence.
 
 M006 also closes M003's database-dependent-serving handoff. Outside contract generation, an account-serving host validates before listening that the configured database already exists, opens read/write, is at the current migration and can obtain/roll back a bounded write transaction, and that the existing key directory is usable. It never creates, migrates, repairs, deletes or falls back. `GET /health/ready` reports only current database/key readiness and stays outside product OpenAPI; `GET /health/live` remains process-only. Build-time OpenAPI generation registers the actual route metadata but performs no database/key/email/listener effect and cannot expose a user-configurable production bypass. The new Identity migration follows the immutable M003 baseline. Account/key records remain durable pending Q-004's later deletion/backup-retention decision; M006 adds no deletion or retention promise, so that unresolved launch policy does not block this bounded creation slice.
 
@@ -148,7 +148,7 @@ For deployment, stop/drain the single instance, take a consistent backup, run th
 
 **M003 staging — 2026-09-09:** The [durable-storage package](../specs/003-durable-storage-foundation/spec.md) establishes explicit local initialization, scoped runtime access and file-backed migration/restart checks. Its initial schema contains framework migration metadata only; account and ledger models arrive with their owning features. Ordinary shell startup remains free of database I/O, and runtime connections do not create a missing file. No storage-readiness endpoint is selected here. Add the storage availability/startup validation from Section 5.2 before introducing database-dependent serving; production migration bundles, backup/restore and operational readiness retain M040's evidence gate. This staging does not weaken the production deployment rules above.
 
-M006 is the first owning database-dependent feature and selects that startup/readiness work as an indispensable prerequisite; until its runtime evidence passes, the M003 no-I/O shell behavior remains the implemented baseline. Contract generation retains the M003 lazy/no-effect boundary even after account serving becomes readiness-gated.
+M006 is the first owning database-dependent feature and implements the startup/readiness handoff. Ordinary serving now requires the current explicitly migrated database and existing usable key directory; contract generation retains the M003 lazy/no-effect boundary and registers route metadata without constructing those serving dependencies.
 
 ### 6.2 Privacy and retention (Q-004)
 
@@ -238,7 +238,7 @@ Use [#6 Section 3](06-verification-plan.md#3-deterministic-backend-and-independe
 
 ### 9.3 Execution and traceability
 
-[#6 Sections 7–8](06-verification-plan.md#7-execution-gates-and-evidence) own inner-loop/PR/release gates, canonical coverage and evidence status. Runtime verification remains pending.
+[#6 Sections 7–8](06-verification-plan.md#7-execution-gates-and-evidence) own inner-loop/PR/release gates, canonical coverage and evidence status. M006 runtime verification passed; full product/release verification remains pending.
 
 ## 10. Decision Records and Source Basis
 
@@ -262,10 +262,12 @@ Technical guidance checked on 2026-09-07; the choices above are LinguaDesk's app
 | --- | --- | --- |
 | Q-001, #4/#6 and owner configuration | Serving/provider-managed caching capabilities, models/settings meeting quality/performance/cost criteria, monetary cap amount; no retention/no-training gate | Paid serving and launch |
 | Q-002, PRD D-17 | Targeted matching and toggle restoration resolved by removal; future assistance association is DF-001/002 | No current-MVP blocker |
-| Q-003/Q-006, #5 with #3 | Shared semantics selected in #5; M006 selects registration DTO/policy/delivery intent and account-serving readiness; auth bootstrap, confirmation/sign-in/token/recovery operations and implementation evidence remain | M006 registration first, then selected authentication/accounting/recovery handlers and dependent clients; generated review remains an early implementation gate |
+| Q-003/Q-006, #5 with #3 | Shared semantics selected in #5; M006 verifies registration DTO/policy/delivery intent and account-serving readiness; auth bootstrap and confirmation/sign-in/token/recovery operations remain | Selected authentication/accounting/recovery handlers and dependent clients; generated review remains an early implementation gate |
 | Q-004, account/privacy package with #3/#5/#10 | Recovery window/stamp rules in #5; M006 makes account/key persistence explicit without deletion/retention claims; backup/aggregate/unresolved-exposure retention, deletion and further logout guarantees/provider disclosure remain; external linking deferred DF-007 | Deletion/backup/related lifecycle features and launch, not M006 account creation |
 | Q-007, #4 | Policy specified in #4; selected adapter/token bounds, executable prompt/validator fixtures and conformance evidence remain | Live provider orchestration readiness; offline policy work can proceed |
 | Q-005, #6 | Verification design and coverage specified in [#6](06-verification-plan.md); executable evidence remains pending | Release acceptance |
 | Q-008/Q-010, PRD then #3/#10 | P-005 safeguard scope and any additional operational thresholds | Adoption of proposed controls; no silent acceptance |
 
-The topology, engineering defaults, and test allocation are ready for **scoped planning**. Documents #4–#6 need only resolve the contracts required by the selected package before its implementation; unrelated future decisions do not block independent work. DF-001–DF-007 do not block MVP and create no speculative framework or testing work. This is not a claim of launch readiness or full resolution of privacy/cost questions.
+**M006 implementation review:** The working tree based on planning HEAD `6b4055d` passed the additive user-only Identity migration/model-drift checks, explicit key persistence and restart checks, pre-listen/current database+key readiness failure matrix, strict non-enumerating registration/concurrency behavior, current-state authorization and contract generation with no serving effects. Exact commands, counts, hashes, audits and limitations are in the [package completion record](../specs/006-register-local-api-account/tasks.md#3-completion-record). No role/authentication scheme, live sender, language route, account deletion or backup-retention behavior was introduced.
+
+The topology, engineering defaults, and test allocation are ready for **scoped planning**. Documents #4–#6 need only resolve the contracts required by the next selected package before its implementation; unrelated future decisions do not block independent work. DF-001–DF-007 do not block MVP and create no speculative framework or testing work. This is not a claim of launch readiness or full resolution of privacy/cost questions.

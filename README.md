@@ -1,6 +1,6 @@
 # LinguaDesk
 
-LinguaDesk contains a minimal ASP.NET Core host, the M002 published signed-out web shell, the M003 SQLite persistence foundation, an independent offline AI development boundary, and the M005 shared input/capability contract. The React shell provides informational sign-in and registration routes, redirects protected feature routes to sign-in, and is served from the same published artifact as the backend. Storage is initialized only through explicit EF Core migrations and currently contains framework migration metadata only. The AI library can compose and inspect the versioned `eligibility.v1` prompt with fixed synthetic data and invoke one scripted `IChatClient` response without the application host. An anonymous `GET /api/capabilities` reports the current language/mode catalog, input limits and counting/recovery metadata; C# endpoint metadata generates the committed OpenAPI 3.1 document and TypeScript declarations. The application does not yet provide working accounts, editors, language-operation submissions, eligibility decisions, product data schemas, provider/email integrations, or deployment configuration.
+LinguaDesk contains a minimal ASP.NET Core host, the M002 published signed-out web shell, explicit SQLite persistence, an independent offline AI development boundary, the M005 shared input/capability contract, and the M006 local-account registration slice. The React shell still provides informational sign-in and registration routes only. An independent client can call anonymous `POST /api/accounts/register` to create one durable, unverified ASP.NET Core Identity account; duplicate valid requests receive the same generic acknowledgment. Registration issues no credential and the application has no sign-in, confirmation-completion, resend, password-reset, or live-email implementation yet. The AI library and anonymous `GET /api/capabilities` retain their earlier bounded behavior. C# endpoint metadata generates the committed OpenAPI 3.1 document and TypeScript declarations. Editors, language-operation submissions, eligibility decisions, provider integrations, usage/accounting, and release deployment remain unimplemented.
 
 ## Prerequisites
 
@@ -9,7 +9,7 @@ LinguaDesk contains a minimal ASP.NET Core host, the M002 published signed-out w
 - Bash, curl, and `pkill` (normally supplied by the operating system or `procps`)
 - Access to the locked NuGet and npm packages; the repository-local EF tool and Chromium are installed explicitly by their setup commands
 
-Backend-only setup/check/smoke still requires no Node, frontend assets, browser, Docker daemon, pre-existing database, credentials, external service, or development certificate. Storage checks create only uniquely owned temporary databases and processes.
+Backend setup/check/run/smoke still requires no Node, frontend assets, browser, Docker daemon, credentials, external service, or development certificate. Checks and smoke create uniquely owned temporary dependencies. The development `run` wrapper explicitly prepares persistent local storage outside the repository; direct/published application serving still requires an explicitly migrated database and an existing writable Data Protection key directory.
 
 ## Backend commands
 
@@ -23,7 +23,8 @@ bash scripts/backend.sh setup
 # that the machine-readable report contains discovered tests and no failures.
 bash scripts/backend.sh check
 
-# Start the backend in the foreground at http://127.0.0.1:5080.
+# Explicitly prepare/update persistent local-development storage, then start
+# the backend in the foreground at http://127.0.0.1:5080.
 bash scripts/backend.sh run
 
 # Build and start the real host on an OS-assigned loopback port, probe it,
@@ -31,15 +32,19 @@ bash scripts/backend.sh run
 bash scripts/backend.sh smoke
 ```
 
-Override the foreground run address with `LINGUADESK_URL`, for example:
+With no storage environment variables, `run` applies the migrations and creates a restricted key directory under the sibling `../.linguadesk-development` directory. This data and its verification keys survive restarts and are not committed. Override that location and the listening address when needed:
 
 ```sh
-LINGUADESK_URL=http://127.0.0.1:5090 bash scripts/backend.sh run
+LINGUADESK_DEVELOPMENT_DATA_PATH="/absolute/path/to/linguadesk-development" \
+LINGUADESK_URL=http://127.0.0.1:5090 \
+bash scripts/backend.sh run
 ```
 
-The operational endpoint is `GET /health/live`. HTTP 200 with plain-text `Healthy` means only that the process can serve the liveness probe; it does not report database, provider, email, or product readiness. `POST /health/live` is rejected with 405. Missing `/api` routes return a JSON Problem Details 404. With no generated frontend webroot, other unimplemented paths remain ordinary 404 responses; a published artifact serves the SPA document only for eligible GET/HEAD client routes. Missing API, health, asset, and file-like paths never fall through to HTML.
+If `Storage__DatabasePath` or `Security__DataProtectionKeysPath` is supplied explicitly, `run` respects that target and does not initialize that custom dependency. Use `scripts/storage.sh migrate` and provision the custom key directory yourself. The convenience behavior belongs to the development wrapper; the application itself never creates or migrates missing serving dependencies.
 
-`check` writes collision-free TRX reports to `artifacts/test-results/backend-api.trx`, `backend-core.trx`, and `backend-ai.trx`. It retains the real file-backed SQLite migration, transaction, foreign-key, locking, failure, host-scope, and clean-restart cases and separately guards the shared Core input-policy and independent-AI suites against zero-test success; it does not need npm or a browser. Generated build, test, and temporary smoke output is not committed. Milestone scope and evidence are tracked in [`specs/001-backend-foundation/tasks.md`](specs/001-backend-foundation/tasks.md), [`specs/003-durable-storage-foundation/tasks.md`](specs/003-durable-storage-foundation/tasks.md), [`specs/004-independent-ai-development/tasks.md`](specs/004-independent-ai-development/tasks.md), and [`specs/005-shared-input-capability-contract/tasks.md`](specs/005-shared-input-capability-contract/tasks.md).
+`GET /health/live` remains process-only. `GET /health/ready` checks that the database still exists, has the current migration and can accept a rolled-back write, and that the configured key directory remains usable. It exposes only healthy/unhealthy and is excluded from product OpenAPI. Account-serving startup performs the same readiness validation before listening and never creates or migrates either dependency. Unsupported health methods are rejected with 405. Missing `/api` routes return a JSON Problem Details 404. With no generated frontend webroot, other unimplemented paths remain ordinary 404 responses; a published artifact serves the SPA document only for eligible GET/HEAD client routes. Missing API, health, asset, and file-like paths never fall through to HTML.
+
+`check` writes collision-free TRX reports to `artifacts/test-results/backend-api.trx`, `backend-core.trx`, and `backend-ai.trx`. It retains the real file-backed SQLite migration, transaction, locking, failure, host-scope, and restart cases; exercises registration, Identity, verified-state authorization, key persistence and readiness; and separately guards the focused suites against zero-test success. It does not need npm or a browser. Generated build, test, and temporary smoke output is not committed. Milestone scope and evidence are tracked in the package task files, including [`specs/006-register-local-api-account/tasks.md`](specs/006-register-local-api-account/tasks.md).
 
 ## Capability and contract commands
 
@@ -59,7 +64,7 @@ bash scripts/contract.sh generate
 bash scripts/contract.sh check
 ```
 
-The committed generated views are `docs/05-openapi.yaml` and `frontend/src/api/generated/linguadesk-api.d.ts`; do not edit either by hand. The document contains only `GET /api/capabilities`, uses the pre-release artifact revision `0.1.0-m005`, and is not served as a runtime documentation endpoint. Its revision does not promise API compatibility or a deprecation period.
+The committed generated views are `docs/05-openapi.yaml` and `frontend/src/api/generated/linguadesk-api.d.ts`; do not edit either by hand. The document contains only `GET /api/capabilities` and `POST /api/accounts/register`, uses the pre-release artifact revision `0.1.0-m006`, and is not served as a runtime documentation endpoint. Contract generation registers the real endpoint metadata without opening storage, writing keys, sending email, or starting a listener. Its revision does not promise API compatibility or a deprecation period.
 
 ## Independent AI development commands
 
@@ -86,7 +91,7 @@ Inspection deliberately prints the checked-in synthetic source containing a quot
 
 ## Storage commands
 
-Storage uses EF Core SQLite `10.0.10`, the repository-local `dotnet-ef` `10.0.10` tool, and the committed migration chain. The native SQLite bundle is pinned to `2.1.12` to avoid the vulnerable transitive `2.1.11` package. Setup restores tools and locked backend dependencies but does not create a directory or database:
+Storage uses EF Core SQLite and Identity Entity Framework Core `10.0.10`, the repository-local `dotnet-ef` `10.0.10` tool, and the committed `InitialStorage` plus `LocalAccounts` migration chain. The native SQLite bundle is pinned to `2.1.12` to avoid the vulnerable transitive `2.1.11` package. Setup restores tools and locked backend dependencies but does not create a directory or database:
 
 ```sh
 bash scripts/storage.sh setup
@@ -102,15 +107,19 @@ bash scripts/storage.sh migrate "$storage_directory/linguadesk.db"
 
 The migration command has no default target, accepts paths containing spaces, and exits nonzero for missing, relative, in-memory, URI, directory, unsafe-output, or unopenable targets. Reapplying it is safe: it retains existing migration history and data. Explicit initialization uses read/write-create mode and establishes WAL; application contexts use read/write-only mode with foreign keys enabled, pooling disabled, and a finite five-second default timeout.
 
-To run the current shell with that initialized file available to future database-dependent scopes:
+To run the account-serving host, also create an existing key directory outside the repository and configure both paths:
 
 ```sh
-Storage__DatabasePath="$storage_directory/linguadesk.db" bash scripts/backend.sh run
+mkdir "$storage_directory/keys"
+chmod 700 "$storage_directory/keys"
+Storage__DatabasePath="$storage_directory/linguadesk.db" \
+Security__DataProtectionKeysPath="$storage_directory/keys" \
+bash scripts/backend.sh run
 ```
 
-Ordinary build, publish, host startup, and `GET /health/live` do not open, create, or migrate storage. The default configured production path is `/var/lib/linguadesk/linguadesk.db`, but the current shell does not require that path to exist. Runtime access to an absent file fails instead of creating an empty replacement.
+Build, publish, and contract generation do not open, create, or migrate storage. Ordinary runtime startup requires the current database and usable key directory before listening. The defaults are `/var/lib/linguadesk/linguadesk.db` and `/var/lib/linguadesk/keys`; runtime access to absent or stale dependencies fails instead of creating, migrating, repairing, or falling back. Data Protection uses the fixed application name `LinguaDesk`; retain and back up its generated key files with account data.
 
-This foundation proves clean-stop local persistence, not power-loss durability, business transaction recovery, backup/restore, a production migration bundle, multi-instance/network-filesystem operation, or storage readiness for database-dependent serving. Those remain later milestones; no product entity or synthetic probe schema is present in the production migration.
+M006 proves local migrated account persistence and serving-readiness behavior, not power-loss durability, backup/restore, a production migration bundle, multi-instance/network-filesystem operation, account deletion/retention, or live email. The production schema contains standard user-only Identity tables and no roles, product profile, ledger, language text, outbox, or key table.
 
 ## Frontend and publishing commands
 

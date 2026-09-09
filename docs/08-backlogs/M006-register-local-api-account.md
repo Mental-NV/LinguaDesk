@@ -1,7 +1,7 @@
 # M006 — Register a Local API Account Backlog
 
-**Document:** #8 · **Version:** 1.0 · **Updated:** 2026-09-09
-**State:** Selected; implementation and verification pending
+**Document:** #8 · **Version:** 1.1 · **Updated:** 2026-09-09
+**State:** Done; AC-001–008 passed
 **Roadmap:** [M006 — Register a local API account](../07-roadmap.md#42-local-access)
 
 ## 1. Outcome and authoritative inputs
@@ -18,7 +18,7 @@ The inspected repository has a Minimal API host, an empty application `LinguaDes
 
 | Item ID | Outcome/title | Priority | Target milestone | Dependencies/blockers | State | Delivery package |
 | --- | --- | --- | --- | --- | --- | --- |
-| BI-006 | Register one durable unverified local account | Selected local-access increment | M006 | M003 done; M005 done; no remaining planning blocker | selected | [006-register-local-api-account](../../specs/006-register-local-api-account/spec.md) |
+| BI-006 | Register one durable unverified local account | Selected local-access increment | M006 | M003 done; M005 done | done | [006-register-local-api-account](../../specs/006-register-local-api-account/spec.md) |
 
 ### BI-006 — Register one durable unverified local account
 
@@ -38,8 +38,8 @@ The inspected repository has a Minimal API host, an empty application `LinguaDes
 
 No real mailbox, link click, email/provider credential, TLS trust action, production volume, domain, monetary approval, browser/device review or product decision is needed. Deterministic tests inject a capturing/failing confirmation-delivery adapter and use synthetic `example.test` addresses. Real delivery and human click evidence remain M034/M007 gates and do not block M006 implementation. There is no planned end-of-milestone human verification. Unexpected human-only dependencies follow [#0's timing rule](../00-SDD-Planning-Workflow.md#selecting-work-and-creating-a-package).
 
-## 4. Selection and readiness review
+## 4. Completion and readiness review
 
-BI-006 is the sole selected item. [Package 006](../../specs/006-register-local-api-account/spec.md) owns eight detailed acceptance scenarios and the exact local wire choices. The shared API design now owns the password/email/non-enumeration/delivery behavior, and architecture owns Identity persistence, Data Protection and database-dependent readiness staging. These are delegated technical/behavioral decisions necessary to implement accepted FR-001/002; they do not accept P-005/NFR-008 or P-006.
+BI-006 is done. [Package 006](../../specs/006-register-local-api-account/spec.md) owns eight passed acceptance scenarios and the exact local wire choices; its [completion record](../../specs/006-register-local-api-account/tasks.md#3-completion-record) records the runtime, migration, contract, audit and regression evidence. The shared API design owns the password/email/non-enumeration/delivery behavior, and architecture owns Identity persistence, Data Protection and database-dependent readiness staging. These delegated technical/behavioral decisions implement only the selected portions of accepted FR-001/002; they do not accept P-005/NFR-008 or P-006.
 
-Q-004 does not block this bounded creation slice: M006 implements no account deletion, backup-retention promise or extra revocation guarantee, and explicitly treats the account/key records as durable pending their later lifecycle owner. Q-006's registration operation/policy details are resolved for this slice; sign-in, tokens, antiforgery, confirmation/resend and recovery remain with their later packages. Requirements-quality and cross-artifact review found every scenario mapped to verification and ordered tasks, every prerequisite justified, and no unresolved planning blocker. Runtime evidence is pending.
+Q-004 did not block this bounded creation slice: M006 implements no account deletion, backup-retention promise or extra revocation guarantee, and explicitly treats the account/key records as durable pending their later lifecycle owner. Q-006's registration operation/policy details are resolved for this slice; sign-in, tokens, antiforgery, confirmation/resend and recovery remain with their later packages. Requirements-quality, implementation and cross-artifact reviews found every scenario mapped to passing evidence, every prerequisite justified and no remaining M006 blocker. Full FR-001/002, RG-005 and release evidence remain pending.

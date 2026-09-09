@@ -14,7 +14,11 @@ namespace LinguaDesk.Api.Tests;
 [TestClass]
 public sealed class StorageHostTests
 {
-    private static readonly string[] ExpectedMigrationIds = ["20260908221711_InitialStorage"];
+    private static readonly string[] ExpectedMigrationIds =
+    [
+        "20260908221711_InitialStorage",
+        "20260909120834_LocalAccounts",
+    ];
 
     [TestMethod]
     public async Task HostScopesResolveTheConfiguredFileWithoutOpeningIt()
@@ -51,14 +55,15 @@ public sealed class StorageHostTests
         }
 
         var beforeStartup = await File.ReadAllBytesAsync(database.DatabasePath);
+        var keysPath = Directory.CreateDirectory(Path.Combine(database.RootPath, "keys")).FullName;
         int firstProcessId;
-        await using (var firstHost = await OwnedKestrelHost.StartAsync(database.DatabasePath))
+        await using (var firstHost = await OwnedKestrelHost.StartAsync(database.DatabasePath, keysPath))
         {
             firstProcessId = firstHost.ProcessId;
             Assert.AreEqual("Healthy", await firstHost.Client.GetStringAsync("/health/live"));
         }
 
-        await using (var secondHost = await OwnedKestrelHost.StartAsync(database.DatabasePath))
+        await using (var secondHost = await OwnedKestrelHost.StartAsync(database.DatabasePath, keysPath))
         {
             Assert.AreNotEqual(firstProcessId, secondHost.ProcessId);
             Assert.AreEqual("Healthy", await secondHost.Client.GetStringAsync("/health/live"));
@@ -92,6 +97,7 @@ public sealed class StorageHostTests
     private sealed class StorageWebApplicationFactory(string databasePath) : WebApplicationFactory<Program>
     {
         private readonly string webRoot = Directory.CreateTempSubdirectory("linguadesk-storage-webroot-").FullName;
+        private readonly string keysPath = Directory.CreateTempSubdirectory("linguadesk-storage-keys-").FullName;
 
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
@@ -101,6 +107,7 @@ public sealed class StorageHostTests
                 new Dictionary<string, string?>
                 {
                     ["Storage:DatabasePath"] = databasePath,
+                    ["Security:DataProtectionKeysPath"] = keysPath,
                 }));
         }
 
@@ -110,6 +117,10 @@ public sealed class StorageHostTests
             if (disposing && Directory.Exists(webRoot))
             {
                 Directory.Delete(webRoot, recursive: true);
+            }
+            if (disposing && Directory.Exists(keysPath))
+            {
+                Directory.Delete(keysPath, recursive: true);
             }
         }
     }
@@ -130,7 +141,7 @@ public sealed class StorageHostTests
 
         public int ProcessId => process.Id;
 
-        public static async Task<OwnedKestrelHost> StartAsync(string databasePath)
+        public static async Task<OwnedKestrelHost> StartAsync(string databasePath, string keysPath)
         {
             var repositoryRoot = StoragePathPolicy.FindRepositoryRoot(AppContext.BaseDirectory)
                 ?? throw new InvalidOperationException("Could not locate repository root.");
@@ -159,6 +170,7 @@ public sealed class StorageHostTests
             startInfo.ArgumentList.Add("http://127.0.0.1:0");
             startInfo.Environment["ASPNETCORE_ENVIRONMENT"] = "Testing";
             startInfo.Environment["Storage__DatabasePath"] = databasePath;
+            startInfo.Environment["Security__DataProtectionKeysPath"] = keysPath;
 
             var output = new ConcurrentQueue<string>();
             var ready = new TaskCompletionSource<Uri>(TaskCreationOptions.RunContinuationsAsynchronously);

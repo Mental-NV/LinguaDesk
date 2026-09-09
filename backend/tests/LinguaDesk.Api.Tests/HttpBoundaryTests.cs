@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.Extensions.Configuration;
 
 namespace LinguaDesk.Api.Tests;
 
@@ -174,6 +175,7 @@ public sealed class HttpBoundaryTests
     private sealed class OwnedWebApplicationFactory : WebApplicationFactory<Program>
     {
         private readonly string webRoot = Directory.CreateTempSubdirectory("linguadesk-webroot-").FullName;
+        private readonly string keysPath = Directory.CreateTempSubdirectory("linguadesk-http-keys-").FullName;
 
         public OwnedWebApplicationFactory(Action<string>? populateWebRoot)
         {
@@ -184,6 +186,11 @@ public sealed class HttpBoundaryTests
         {
             builder.UseEnvironment("Testing");
             builder.UseWebRoot(webRoot);
+            builder.ConfigureAppConfiguration(configuration => configuration.AddInMemoryCollection(
+                new Dictionary<string, string?>
+                {
+                    ["Security:DataProtectionKeysPath"] = keysPath,
+                }));
         }
 
         protected override void Dispose(bool disposing)
@@ -192,6 +199,10 @@ public sealed class HttpBoundaryTests
             if (disposing && Directory.Exists(webRoot))
             {
                 Directory.Delete(webRoot, recursive: true);
+            }
+            if (disposing && Directory.Exists(keysPath))
+            {
+                Directory.Delete(keysPath, recursive: true);
             }
         }
     }

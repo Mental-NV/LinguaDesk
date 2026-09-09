@@ -2,8 +2,8 @@
 openapi: 3.1.1
 info:
   title: LinguaDesk API
-  description: Pre-release M005 contract containing only the implemented public capabilities operation. No compatibility or deprecation guarantee is implied.
-  version: 0.1.0-m005
+  description: Pre-release M006 contract containing only the implemented public capabilities and anonymous local-account registration operations. No compatibility or deprecation guarantee is implied.
+  version: 0.1.0-m006
 paths:
   /api/capabilities:
     get:
@@ -25,6 +25,68 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/CapabilitiesResponse"
+  /api/accounts/register:
+    post:
+      tags:
+        - RegistrationEndpoints
+      summary: Register a local account
+      description: Creates an unverified local account when the normalized email is new and always returns the same verification-required acknowledgment for a valid duplicate. No authentication credential is issued.
+      operationId: registerLocalAccount
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegistrationRequest"
+        required: true
+      responses:
+        "202":
+          description: Accepted
+          headers:
+            Cache-Control:
+              description: Always `no-store` for registration responses.
+              required: true
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RegistrationAccepted"
+        "400":
+          description: Bad Request
+          headers:
+            Cache-Control:
+              description: Always `no-store` for registration responses.
+              required: true
+              schema:
+                type: string
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/RegistrationProblemDetails"
+        "415":
+          description: Unsupported Media Type
+          headers:
+            Cache-Control:
+              description: Always `no-store` for registration responses.
+              required: true
+              schema:
+                type: string
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/RegistrationProblemDetails"
+        "503":
+          description: Service Unavailable
+          headers:
+            Cache-Control:
+              description: Always `no-store` for registration responses.
+              required: true
+              schema:
+                type: string
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/RegistrationProblemDetails"
 components:
   schemas:
     CapabilitiesResponse:
@@ -195,6 +257,76 @@ components:
         - rejectWhole
       type: string
       description: Whole-input behavior when the source exceeds the maximum.
+    RegistrationAccepted:
+      required:
+        - status
+      type: object
+      properties:
+        status:
+          description: Always `verificationRequired` for an accepted new or existing normalized email.
+          $ref: "#/components/schemas/RegistrationStatus"
+    RegistrationProblemDetails:
+      required:
+        - title
+        - status
+        - detail
+        - category
+        - correlationId
+      type: object
+      properties:
+        type:
+          type:
+            - "null"
+            - string
+          description: RFC 9457 problem type reference.
+        title:
+          type: string
+          description: Short, stable problem summary.
+        status:
+          type: integer
+          description: HTTP status code for this occurrence.
+          format: int32
+        detail:
+          type: string
+          description: Safe explanation that never echoes submitted account values.
+        category:
+          type: string
+          description: "LinguaDesk error category: `invalidRequest` or `availability`."
+        correlationId:
+          type: string
+          description: Opaque request correlation identifier.
+        errors:
+          type:
+            - "null"
+            - object
+          additionalProperties:
+            type: array
+            items:
+              type: string
+          description: Field messages keyed only by `email` or `password`; present for field validation failures.
+    RegistrationRequest:
+      required:
+        - email
+        - password
+      type: object
+      properties:
+        email:
+          maxLength: 254
+          type: string
+          description: Local account email address. Maximum 254 Unicode scalar values; surrounding whitespace is invalid.
+          format: email
+        password:
+          maxLength: 128
+          minLength: 15
+          type: string
+          description: Write-only password containing 15 to 128 well-formed Unicode scalar values.
+          format: password
+          writeOnly: true
+    RegistrationStatus:
+      enum:
+        - verificationRequired
+      type: string
+      description: Always `verificationRequired` for an accepted new or existing normalized email.
     RewritingCapability:
       required:
         - maximumSourceCharacters
@@ -327,3 +459,4 @@ components:
           $ref: "#/components/schemas/LanguageId"
 tags:
   - name: CapabilitiesEndpoints
+  - name: RegistrationEndpoints

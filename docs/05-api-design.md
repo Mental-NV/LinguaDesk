@@ -1,6 +1,6 @@
 # LinguaDesk — API Behavioral Design
 
-**Document:** #5 · **Version:** 1.4 · **Status:** Shared design; M005 verified; M006 registration selected and pending
+**Document:** #5 · **Version:** 1.5 · **Status:** Shared design; M005–M006 selected slices verified
 **Updated:** 2026-09-09
 
 ## 1. Authority, sources, and artifact lifecycle
@@ -32,7 +32,7 @@ Document #0 owns this lifecycle. C# owns editable wire structure; generated Open
 
 **M005 completion — 2026-09-09:** The implemented public route, Core/TypeScript `unicode-scalar-v1` policy and generated OpenAPI/type views passed package AC-001–008. The first publish smoke exposed and the implementation corrected an omitted OpenAPI runtime assembly; the corrected isolated artifact passed. Exact commands and failure/regression evidence are in the [completion record](../specs/005-shared-input-capability-contract/tasks.md#3-completion-record).
 
-**M006 selection — 2026-09-09:** [Package 006](../specs/006-register-local-api-account/spec.md) selects only anonymous `POST /api/accounts/register`, the local email/password policy, generic duplicate behavior, durable unverified Identity state, confirmation-delivery intent, current-state verified-account policy and indispensable database/key readiness. It advances the generated pre-release artifact to `0.1.0-m006` during implementation. Sign-in, cookies/bearer/refresh, antiforgery, confirmation/resend/status/reset, frontend adoption, real email, language admission and deletion remain later slices. P-005/P-006 and Q-004's deletion/backup lifecycle retain their status.
+**M006 implementation — verified 2026-09-09:** [Package 006](../specs/006-register-local-api-account/spec.md) implements only anonymous `POST /api/accounts/register`, the selected local email/password policy, generic duplicate behavior, durable unverified Identity state, confirmation-delivery intent, current-state verified-account policy and indispensable database/key readiness. The generated artifact is `0.1.0-m006`; sign-in, cookies/bearer/refresh, antiforgery, confirmation/resend/status/reset, frontend adoption, real email, language admission and deletion remain later slices. P-005/P-006 and Q-004's deletion/backup lifecycle retain their status.
 
 ## 2. Capability and transport boundaries
 
@@ -285,6 +285,8 @@ These shared scenarios guide selected packages; [#6 Section 8](06-verification-p
 | Q-005, #6 | Local acceptance scenarios retained here; [#6](06-verification-plan.md) specifies coverage and workloads | Executable release evidence |
 | Q-008/Q-010, PRD then #3/#10 | Proposal status preserved | No new abuse rate or compatibility obligation until its owning proposal is accepted |
 
-**M005 implementation review:** The implementation working tree based on planning HEAD `75647db` was checked against the selected fields, count fixtures, generation stages and proposal status. Locked checks passed 47 API/storage, 10 Core, 10 AI, 36 frontend unit and 6 published Chromium cases; deterministic contract regeneration and deliberate drift/CLI/zero-test failures behaved correctly. The generated OpenAPI 3.1 document currently contains only `GET /api/capabilities`, and TypeScript declarations compile. The [package completion record](../specs/005-shared-input-capability-contract/tasks.md#3-completion-record) owns exact commands, artifact hashes, audit and no-effect evidence. M006 artifacts and runtime behavior remain pending.
+**M005 implementation review:** The implementation working tree based on planning HEAD `75647db` was checked against the selected fields, count fixtures, generation stages and proposal status. Locked checks passed 47 API/storage, 10 Core, 10 AI, 36 frontend unit and 6 published Chromium cases; deterministic contract regeneration and deliberate drift/CLI/zero-test failures behaved correctly. Package 005's [completion record](../specs/005-shared-input-capability-contract/tasks.md#3-completion-record) preserves its exact historical evidence.
+
+**M006 implementation review:** The working tree based on planning HEAD `6b4055d` was checked against registration, strict request/password/email policy, non-enumerating duplicate and delivery semantics, Identity persistence, current-state authorization and serving readiness. Locked checks passed 67 API/storage/Identity/readiness, 10 Core, 10 AI, 36 frontend unit and 6 published Chromium cases; audits and deliberate contract-drift/CLI failures passed. The generated OpenAPI 3.1 document contains exactly `GET /api/capabilities` and anonymous `POST /api/accounts/register`, and the TypeScript declarations compile. The [package completion record](../specs/006-register-local-api-account/tasks.md#3-completion-record) owns commands, hashes and limitations. It does not claim sign-in, confirmation completion/live delivery, language access, full FR-001/002 or RG-005.
 
 The shared design and completed M005 package now provide the contract-generation baseline for later selected API slices. Unrelated wire/auth/accounting questions remain explicit and block only their affected handlers/clients. Shared rules continue to preserve whole-source processing, success-only charging, no saved text, simple LLM chains and the PRD's deferred/proposed distinctions; M005 did not implement those later behaviors.

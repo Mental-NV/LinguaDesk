@@ -113,6 +113,8 @@ smoke() {
     cp -R "$publish_directory/." "$isolated_publish/"
     api_dll="$isolated_publish/LinguaDesk.Api.dll"
     smoke_log="$smoke_directory/host.log"
+    smoke_database="$smoke_directory/linguadesk.db"
+    smoke_keys="$smoke_directory/keys"
     smoke_process_id=""
     smoke_deadline=$((SECONDS + 90))
 
@@ -131,8 +133,21 @@ smoke() {
     trap 'exit 143' TERM
     trap 'exit 129' HUP
 
+    mkdir -p "$smoke_keys"
+    dotnet tool restore
+    dotnet ef database update \
+        --project "$repository_root/backend/src/LinguaDesk.Api/LinguaDesk.Api.csproj" \
+        --startup-project "$repository_root/backend/src/LinguaDesk.Api/LinguaDesk.Api.csproj" \
+        --configuration Release \
+        --no-build \
+        -- \
+        --database-path "$smoke_database"
+
     cd "$isolated_publish"
-    ASPNETCORE_ENVIRONMENT=Smoke ASPNETCORE_URLS=http://127.0.0.1:0 \
+    ASPNETCORE_ENVIRONMENT=Smoke \
+        ASPNETCORE_URLS=http://127.0.0.1:0 \
+        Storage__DatabasePath="$smoke_database" \
+        Security__DataProtectionKeysPath="$smoke_keys" \
         dotnet "$api_dll" >"$smoke_log" 2>&1 &
     smoke_process_id=$!
 

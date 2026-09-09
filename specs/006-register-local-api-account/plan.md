@@ -1,8 +1,8 @@
 # 006 — Register a Local API Account: Implementation Plan
 
-**Version:** 1.0 · **Updated:** 2026-09-09
-**State:** Prepared; implementation and verification pending
-**Inputs:** [spec.md](spec.md) v1.0; [BI-006](../../docs/08-backlogs/M006-register-local-api-account.md) v1.0
+**Version:** 1.1 · **Updated:** 2026-09-09
+**State:** Implemented and verified
+**Inputs:** [spec.md](spec.md) v1.1; [BI-006](../../docs/08-backlogs/M006-register-local-api-account.md) v1.1
 
 ## 1. Current state, revisions and preflight
 
@@ -93,4 +93,4 @@ M003/M005 are satisfied. Package restore, writable owned temp paths and local pr
 
 No blocking technical question remains. #3 owns the selected Identity/key/readiness staging; #5 owns the registration/password/email/duplicate/delivery wire behavior; #6 owns execution/evidence. Existing ADR-003/004/007/009 cover the vertical slice, generated contract, migration parity and unit-heavy boundary verification; no consequential new architecture direction requires an ADR. Q-004, P-005 and P-006 retain their prior status.
 
-Consistency review passed: BI-006 → US-001–003 → AC-001–008 → the approach, verification table and T001–T008 are complete and contain no orphan scenario or unsupported production work. Every touched component is justified by registration or its indispensable migration/key/readiness/contract prerequisite. The plan is feasible against the inspected repository; implementation preflight and runtime evidence remain pending.
+Consistency review passed: BI-006 → US-001–003 → AC-001–008 → the approach, verification table and T001–T008 are complete and contain no orphan scenario or unsupported production work. Every touched component is justified by registration or its indispensable migration/key/readiness/contract prerequisite. Implementation and runtime verification completed with exact evidence in [tasks.md](tasks.md#3-completion-record).

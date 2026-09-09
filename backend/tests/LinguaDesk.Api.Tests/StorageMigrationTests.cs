@@ -2,6 +2,8 @@ using System.Diagnostics;
 using LinguaDesk.Api.Infrastructure.Persistence;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace LinguaDesk.Api.Tests;
 
@@ -9,6 +11,7 @@ namespace LinguaDesk.Api.Tests;
 public sealed class StorageMigrationTests
 {
     private const string InitialMigrationId = "20260908221711_InitialStorage";
+    private const string LocalAccountsMigrationId = "20260909120834_LocalAccounts";
 
     [TestMethod]
     public async Task ModelMatchesSnapshotWithoutOpeningOrCreatingDatabase()
@@ -29,12 +32,17 @@ public sealed class StorageMigrationTests
         await using (var context = database.CreateContext())
         {
             var applied = await context.Database.GetAppliedMigrationsAsync();
-            CollectionAssert.AreEqual(new[] { InitialMigrationId }, applied.ToArray());
+            CollectionAssert.AreEqual(new[] { InitialMigrationId, LocalAccountsMigrationId }, applied.ToArray());
+            Assert.AreEqual(
+                4L,
+                await ExecuteScalarAsync<long>(
+                    context,
+                    "SELECT COUNT(*) FROM sqlite_master WHERE type = 'table' AND name LIKE 'AspNet%';"));
             Assert.AreEqual(
                 0L,
                 await ExecuteScalarAsync<long>(
                     context,
-                    "SELECT COUNT(*) FROM sqlite_master WHERE type = 'table' AND name NOT IN ('__EFMigrationsHistory', '__EFMigrationsLock');"));
+                    "SELECT COUNT(*) FROM sqlite_master WHERE type = 'table' AND name LIKE 'AspNetRole%';"));
             await context.Database.ExecuteSqlRawAsync(
                 "CREATE TABLE test_fixture (id INTEGER PRIMARY KEY, value TEXT NOT NULL);");
             await context.Database.ExecuteSqlRawAsync(
@@ -45,8 +53,42 @@ public sealed class StorageMigrationTests
 
         await using var verification = database.CreateContext();
         var repeatedHistory = await verification.Database.GetAppliedMigrationsAsync();
-        CollectionAssert.AreEqual(new[] { InitialMigrationId }, repeatedHistory.ToArray());
+        CollectionAssert.AreEqual(new[] { InitialMigrationId, LocalAccountsMigrationId }, repeatedHistory.ToArray());
         Assert.AreEqual("preserved", await ExecuteScalarAsync<string>(verification, "SELECT value FROM test_fixture WHERE id = 1;"));
+    }
+
+    [TestMethod]
+    public async Task UpgradeFromInitialStoragePreservesExistingDataAndAddsOnlyUserIdentityTables()
+    {
+        await using var database = StorageTestDatabase.Create();
+        await using (var initial = database.CreateContext(allowCreate: true))
+        {
+            await initial.GetService<IMigrator>().MigrateAsync(InitialMigrationId);
+            await initial.Database.ExecuteSqlRawAsync(
+                "CREATE TABLE upgrade_fixture (id INTEGER PRIMARY KEY, value TEXT NOT NULL);");
+            await initial.Database.ExecuteSqlRawAsync(
+                "INSERT INTO upgrade_fixture (id, value) VALUES (1, 'preserved');");
+        }
+
+        await database.MigrateAsync();
+
+        await using var verification = database.CreateContext();
+        CollectionAssert.AreEqual(
+            new[] { InitialMigrationId, LocalAccountsMigrationId },
+            (await verification.Database.GetAppliedMigrationsAsync()).ToArray());
+        Assert.AreEqual(
+            "preserved",
+            await ExecuteScalarAsync<string>(verification, "SELECT value FROM upgrade_fixture WHERE id = 1;"));
+        Assert.AreEqual(
+            4L,
+            await ExecuteScalarAsync<long>(
+                verification,
+                "SELECT COUNT(*) FROM sqlite_master WHERE type = 'table' AND name LIKE 'AspNet%';"));
+        Assert.AreEqual(
+            0L,
+            await ExecuteScalarAsync<long>(
+                verification,
+                "SELECT COUNT(*) FROM sqlite_master WHERE type = 'table' AND name LIKE 'AspNetRole%';"));
     }
 
     [TestMethod]

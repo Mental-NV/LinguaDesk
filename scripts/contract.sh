@@ -47,7 +47,12 @@ check_installed_dependencies() {
 }
 
 restore_locked() {
-    dotnet restore "$repository_root/backend/LinguaDesk.slnx" --locked-mode
+    dotnet restore "$repository_root/backend/LinguaDesk.slnx" \
+        --locked-mode \
+        --disable-build-servers \
+        --disable-parallel \
+        --verbosity minimal \
+        -m:1
 }
 
 setup() {
@@ -64,7 +69,7 @@ generate_into() {
     generated_types="$destination/linguadesk-api.d.ts"
 
     mkdir -p "$intermediate"
-    dotnet build "$api_project" \
+    LINGUADESK_OPENAPI_GENERATION=1 dotnet build "$api_project" \
         --configuration Release \
         --no-restore \
         --no-incremental \
@@ -125,8 +130,8 @@ with_owned_work_directory() {
 
 run_generation() {
     check_toolchain
-    check_installed_dependencies
     restore_locked
+    check_installed_dependencies
     with_owned_work_directory "$1"
 }
 
