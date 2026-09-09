@@ -1,22 +1,22 @@
 # M004 — Independent AI Development Backlog
 
-**Document:** #8 · **Version:** 1.0 · **Updated:** 2026-09-09
-**State:** Selected; ready for implementation
+**Document:** #8 · **Version:** 1.1 · **Updated:** 2026-09-09
+**State:** Done; package AC-001–007 passed
 **Roadmap:** [M004 — Independent AI development](../07-roadmap.md#41-basic-infrastructure)
 
 ## 1. Outcome and authoritative inputs
 
 An agent can build and exercise LinguaDesk's shared `IChatClient` boundary with a scripted client and inspect a real versioned prompt using only fixed synthetic data, without starting the API or frontend, opening a database, loading credentials or reaching a provider. This establishes a meaningful independent-AI inner loop before language eligibility, transformations, chain policy, provider adapters or live evaluation are implemented.
 
-Authoring baseline: Git `6f86f9f038fca908c650f5d8121a2ae53ebd8ffc`. The current implementation is Git `4207c2478855f4dcedbe5e7e0a49529d35d6be12` plus the unrelated automation-only commit at the authoring baseline. Inputs read: [workflow #0](../00-SDD-Planning-Workflow.md) v1.7, [PRD #1](../01-PRD.md) v0.6, [UX #2](../02-ux-specification.md) v1.6, [architecture #3](../03-architecture.md) v1.9, [AI #4](../04-llm-specification.md) v1.3, [API #5](../05-api-design.md) v1.1, [verification #6](../06-verification-plan.md) v1.6, [roadmap #7](../07-roadmap.md) v1.6 and [ADRs #9](../09-architecture-decisions.md) v1.7. Selection clarifies staged project references in architecture #3 v1.10, updates AI #4 to v1.4 and verification/roadmap #6/#7 to v1.7; no product requirement, proposal disposition or accepted technical direction changes.
+Authoring baseline: Git `6f86f9f038fca908c650f5d8121a2ae53ebd8ffc`. At selection, the implementation was Git `4207c2478855f4dcedbe5e7e0a49529d35d6be12` plus the unrelated automation-only commit at that authoring baseline. Inputs read: [workflow #0](../00-SDD-Planning-Workflow.md) v1.7, [PRD #1](../01-PRD.md) v0.6, [UX #2](../02-ux-specification.md) v1.6, [architecture #3](../03-architecture.md) v1.9, [AI #4](../04-llm-specification.md) v1.3, [API #5](../05-api-design.md) v1.1, [verification #6](../06-verification-plan.md) v1.6, [roadmap #7](../07-roadmap.md) v1.6 and [ADRs #9](../09-architecture-decisions.md) v1.7. Selection clarified staged project references in architecture #3 v1.10, updated AI #4 to v1.4 and verification/roadmap #6/#7 to v1.7; completion reconciles verified behavior in AI #4 v1.5, verification #6 v1.8 and roadmap #7 v1.8 without changing a product requirement, proposal disposition or accepted technical direction.
 
-M001, the formal prerequisite, is done. Its [completion record](../../specs/001-backend-foundation/tasks.md#3-completion-record) documents the pinned .NET host, locked build/test commands and real-process smoke. M002 and M003 are also done and were inspected as current regression baselines, but the selected AI commands must not depend on their frontend or persistence behavior. The solution currently contains only the API and API test projects; there is no AI/Core project, evaluation runner, AI command, AI package reference, executable prompt resource or provider credential/configuration.
+M001, the formal prerequisite, is done. Its [completion record](../../specs/001-backend-foundation/tasks.md#3-completion-record) documents the pinned .NET host, locked build/test commands and real-process smoke. M002 and M003 are also done and were inspected as regression baselines, but the selected AI commands do not depend on their frontend or persistence behavior. At selection, the solution contained only the API and API test projects, with no AI/Core project, evaluation runner, AI command, AI package reference, executable prompt resource or provider credential/configuration. M004 adds only the documented AI library/test/runner surface and still adds no Core, API reference, provider credential or live configuration.
 
 ## 2. Item
 
 | Item ID | Outcome/title | Priority | Target milestone | Dependencies/blockers | State | Delivery package |
 | --- | --- | --- | --- | --- | --- | --- |
-| BI-004 | Establish a host-independent AI inner loop | Next / AI-risk enablement | M004 | M001 done; no remaining blocker | selected | [004-independent-ai-development](../../specs/004-independent-ai-development/spec.md) |
+| BI-004 | Establish a host-independent AI inner loop | Next / AI-risk enablement | M004 | M001 done; no remaining blocker | done | [004-independent-ai-development](../../specs/004-independent-ai-development/spec.md) |
 
 ### BI-004 — Establish a host-independent AI inner loop
 
@@ -36,4 +36,4 @@ No provider account, API key, monetary cap, certificate, email action, productio
 
 BI-004 is selected as the sole item in [package 004](../../specs/004-independent-ai-development/spec.md). The accepted shared design already resolves the library/runner names, layer ownership, `IChatClient` boundary and host-independent verification strategy. Package planning selects the compatible package pin and command/test layout within delegated technical scope; it does not decide Q-001, Q-004, Q-005 or Q-007's later live/provider/checker deliverables.
 
-Seven observable scenarios cover project isolation, the shared prompt snapshot, a single scripted boundary call, deterministic commands/failures, no-secret/no-effect behavior, regressions and truthful closeout. Every scenario maps to ordered tasks and verification in the package. No blocking product choice, technical unknown, dependency or human action remains; implementation evidence is pending.
+Seven observable scenarios cover project isolation, the shared prompt snapshot, a single scripted boundary call, deterministic commands/failures, no-secret/no-effect behavior, regressions and truthful closeout. Every scenario maps to ordered tasks and verification in the package. All passed with 10 focused AI cases, 42 retained API/storage cases, backend and published-shell smokes, deterministic `eligibility.v1` inspection and nonzero controlled failures. The [completion record](../../specs/004-independent-ai-development/tasks.md#3-completion-record) owns the exact evidence and limitations. No product requirement, provider qualification, live evaluation or release gate is claimed.

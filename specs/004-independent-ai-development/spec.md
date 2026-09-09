@@ -1,7 +1,7 @@
 # 004 — Independent AI Development: Selected Specification
 
-**Version:** 1.0 · **Updated:** 2026-09-09
-**State:** Ready for implementation; evidence pending
+**Version:** 1.1 · **Updated:** 2026-09-09
+**State:** Implemented and verified; AC-001–007 passed
 **Milestone/item:** [M004 / BI-004](../../docs/08-backlogs/M004-independent-ai-development.md)
 
 ## 1. Selection and authority
@@ -49,4 +49,4 @@ Authentication, account isolation, public API behavior, durable/cost accounting,
 - **Staging clarification:** `eligibility.v1` becomes executable/inspectable here; language classification, its strict response parser and acceptance remain M015. Translation/Rewriting bundles remain M016/M017. This preserves stable #4 identifiers without treating a prompt snapshot or scripted response as accepted language behavior.
 - **Unresolved but nonblocking:** Q-001 serving/provider/cost bounds, Q-004 lifecycle details, Q-005 corpus/review evidence and Q-007 adapter/checker/token-bound proof still block their owning live/product gates, not M004.
 
-Ready-for-implementation review passed: selected IDs/exclusions are explicit; seven scenarios are testable; the formal dependency is complete; no behavior/product question is hidden; applicable nonfunctional boundaries and human timing are recorded. [plan.md](plan.md) and [tasks.md](tasks.md) map every scenario without adding another milestone's work. Runtime evidence remains pending.
+Ready-for-implementation review passed before execution: selected IDs/exclusions were explicit; seven scenarios were testable; the formal dependency was complete; no behavior/product question was hidden; applicable nonfunctional boundaries and human timing were recorded. [plan.md](plan.md) and [tasks.md](tasks.md) mapped every scenario without adding another milestone's work. All seven scenarios subsequently passed; the [completion record](tasks.md#3-completion-record) owns the runtime commands, counts, prompt hash, no-effect observations, and retained regressions. This remains offline enabling evidence only.

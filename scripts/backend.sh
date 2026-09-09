@@ -6,8 +6,10 @@ script_directory=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 repository_root=$(CDPATH= cd -- "$script_directory/.." && pwd)
 solution="$repository_root/backend/LinguaDesk.slnx"
 api_project="$repository_root/backend/src/LinguaDesk.Api/LinguaDesk.Api.csproj"
+api_test_project="$repository_root/backend/tests/LinguaDesk.Api.Tests/LinguaDesk.Api.Tests.csproj"
+ai_test_project="$repository_root/backend/tests/LinguaDesk.Infrastructure.Ai.Tests/LinguaDesk.Infrastructure.Ai.Tests.csproj"
 expected_sdk="10.0.302"
-expected_minimum_tests=42
+expected_minimum_api_tests=42
 configuration="Release"
 
 usage() {
@@ -84,35 +86,90 @@ check() {
     setup
 
     results_directory="$repository_root/artifacts/test-results"
-    report="$results_directory/backend.trx"
+    api_report="$results_directory/backend-api.trx"
+    ai_report="$results_directory/backend-ai.trx"
     mkdir -p "$results_directory"
-    rm -f "$report"
+    rm -f "$api_report" "$ai_report"
 
     dotnet build "$solution" --configuration "$configuration" --no-restore
-    dotnet test "$solution" \
+    dotnet test "$api_test_project" \
         --configuration "$configuration" \
         --no-build \
         --no-restore \
-        --logger "trx;LogFileName=backend.trx" \
+        --logger "trx;LogFileName=backend-api.trx" \
+        --results-directory "$results_directory"
+    dotnet test "$ai_test_project" \
+        --configuration "$configuration" \
+        --no-build \
+        --no-restore \
+        --logger "trx;LogFileName=backend-ai.trx" \
         --results-directory "$results_directory"
 
+    validate_report "$api_report" "API/storage" "$expected_minimum_api_tests"
+    validate_report "$ai_report" "independent AI" 1
+
+    api_total=$(counter_value "$api_report" total)
+    api_passed=$(counter_value "$api_report" passed)
+    api_failed=$(counter_value "$api_report" failed)
+    api_skipped=$(counter_value "$api_report" notExecuted)
+    ai_total=$(counter_value "$ai_report" total)
+    ai_passed=$(counter_value "$ai_report" passed)
+    ai_failed=$(counter_value "$ai_report" failed)
+    ai_skipped=$(counter_value "$ai_report" notExecuted)
+
+    total=$((api_total + ai_total))
+    passed=$((api_passed + ai_passed))
+    failed=$((api_failed + ai_failed))
+    skipped=$((api_skipped + ai_skipped))
+
+    echo "Backend check passed: $total total, $passed passed, $failed failed, $skipped skipped."
+    echo "API/storage report ($api_total tests): $api_report"
+    echo "Independent AI report ($ai_total tests): $ai_report"
+}
+
+counter_value() {
+    report=$1
+    counter_name=$2
+    sed -n "s/.* $counter_name=\"\([0-9][0-9]*\)\".*/\1/p" "$report" | head -1
+}
+
+validate_report() {
+    report=$1
+    suite_name=$2
+    minimum_tests=$3
+
     if [ ! -f "$report" ]; then
-        echo "Backend test run did not produce the expected TRX report: $report" >&2
+        echo "Backend test run did not produce the expected $suite_name TRX report: $report" >&2
         exit 1
     fi
 
-    test_total=$(sed -n 's/.*<Counters total="\([0-9][0-9]*\)".*/\1/p' "$report" | head -1)
-    if [ -z "$test_total" ] || [ "$test_total" -lt "$expected_minimum_tests" ]; then
-        echo "Backend check expected at least $expected_minimum_tests tests, but the TRX report recorded ${test_total:-none}." >&2
+    test_total=$(counter_value "$report" total)
+    test_executed=$(counter_value "$report" executed)
+    test_passed=$(counter_value "$report" passed)
+    test_failed=$(counter_value "$report" failed)
+    test_skipped=$(counter_value "$report" notExecuted)
+
+    if [ -z "$test_total" ] || [ -z "$test_executed" ] || [ -z "$test_passed" ] || \
+        [ -z "$test_failed" ] || [ -z "$test_skipped" ]; then
+        echo "Backend check could not read complete counters from $suite_name report: $report" >&2
         exit 1
     fi
-
-    if ! grep -Eq 'failed="0"' "$report"; then
-        echo "Backend check failed because the TRX report contains failed tests." >&2
+    if [ "$test_total" -lt "$minimum_tests" ]; then
+        echo "Backend check expected at least $minimum_tests $suite_name tests, but the report recorded $test_total." >&2
         exit 1
     fi
-
-    echo "Backend check passed. Test report: $report"
+    if [ "$test_failed" -ne 0 ]; then
+        echo "Backend check found $test_failed failed $suite_name tests." >&2
+        exit 1
+    fi
+    if [ $((test_executed + test_skipped)) -ne "$test_total" ]; then
+        echo "Backend check found inconsistent total/executed/skipped counters in $suite_name report." >&2
+        exit 1
+    fi
+    if [ "$test_passed" -ne "$test_executed" ]; then
+        echo "Backend check requires every executed $suite_name test to pass." >&2
+        exit 1
+    fi
 }
 
 run() {

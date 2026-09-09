@@ -1,6 +1,6 @@
 # LinguaDesk — Roadmap and Milestone Plan
 
-**Document:** #7 · **Version:** 1.7 · **Status:** M001–M003 done; M004 selected and ready for implementation
+**Document:** #7 · **Version:** 1.8 · **Status:** M001–M004 done; no successor selected
 **Updated:** 2026-09-09
 
 ## 1. Authority and planning basis
@@ -35,7 +35,7 @@ A milestone is done only when its selected exit criteria, applicable #6 checks a
 
 ## 3. Priority, dependency and current milestone summary
 
-**Most recently completed milestone: [M003 — Durable storage foundation](08-backlogs/M003-durable-storage-foundation.md).** State: **Done**. [Package 003](../specs/003-durable-storage-foundation/spec.md) delivered BI-003 with all six scenarios passed; its [completion record](../specs/003-durable-storage-foundation/tasks.md#3-completion-record) records 42 backend cases, explicit repeat migration, same-file two-process restart and retained backend/published-shell regressions. M001/M002 remain complete with their history preserved. **Current milestone: [M004 — Independent AI development](08-backlogs/M004-independent-ai-development.md).** State: **Selected**. [Package 004](../specs/004-independent-ai-development/spec.md) selects BI-004 with seven pending scenarios and no implementation blocker.
+**Most recently completed milestone: [M004 — Independent AI development](08-backlogs/M004-independent-ai-development.md).** State: **Done**. [Package 004](../specs/004-independent-ai-development/spec.md) delivered BI-004 with all seven scenarios passed; its [completion record](../specs/004-independent-ai-development/tasks.md#3-completion-record) records 10 focused AI cases, 42 retained API/storage cases, deterministic prompt inspection, controlled failures and retained backend/published-shell regressions. M001–M003 remain complete with their history preserved. No successor milestone is selected.
 
 The numbered sections below group related outcomes; **M IDs are identities, not execution positions**. The current priority policy is:
 
@@ -44,7 +44,7 @@ The numbered sections below group related outcomes; **M IDs are identities, not 
 3. Enable a verified independent API operation with durable limits and recovery, then connect its web journey. Prefer demonstrated Translation followed by Rewriting over polishing all account screens or all visuals first.
 4. Integrate accessibility, privacy and failure checks with each feature. Begin bounded corpus/evaluation and operational preparation as soon as inputs are available; do not leave qualification risk until the final release review.
 
-Dependencies in Section 4 are the minimum named prerequisites, not substitutes for #8's code/design readiness check. Satisfy transitive dependencies and the applicable Section 5 blockers too. Choose the highest-value eligible milestone; a blocked independent track need not stop another eligible one. M001–M003 are done and M004 is selected as linked above. All remaining milestones other than M004 are **Candidate**, with **Backlog: not created; Package: none; Evidence: pending**. These shared values are stated once instead of repeating empty columns.
+Dependencies in Section 4 are the minimum named prerequisites, not substitutes for #8's code/design readiness check. Satisfy transitive dependencies and the applicable Section 5 blockers too. Choose the highest-value eligible milestone; a blocked independent track need not stop another eligible one. M001–M004 are done as linked above. All remaining milestones are **Candidate**, with **Backlog: not created; Package: none; Evidence: pending**. These shared values are stated once instead of repeating empty columns.
 
 M001 now has its [owning backlog](08-backlogs/M001-backend-foundation.md) and [selected package](../specs/001-backend-foundation/spec.md). Later milestones use #0's `Mxxx-<slug>.md` convention, or link an existing owning feature backlog. Replace the corresponding milestone title with a link to its actual backlog when created; record actual package/evidence links there and in #6. Do not create empty backlogs or package placeholders for this entire roadmap.
 
@@ -177,8 +177,10 @@ Use milestone summary states **Candidate → Selected → In progress → Done**
 
 **M004 selection — 2026-09-09:** Selected BI-004/package 004 after confirming M001 and the current SDK/solution/package baseline. The increment adds only the host-independent Infrastructure.Ai library, focused tests and standalone development runner needed to inspect `eligibility.v1` with fixed synthetic data and exercise one scripted `IChatClient` call. Eligibility decisions, transformations, fallback, adapters, live evaluation, API/UI composition and product/release evidence remain later milestones. No human action or blocking planning question remains.
 
+**M004 completion — 2026-09-09:** Implemented the host-independent Infrastructure.Ai library, shared embedded `eligibility.v1` composition, exactly-one-call complete-response boundary, focused MSTest suite and fixed-only inspect/probe runner. Locked warning-free checks passed 10 AI plus 42 retained API/storage cases; backend smoke, 8 component cases and 6 isolated published Chromium cases passed. Offline execution used no credentials/provider/database/API host and left no process or persistent evaluation report. This is synthetic boundary evidence only: eligibility decisions, transformations, fallback, adapters, live evaluation and all product/release gates remain pending.
+
 ## 7. Next applicable gate and validation
 
-M001–M003 are complete with linked evidence. M004's BI-004 and package 004 are selected and pass document #0's ready-for-implementation gate: its M001 dependency is done, selected behavior/exclusions and seven verification scenarios are explicit, the compatible AI abstraction/package layout is planned, tasks are ordered and no human action or blocking question remains. Runtime evidence is pending. M003 remains only a durable-storage foundation, and M004 will remain only independent AI enablement; neither makes account, accounting, backup/restore, editor, language-operation or release acceptance complete.
+M001–M004 are complete with linked evidence, and no successor is selected. M004 remains only independent AI enablement; together with M003's durable-storage foundation it does not make account, accounting, backup/restore, editor, eligibility/language-operation or release acceptance complete. The next milestone must be selected through its own #8 readiness review; this closeout does not start M005 or M015.
 
-**Planning consistency review:** Local source links, unique milestone/item/package IDs, dependency evidence, check/task mappings, package versions, human-step timing and the separation of active/deferred/proposed scope were checked against Git `6f86f9f`. M004's backlog/spec/plan/tasks and #4/#6/#7 agree; no production code or test was created during planning. M001–M003 runtime evidence remains linked; M004 runtime evidence and all product/release gates remain pending.
+**M004 consistency and evidence review:** The planning comparison against Git `6f86f9f` remains historical. Implementation started from clean planning HEAD `762a0acd`, and the complete working-tree diff was reviewed against #0, BI-004, package acceptance and the shared designs. Package, lock, command, test/report, prompt-hash, no-effect, security/privacy and limitation evidence is linked from [tasks.md](../specs/004-independent-ai-development/tasks.md#3-completion-record). M001–M003 evidence remains linked; all active product requirements and release gates remain pending.

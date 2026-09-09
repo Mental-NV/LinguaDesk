@@ -1,6 +1,6 @@
 # LinguaDesk
 
-LinguaDesk contains a minimal ASP.NET Core host, the M002 published signed-out web shell, and the M003 SQLite persistence foundation. The React shell provides informational sign-in and registration routes, redirects protected feature routes to sign-in, and is served from the same published artifact as the backend. Storage is initialized only through explicit EF Core migrations and currently contains framework migration metadata only. The application does not yet provide working accounts, editors, language operations, product data schemas, provider/email integrations, OpenAPI, or deployment configuration.
+LinguaDesk contains a minimal ASP.NET Core host, the M002 published signed-out web shell, the M003 SQLite persistence foundation, and an independent offline AI development boundary. The React shell provides informational sign-in and registration routes, redirects protected feature routes to sign-in, and is served from the same published artifact as the backend. Storage is initialized only through explicit EF Core migrations and currently contains framework migration metadata only. The AI library can compose and inspect the versioned `eligibility.v1` prompt with fixed synthetic data and invoke one scripted `IChatClient` response without the application host. The application does not yet provide working accounts, editors, language operations, eligibility decisions, product data schemas, provider/email integrations, OpenAPI, or deployment configuration.
 
 ## Prerequisites
 
@@ -39,7 +39,30 @@ LINGUADESK_URL=http://127.0.0.1:5090 bash scripts/backend.sh run
 
 The operational endpoint is `GET /health/live`. HTTP 200 with plain-text `Healthy` means only that the process can serve the liveness probe; it does not report database, provider, email, or product readiness. `POST /health/live` is rejected with 405. Missing `/api` routes return a JSON Problem Details 404. With no generated frontend webroot, other unimplemented paths remain ordinary 404 responses; a published artifact serves the SPA document only for eligible GET/HEAD client routes. Missing API, health, asset, and file-like paths never fall through to HTML.
 
-`check` writes its TRX report to `artifacts/test-results/backend.trx`. It includes the real file-backed SQLite migration, transaction, foreign-key, locking, failure, host-scope, and clean-restart cases; it does not need npm or a browser. Generated build, test, and temporary smoke output is not committed. Milestone scope and evidence are tracked in [`specs/001-backend-foundation/tasks.md`](specs/001-backend-foundation/tasks.md) and [`specs/003-durable-storage-foundation/tasks.md`](specs/003-durable-storage-foundation/tasks.md).
+`check` writes collision-free TRX reports to `artifacts/test-results/backend-api.trx` and `backend-ai.trx`. It retains the real file-backed SQLite migration, transaction, foreign-key, locking, failure, host-scope, and clean-restart cases and includes the focused independent-AI tests; it does not need npm or a browser. Generated build, test, and temporary smoke output is not committed. Milestone scope and evidence are tracked in [`specs/001-backend-foundation/tasks.md`](specs/001-backend-foundation/tasks.md), [`specs/003-durable-storage-foundation/tasks.md`](specs/003-durable-storage-foundation/tasks.md), and [`specs/004-independent-ai-development/tasks.md`](specs/004-independent-ai-development/tasks.md).
+
+## Independent AI development commands
+
+The M004 inner loop uses `Microsoft.Extensions.AI.Abstractions` `10.9.0` and does not reference the API, ASP.NET Core, EF/Identity, a provider SDK, or the full AI middleware package. Run setup once when the locked graph is absent locally, then use the focused commands from any directory:
+
+```sh
+# Verify .NET 10.0.302 and restore only the three locked AI projects.
+bash scripts/ai.sh setup
+
+# Build the shared library, standalone runner, and tests in Release; run the
+# focused tests offline and verify deterministic inspect plus scripted probe.
+bash scripts/ai.sh check
+
+# Print the exact eligibility.v1 system/user messages and resource SHA-256.
+bash scripts/ai.sh inspect
+
+# Invoke the shared boundary once with a fixed scripted raw response.
+bash scripts/ai.sh probe
+```
+
+`check`, `inspect`, and `probe` clear common provider credential variables and point outbound HTTP proxies at an unreachable loopback address. They start no API/frontend process, open no database, and write no persistent evaluation report; `check` writes only generated build output and `artifacts/test-results/ai.trx`. The runner accepts only `inspect` or `probe`, exposes no live mode, and accepts no source, configuration, credential, or arbitrary text argument.
+
+Inspection deliberately prints the checked-in synthetic source containing a quote, newline, and instruction-like phrase. `probe` labels its observation `raw_scripted_observation` and reports `live: false` and `validated: false`. Neither command classifies a product input, validates a response, transforms text, qualifies a model/provider, measures quality/cost/performance, or proves a release gate. Those behaviors remain later selected milestones.
 
 ## Storage commands
 

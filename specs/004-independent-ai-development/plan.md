@@ -1,12 +1,12 @@
 # 004 — Independent AI Development: Implementation Plan
 
-**Version:** 1.0 · **Updated:** 2026-09-09
-**State:** Ready for implementation; execution pending
-**Inputs:** [spec.md](spec.md) v1.0; [BI-004](../../docs/08-backlogs/M004-independent-ai-development.md) v1.0
+**Version:** 1.1 · **Updated:** 2026-09-09
+**State:** Implemented and verified
+**Inputs:** [spec.md](spec.md) v1.1; [BI-004](../../docs/08-backlogs/M004-independent-ai-development.md) v1.1
 
 ## 1. Current state, dependency and tooling
 
-Baseline `6f86f9f038fca908c650f5d8121a2ae53ebd8ffc` is clean and points at the implemented M003 tree plus one later automation-only change. Git history and package evidence show M001–M003 done. The repository uses SDK `10.0.302`, target framework `net10.0`, central package management, locked restores, warnings-as-errors and MSTest. The solution has one API and one API-test project; `scripts/backend.sh check` currently expects one `backend.trx` with at least 42 cases. There is no AI project/package/runner/script or executable prompt.
+At planning, baseline `6f86f9f038fca908c650f5d8121a2ae53ebd8ffc` was clean and pointed at the implemented M003 tree plus one later automation-only change. Git history and package evidence showed M001–M003 done. The repository used SDK `10.0.302`, target framework `net10.0`, central package management, locked restores, warnings-as-errors and MSTest. The solution then had one API and one API-test project; `scripts/backend.sh check` expected one `backend.trx` with at least 42 cases, and no AI project/package/runner/script or executable prompt existed. The implemented result and revised report layout are recorded in [tasks.md](tasks.md#3-completion-record).
 
 Pin `Microsoft.Extensions.AI.Abstractions` **10.9.0** centrally and reference it only from `LinguaDesk.Infrastructure.Ai`. NuGet lists 10.9.0 as the current stable package on 2026-09-09, with a `net10.0` asset and no dependencies for that target; Microsoft documents that this package supplies `IChatClient` and core exchange types. Use the Abstractions package rather than `Microsoft.Extensions.AI`: the full package's caching, telemetry and middleware utilities are unnecessary and several are explicitly out of scope under AI #4. See the official [10.9.0 package](https://www.nuget.org/packages/Microsoft.Extensions.AI.Abstractions/10.9.0) and [`IChatClient` API](https://learn.microsoft.com/en-us/dotnet/api/microsoft.extensions.ai.ichatclient?view=net-10.0-pp).
 
@@ -32,7 +32,7 @@ The `probe` runner mode composes the same snapshot used by `inspect`, supplies a
 
 ## 3. Commands and affected components
 
-These are implementation targets, not commands claimed to exist yet.
+These were the implementation targets; their verified results and commands are linked from the completion record.
 
 | Target | Intended change |
 | --- | --- |
@@ -66,4 +66,4 @@ README becomes #10's actual command owner only after the commands work. Closeout
 
 Main risks are accidentally coupling Ai to Api/storage, introducing a throwaway evaluation-only prompt, leaking arbitrary text through inspection, mistaking a scripted raw response for product validation, allowing hidden retries/middleware, and weakening multi-project test-count guards. One-way references, the shared embedded resource, fixed-only runner surface, explicit raw labeling, direct single-call abstraction and per-suite report accounting address them. Package restore availability and a clean NuGet audit are preflight risks; a real incompatibility remains blocking rather than authorizing a silent version change.
 
-Review outcome: the design is feasible on the installed .NET 10 SDK, uses the accepted boundary and current stable compatible abstraction package, respects staged architecture, and maps all seven scenarios to verification/tasks. It changes no product requirement or unresolved proposal. M015–M020, public API/UI integration, provider access, cost/quality/performance and release gates remain explicitly pending. No blocker remains for implementation.
+Review outcome before execution: the design was feasible on the installed .NET 10 SDK, used the accepted boundary and stable compatible abstraction package, respected staged architecture, and mapped all seven scenarios to verification/tasks. Implementation then followed this design without requiring a product or shared-design correction. The [completion record](tasks.md#3-completion-record) reports passing focused and regression evidence. M015–M020, public API/UI integration, provider access, cost/quality/performance and release gates remain explicitly pending.
