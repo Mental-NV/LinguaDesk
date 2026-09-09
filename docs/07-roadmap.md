@@ -1,6 +1,6 @@
 # LinguaDesk — Roadmap and Milestone Plan
 
-**Document:** #7 · **Version:** 1.10 · **Status:** M001–M005 done; M015 recommended next
+**Document:** #7 · **Version:** 1.11 · **Status:** M001–M005 done; M006 selected and ready for implementation
 **Updated:** 2026-09-09
 
 ## 1. Authority and planning basis
@@ -35,9 +35,11 @@ A milestone is done only when its selected exit criteria, applicable #6 checks a
 
 ## 3. Priority, dependency and current milestone summary
 
-**Most recently completed: [M005 — Shared input and capability contract](08-backlogs/M005-shared-input-capability-contract.md).** State: **Done**. [Package 005](../specs/005-shared-input-capability-contract/spec.md) passed all eight scenarios for public capability discovery, shared C#/TypeScript scalar/validation fixtures and the first generated OpenAPI/type slice. Its [completion record](../specs/005-shared-input-capability-contract/tasks.md#3-completion-record) preserves exact evidence and exclusions. No milestone is currently selected.
+**Most recently completed: [M005 — Shared input and capability contract](08-backlogs/M005-shared-input-capability-contract.md).** State: **Done**. [Package 005](../specs/005-shared-input-capability-contract/spec.md) passed all eight scenarios for public capability discovery, shared C#/TypeScript scalar/validation fixtures and the first generated OpenAPI/type slice. Its [completion record](../specs/005-shared-input-capability-contract/tasks.md#3-completion-record) preserves exact evidence and exclusions.
 
-**Next recommended eligible milestone: M015 — Validate language eligibility.** M004 and M005 now satisfy its named dependencies, and the priority policy below brings the independent AI path forward when eligible. M015 remains a Candidate until its owning backlog and selected delivery package are authored from the then-current code/design baseline. M001–M004 remain complete with their history preserved; M006 is independently eligible but not selected.
+**Current selected milestone: [M006 — Register a local API account](08-backlogs/M006-register-local-api-account.md).** State: **Selected; ready for implementation**. The user's 2026-09-09 automation request selects this independently eligible local-access increment. M003 and M005 satisfy its named dependencies; [package 006](../specs/006-register-local-api-account/spec.md) resolves registration policy/wire details and the indispensable Identity migration, durable key and account-serving readiness handoff. All eight scenarios and tasks are pending runtime evidence.
+
+**Next recommended eligible milestone after M006:** M015 — Validate language eligibility. M004 and M005 satisfy its named dependencies, and the priority policy below still brings the independent AI path forward. M015 remains a Candidate until its own backlog/package is authored from the then-current baseline; selecting M006 now does not create a concurrent implementation request or change M015's identity/dependencies.
 
 The numbered sections below group related outcomes; **M IDs are identities, not execution positions**. The current priority policy is:
 
@@ -46,9 +48,9 @@ The numbered sections below group related outcomes; **M IDs are identities, not 
 3. Enable a verified independent API operation with durable limits and recovery, then connect its web journey. Prefer demonstrated Translation followed by Rewriting over polishing all account screens or all visuals first.
 4. Integrate accessibility, privacy and failure checks with each feature. Begin bounded corpus/evaluation and operational preparation as soon as inputs are available; do not leave qualification risk until the final release review.
 
-Dependencies in Section 4 are the minimum named prerequisites, not substitutes for #8's code/design readiness check. Satisfy transitive dependencies and the applicable Section 5 blockers too. Choose the highest-value eligible milestone; a blocked independent track need not stop another eligible one. M001–M005 are done as linked above. All milestones after M005 remain **Candidate**, with **Backlog: not created; Package: none; Evidence: pending**. These shared values are stated once instead of repeating empty columns.
+Dependencies in Section 4 are the minimum named prerequisites, not substitutes for #8's code/design readiness check. Satisfy transitive dependencies and the applicable Section 5 blockers too. Choose the highest-value eligible milestone; a blocked independent track need not stop another eligible one. M001–M005 are done as linked above. M006 is the sole **Selected** milestone with backlog/package links and pending evidence. All other milestones after M005 remain **Candidate**, with **Backlog: not created; Package: none; Evidence: pending**. These shared values are stated once instead of repeating empty columns.
 
-M001–M005 now have owning backlogs and delivery packages linked from their rows. Later milestones use #0's `Mxxx-<slug>.md` convention, or link an existing owning feature backlog. Replace the corresponding milestone title with a link to its actual backlog when created; record actual package/evidence links there and in #6. Do not create empty backlogs or package placeholders for this entire roadmap.
+M001–M006 now have owning backlogs and delivery packages linked from their rows; only M001–M005 have completion evidence. Later milestones use #0's `Mxxx-<slug>.md` convention, or link an existing owning feature backlog. Replace the corresponding milestone title with a link to its actual backlog when created; record actual package/evidence links there and in #6. Do not create empty backlogs or package placeholders for this entire roadmap.
 
 ## 4. Provisional milestone outcomes
 
@@ -68,7 +70,7 @@ The exit column describes the increment's observable value. #8 supplies concrete
 
 | ID | Outcome | Exit criterion | Prerequisites | Basis / verification |
 | --- | --- | --- | --- | --- |
-| M006 | Register a local API account | An API consumer can register; invalid registration is rejected and the new unverified account cannot perform language work. | M003, M005 | FR-001/002; V-004/V-009 |
+| M006 | [Register a local API account](08-backlogs/M006-register-local-api-account.md) | An API consumer can register; invalid registration is rejected and the new unverified account cannot perform language work. | M003, M005 | FR-001/002; V-004/V-009 |
 | M007 | Verify a local account | A local account can complete verification or recover from an invalid/expired link; deterministic email evidence covers delivery intent. | M006 | FR-002; V-004 |
 | M008 | Browser session access | A verified account can sign in/out through the cookie API with the required antiforgery and session invalidation behavior. | M007 | FR-001/002; API §3; V-004 |
 | M009 | Independent client access | A verified API consumer can authenticate and refresh bearer access; credential precedence and revocation follow the shared contract. | M008 | FR-036; API §3; V-004/V-009 |
@@ -143,7 +145,7 @@ G1–G4 are **aggregate release checkpoints, not individual delivery increments*
 | G3 — Supported web access | Full agreed current/previous actual-browser, device, keyboard and AT evidence for current core journeys under #2/#6 | M038/M039 plus successors and qualified manual review; access to actual versions/devices/reviewers. Bundled engines alone are insufficient |
 | G4 — Operational and specification readiness | Actual monetary cap and serving configuration; email evidence; retention/reconciliation/account lifecycle decisions; published migration/restore/privacy evidence and disposition of applicable launch questions | M034/M040/M041 plus successors; Q-001/Q-004/Q-006/Q-008/Q-010. PRD owners review proposals before any new safeguard or compatibility obligation is adopted |
 
-Q-003/Q-006's selected wire/auth-policy/bootstrap/delivery details are resolved before their affected handlers/clients, not postponed to G4. Q-004 blocks related retention/account behavior when introduced. Offline scaffolding or scripted AI work does not need live credentials or a production cap; every live run needs its own finite admitted budget. Provider-managed caching does not waive application privacy, successful-character accounting or cost verification, and provider retention/no-training certification is not a release checkpoint.
+Q-003/Q-006's selected wire/auth-policy/bootstrap/delivery details are resolved before their affected handlers/clients, not postponed to G4. M006 explicitly stages durable account/key records without a deletion or backup-retention claim; Q-004 still blocks those lifecycle behaviors and launch evidence when introduced. Offline scaffolding or scripted AI work does not need live credentials or a production cap; every live run needs its own finite admitted budget. Provider-managed caching does not waive application privacy, successful-character accounting or cost verification, and provider retention/no-training certification is not a release checkpoint.
 
 M042 assembles **all RG-001–008** from the canonical [#6 coverage/evidence matrix](06-verification-plan.md#81-product-and-release-coverage), including functional/accounting/access evidence from earlier milestones and successors. Its prerequisite is that all active MVP obligations have evidence, not merely that the specifically named predecessors are done. The operating walkthrough describes actual working commands and limitations. Release readiness does not itself publish the product or create a new pilot/adoption gate.
 
@@ -185,11 +187,13 @@ Use milestone summary states **Candidate → Selected → In progress → Done**
 
 **M005 completion — 2026-09-09:** Implemented the Core catalog and `unicode-scalar-v1` policy, anonymous `GET /api/capabilities`, shared C#/TypeScript fixtures, deterministic OpenAPI 3.1 generation and compile-checked TypeScript declarations. Locked checks passed 47 API/storage, 10 Core, 10 AI and 36 frontend unit cases; backend smoke and 6 isolated published Chromium cases passed after correcting the published OpenAPI runtime dependency. Audit and deliberate drift/CLI/zero-test guards passed. All eight package scenarios passed; language submissions, semantic eligibility, auth, usage/accounting, UI adoption, live services and release gates remain pending.
 
+**M006 selection — 2026-09-09:** Selected BI-006/package 006 at clean Git `4aca2c52` after confirming M003/M005 completion in Git/evidence and rerunning 67 backend/Core/AI plus 36 frontend checks. The slice adds only anonymous local registration, durable unverified Identity state, deterministic confirmation intent, a current-state verified-account guard and indispensable migration/key/readiness/contract updates. It excludes sign-in, confirmation completion/resend, cookie/bearer/antiforgery, UI adoption, real email, language/accounting and deletion. #3/#5 resolve the selected technical/behavioral details; Q-004 lifecycle and P-005/P-006 retain their status. All eight scenarios and tasks are pending implementation. Contract preflight found a reproducible wrapper restore stall with a successful `--disable-build-servers` workaround; T001 owns the bounded correction before dependent work.
+
 ## 7. Next applicable gate and validation
 
-M001–M005 are complete with linked evidence. The next applicable gate is to create and readiness-review M015's owning backlog and selected delivery package before implementing semantic eligibility. M004 supplies its independent AI boundary and M005 supplies its shared local input policy; neither package implements the M015 classifier/parser behavior.
+M001–M005 are complete with linked evidence. M006 has passed selection, specification, plan, requirements/design review, task derivation and consistency analysis. Its next applicable gate is implementation preflight followed by T001–T008; no production code/test or runtime acceptance was produced during planning. M003 supplies its durable storage boundary and M005 its generated contract baseline.
 
-M003–M005 together still do not make account, accounting, backup/restore, editor, semantic eligibility/language-operation or release acceptance complete. M006 is eligible on its named dependencies but remains unselected. The M015 recommendation does not authorize live provider work or bypass its package-specific Q-005/Q-007 decisions and verification boundaries.
+M003–M005 together still do not make account, accounting, backup/restore, editor, semantic eligibility/language-operation or release acceptance complete. M006 is selected but pending and therefore does not yet establish account behavior. M015 remains eligible/recommended after M006, but that recommendation does not authorize live provider work or bypass its package-specific Q-005/Q-007 decisions and verification boundaries.
 
 **M004 consistency and evidence review:** The planning comparison against Git `6f86f9f` remains historical. Implementation started from clean planning HEAD `762a0acd`, and the complete working-tree diff was reviewed against #0, BI-004, package acceptance and the shared designs. Package, lock, command, test/report, prompt-hash, no-effect, security/privacy and limitation evidence is linked from [tasks.md](../specs/004-independent-ai-development/tasks.md#3-completion-record). M001–M003 evidence remains linked; all active product requirements and release gates remain pending.
 
