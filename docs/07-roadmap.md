@@ -55,7 +55,7 @@ The exit column describes the increment's observable value. #8 supplies concrete
 | ID | Outcome | Exit criterion | Prerequisites | Basis / verification |
 | --- | --- | --- | --- | --- |
 | M006 | [Register a local API account](08-backlogs/M006/backlog.md) | An API consumer can register; invalid registration is rejected and the new unverified account cannot perform language work. | M003, M005 | FR-001/002; V-004/V-009 |
-| M007 | Verify a local account | A local account can complete verification or recover from an invalid/expired link; deterministic email evidence covers delivery intent. | M006 | FR-002; V-004 |
+| M007 | [Verify a local account](08-backlogs/M007/backlog.md) | A local account can complete verification or recover from an invalid/expired link; deterministic email evidence covers delivery intent. | M006 | FR-002; V-004 |
 | M008 | Browser session access | A verified account can sign in/out through the cookie API with the required antiforgery and session invalidation behavior. | M007 | FR-001/002; API §3; V-004 |
 | M009 | Independent client access | A verified API consumer can authenticate and refresh bearer access; credential precedence and revocation follow the shared contract. | M008 | FR-036; API §3; V-004/V-009 |
 | M010 | Recover API account access | A local user can request and complete password reset; invalid tokens, non-enumeration and subsequent access invalidation are verified. | M009 | FR-002; V-004 |
