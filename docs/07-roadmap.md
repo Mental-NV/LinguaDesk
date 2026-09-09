@@ -1,45 +1,29 @@
 # LinguaDesk — Roadmap and Milestone Plan
 
-**Document:** #7 · **Version:** 1.12 · **Status:** M001–M006 done; M015 is the next recommended eligible candidate
+**Document:** #7 · **Version:** 1.12 · **Status:** Current design; implementation/evidence status is maintained in delivery/current.md and verification/coverage.md
 **Updated:** 2026-09-09
 
 ## 1. Authority and planning basis
 
-This roadmap follows [planning workflow #0](00-SDD-Planning-Workflow.md), including its v1.7 amendment removing the milestone duration limit. It orders small user/API outcomes and necessary infrastructure. Concrete backlog items, acceptance scenarios, implementation decisions and tasks are authored through #8 when a milestone approaches execution.
+This roadmap follows [planning workflow #0](00-SDD-Planning-Workflow.md), It orders small user/API outcomes and necessary infrastructure. Concrete backlog items, acceptance scenarios, implementation decisions and tasks are authored through #8 when a milestone approaches execution.
 
-| Authoritative input | Revision read at Git `dede27c7e14409dff54c04ea0aaafc13cc0f3af9` | Responsibility |
-| --- | --- | --- |
-| [Workflow #0](00-SDD-Planning-Workflow.md) | v1.4; amended to v1.5 with this roadmap | Scope selection, artifact ownership, readiness and change control |
-| [PRD #1](01-PRD.md) | v0.6 | Product scope, priorities, deferred/proposed status and release gates |
-| [UX #2](02-ux-specification.md) | v1.5 | User journeys, workspace behavior and browser/accessibility contracts |
-| [Architecture #3](03-architecture.md) | v1.7 | Stack, independent AI, hosting, persistence and accounting boundaries |
-| [LLM specification #4](04-llm-specification.md) | v1.3 | Eligibility, prompts/checkers, family chains and serving qualification |
-| [API design #5](05-api-design.md) | v1.1 | Shared auth, counting, identity/recovery/usage behavior and contract lifecycle |
-| [Verification plan #6](06-verification-plan.md) | v1.0 | Checks, corpus/rubric/reviews, workloads, coverage and release evidence |
-| [ADRs #9](09-architecture-decisions.md) | v1.7 | Existing decision rationale |
-| User direction | 2026-09-08 | Infrastructure first; small feature/story milestones; easy rearrangement (duration rule superseded below) |
+Original authoring inputs are in the [archive](archive/07-roadmap-inputs.md). Current scope follows the owning documents linked from [#0](00-SDD-Planning-Workflow.md).
 
 **Current policy — user direction, 2026-09-09:** No fixed milestone duration limit; this supersedes the original time cap and associated stop/split rules.
 
-At the original roadmap baseline, the repository contained specifications only. No backend/frontend, generated OpenAPI, #8 backlog, delivery package or runtime evidence was present at this baseline. No implementation or model-speed benchmark is claimed here. The roadmap is a delivery hypothesis to revise after observing actual work.
-
-MVP scope remains the PRD's two explicit whole-text operations, local accounts, independent API, shared allowances/cost bounds and accessible private workspace. Deferred capabilities remain in [PRD Section 3.1](01-PRD.md#31-deferred-scope-register-product-authority) with no scheduled milestone. Retired behavior is not restored; P-005/NFR-008 and P-006 are not accepted by scheduling adjacent work. Product thresholds and the full requirement-to-evidence matrix stay in #1/#6.
+MVP scope remains the PRD's two explicit whole-text operations, local accounts, independent API, shared allowances/cost bounds and accessible private workspace. Deferred capabilities remain in [PRD Section 3.1](product/deferred-scope.md#31-deferred-scope-register-product-authority) with no scheduled milestone. Retired behavior is not restored; P-005/NFR-008 and P-006 are not accepted by scheduling adjacent work. Product thresholds and the full requirement-to-evidence matrix stay in #1/#6.
 
 ## 2. Milestone size and completion rules
 
 Each executable milestone delivers a small, coherent outcome with explicit dependencies and observable acceptance. There is no fixed execution-duration limit. At #8 selection, inspect current code and previous evidence to assess scope, verification effort and risks. Split a candidate when independently valuable boundaries or dependencies justify it; elapsed time alone does not require stopping or splitting an active milestone.
 
-Apply [#0's human-step timing](00-SDD-Planning-Workflow.md#selecting-work-and-creating-a-package): batch indispensable requests at the beginning; queue nonblocking human steps for the end with prepared instructions and pending evidence. Resolve necessary access, product decisions and external evidence dependencies before dependent execution. Section 5 tracks aggregate human/live-service gates separately; preparation and evidence-producing milestones can proceed without claiming those gates passed.
+Apply [#0's human-step timing](00-workflow/planning.md#select-and-gather-bounded-context): batch indispensable requests at the beginning; queue nonblocking human steps for the end with prepared instructions and pending evidence. Resolve necessary access, product decisions and external evidence dependencies before dependent execution. Section 5 tracks aggregate human/live-service gates separately; preparation and evidence-producing milestones can proceed without claiming those gates passed.
 
 A milestone is done only when its selected exit criteria, applicable #6 checks and documentation/evidence updates are complete under #0's gates. Account isolation, no unintended submissions, privacy, durable accounting and cost admission apply when a capability is first introduced. Later cross-feature verification adds evidence; it does not authorize temporarily violating those contracts. Run all applicable regressions and record actual results. Durations may inform planning but are not readiness or completion gates. If work cannot continue because of a real blocker, preserve it and record the remaining outcome honestly. There is no fixed calendar schedule or total-duration promise.
 
 ## 3. Priority, dependency and current milestone summary
 
-**Most recently completed: [M005 — Shared input and capability contract](08-backlogs/M005-shared-input-capability-contract.md).** State: **Done**. [Package 005](../specs/005-shared-input-capability-contract/spec.md) passed all eight scenarios for public capability discovery, shared C#/TypeScript scalar/validation fixtures and the first generated OpenAPI/type slice. Its [completion record](../specs/005-shared-input-capability-contract/tasks.md#3-completion-record) preserves exact evidence and exclusions.
-
-**Most recently completed milestone: [M006 — Register a local API account](08-backlogs/M006-register-local-api-account.md).** State: **Done**. [Package 006](../specs/006-register-local-api-account/spec.md) AC-001–008 passed anonymous local registration, durable unverified Identity state, confirmation intent, current-state verification guard, the Identity migration, durable key configuration, account-serving readiness and generated-contract updates. Its [completion record](../specs/006-register-local-api-account/tasks.md#3-completion-record) owns the exact evidence. No later milestone is selected by this completion update.
-
-**Next recommended eligible milestone after M006:** M015 — Validate language eligibility. M004 and M005 satisfy its named dependencies, and the priority policy below still brings the independent AI path forward. M015 remains a Candidate until its own backlog/package is authored from the then-current baseline; selecting M006 now does not create a concurrent implementation request or change M015's identity/dependencies.
+Read [current delivery status](delivery/current.md) for the latest completion, selected scope, dependencies and next recommendation.
 
 The numbered sections below group related outcomes; **M IDs are identities, not execution positions**. The current priority policy is:
 
@@ -48,9 +32,9 @@ The numbered sections below group related outcomes; **M IDs are identities, not 
 3. Enable a verified independent API operation with durable limits and recovery, then connect its web journey. Prefer demonstrated Translation followed by Rewriting over polishing all account screens or all visuals first.
 4. Integrate accessibility, privacy and failure checks with each feature. Begin bounded corpus/evaluation and operational preparation as soon as inputs are available; do not leave qualification risk until the final release review.
 
-Dependencies in Section 4 are the minimum named prerequisites, not substitutes for #8's code/design readiness check. Satisfy transitive dependencies and the applicable Section 5 blockers too. Choose the highest-value eligible milestone; a blocked independent track need not stop another eligible one. M001–M006 are done as linked above. All milestones after M006 remain **Candidate**, with **Backlog: not created; Package: none; Evidence: pending**. These shared values are stated once instead of repeating empty columns.
+Dependencies in Section 4 are the minimum named prerequisites, not substitutes for #8's code/design readiness check. Satisfy transitive dependencies and the applicable Section 5 blockers too. Choose the highest-value eligible milestone; a blocked independent track need not stop another eligible one. Current states and evidence are recorded once in [delivery status](delivery/current.md).
 
-M001–M006 have owning backlogs, delivery packages and completion evidence linked from their rows. Later milestones use #0's `Mxxx-<slug>.md` convention, or link an existing owning feature backlog. Replace the corresponding milestone title with a link to its actual backlog when created; record actual package/evidence links there and in #6. Do not create empty backlogs or package placeholders for this entire roadmap.
+Existing packages are linked from their rows. New milestones use `docs/08-backlogs/<scope-id>/backlog.md`, with `spec.md`, `plan.md` and `tasks.md` in the same folder. Replace the corresponding milestone title with a link to its actual backlog when created; record actual package/evidence links there and in #6. Do not create empty backlogs or package placeholders for this entire roadmap.
 
 ## 4. Provisional milestone outcomes
 
@@ -60,17 +44,17 @@ The exit column describes the increment's observable value. #8 supplies concrete
 
 | ID | Outcome | Exit criterion | Prerequisites | Basis / verification |
 | --- | --- | --- | --- | --- |
-| M001 | [Backend foundation](08-backlogs/M001-backend-foundation.md) | An agent can build and start the minimal backend and run an isolated meaningful smoke check with reproducible commands. | — | Architecture §2–3/5; V-009/V-012 (host portions only) |
-| M002 | [Published web shell](08-backlogs/M002-published-web-shell.md) | A user can open the basic SPA through the API host; navigation works and missing API/assets return proper errors. | M001 | FR-003; architecture §3; V-003/V-012 |
-| M003 | [Durable storage foundation](08-backlogs/M003-durable-storage-foundation.md) | A clean isolated store is created through migrations; persisted data survives a host restart and the storage checks are repeatable. | M001 | Architecture §6; V-005/V-016 |
-| M004 | [Independent AI development](08-backlogs/M004-independent-ai-development.md) | An agent can exercise the shared AI boundary offline and inspect a synthetic prompt without starting API/UI or accessing secrets. | M001 | AI §2/9; V-007 |
-| M005 | [Shared input and capability contract](08-backlogs/M005-shared-input-capability-contract.md) | An API consumer can discover the supported choices/limits; client and server agree on canonical input counts and validation fixtures. | M001 | FR-004/006/007/014/036; API §4/9; V-001/V-009 |
+| M001 | [Backend foundation](08-backlogs/M001/backlog.md) | An agent can build and start the minimal backend and run an isolated meaningful smoke check with reproducible commands. | — | Architecture §2–3/5; V-009/V-012 (host portions only) |
+| M002 | [Published web shell](08-backlogs/M002/backlog.md) | A user can open the basic SPA through the API host; navigation works and missing API/assets return proper errors. | M001 | FR-003; architecture §3; V-003/V-012 |
+| M003 | [Durable storage foundation](08-backlogs/M003/backlog.md) | A clean isolated store is created through migrations; persisted data survives a host restart and the storage checks are repeatable. | M001 | Architecture §6; V-005/V-016 |
+| M004 | [Independent AI development](08-backlogs/M004/backlog.md) | An agent can exercise the shared AI boundary offline and inspect a synthetic prompt without starting API/UI or accessing secrets. | M001 | AI §2/9; V-007 |
+| M005 | [Shared input and capability contract](08-backlogs/M005/backlog.md) | An API consumer can discover the supported choices/limits; client and server agree on canonical input counts and validation fixtures. | M001 | FR-004/006/007/014/036; API §4/9; V-001/V-009 |
 
 ### 4.2 Local access
 
 | ID | Outcome | Exit criterion | Prerequisites | Basis / verification |
 | --- | --- | --- | --- | --- |
-| M006 | [Register a local API account](08-backlogs/M006-register-local-api-account.md) | An API consumer can register; invalid registration is rejected and the new unverified account cannot perform language work. | M003, M005 | FR-001/002; V-004/V-009 |
+| M006 | [Register a local API account](08-backlogs/M006/backlog.md) | An API consumer can register; invalid registration is rejected and the new unverified account cannot perform language work. | M003, M005 | FR-001/002; V-004/V-009 |
 | M007 | Verify a local account | A local account can complete verification or recover from an invalid/expired link; deterministic email evidence covers delivery intent. | M006 | FR-002; V-004 |
 | M008 | Browser session access | A verified account can sign in/out through the cookie API with the required antiforgery and session invalidation behavior. | M007 | FR-001/002; API §3; V-004 |
 | M009 | Independent client access | A verified API consumer can authenticate and refresh bearer access; credential precedence and revocation follow the shared contract. | M008 | FR-036; API §3; V-004/V-009 |
@@ -147,11 +131,11 @@ G1–G4 are **aggregate release checkpoints, not individual delivery increments*
 
 Q-003/Q-006's selected wire/auth-policy/bootstrap/delivery details are resolved before their affected handlers/clients, not postponed to G4. M006 explicitly stages durable account/key records without a deletion or backup-retention claim; Q-004 still blocks those lifecycle behaviors and launch evidence when introduced. Offline scaffolding or scripted AI work does not need live credentials or a production cap; every live run needs its own finite admitted budget. Provider-managed caching does not waive application privacy, successful-character accounting or cost verification, and provider retention/no-training certification is not a release checkpoint.
 
-M042 assembles **all RG-001–008** from the canonical [#6 coverage/evidence matrix](06-verification-plan.md#81-product-and-release-coverage), including functional/accounting/access evidence from earlier milestones and successors. Its prerequisite is that all active MVP obligations have evidence, not merely that the specifically named predecessors are done. The operating walkthrough describes actual working commands and limitations. Release readiness does not itself publish the product or create a new pilot/adoption gate.
+M042 assembles **all RG-001–008** from the canonical [#6 coverage/evidence matrix](verification/coverage.md#81-product-and-release-coverage), including functional/accounting/access evidence from earlier milestones and successors. Its prerequisite is that all active MVP obligations have evidence, not merely that the specifically named predecessors are done. The operating walkthrough describes actual working commands and limitations. Release readiness does not itself publish the product or create a new pilot/adoption gate.
 
 ## 6. Revising the roadmap without losing history
 
-After each completed or interrupted milestone, update this document's current summary with its ID/state, measured elapsed time, outcome/evidence link, blockers and next recommended eligible ID. Item/task detail stays in its owning backlog/package. Use measured work to refine the next few milestones; leave later rows at outcome level.
+After each completed or interrupted milestone, update [delivery status](delivery/current.md) with its ID/state, measured elapsed time, outcome/evidence link, blockers and next recommended eligible ID. Item/task detail stays in its owning backlog/package. Use measured work to refine the next few milestones; leave later rows at outcome level.
 
 | Change | Update rule |
 | --- | --- |
@@ -165,40 +149,6 @@ After each completed or interrupted milestone, update this document's current su
 
 Use milestone summary states **Candidate → Selected → In progress → Done**, with **Blocked**, **Deferred** or **Superseded** and a reason where appropriate. A blocker is also recorded against the affected scope; #8 keeps its own item states under #0. Never reuse an ID or renumber completed milestones to make ordering look sequential. A short dated change note records what moved/split and why; preserve previous plans and measured evidence in their packages/Git history.
 
-**Initial change record — 2026-09-08:** Created M001–M042 as provisional small outcome boundaries. M001 is recommended first; no backlog item/package was selected. G1–G4 distinguish aggregate external/release evidence from bounded engineering execution. New successor IDs will be allocated as evidence batches and actual scope become known.
-
-**Selection update — 2026-09-08:** Created M001 backlog/BI-001 and package 001 with six acceptance scenarios and six unchecked execution tasks. Added the initial/end human-step rule from #0 v1.6; no human action is required for M001 as scoped. Updated its check references to the actual host portions of V-009/V-012; independent AI verification remains M004.
-
-**M001 completion — 2026-09-08:** Implemented the pinned two-project backend scaffold, process-only liveness and absent-route boundary. Locked clean/repeated Release checks executed nine passing HTTP cases; successful and controlled-failure real-process smokes verified ephemeral loopback startup, nonzero propagation and cleanup. All package scenarios passed; no product or release gate is claimed.
-
-**M002 selection — 2026-09-08:** Selected BI-002/package 002 after inspecting the completed M001 host, tests, commands and evidence. The increment adds a bounded signed-out informational shell, real static publication and focused navigation/asset-boundary verification; account forms and language features remain later milestones. Toolchain provisioning is explicitly front-loaded under #0.
-
-**M002 completion — 2026-09-08:** Implemented the pinned React/Vite shell, explicit ASP.NET static/fallback boundaries and clean single-artifact publication. Locked checks passed 8 component and 20 HTTP cases; 6 Chromium cases passed against an isolated published Kestrel host at desktop/390/320 widths, repeated publication removed stale assets, and backend-only checks passed without a webroot. All package scenarios passed. The recorded full turn took approximately 35 minutes; this is historical duration evidence, with no continuing time-limit requirement. No account/editor product capability or release gate is claimed.
-
-**M003 selection and policy update — 2026-09-09:** Selected BI-003/package 003 for explicit storage initialization, connection policy and isolated persistence/restart verification. Account/ledger schemas and production backup/recovery remain their own later outcomes. Applied #0 v1.7: the fixed milestone duration limit and associated time-based stop/split rules are removed. M001/M002 completion evidence is preserved.
-
-**M003 completion — 2026-09-09:** Implemented EF Core SQLite migration and lazy runtime boundaries with explicit safe paths, WAL, per-connection foreign keys and finite lock waiting. Locked checks passed 42 backend cases; the documented path-with-spaces migration was repeatable, same-file data/history survived two real host processes, invalid targets failed without fallback and published-shell regressions remained green. The initial production schema contains framework migration metadata only. No account/ledger, backup/restore, storage-readiness or product/release acceptance is claimed.
-
-**M004 selection — 2026-09-09:** Selected BI-004/package 004 after confirming M001 and the current SDK/solution/package baseline. The increment adds only the host-independent Infrastructure.Ai library, focused tests and standalone development runner needed to inspect `eligibility.v1` with fixed synthetic data and exercise one scripted `IChatClient` call. Eligibility decisions, transformations, fallback, adapters, live evaluation, API/UI composition and product/release evidence remain later milestones. No human action or blocking planning question remains.
-
-**M004 completion — 2026-09-09:** Implemented the host-independent Infrastructure.Ai library, shared embedded `eligibility.v1` composition, exactly-one-call complete-response boundary, focused MSTest suite and fixed-only inspect/probe runner. Locked warning-free checks passed 10 AI plus 42 retained API/storage cases; backend smoke, 8 component cases and 6 isolated published Chromium cases passed. Offline execution used no credentials/provider/database/API host and left no process or persistent evaluation report. This is synthetic boundary evidence only: eligibility decisions, transformations, fallback, adapters, live evaluation and all product/release gates remain pending.
-
-**M005 selection — 2026-09-09:** Selected BI-005/package 005 after confirming M001 in Git/evidence and rerunning the clean current baseline. The slice adds one anonymous read-only capabilities operation, the first nonempty Core count/catalog policy, shared C#/TypeScript scalar/validation fixtures, and deterministic OpenAPI 3.1/TypeScript type generation from actual endpoint metadata. It excludes text submission, semantic eligibility, auth, usage/accounting, persistence changes, AI/provider work, UI adoption and compatibility promises. No human action or blocking planning question remains; all eight scenarios and seven tasks are pending implementation.
-
-**M005 completion — 2026-09-09:** Implemented the Core catalog and `unicode-scalar-v1` policy, anonymous `GET /api/capabilities`, shared C#/TypeScript fixtures, deterministic OpenAPI 3.1 generation and compile-checked TypeScript declarations. Locked checks passed 47 API/storage, 10 Core, 10 AI and 36 frontend unit cases; backend smoke and 6 isolated published Chromium cases passed after correcting the published OpenAPI runtime dependency. Audit and deliberate drift/CLI/zero-test guards passed. All eight package scenarios passed; language submissions, semantic eligibility, auth, usage/accounting, UI adoption, live services and release gates remain pending.
-
-**M006 selection — 2026-09-09:** Selected BI-006/package 006 at clean Git `4aca2c52` after confirming M003/M005 completion in Git/evidence and rerunning 67 backend/Core/AI plus 36 frontend checks. The slice adds only anonymous local registration, durable unverified Identity state, deterministic confirmation intent, a current-state verified-account guard and indispensable migration/key/readiness/contract updates. It excludes sign-in, confirmation completion/resend, cookie/bearer/antiforgery, UI adoption, real email, language/accounting and deletion. #3/#5 resolve the selected technical/behavioral details; Q-004 lifecycle and P-005/P-006 retain their status. All eight scenarios and tasks are pending implementation. Contract preflight found a reproducible wrapper restore stall with a successful `--disable-build-servers` workaround; T001 owns the bounded correction before dependent work.
-
-**M006 completion — 2026-09-09:** Implemented anonymous strict local registration, durable user-only Identity state, non-enumerating duplicate/concurrency behavior, deterministic confirmation intent, current-state `VerifiedAccount` authorization, the additive `LocalAccounts` migration, explicit durable Data Protection keys and pre-listen/current readiness. Generated OpenAPI 3.1/types now contain only capabilities plus registration. Locked checks passed 67 API/storage/Identity/readiness, 10 Core, 10 AI, 36 frontend unit and 6 published Chromium cases; audits and deliberate drift/CLI/startup failure guards passed. All eight package scenarios passed. Sign-in, confirmation/resend/status/reset, web adoption, real email, language/accounting, deletion/backup lifecycle, full FR-001/002, RG-005 and release evidence remain pending.
-
 ## 7. Next applicable gate and validation
 
-M001–M006 are complete with linked evidence. M006 passed selection, specification, plan, implementation, requirements/design/source review, all T001–T008 checks and AC-001–008. The next applicable workflow action is to select and package an eligible candidate; M015 remains the recommendation but is not selected by this document update.
-
-M003–M006 establish only explicit storage, registration and durable unverified account state; they do not make sign-in/verification, accounting, backup/restore, editor, semantic eligibility/language-operation or release acceptance complete. M015 remains eligible/recommended after M006, but that recommendation does not authorize live provider work or bypass its package-specific Q-005/Q-007 decisions and verification boundaries.
-
-**M004 consistency and evidence review:** The planning comparison against Git `6f86f9f` remains historical. Implementation started from clean planning HEAD `762a0acd`, and the complete working-tree diff was reviewed against #0, BI-004, package acceptance and the shared designs. Package, lock, command, test/report, prompt-hash, no-effect, security/privacy and limitation evidence is linked from [tasks.md](../specs/004-independent-ai-development/tasks.md#3-completion-record). M001–M003 evidence remains linked; all active product requirements and release gates remain pending.
-
-**M005 consistency and evidence review:** Planning used clean Git `a257cd1f`; implementation used the working tree based on planning HEAD `75647db`. The complete diff, package/reference graphs, generated artifacts and commands were reviewed against #0, BI-005, package acceptance, #1/#3/#5/#6 and ADR-004. [Tasks/evidence](../specs/005-shared-input-capability-contract/tasks.md#3-completion-record) records tool versions, test/report counts, hashes, audit, deterministic/failure checks, the corrected publish defect and scope limitations. All active language behavior and product/release gates beyond M005's narrow discovery/local-validation contract remain pending.
-
-**M006 consistency and evidence review:** Implementation used the working tree based on planning HEAD `6b4055d`. The complete diff, additive migration, route/policy/readiness boundaries, dependency graph and generated artifacts were reviewed against #0, BI-006, package acceptance, #1/#2/#3/#5/#6 and ADR-003/004/007/009. [Tasks/evidence](../specs/006-register-local-api-account/tasks.md#3-completion-record) records tool versions, counts, hashes, audits, deliberate failures, no-effect/secret checks and limitations. M006 proves only registration and durable unverified state; full account access and every release gate remain pending.
+Use [current delivery status](delivery/current.md) to select the next eligible candidate, then follow [planning procedure](00-workflow/planning.md). Historical selection/review notes are in the [roadmap archive](archive/roadmap-history.md). Completion does not imply release readiness.

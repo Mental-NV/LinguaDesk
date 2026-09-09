@@ -123,6 +123,7 @@ require_command dotnet
 require_command git
 require_command grep
 require_command sed
+require_command python3
 
 [ -f "$roadmap" ] || fail "Roadmap not found: $roadmap"
 [ -f "$solution" ] || fail "Solution not found: $solution"
@@ -136,6 +137,7 @@ fi
 
 cd "$repository_root"
 ensure_clean_repository
+python3 automation/context.py audit
 
 for ((i=start_milestone; i<=end_milestone; i++)); do
     milestone=$(printf "M%03d" "$i")
@@ -157,16 +159,20 @@ for ((i=start_milestone; i<=end_milestone; i++)); do
 
     ensure_clean_repository
 
-    if has_milestone_commit "$milestone" planned; then
-        echo "$milestone already has a planning commit. Reusing it."
+    if has_milestone_commit "$milestone" planned && python3 automation/context.py check "$milestone"; then
+        echo "$milestone already has a planning commit and current context lock. Reusing it."
     else
         echo "Planning $milestone..."
         run_codex "$plan_prompt_template" "$milestone" "MILESTONE_AUTOMATION_STATUS: READY"
+        python3 automation/context.py check "$milestone"
+        python3 automation/context.py audit
         commit_changes "$milestone planned"
     fi
 
     echo "Implementing $milestone..."
+    python3 automation/context.py check "$milestone"
     run_codex "$implement_prompt_template" "$milestone" "MILESTONE_AUTOMATION_STATUS: COMPLETE"
+    python3 automation/context.py audit
 
     echo "Testing $milestone..."
     ./scripts/backend.sh check

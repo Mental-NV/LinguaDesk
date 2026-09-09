@@ -1,23 +1,15 @@
 # LinguaDesk — LLM Behavior and Routing Specification
 
-**Document:** #4 · **Version:** 1.5 · **Status:** Shared design; M004 offline boundary verified; language behavior and provider qualification pending
+**Document:** #4 · **Version:** 1.5 · **Status:** Current design; implementation/evidence status is maintained in delivery/current.md and verification/coverage.md
 **Updated:** 2026-09-09
 
 ## 1. Authority, inputs, and scope
 
-| Authoritative input | Revision read | Responsibility |
-| --- | --- | --- |
-| [SDD Planning Workflow](00-SDD-Planning-Workflow.md) | v1.2 at `1646094627a4921880015c4909151d27f89616f0` | Process, ownership, traceability and readiness |
-| [PRD](01-PRD.md) | v0.4 at the same commit | Active product requirements, D-17/D-18, deferred scope and release thresholds |
-| [UX specification](02-ux-specification.md) | v1.3 at the same commit | Explicit submission, validation/recovery, complete output and workspace lifecycle |
-| [Architecture](03-architecture.md) | v1.3 at the same commit; aligned to v1.5 with this document and naming clarification | Component boundaries, durable accounting, privacy, deadlines and testing |
-| [Architecture decisions](09-architecture-decisions.md) | v1.3 at the same commit; ADR-012 added with this document | Decision rationale; current design remains in its owning specification |
-| User request and clarification | 2026-09-08 | Generate #4; consider `Microsoft.Extensions.AI` and independent AI development/validation; name the Infrastructure library `LinguaDesk.Infrastructure.Ai` |
-| [API behavioral design](05-api-design.md) and #0 v1.3 | 2026-09-08 workflow approval, baseline `24ffe3b` | Shared counting/recovery/accounting semantics now specified; OpenAPI generation deferred to early selected implementation |
+Original authoring inputs are in the [archive](archive/04-llm-specification-inputs.md). Current scope follows the owning documents linked from [#0](00-SDD-Planning-Workflow.md).
 
 This document owns prompts, provider settings/adapters, language eligibility, family chains, output checks, error classification, context and attempt bounds under Q-007. It supplies capability and cost evidence for Q-001; it does not certify a serving arrangement or select a monetary cap. The technical choices below exercise the design authority delegated by #0 and are recorded in ADR-012. They are not claims of product-owner approval of a new requirement.
 
-At this document's original authoring baseline, the repository contained specifications only. M001–M003 subsequently implemented the backend host, published shell and durable-storage foundation. [M004 / BI-004](08-backlogs/M004-independent-ai-development.md) now implements the host-independent AI project boundary, an executable/inspectable `eligibility.v1` prompt snapshot and one scripted complete-response call; its [offline completion evidence](../specs/004-independent-ai-development/tasks.md#3-completion-record) passes without provider access. Eligibility decisions/parsing, Translation, Rewriting, fallback/deadline orchestration, adapters and evaluation stay with M015–M020. [API behavioral design #5](05-api-design.md) supplies shared semantics, and `docs/05-openapi.yaml` remains deferred to the start of selected API implementation. [Verification plan #6](06-verification-plan.md) owns the independent workflows, corpus, rubric, human review, workloads and evidence mapping.
+Current implemented boundaries and evidence are indexed in [delivery status](delivery/current.md). [API design #5](05-api-design.md) owns shared semantics; the generated OpenAPI covers only selected implemented routes. [Verification #6](06-verification-plan.md) owns evaluation methods.
 
 Scope is the current Translation and Rewriting MVP: FR-004–014, active FR-016–018/022–024, FR-026–030/032–038 and applicable NFR-001–006. Preserve the PRD's exact language/mode catalog, input limits, allowance values and performance/quality thresholds by reference to Sections 5–8. DF-001–DF-007, retired sentence preservation and the duplicate correction toggle create no work here. P-005/NFR-008 and P-006 remain proposed; this design does not select new abuse rates, content restrictions, API compatibility promises or provider privacy gates.
 
@@ -176,27 +168,7 @@ Settings do not inherit silently from provider defaults. The first qualification
 
 ### 5.2 DeepSeek documentation checked on 2026-09-08
 
-The direct DeepSeek API is a **documented candidate**, not a chosen production provider or qualified fallback. Official documentation advertises `deepseek-v4-flash` at `https://api.deepseek.com`, currently mapped to DeepSeek-V4-Flash-0731. A mutable alias is not an immutable model snapshot; record the requested ID and returned model/fingerprint when available. [DeepSeek quick start](https://api-docs.deepseek.com/)
-
-For Chat Completions, explicitly send `thinking: {"type":"disabled"}`; thinking is enabled by default. An “OpenAI-compatible” client or a low reasoning-effort setting is not evidence that this field reached the provider. Verify the serialized request in adapter tests. [DeepSeek thinking mode](https://api-docs.deepseek.com/guides/thinking_mode/)
-
-DeepSeek documents `response_format: {"type":"json_object"}` and asks for a JSON instruction and example. Empty content can still occur. Use this format and local envelope checks; do not assume JSON Schema enforcement from compatibility branding. [DeepSeek JSON output](https://api-docs.deepseek.com/guides/json_mode/)
-
-The published Flash tariff snapshot is USD per million tokens:
-
-| Token category | Off-peak | Peak |
-| --- | ---: | ---: |
-| Input cache hit | 0.007 | 0.014 |
-| Input cache miss | 0.22 | 0.44 |
-| Output | 0.66 | 1.32 |
-
-The same page lists a 1M-token context and a 384K-token maximum output. These are provider ceilings, not application defaults or permission to accept longer source text. Use peak cache-miss/output rates for conservative reservations unless the actual billing contract establishes a tighter bound; recheck the tariff before paid use. These documentary numbers do not set the project cap or establish total request cost. [DeepSeek models and pricing](https://api-docs.deepseek.com/quick_start/pricing/)
-
-Provider-managed context caching reuses eligible input prefixes; output is still generated and cache hits are best effort. Record the provider's hit/miss token evidence, and keep stable prompt prefixes without including unrelated text or padding solely to seek a cache hit. Cache-hit latency/cost must be measured separately from cache misses. [DeepSeek context caching](https://api-docs.deepseek.com/guides/kv_cache/)
-
-Adapter conformance must preserve documented completion status and usage information, including cache and reasoning breakdown where returned. Missing usage is unknown, not zero. Request caps must be explicitly sent rather than relying on the large provider limits. [DeepSeek Chat Completions API](https://api-docs.deepseek.com/api/create-chat-completion/)
-
-No live request, SDK compatibility test, token-bound proof, billing reconciliation or language-quality benchmark was run while authoring this document. Third-party hosts must provide their own evidence for their endpoint, actual model, settings, pricing and cache behavior; direct DeepSeek documentation cannot qualify them. No fallback is selected by this document. Provider retention/no-training certification remains excluded by D-18.
+See [DeepSeek candidate documentation snapshot](research/deepseek-2026-09-08.md#52-deepseek-documentation-checked-on-2026-09-08).
 
 ### 5.3 Context and monetary bounds
 
@@ -284,19 +256,19 @@ Provider-managed caching remains permitted. Do not install `UseDistributedCache`
 
 ### 9.1 Host-independent capability
 
-The standalone `LinguaDesk.Ai.Evaluation` runner is a development tool. M004 implements its fixed synthetic `inspect` and scripted `probe` modes using the shared prompt composition and complete-response boundary, without Api, migrations, accounts, frontend or production data. Configuration validators, adapters, live-candidate and chain workflows remain later slices under [verification plan Section 3.3](06-verification-plan.md#33-independent-ai-workflows). Verified current commands and limitations are documented in [#10](../README.md#independent-ai-development-commands).
+The standalone `LinguaDesk.Ai.Evaluation` runner is a development tool. M004 implements its fixed synthetic `inspect` and scripted `probe` modes using the shared prompt composition and complete-response boundary, without Api, migrations, accounts, frontend or production data. Configuration validators, adapters, live-candidate and chain workflows remain later slices under [verification plan Section 3.3](verification/backend.md#33-independent-ai-workflows). Verified current commands and limitations are documented in [#10](../README.md#independent-ai-development-commands).
 
 ### 9.2 Evaluation ownership and data boundary
 
-[#6 Sections 5–7](06-verification-plan.md#5-llm-quality-and-candidate-qualification-q-005) own Q-005: corpus construction, grading/human review, API workloads, optional evaluation tooling and report requirements. Runner-only grading/report dependencies do not enter the serving library. Production text must never become an evaluation dataset or persistent report; Section 8 and #3 retain application privacy authority. Live evaluation requires bounded monetary admission including graders and unresolved exposure; #6 specifies execution and billing isolation.
+[#6 Sections 5–7](verification/llm-evaluation.md#5-llm-quality-and-candidate-qualification-q-005) own Q-005: corpus construction, grading/human review, API workloads, optional evaluation tooling and report requirements. Runner-only grading/report dependencies do not enter the serving library. Production text must never become an evaluation dataset or persistent report; Section 8 and #3 retain application privacy authority. Live evaluation requires bounded monetary admission including graders and unresolved exposure; #6 specifies execution and billing isolation.
 
 ### 9.3 Candidate eligibility
 
-Every serving candidate must demonstrate adapter/settings capability, finite monetary/context bounds, full-family eligibility and transformation quality, runtime-validator behavior and applicable performance. Qualification binds evidence to the exact candidate/bundle revisions under [#6 Section 5.4](06-verification-plan.md#54-qualification-and-changes). A fallback is optional; configure none until one qualifies. No per-route exception may hide a failing candidate. Startup validation remains Section 5's runtime contract; qualification is evidence with limitations, not a guarantee of every future response.
+Every serving candidate must demonstrate adapter/settings capability, finite monetary/context bounds, full-family eligibility and transformation quality, runtime-validator behavior and applicable performance. Qualification binds evidence to the exact candidate/bundle revisions under [#6 Section 5.4](verification/llm-evaluation.md#54-qualification-and-changes). A fallback is optional; configure none until one qualifies. No per-route exception may hide a failing candidate. Startup validation remains Section 5's runtime contract; qualification is evidence with limitations, not a guarantee of every future response.
 
 ## 10. Local acceptance scenarios and handoffs
 
-These IDs describe checks for #4, not a duplicate product coverage catalog or implementation task list. [#6 Section 8](06-verification-plan.md#8-canonical-coverage-and-acceptance-allocation) links them to the canonical requirement-to-evidence matrix and allocates checks. M004 provides enabling evidence for LLM-AC-001's independent build boundary and LLM-AC-005's prompt data separation only; every complete product scenario and remaining runtime assertion is still pending its owning slice.
+These IDs describe checks for #4, not a duplicate product coverage catalog or implementation task list. [#6 Section 8](verification/coverage.md#8-canonical-coverage-and-acceptance-allocation) links them to the canonical requirement-to-evidence matrix and allocates checks. M004 provides enabling evidence for LLM-AC-001's independent build boundary and LLM-AC-005's prompt data separation only; every complete product scenario and remaining runtime assertion is still pending its owning slice.
 
 | Scenario | Observable acceptance / boundary | Upstream |
 | --- | --- | --- |
@@ -324,5 +296,3 @@ These IDs describe checks for #4, not a duplicate product coverage catalog or im
 | Q-005, #6 | Corpus/rubric/human coverage and workloads specified in [#6](06-verification-plan.md); actual cases, reviews and execution evidence pending | Candidate acceptance and release gates |
 | Q-004, #3/#5/#10 | Operational metadata retention/reconciliation windows, account lifecycle and provider disclosure; source/result storage policy remains unchanged | Related retention/account implementation and launch |
 | Q-008/Q-010, PRD then architecture/operations | P-005/P-006 disposition and any new operational controls | Adoption of proposed controls; not permission to add them here |
-
-**Implementation reconciliation:** This document preserves the two family chains, whole-input processing, success-only character charging, invisible fallback, provider-managed caching and deferred/proposed distinctions. Architecture, ADR-012 and [package 004](../specs/004-independent-ai-development/spec.md) remain aligned on the staged shared AI boundary. M004's focused runtime evidence is linked above; later AI behavior and every live/provider/product/release gate remain pending.

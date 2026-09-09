@@ -28,3 +28,7 @@ backend/src/LinguaDesk.Api/wwwroot/
 .DS_Store
 *.user
 *.suo
+
+# Python documentation tooling
+__pycache__/
+*.py[cod]

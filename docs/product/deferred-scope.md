@@ -1,0 +1,19 @@
+# Deferred scope register
+
+#1 product authority. Read when selecting deferred work or checking a scope boundary; excluded from ordinary MVP execution context.
+
+### 3.1 Deferred scope register (product authority)
+
+The user approved the simplification on **2026-09-08**, against the documents at Git revision `54343c3`. This register is the single source for later-phase scope; it is not a second executable specification or a roadmap. **Deferred** items are intended for later implementation, with milestone/date unassigned. They are not MVP blockers and need no placeholder endpoints, DTOs, feature flags, UI, or tests now. Before selecting one, refine its design against the then-current product; retain its original IDs and connect it to a document #8 backlog/package. Historical detailed UX at `54343c3` is reference material, not automatically reinstated acceptance criteria.
+
+| ID | Deferred capability / related IDs | Current MVP substitute | Reactivation boundary |
+| --- | --- | --- | --- |
+| DF-001 | Sentence alternatives, selection/reuse, sentence-only charging, sentence/version API association — FR-020/021/025; deferred parts of FR-022/035 | Complete rewrite plus ordinary result editing; no sentence metadata or alternatives API | Define alternative context/IDs/accounting/evaluation and local result lifecycle. Any manual edit clears all assistance metadata; targeted preservation remains retired |
+| DF-002 | Change review: highlighting/comparison — FR-019; related FR-038 preference | Plain editable result; no diff/comparison view or Show changes control | Start from a separate read-only comparison design; re-evaluate highlighting needs. Does not require sentence alternatives or restore targeted correspondence |
+| DF-003 | Automatic processing after a pause — timing parts of FR-011/016, former P-001/P-003 | Explicit buttons; validity recovery merely reenables submission | Define opt-in/default behavior, debounce/IME timing, races, cost disclosures and tests before activation; prior 1-second design is historical input |
+| DF-004 | Per-language/directed-route matching, priorities, overlapping rules, arbitrary fallback chains — FR-031; deferred parts of FR-030/032 | Two operation-family chains, one primary plus at most one fallback each | Evidence that route-specific quality/cost needs justify the rule system; validate configurations and eligible models |
+| DF-005 | Bespoke selectors, anchored tools, responsive rails/sheets — UX custom interaction design | Native selects and persistent inline controls; ordinary responsive layout and accessibility remain | A selected UX package demonstrates user benefit; do not replace native behavior solely for visual parity |
+| DF-006 | Translation prefix processing, truncation disclosure and processed-boundary navigation — deferred part of FR-007/024 | Reject oversized input with count and shortening guidance; preserve all source text | Reintroduce partial-result semantics, Unicode prefix boundary, charging and disclosures together |
+| DF-007 | Google sign-in and related external-account linking — deferred part of FR-001, Q-004 | Local accounts with verification/recovery; cookie and independent API access remain | Add provider/callback/linking design and real integration evidence; no Google configuration needed for MVP |
+
+**Removed, not deferred:** targeted sentence identity/cache preservation through manual edits (former FR-023/Q-002) is cut. If DF-001/002 are implemented later, any manual edit invalidates all assistance metadata; the text remains editable/copyable. The separate Correction-only toggle, None set duplication, and remembered-style restoration (former FR-015/Q-002) are retired in favor of the single dropdown. These are not implied future tasks.

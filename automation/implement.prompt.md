@@ -1,21 +1,12 @@
-Implement milestone {{MILESTONE}} in the LinguaDesk repository.
+Execute one LinguaDesk milestone under the authoritative SDD workflow.
 
-Read the authoritative SDD documents beginning with `docs/00-SDD-Planning-Workflow.md`, the roadmap and backlog entry for {{MILESTONE}}, and the selected delivery package's `spec.md`, `plan.md`, and `tasks.md`. Compare their recorded source revisions with the current repository before making changes.
+Run `python3 automation/context.py packet {{MILESTONE}}`. It validates reviewed inputs and supplies #0, execution rules, selected canonical excerpts, spec/plan and mutable backlog/tasks in that order. Follow this bounded reading set; do not reread all authoritative documents or follow every link. Inspect relevant code and current dependencies/Git changes. If the packet fails, review the affected inputs and plan before continuing; never blindly refresh a lock. Missing required context must be resolved at its owner and added to the selected manifest.
 
-Execute the selected implementation plan completely:
+Complete all ordered tasks and selected acceptance, run every applicable package/regression check, review the full diff, and update tasks/evidence, backlog state, current delivery status, affected coverage rows and operating instructions. Preserve human/live evidence gates and scope exclusions. No other milestone or Git commit (the runner owns commits). The runner's fixed checks supplement package-specific verification.
 
-- Work only on {{MILESTONE}} and its documented indispensable prerequisites. Do not start another milestone.
-- Confirm the package is ready for implementation and stop if a blocking dependency, decision, credential, or human action is missing.
-- Follow the authoritative specifications and ordered tasks. Fix inconsistencies at their owning source rather than coding around them.
-- Implement the required behavior and tests completely. Milestones have no fixed duration limit; completion requires all acceptance criteria and applicable verification.
-- Run every applicable check from the selected package and verification plan, including relevant regression, integration, smoke, or frontend checks; correct failures before finishing.
-- Review the complete diff for scope, correctness, security, privacy, and accidental generated files.
-- Update task completion, backlog state, roadmap evidence, affected specifications, and operating instructions so they describe verified behavior accurately.
-- Do not claim a release gate, live-service result, or human verification without its required evidence.
-- Do not create a Git commit; the automation script owns commits.
+Finish with a concise outcome/blocker summary and exactly one raw final status line, without a bullet, fence or backticks:
+MILESTONE_AUTOMATION_STATUS: COMPLETE
+or, when work/evidence/blockers remain:
+MILESTONE_AUTOMATION_STATUS: BLOCKED
 
-Finish only when {{MILESTONE}} is done under document #0, or clearly report the blocker without claiming completion. End your final response with exactly one of these raw status lines, without a bullet, Markdown fence, or backticks:
-
-`MILESTONE_AUTOMATION_STATUS: COMPLETE` only when {{MILESTONE}} is done and all required checks pass.
-
-`MILESTONE_AUTOMATION_STATUS: BLOCKED` when it is not complete. Never report `COMPLETE` while work, evidence, or a blocking issue remains.
+Selected milestone: {{MILESTONE}}.
