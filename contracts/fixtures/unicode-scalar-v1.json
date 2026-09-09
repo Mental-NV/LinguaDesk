@@ -1,0 +1,38 @@
+{
+  "policyId": "unicode-scalar-v1",
+  "whitespaceCodePoints": [9, 10, 11, 12, 13, 32, 133, 160, 5760, 8192, 8193, 8194, 8195, 8196, 8197, 8198, 8199, 8200, 8201, 8202, 8232, 8233, 8239, 8287, 12288],
+  "validCases": [
+    { "id": "ascii", "text": "A", "expectedCount": 1, "expectedWhitespaceOnly": false },
+    { "id": "precomposed", "text": "é", "expectedCount": 1, "expectedWhitespaceOnly": false },
+    { "id": "decomposed", "text": "é", "expectedCount": 2, "expectedWhitespaceOnly": false },
+    { "id": "surrogate-pair-emoji", "text": "😀", "expectedCount": 1, "expectedWhitespaceOnly": false },
+    { "id": "multi-scalar-emoji", "text": "👩🏽‍🚒", "expectedCount": 4, "expectedWhitespaceOnly": false },
+    { "id": "chinese", "text": "中文", "expectedCount": 2, "expectedWhitespaceOnly": false },
+    { "id": "crlf", "text": "a\r\nb", "expectedCount": 4, "expectedWhitespaceOnly": false },
+    { "id": "lf", "text": "a\nb", "expectedCount": 3, "expectedWhitespaceOnly": false },
+    { "id": "significant-whitespace", "text": " a\t", "expectedCount": 3, "expectedWhitespaceOnly": false },
+    { "id": "fixed-whitespace", "text": "\t\n\u000b\f\r \u0085                 　", "expectedCount": 25, "expectedWhitespaceOnly": true },
+    { "id": "empty", "text": "", "expectedCount": 0, "expectedWhitespaceOnly": true }
+  ],
+  "malformedCases": [
+    { "id": "isolated-high", "utf16CodeUnits": [55296] },
+    { "id": "isolated-low", "utf16CodeUnits": [56320] },
+    { "id": "high-before-ascii", "utf16CodeUnits": [55296, 65] },
+    { "id": "low-after-ascii", "utf16CodeUnits": [65, 56320] }
+  ],
+  "limitCases": [
+    { "id": "translation-l-minus-1", "family": "translation", "scalar": "😀", "repeat": 4999, "maximum": 5000, "expectedValid": true, "expectedExcess": 0 },
+    { "id": "translation-l", "family": "translation", "scalar": "😀", "repeat": 5000, "maximum": 5000, "expectedValid": true, "expectedExcess": 0 },
+    { "id": "translation-l-plus-1", "family": "translation", "scalar": "😀", "repeat": 5001, "maximum": 5000, "expectedValid": false, "expectedExcess": 1 },
+    { "id": "rewriting-l-minus-1", "family": "rewriting", "scalar": "😀", "repeat": 1999, "maximum": 2000, "expectedValid": true, "expectedExcess": 0 },
+    { "id": "rewriting-l", "family": "rewriting", "scalar": "😀", "repeat": 2000, "maximum": 2000, "expectedValid": true, "expectedExcess": 0 },
+    { "id": "rewriting-l-plus-1", "family": "rewriting", "scalar": "😀", "repeat": 2001, "maximum": 2000, "expectedValid": false, "expectedExcess": 1 }
+  ],
+  "selectorPolicy": {
+    "sourceDefault": "auto",
+    "sourceValues": ["auto", "en", "ru", "ro", "zh"],
+    "targetValues": ["en", "ru", "ro", "zh"],
+    "modeDefault": "correctionOnly",
+    "modeValues": ["correctionOnly", "simple", "casual", "business", "academic", "enthusiastic", "friendly", "confident", "diplomatic"]
+  }
+}

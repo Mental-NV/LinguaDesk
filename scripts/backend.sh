@@ -7,9 +7,11 @@ repository_root=$(CDPATH= cd -- "$script_directory/.." && pwd)
 solution="$repository_root/backend/LinguaDesk.slnx"
 api_project="$repository_root/backend/src/LinguaDesk.Api/LinguaDesk.Api.csproj"
 api_test_project="$repository_root/backend/tests/LinguaDesk.Api.Tests/LinguaDesk.Api.Tests.csproj"
+core_test_project="$repository_root/backend/tests/LinguaDesk.Core.Tests/LinguaDesk.Core.Tests.csproj"
 ai_test_project="$repository_root/backend/tests/LinguaDesk.Infrastructure.Ai.Tests/LinguaDesk.Infrastructure.Ai.Tests.csproj"
 expected_sdk="10.0.302"
-expected_minimum_api_tests=42
+expected_minimum_api_tests=47
+expected_minimum_core_tests=8
 configuration="Release"
 
 usage() {
@@ -87,9 +89,10 @@ check() {
 
     results_directory="$repository_root/artifacts/test-results"
     api_report="$results_directory/backend-api.trx"
+    core_report="$results_directory/backend-core.trx"
     ai_report="$results_directory/backend-ai.trx"
     mkdir -p "$results_directory"
-    rm -f "$api_report" "$ai_report"
+    rm -f "$api_report" "$core_report" "$ai_report"
 
     dotnet build "$solution" --configuration "$configuration" --no-restore
     dotnet test "$api_test_project" \
@@ -98,6 +101,18 @@ check() {
         --no-restore \
         --logger "trx;LogFileName=backend-api.trx" \
         --results-directory "$results_directory"
+    core_test_arguments=(
+        dotnet test "$core_test_project"
+        --configuration "$configuration"
+        --no-build
+        --no-restore
+        --logger "trx;LogFileName=backend-core.trx"
+        --results-directory "$results_directory"
+    )
+    if [ -n "${LINGUADESK_CORE_TEST_FILTER:-}" ]; then
+        core_test_arguments+=(--filter "$LINGUADESK_CORE_TEST_FILTER")
+    fi
+    "${core_test_arguments[@]}"
     dotnet test "$ai_test_project" \
         --configuration "$configuration" \
         --no-build \
@@ -106,24 +121,30 @@ check() {
         --results-directory "$results_directory"
 
     validate_report "$api_report" "API/storage" "$expected_minimum_api_tests"
+    validate_report "$core_report" "Core input policy" "$expected_minimum_core_tests"
     validate_report "$ai_report" "independent AI" 1
 
     api_total=$(counter_value "$api_report" total)
     api_passed=$(counter_value "$api_report" passed)
     api_failed=$(counter_value "$api_report" failed)
     api_skipped=$(counter_value "$api_report" notExecuted)
+    core_total=$(counter_value "$core_report" total)
+    core_passed=$(counter_value "$core_report" passed)
+    core_failed=$(counter_value "$core_report" failed)
+    core_skipped=$(counter_value "$core_report" notExecuted)
     ai_total=$(counter_value "$ai_report" total)
     ai_passed=$(counter_value "$ai_report" passed)
     ai_failed=$(counter_value "$ai_report" failed)
     ai_skipped=$(counter_value "$ai_report" notExecuted)
 
-    total=$((api_total + ai_total))
-    passed=$((api_passed + ai_passed))
-    failed=$((api_failed + ai_failed))
-    skipped=$((api_skipped + ai_skipped))
+    total=$((api_total + core_total + ai_total))
+    passed=$((api_passed + core_passed + ai_passed))
+    failed=$((api_failed + core_failed + ai_failed))
+    skipped=$((api_skipped + core_skipped + ai_skipped))
 
     echo "Backend check passed: $total total, $passed passed, $failed failed, $skipped skipped."
     echo "API/storage report ($api_total tests): $api_report"
+    echo "Core input policy report ($core_total tests): $core_report"
     echo "Independent AI report ($ai_total tests): $ai_report"
 }
 

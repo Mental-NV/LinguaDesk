@@ -8,7 +8,8 @@ frontend_directory="$repository_root/frontend"
 npm_cache="$repository_root/artifacts/npm-cache"
 expected_node="v24.20.0"
 expected_npm="11.11.0"
-expected_minimum_tests=8
+expected_minimum_tests=36
+expected_minimum_input_policy_tests=20
 
 usage() {
     echo "Usage: bash scripts/frontend.sh {setup|check|dev|smoke}" >&2
@@ -73,7 +74,7 @@ check() {
 
     report="$repository_root/artifacts/test-results/frontend-unit.xml"
     if [ ! -f "$report" ]; then
-        echo "Frontend component tests did not produce the expected report: $report" >&2
+        echo "Frontend component/policy tests did not produce the expected report: $report" >&2
         exit 1
     fi
 
@@ -83,7 +84,13 @@ check() {
         exit 1
     fi
 
-    echo "Frontend check passed with $test_total component tests. Report: $report"
+    input_policy_total=$(sed -n 's/.*<testsuite name="tests\/unit\/inputPolicy.test.ts".* tests="\([0-9][0-9]*\)".*/\1/p' "$report" | head -1)
+    if [ -z "$input_policy_total" ] || [ "$input_policy_total" -lt "$expected_minimum_input_policy_tests" ]; then
+        echo "Frontend check expected at least $expected_minimum_input_policy_tests shared input-policy tests, but the report recorded ${input_policy_total:-none}." >&2
+        exit 1
+    fi
+
+    echo "Frontend check passed with $test_total component/policy tests, including $input_policy_total shared input-policy cases. Report: $report"
 }
 
 dev() {

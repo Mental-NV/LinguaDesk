@@ -1,6 +1,6 @@
 # LinguaDesk — Verification Plan
 
-**Document:** #6 · **Version:** 1.9 · **Status:** Verification design specified; M001–M004 evidence passed; M005 selected and pending; product/release evidence pending
+**Document:** #6 · **Version:** 1.10 · **Status:** Verification design specified; M001–M005 scoped evidence passed; remaining product/release evidence pending
 **Updated:** 2026-09-09
 
 ## 1. Authority, ownership and scope
@@ -20,7 +20,7 @@ The authoring baseline is Git `0ac27aef9641e3bf8a23649268a513a0198b7332`: #0 v1.
 
 Only active MVP acceptance is tested for release. Preserve deferred/retired IDs without placeholder tests. A compound requirement creates work only for its active branch. NFR-007 remains Should; P-005/NFR-008 and P-006 remain proposed. Test already accepted authentication, isolation, credentials, privacy and instruction-as-content contracts without inventing abuse limits or compatibility obligations. Provider retention/no-training certification is not a gate under D-18; application text privacy and monetary admission remain required.
 
-The [M001 / package 001](../specs/001-backend-foundation/spec.md) backend host, [M002 / package 002](../specs/002-published-web-shell/spec.md) published signed-out shell, [M003 / package 003](../specs/003-durable-storage-foundation/spec.md) durable-storage foundation and [M004 / package 004](../specs/004-independent-ai-development/spec.md) offline AI boundary are implemented. [M005 / package 005](../specs/005-shared-input-capability-contract/spec.md) is selected for the public capability operation, shared scalar/validation fixtures and first generated contract/type slice; all M005 runtime evidence is pending. The clean selection baseline reran 42 API/storage, 10 AI and 8 frontend component cases successfully, but these results establish only dependency/regression readiness. There is still no account/editor capability, eligibility parser/decision, generated OpenAPI, provider evidence or passing release evidence. Names outside completed packages below identify planned checks, not necessarily existing commands or files. Document review cannot discharge a release gate.
+The [M001 / package 001](../specs/001-backend-foundation/spec.md) backend host, [M002 / package 002](../specs/002-published-web-shell/spec.md) published signed-out shell, [M003 / package 003](../specs/003-durable-storage-foundation/spec.md) durable-storage foundation, [M004 / package 004](../specs/004-independent-ai-development/spec.md) offline AI boundary and [M005 / package 005](../specs/005-shared-input-capability-contract/spec.md) public capability/shared-input contract are implemented. M005 passed its selected scalar/validation fixture, public HTTP, generated schema/type drift and retained route/publish portions with evidence in its completion record. There is still no account/editor capability, HTTP language submission, eligibility parser/decision, provider evidence or passing release evidence. Names outside completed packages below identify planned checks, not necessarily existing commands or files. Document review cannot discharge a release gate.
 
 ## 2. Verification layers and check catalog
 
@@ -253,24 +253,24 @@ On failure, retain the original result, classify defect versus harness/environme
 
 ### 8.1 Product and release coverage
 
-This is the sole cross-document product coverage matrix; the source documents retain their behavioral acceptance IDs. Active product rows remain **Unselected / Pending** except for the explicitly linked M005 portions below; selection is not passing evidence and no complete product requirement or release gate is yet satisfied. The separately identified M001–M004 rows link their completed enabling packages. Once product work is selected, link its actual #8 backlog/package and state partial coverage honestly. Deferred, retired and proposed rows are intentionally not current test gaps or passing gates. Design references plus Section 8.2 connect product rows to local scenario checks without copying their full acceptance prose.
+This is the sole cross-document product coverage matrix; the source documents retain their behavioral acceptance IDs. Active product rows remain **Unselected / Pending** except for the explicitly linked, passing M005 portions below; those narrow portions do not satisfy a complete product requirement or release gate. The separately identified M001–M005 rows link their completed packages. Once product work is selected, link its actual #8 backlog/package and state partial coverage honestly. Deferred, retired and proposed rows are intentionally not current test gaps or passing gates. Design references plus Section 8.2 connect product rows to local scenario checks without copying their full acceptance prose.
 
 | Requirement / gate | Shared design / acceptance owner | Checks | Backlog/package → evidence/status |
 | --- | --- | --- | --- |
 | FR-001 | UX §9; API §3 | V-004, V-003, V-010 | Unselected → Pending |
 | FR-002 | UX §9; API §3 | V-004, V-003, V-016 | Unselected → Pending |
 | FR-003 | UX §3; API §2 | V-003, V-009, V-012 | Unselected → Pending |
-| FR-004 | UX §6–8; AI §3; API §2/4 | V-001, V-002, V-003, V-007, V-009, V-013 | [M005 AC-002/005](../specs/005-shared-input-capability-contract/spec.md#4-selected-acceptance) selected for source-choice discovery/local selector rules → Pending; semantic eligibility/UI remain unselected |
-| FR-005 | AI §3; UX §7–8; API §2 | V-003, V-007, V-009, V-013 | [M005 AC-002](../specs/005-shared-input-capability-contract/spec.md#4-selected-acceptance) selected for supported-language discovery only → Pending; eligibility/quality/UI remain unselected |
-| FR-006 | AI §3; UX §7–8; API §2 | V-003, V-007, V-009, V-013 | [M005 AC-002](../specs/005-shared-input-capability-contract/spec.md#4-selected-acceptance) selected for Chinese script-policy discovery only → Pending; transformation/quality/UI remain unselected |
-| FR-007 | API §2/4; UX §7–8 | V-001, V-002, V-003, V-009 | [M005 AC-003–005](../specs/005-shared-input-capability-contract/spec.md#4-selected-acceptance) selected for counts/limits/pure validation → Pending; HTTP submission/UI remain unselected |
+| FR-004 | UX §6–8; AI §3; API §2/4 | V-001, V-002, V-003, V-007, V-009, V-013 | [M005 AC-002/005](../specs/005-shared-input-capability-contract/spec.md#4-selected-acceptance) source-choice discovery/local selector portion → Passed; semantic eligibility/UI remain unselected |
+| FR-005 | AI §3; UX §7–8; API §2 | V-003, V-007, V-009, V-013 | [M005 AC-002](../specs/005-shared-input-capability-contract/spec.md#4-selected-acceptance) supported-language discovery portion → Passed; eligibility/quality/UI remain unselected |
+| FR-006 | AI §3; UX §7–8; API §2 | V-003, V-007, V-009, V-013 | [M005 AC-002](../specs/005-shared-input-capability-contract/spec.md#4-selected-acceptance) Chinese script-policy discovery portion → Passed; transformation/quality/UI remain unselected |
+| FR-007 | API §2/4; UX §7–8 | V-001, V-002, V-003, V-009 | [M005 AC-003–005](../specs/005-shared-input-capability-contract/spec.md#4-selected-acceptance) counts/limits/pure-validation portion → Passed; HTTP submission/UI remain unselected |
 | FR-008 | AI §3–4; UX §7–8 | V-007, V-013, V-010 | Unselected → Pending |
-| FR-009 | AI §3; UX §7; API §2 | V-013, V-003, V-009 | [M005 AC-002](../specs/005-shared-input-capability-contract/spec.md#4-selected-acceptance) selected for direction discovery only → Pending; transformations/evaluation/UI remain unselected |
+| FR-009 | AI §3; UX §7; API §2 | V-013, V-003, V-009 | [M005 AC-002](../specs/005-shared-input-capability-contract/spec.md#4-selected-acceptance) direction-discovery portion → Passed; transformations/evaluation/UI remain unselected |
 | FR-010 | AI §3–4; UX §7 | V-013, V-007, V-003 | Unselected → Pending |
 | FR-011 | UX §6–7; AI §4; API §6 | V-002, V-003, V-007, V-010, V-012 | Unselected → Pending |
-| FR-012 | AI §3; UX §8; API §2 | V-003, V-009, V-013 | [M005 AC-002](../specs/005-shared-input-capability-contract/spec.md#4-selected-acceptance) selected for rewrite-language discovery only → Pending; transformations/evaluation/UI remain unselected |
+| FR-012 | AI §3; UX §8; API §2 | V-003, V-009, V-013 | [M005 AC-002](../specs/005-shared-input-capability-contract/spec.md#4-selected-acceptance) rewrite-language-discovery portion → Passed; transformations/evaluation/UI remain unselected |
 | FR-013 | AI §3–4; UX §8 | V-013, V-007, V-003 | Unselected → Pending |
-| FR-014 | UX §8; AI §3; API §2/4 | V-002, V-003, V-007, V-009, V-013 | [M005 AC-002/005](../specs/005-shared-input-capability-contract/spec.md#4-selected-acceptance) selected for mode catalog/default/local selector rules → Pending; rewrite behavior/UI remain unselected |
+| FR-014 | UX §8; AI §3; API §2/4 | V-002, V-003, V-007, V-009, V-013 | [M005 AC-002/005](../specs/005-shared-input-capability-contract/spec.md#4-selected-acceptance) mode catalog/default/local-selector portion → Passed; rewrite behavior/UI remain unselected |
 | FR-015 | PRD FR-015; UX-AC-041/042 | — | Not applicable — Retired |
 | FR-016 | UX §6/8; API §5 | V-002, V-003, V-010, V-012 | Unselected → Pending |
 | FR-017 | UX §6/8 | V-002, V-003, V-010 | Unselected → Pending |
@@ -292,7 +292,7 @@ This is the sole cross-document product coverage matrix; the source documents re
 | FR-033 | AI §4/6–7; API §8 | V-007, V-008, V-005, V-009 | Unselected → Pending |
 | FR-034 | AI §6–7; UX §6; API §6 | V-007, V-013, V-014, V-005, V-003 | Unselected → Pending |
 | FR-035 | API §2/5/9 | V-009, V-005 | Unselected → Pending |
-| FR-036 | API §2–3/7 | V-004, V-009, V-005 | [BI-005](08-backlogs/M005-shared-input-capability-contract.md) → [AC-001–006](../specs/005-shared-input-capability-contract/spec.md#4-selected-acceptance) selected for public choices/limits and generated types → Pending; auth/language/usage independence remains unselected |
+| FR-036 | API §2–3/7 | V-004, V-009, V-005 | [BI-005](08-backlogs/M005-shared-input-capability-contract.md) → [AC-001–006](../specs/005-shared-input-capability-contract/spec.md#4-selected-acceptance) public choices/limits and generated-type portion → Passed; auth/language/usage independence remains unselected |
 | FR-037 | API §8; AI §7; UX §6/9 | V-009, V-003, V-004, V-005, V-007 | Unselected → Pending |
 | FR-038 | UX §3/8; architecture §6/8 | V-002, V-003, V-010, V-015 | Unselected → Pending |
 | NFR-001 | PRD §8; AI §3–5 | V-013 | Unselected → Pending |
@@ -315,11 +315,11 @@ This is the sole cross-document product coverage matrix; the source documents re
 | M002 / BI-002 — enabling scope | Architecture §3.1; UX §3–5 staged shell; partial enablement for FR-003/NFR-005/007, no full product acceptance claimed | V-003 shell components; V-009 API/static boundaries; V-010 navigation/reflow; V-011 visual inspection; V-012 published-shell portion | [BI-002](08-backlogs/M002-published-web-shell.md) → [package AC-001–008](../specs/002-published-web-shell/spec.md#3-selected-acceptance) → [tasks/evidence](../specs/002-published-web-shell/tasks.md#3-completion-record); Done / Passed — 8 component, 20 HTTP and 6 isolated published-host Chromium cases plus stale-asset and screenshot evidence |
 | M003 / BI-003 — enabling scope | Architecture §4.1/5.2/6.1; explicit initialization and clean-restart persistence; no account/ledger or full product acceptance claimed | V-016 fresh migrations/model drift; V-005 file-backed transaction/restart foundation only; V-009/V-012 host/published regressions | [BI-003](08-backlogs/M003-durable-storage-foundation.md) → [package AC-001–006](../specs/003-durable-storage-foundation/spec.md#3-selected-acceptance) → [tasks/evidence](../specs/003-durable-storage-foundation/tasks.md#3-completion-record); Done / Passed — 22 storage cases within 42 backend tests, explicit repeat migration and same-file two-process restart, plus backend/published-shell regressions |
 | M004 / BI-004 — enabling scope | Architecture §3.2/4.1/8.2; AI §2/4.1/9; host-independent shared boundary and synthetic prompt inspection only | V-007 independent build/prompt/scripted-client portions; V-009/V-012 host/published regressions | [BI-004](08-backlogs/M004-independent-ai-development.md) → [package AC-001–007](../specs/004-independent-ai-development/spec.md#3-selected-acceptance) → [tasks/evidence](../specs/004-independent-ai-development/tasks.md#3-completion-record); Done / Passed — 10 focused AI and 42 retained API/storage cases, deterministic prompt hash/inspection, controlled failures, backend smoke and 8 component/6 published Chromium regressions; M015–M020 and all product/release assertions remain unselected |
-| M005 / BI-005 — selected product contract slice | PRD FR-004–007/009/012/014/036; API §2/4/9; public discovery, pure local validation and generated contract/types only | V-001 shared scalar/limit/selector fixtures; V-009 public capability HTTP and schema/type drift portions; V-012 route/publish regressions | [BI-005](08-backlogs/M005-shared-input-capability-contract.md) → [package AC-001–008](../specs/005-shared-input-capability-contract/spec.md#4-selected-acceptance) → [tasks](../specs/005-shared-input-capability-contract/tasks.md); Selected / Pending — no M005 implementation evidence; text submission, auth, usage, AI, accounting, UI and release checks remain unselected |
+| M005 / BI-005 — product contract slice | PRD FR-004–007/009/012/014/036; API §2/4/9; public discovery, pure local validation and generated contract/types only | V-001 shared scalar/limit/selector fixtures; V-009 public capability HTTP and schema/type drift portions; V-012 route/publish regressions | [BI-005](08-backlogs/M005-shared-input-capability-contract.md) → [package AC-001–008](../specs/005-shared-input-capability-contract/spec.md#4-selected-acceptance) → [tasks/evidence](../specs/005-shared-input-capability-contract/tasks.md#3-completion-record); Done / Passed — 47 API/storage, 10 Core, 10 AI, 36 frontend unit and 6 published Chromium cases plus deterministic generation/drift and failure guards; text submission, auth, usage, AI behavior, accounting, UI adoption and release checks remain unselected |
 
 ### 8.2 Local acceptance allocation
 
-Read the complete contracts at [UX Section 12](02-ux-specification.md#12-acceptance-contracts-and-preserved-scenario-ids), [LLM Section 10](04-llm-specification.md#10-local-acceptance-scenarios-and-handoffs) and [API Section 10](05-api-design.md#10-acceptance-scenarios-and-readiness). The following indexes allocate every existing scenario. Active checks are pending; only M005's explicitly selected API-AC-001 fixture portion and API-AC-014 first-slice portion now have a package, with no runtime evidence yet. Multiple V-IDs split different assertions; they do not require repeating a journey at every layer. For example, UX-AC-106 uses V-002 for ordering, V-003 for display and V-005 for durable snapshot order.
+Read the complete contracts at [UX Section 12](02-ux-specification.md#12-acceptance-contracts-and-preserved-scenario-ids), [LLM Section 10](04-llm-specification.md#10-local-acceptance-scenarios-and-handoffs) and [API Section 10](05-api-design.md#10-acceptance-scenarios-and-readiness). The following indexes allocate every existing scenario. Active checks remain pending except for M005's completed API-AC-001 fixture/local-boundary portion and API-AC-014 first capability-slice portion. Multiple V-IDs split different assertions; they do not require repeating a journey at every layer. For example, UX-AC-106 uses V-002 for ordering, V-003 for display and V-005 for durable snapshot order.
 
 | UX scenario IDs | Current status | Check allocation |
 | --- | --- | --- |
@@ -456,7 +456,7 @@ Read the complete contracts at [UX Section 12](02-ux-specification.md#12-accepta
 
 | API scenario | Check allocation |
 | --- | --- |
-| API-AC-001 | V-001; M005 AC-004/005 selected for the fixture/local-boundary portion, HTTP submission boundary later |
+| API-AC-001 | V-001; M005 AC-004/005 passed for the fixture/local-boundary portion, HTTP submission boundary later |
 | API-AC-002 | V-004 |
 | API-AC-003 | V-004 |
 | API-AC-004 | V-005 |
@@ -469,13 +469,13 @@ Read the complete contracts at [UX Section 12](02-ux-specification.md#12-accepta
 | API-AC-011 | V-005, V-002, V-003 |
 | API-AC-012 | V-004, V-015 |
 | API-AC-013 | V-009 |
-| API-AC-014 | V-009; M005 AC-006/007 selected for the first capability slice |
+| API-AC-014 | V-009; M005 AC-006/007 passed for the first capability slice |
 
 The UX index contains 86 active scenarios (29 MVP, 57 Amended), 21 Deferred and five Retired, retaining all 112 IDs. The LLM index retains 15 and the API index 14 active scenarios. Deferred alternative branches within active rows do not create current checks. Native browser/AT evidence uses Section 4's representative journeys, not 86 full end-to-end scripts.
 
 ## 9. Readiness and remaining dependencies
 
-Q-005 is **specified at design level** by Sections 5–6. The corpus, implementation, reviewers and measurements are still pending; specifying counts is not qualifying a candidate. M001–M004's scoped evidence is complete, but it does not qualify product behavior or any release gate. M005 now selects only the V-001/V-009 portions listed above; its implementation evidence is pending. Later work continues through #0's roadmap/backlog/delivery-package process.
+Q-005 is **specified at design level** by Sections 5–6. The corpus, implementation, reviewers and measurements are still pending; specifying counts is not qualifying a candidate. M001–M005's scoped evidence is complete, but it does not qualify language behavior or any release gate. M005 passes only the V-001/V-009/V-012 portions listed above. Later work continues through #0's roadmap/backlog/delivery-package process.
 
 | Dependency | Required before claiming readiness |
 | --- | --- |
@@ -487,4 +487,4 @@ Q-005 is **specified at design level** by Sections 5–6. The corpus, implementa
 | Browser/AT and operations | Access to supported current/previous actual versions/devices/AT; real email and published-host/restore evidence |
 | Q-008/Q-010 / P-005/P-006 | Product-owner disposition of proposed safeguards/compatibility before making them binding; RG-008 reviews current launch dependencies only |
 
-**M005 planning validation:** Requirement/scenario inventory, local links, fixture/field coverage, task mappings and proposal status are document checks. Clean-baseline backend/frontend checks passed as dependency/regression readiness, not M005 behavior. No M005 runtime, live-provider, performance, browser, accessibility or release gate is reported passed. Earlier technical references retain their recorded dates; package 005 records the generation-tool sources checked on 2026-09-09.
+**M005 implementation validation:** The [completion record](../specs/005-shared-input-capability-contract/tasks.md#3-completion-record) links the exact deterministic/runtime evidence for the selected public capability, fixture/validation and contract-generation portions. The record distinguishes the initial published-artifact failure and corrected rerun, passing package audits, deliberate drift/CLI/zero-test failures and retained regressions. No HTTP text-submission, live-provider, quality, performance, accessibility or release gate is reported passed. Earlier technical references retain their recorded dates; package 005 records the generation-tool sources checked on 2026-09-09.

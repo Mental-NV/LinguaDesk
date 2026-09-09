@@ -1,8 +1,8 @@
 # 005 — Shared Input and Capability Contract: Implementation Plan
 
-**Version:** 1.0 · **Updated:** 2026-09-09
-**State:** Ready for implementation
-**Inputs:** [spec.md](spec.md) v1.0; [BI-005](../../docs/08-backlogs/M005-shared-input-capability-contract.md) v1.0
+**Version:** 1.1 · **Updated:** 2026-09-09
+**State:** Implemented and verified
+**Inputs:** [spec.md](spec.md) v1.1; [BI-005](../../docs/08-backlogs/M005-shared-input-capability-contract.md) v1.1
 
 ## 1. Current state, dependency and tooling
 
@@ -10,9 +10,13 @@ Planning baseline `a257cd1f8b0ff08147ad2770c7851e98184fa7a9` is clean and contai
 
 The API currently has only process liveness, lazy persistence service registration, static/fallback routing and explicit `/api` catch-alls. The solution has no Core project or contract tooling. Frontend TypeScript is strict with JSON-module support, but it has no `src/api`, shared input helper or generated type. There is no OpenAPI artifact. This is exactly the state expected before the first selected product API slice.
 
-Pin `Microsoft.AspNetCore.OpenApi` and `Microsoft.Extensions.ApiDescription.Server` at **10.0.10**, matching the repository's existing .NET 10.0.10 package/runtime baseline instead of introducing an unrelated servicing update. Microsoft documents that these packages provide native OpenAPI support and build-time generation, that build-time generation runs the app entry point with a mock server, and that `--openapi-version OpenApi3_1` fixes the format. Use `openapi-typescript` **7.13.0** and `yaml` **2.9.0** as npm development dependencies; both support the pinned Node/TypeScript stack and local OpenAPI 3.1/YAML generation. Sources checked 2026-09-09: [ASP.NET Core generation](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/openapi/aspnetcore-openapi?view=aspnetcore-10.0), [Microsoft.AspNetCore.OpenApi 10.0.10](https://www.nuget.org/packages/Microsoft.AspNetCore.OpenApi/10.0.10), [Microsoft.Extensions.ApiDescription.Server 10.0.10](https://www.nuget.org/packages/Microsoft.Extensions.ApiDescription.Server/10.0.10), [openapi-typescript 7.13.0](https://www.npmjs.com/package/openapi-typescript/v/7.13.0) and [yaml 2.9.0](https://www.npmjs.com/package/yaml/v/2.9.0).
+Pin `Microsoft.AspNetCore.OpenApi` and `Microsoft.Extensions.ApiDescription.Server` at **10.0.10**, matching the repository's existing .NET 10.0.10 package/runtime baseline instead of introducing an unrelated servicing update. Pin their `Microsoft.OpenApi` 2.x dependency at patched **2.7.5**: implementation preflight on 2026-09-09 found that the packages otherwise resolved vulnerable 2.0.0, and GHSA-v5pm-xwqc-g5wc identifies 2.7.5 as the patched 2.x release. Microsoft documents that the ASP.NET packages provide native OpenAPI support and build-time generation, that build-time generation runs the app entry point with a mock server, and that `--openapi-version OpenApi3_1` fixes the format. Use `openapi-typescript` **7.13.0** and `yaml` **2.9.0** as npm development dependencies; both support the pinned Node/TypeScript stack and local OpenAPI 3.1/YAML generation. Sources checked 2026-09-09: [ASP.NET Core generation](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/openapi/aspnetcore-openapi?view=aspnetcore-10.0), [Microsoft.AspNetCore.OpenApi 10.0.10](https://www.nuget.org/packages/Microsoft.AspNetCore.OpenApi/10.0.10), [Microsoft.Extensions.ApiDescription.Server 10.0.10](https://www.nuget.org/packages/Microsoft.Extensions.ApiDescription.Server/10.0.10), [Microsoft.OpenApi security advisory](https://github.com/advisories/GHSA-v5pm-xwqc-g5wc), [openapi-typescript 7.13.0](https://www.npmjs.com/package/openapi-typescript/v/7.13.0) and [yaml 2.9.0](https://www.npmjs.com/package/yaml/v/2.9.0).
 
 Do not add a provider package, EF/Identity dependency to Core, OpenAPI UI/runtime document route, second schema source, `openapi-fetch`, auth library or API-versioning framework. Initial restore/npm lock updates are followed by locked/offline-capable checks and dependency audit; an incompatible/vulnerable selected graph is a blocker until explicitly resolved.
+
+**Implementation preflight adjustment — 2026-09-09:** Current NuGet/npm advisory data made the originally recorded graph fail the required audit. Retain the selected OpenAPI generator pins, add the patched transitive `Microsoft.OpenApi` 2.7.5 pin, update the existing compatible frontend pins to `react-router-dom` 7.18.3, Vite 8.2.2 and Vitest 4.1.11, and override `js-yaml` to patched 4.3.2 for `openapi-typescript`'s Redocly dependency. These are audit-only prerequisite updates with locked regression coverage; they add no M005 behavior or compatibility promise.
+
+**Published-artifact correction — 2026-09-09:** The first isolated publish smoke exposed that marking the direct `Microsoft.OpenApi` pin private omitted its runtime assembly while `AddOpenApi` registration still executes at application startup. Keep `Microsoft.Extensions.ApiDescription.Server` private because it is build tooling, but retain `Microsoft.OpenApi` as a normal direct API dependency. The corrected artifact contains the assembly and passes the real published-host smoke; no runtime OpenAPI document route is mapped.
 
 ## 2. Design and affected components
 

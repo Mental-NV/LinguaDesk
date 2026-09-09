@@ -5,13 +5,14 @@
     <TargetFramework>net10.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" />
     <PackageReference Include="MSTest.TestAdapter" />
     <PackageReference Include="MSTest.TestFramework" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="../../src/LinguaDesk.Api/LinguaDesk.Api.csproj" />
     <ProjectReference Include="../../src/LinguaDesk.Core/LinguaDesk.Core.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="../../../contracts/fixtures/unicode-scalar-v1.json" Link="Fixtures/unicode-scalar-v1.json" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>

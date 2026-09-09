@@ -1,10 +1,12 @@
 <Solution>
   <Folder Name="/src/">
     <Project Path="src/LinguaDesk.Api/LinguaDesk.Api.csproj" />
+    <Project Path="src/LinguaDesk.Core/LinguaDesk.Core.csproj" />
     <Project Path="src/LinguaDesk.Infrastructure.Ai/LinguaDesk.Infrastructure.Ai.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/LinguaDesk.Api.Tests/LinguaDesk.Api.Tests.csproj" />
+    <Project Path="tests/LinguaDesk.Core.Tests/LinguaDesk.Core.Tests.csproj" />
     <Project Path="tests/LinguaDesk.Infrastructure.Ai.Tests/LinguaDesk.Infrastructure.Ai.Tests.csproj" />
   </Folder>
   <Folder Name="/tools/">

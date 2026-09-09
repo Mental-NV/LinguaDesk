@@ -39,6 +39,12 @@ test('keeps API, health, asset, file, and method boundaries non-HTML', async ({ 
 
   const apiResponse = await request.get('/api/missing')
   expect(apiResponse.headers()['content-type']).toContain('application/problem+json')
+  const capabilityResponse = await request.get('/api/capabilities')
+  expect(capabilityResponse.status()).toBe(200)
+  expect(capabilityResponse.headers()['content-type']).toContain('application/json')
+  expect(capabilityResponse.headers()['cache-control']).toBe('no-store')
+  expect((await capabilityResponse.json()).countingPolicy.id).toBe('unicode-scalar-v1')
+  expect((await request.post('/api/capabilities')).status()).toBe(405)
   const healthResponse = await request.get('/health/live')
   expect(healthResponse.status()).toBe(200)
   expect(await healthResponse.text()).toBe('Healthy')

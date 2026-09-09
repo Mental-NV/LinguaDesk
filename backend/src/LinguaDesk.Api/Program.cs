@@ -1,11 +1,14 @@
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Routing;
+using LinguaDesk.Api.Features.Capabilities;
 using LinguaDesk.Api.Infrastructure.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddHealthChecks();
 builder.Services.AddProblemDetails();
+builder.Services.AddSingleton(TimeProvider.System);
+builder.Services.AddLinguaDeskOpenApi();
 builder.Services.AddLinguaDeskPersistence(builder.Configuration, builder.Environment);
 
 var app = builder.Build();
@@ -34,6 +37,8 @@ app.MapHealthChecks(
             Predicate = static _ => false,
         })
     .WithMetadata(new HttpMethodMetadata([HttpMethods.Get]));
+
+app.MapCapabilities();
 
 static IResult ApiNotFound() => Results.Problem(
     detail: "The requested API endpoint does not exist.",

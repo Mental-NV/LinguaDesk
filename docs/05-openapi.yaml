@@ -1,0 +1,329 @@
+# Generated from C# endpoint metadata by scripts/contract.sh. Do not edit by hand.
+openapi: 3.1.1
+info:
+  title: LinguaDesk API
+  description: Pre-release M005 contract containing only the implemented public capabilities operation. No compatibility or deprecation guarantee is implied.
+  version: 0.1.0-m005
+paths:
+  /api/capabilities:
+    get:
+      tags:
+        - CapabilitiesEndpoints
+      summary: Get accepted language and input capabilities
+      description: Returns public catalog, input-counting, whole-input limit, deadline, and retry-identity metadata. The catalog does not imply that language-operation, account, usage, or status endpoints are implemented.
+      operationId: getCapabilities
+      responses:
+        "200":
+          description: OK
+          headers:
+            Cache-Control:
+              description: Always `no-store` because the response includes current server time.
+              required: true
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CapabilitiesResponse"
+components:
+  schemas:
+    CapabilitiesResponse:
+      required:
+        - serverTimeUtc
+        - languages
+        - sourceSelection
+        - chineseScriptPolicy
+        - countingPolicy
+        - translation
+        - rewriting
+        - operationIdentity
+      type: object
+      properties:
+        serverTimeUtc:
+          type: string
+          description: Current server time in UTC, used by clients when validating new UUIDv7 timestamps.
+          format: date-time
+        languages:
+          type: array
+          items:
+            $ref: "#/components/schemas/LanguageCapability"
+          description: Ordered supported language identifiers and English names.
+        sourceSelection:
+          description: Accepted source-language values and omission default.
+          $ref: "#/components/schemas/SourceSelectionCapability"
+        chineseScriptPolicy:
+          description: Accepted Chinese input scripts and required Chinese output script.
+          $ref: "#/components/schemas/ChineseScriptPolicyCapability"
+        countingPolicy:
+          description: Canonical decoded-input counting and local rejection policy.
+          $ref: "#/components/schemas/CountingPolicyCapability"
+        translation:
+          description: Translation directions, whole-input limit, and overall deadline.
+          $ref: "#/components/schemas/TranslationCapability"
+        rewriting:
+          description: Exclusive rewriting modes, whole-input limit, and overall deadline.
+          $ref: "#/components/schemas/RewritingCapability"
+        operationIdentity:
+          description: UUIDv7 operation-identity recovery bounds.
+          $ref: "#/components/schemas/OperationIdentityCapability"
+    ChineseScript:
+      enum:
+        - simplified
+        - traditional
+      type: string
+    ChineseScriptPolicyCapability:
+      required:
+        - acceptedInput
+        - output
+      type: object
+      properties:
+        acceptedInput:
+          type: array
+          items:
+            $ref: "#/components/schemas/ChineseScript"
+          description: Chinese scripts accepted as input.
+        output:
+          description: Chinese script used for output.
+          $ref: "#/components/schemas/ChineseScript"
+      description: Accepted Chinese input scripts and required Chinese output script.
+    CountingPolicyCapability:
+      required:
+        - id
+        - unit
+        - normalization
+        - lineEndings
+        - invalidUnicode
+        - emptyOrWhitespace
+        - whitespaceCodePointRanges
+      type: object
+      properties:
+        id:
+          type: string
+          description: Versioned counting policy identifier.
+        unit:
+          description: Unit counted in exact decoded source text.
+          $ref: "#/components/schemas/CountingUnit"
+        normalization:
+          description: Unicode normalization applied before counting; none for this policy.
+          $ref: "#/components/schemas/NormalizationPolicy"
+        lineEndings:
+          description: Line-ending treatment before counting; exact line endings are preserved.
+          $ref: "#/components/schemas/LineEndingPolicy"
+        invalidUnicode:
+          description: Disposition of isolated UTF-16 surrogates or malformed decoded Unicode.
+          $ref: "#/components/schemas/InvalidUnicodePolicy"
+        emptyOrWhitespace:
+          description: Disposition of empty or fixed-set whitespace-only source.
+          $ref: "#/components/schemas/EmptyOrWhitespacePolicy"
+        whitespaceCodePointRanges:
+          type: array
+          items:
+            type: string
+          description: Inclusive Unicode code-point ranges used only for the all-whitespace decision.
+      description: Canonical decoded-input counting and local rejection policy.
+    CountingUnit:
+      enum:
+        - unicodeScalar
+      type: string
+      description: Unit counted in exact decoded source text.
+    EmptyOrWhitespacePolicy:
+      enum:
+        - reject
+      type: string
+      description: Disposition of empty or fixed-set whitespace-only source.
+    InvalidUnicodePolicy:
+      enum:
+        - reject
+      type: string
+      description: Disposition of isolated UTF-16 surrogates or malformed decoded Unicode.
+    LanguageCapability:
+      required:
+        - id
+        - name
+      type: object
+      properties:
+        id:
+          description: Stable language identifier.
+          $ref: "#/components/schemas/LanguageId"
+        name:
+          type: string
+          description: English display name.
+    LanguageId:
+      enum:
+        - en
+        - ru
+        - ro
+        - zh
+      type: string
+      description: Stable language identifier.
+    LineEndingPolicy:
+      enum:
+        - preserve
+      type: string
+      description: Line-ending treatment before counting; exact line endings are preserved.
+    NormalizationPolicy:
+      enum:
+        - none
+      type: string
+      description: Unicode normalization applied before counting; none for this policy.
+    OperationIdentityCapability:
+      required:
+        - format
+        - validForSeconds
+        - maximumFutureSkewSeconds
+      type: object
+      properties:
+        format:
+          description: Client-generated operation identity format.
+          $ref: "#/components/schemas/OperationIdentityFormat"
+        validForSeconds:
+          type: integer
+          description: Retry and status validity after the UUID embedded timestamp, in seconds.
+          format: int32
+        maximumFutureSkewSeconds:
+          type: integer
+          description: Maximum accepted future UUID timestamp skew, in seconds.
+          format: int32
+      description: UUIDv7 operation-identity recovery bounds.
+    OperationIdentityFormat:
+      enum:
+        - uuidV7
+      type: string
+      description: Client-generated operation identity format.
+    OversizeHandling:
+      enum:
+        - rejectWhole
+      type: string
+      description: Whole-input behavior when the source exceeds the maximum.
+    RewritingCapability:
+      required:
+        - maximumSourceCharacters
+        - oversizeHandling
+        - overallDeadlineSeconds
+        - defaultMode
+        - modes
+      type: object
+      properties:
+        maximumSourceCharacters:
+          type: integer
+          description: Maximum complete decoded source in Unicode scalar values.
+          format: int32
+        oversizeHandling:
+          description: Whole-input behavior when the source exceeds the maximum.
+          $ref: "#/components/schemas/OversizeHandling"
+        overallDeadlineSeconds:
+          type: integer
+          description: Overall server deadline including eligibility and fallback attempts.
+          format: int32
+        defaultMode:
+          description: Writing mode used when a client omits the mode.
+          $ref: "#/components/schemas/RewritingModeId"
+        modes:
+          type: array
+          items:
+            $ref: "#/components/schemas/RewritingModeCapability"
+          description: Ordered mutually exclusive rewriting choices; correction applies to every choice.
+      description: Exclusive rewriting modes, whole-input limit, and overall deadline.
+    RewritingModeCapability:
+      required:
+        - id
+        - name
+        - kind
+      type: object
+      properties:
+        id:
+          description: Stable writing-mode identifier.
+          $ref: "#/components/schemas/RewritingModeId"
+        name:
+          type: string
+          description: English display name.
+        kind:
+          description: Correction, writing-style, or tone category.
+          $ref: "#/components/schemas/RewritingModeKind"
+    RewritingModeId:
+      enum:
+        - correctionOnly
+        - simple
+        - casual
+        - business
+        - academic
+        - enthusiastic
+        - friendly
+        - confident
+        - diplomatic
+      type: string
+      description: Writing mode used when a client omits the mode.
+    RewritingModeKind:
+      enum:
+        - correction
+        - style
+        - tone
+      type: string
+      description: Correction, writing-style, or tone category.
+    SourceSelectionCapability:
+      required:
+        - default
+        - values
+      type: object
+      properties:
+        default:
+          description: Source selection used when a client omits the setting.
+          $ref: "#/components/schemas/SourceSelectionValue"
+        values:
+          type: array
+          items:
+            $ref: "#/components/schemas/SourceSelectionValue"
+          description: Ordered accepted automatic and manual source selections.
+      description: Accepted source-language values and omission default.
+    SourceSelectionValue:
+      enum:
+        - auto
+        - en
+        - ru
+        - ro
+        - zh
+      type: string
+      description: Source selection used when a client omits the setting.
+    TranslationCapability:
+      required:
+        - maximumSourceCharacters
+        - oversizeHandling
+        - overallDeadlineSeconds
+        - targetRequired
+        - supportedDirections
+      type: object
+      properties:
+        maximumSourceCharacters:
+          type: integer
+          description: Maximum complete decoded source in Unicode scalar values.
+          format: int32
+        oversizeHandling:
+          description: Whole-input behavior when the source exceeds the maximum.
+          $ref: "#/components/schemas/OversizeHandling"
+        overallDeadlineSeconds:
+          type: integer
+          description: Overall server deadline including eligibility and fallback attempts.
+          format: int32
+        targetRequired:
+          type: boolean
+          description: Whether the client must explicitly select a translation target.
+        supportedDirections:
+          type: array
+          items:
+            $ref: "#/components/schemas/TranslationDirectionCapability"
+          description: Ordered supported distinct source-to-target language pairs.
+      description: Translation directions, whole-input limit, and overall deadline.
+    TranslationDirectionCapability:
+      required:
+        - source
+        - target
+      type: object
+      properties:
+        source:
+          description: Translation source language.
+          $ref: "#/components/schemas/LanguageId"
+        target:
+          description: Translation target language.
+          $ref: "#/components/schemas/LanguageId"
+tags:
+  - name: CapabilitiesEndpoints

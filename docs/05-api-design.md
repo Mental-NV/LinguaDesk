@@ -1,6 +1,6 @@
 # LinguaDesk — API Behavioral Design
 
-**Document:** #5 · **Version:** 1.2 · **Status:** Shared design; M005 capability contract selected; generated contract and implementation evidence pending
+**Document:** #5 · **Version:** 1.3 · **Status:** Shared design; M005 capability contract implemented and verified; later API slices pending
 **Updated:** 2026-09-09
 
 ## 1. Authority, sources, and artifact lifecycle
@@ -17,7 +17,7 @@
 
 This document owns shared observable API behavior under Q-003/Q-006, coordinated with #3 for identity, accounting and privacy. The technical choices below use #0's delegated design authority. They do not accept P-005/NFR-008, P-006, a new product feature or a provider privacy requirement. Product values remain canonical in PRD Sections 5–8; configuration exposes those values rather than creating independent defaults here.
 
-M001–M004 have since established the backend host, published shell, durable-storage boundary and independent AI boundary. [M005 / package 005](../specs/005-shared-input-capability-contract/spec.md) is now the first selected product API slice; its exact public capability operation/fields and slice-local artifact mechanics are resolved, while implementation and `docs/05-openapi.yaml` remain pending. [Verification plan #6](06-verification-plan.md) supplies shared verification methods and coverage. The YAML remains the prescribed generated artifact, not a file to create by hand. This document supplies cross-operation rules and behavioral examples, not endpoint signatures or a complete DTO catalog. #6 owns the requirement-to-test/evidence matrix. No M005 behavior is claimed implemented or verified.
+M001–M004 established the backend host, published shell, durable-storage boundary and independent AI boundary. [M005 / package 005](../specs/005-shared-input-capability-contract/spec.md) has now implemented and verified the first product API slice: its exact public capability operation/fields, shared scalar fixtures and slice-local artifact mechanics are represented by actual C# metadata, generated [`docs/05-openapi.yaml`](05-openapi.yaml) and generated TypeScript declarations. [Verification plan #6](06-verification-plan.md) supplies shared verification methods and coverage. The YAML remains a generated artifact, not a hand-edited source. This document supplies cross-operation rules and behavioral examples, not endpoint signatures or a complete DTO catalog. #6 owns the requirement-to-test/evidence matrix. M005 evidence does not make any language-operation, auth, usage/status, accounting or release behavior complete.
 
 For each selected API slice:
 
@@ -29,6 +29,8 @@ For each selected API slice:
 Document #0 owns this lifecycle. C# owns editable wire structure; generated OpenAPI is the machine-readable contract view. A generated change cannot redefine a shared decision silently. Paths, methods, operation IDs, JSON names/nullability, exact response/header schemas and client-facing examples are fixed in the selected slice and then represented in C# metadata/OpenAPI. Markdown retains shared semantics and scenario references, avoiding a second schema to maintain.
 
 **M005 selection — 2026-09-09:** Package 005 fixes `GET /api/capabilities`, its public no-auth/no-store behavior, catalog/policy/recovery field names and values, unversioned route, and pre-release `info.version` for this slice. It also selects shared C#/TypeScript scalar fixtures and generated TypeScript declarations. These are delegated slice decisions under the accepted design. They do not accept P-006, add a compatibility promise, select an auth/usage/language-operation wire shape, or make unimplemented operations appear in the generated paths.
+
+**M005 completion — 2026-09-09:** The implemented public route, Core/TypeScript `unicode-scalar-v1` policy and generated OpenAPI/type views passed package AC-001–008. The first publish smoke exposed and the implementation corrected an omitted OpenAPI runtime assembly; the corrected isolated artifact passed. Exact commands and failure/regression evidence are in the [completion record](../specs/005-shared-input-capability-contract/tasks.md#3-completion-record).
 
 ## 2. Capability and transport boundaries
 
@@ -243,7 +245,7 @@ P-006 remains proposed: this document does not introduce published-version compa
 
 ## 10. Acceptance scenarios and readiness
 
-These shared scenarios guide selected packages; [#6 Section 8](06-verification-plan.md#8-canonical-coverage-and-acceptance-allocation) owns the canonical coverage matrix and check allocation. They are not an all-MVP implementation task list. Runtime evidence is pending.
+These shared scenarios guide selected packages; [#6 Section 8](06-verification-plan.md#8-canonical-coverage-and-acceptance-allocation) owns the canonical coverage matrix and check allocation. They are not an all-MVP implementation task list. Only the M005 portions of API-AC-001 and API-AC-014 have passing runtime evidence; all other portions remain pending until selected.
 
 | ID | Observable outcome | Upstream |
 | --- | --- | --- |
@@ -271,6 +273,6 @@ These shared scenarios guide selected packages; [#6 Section 8](06-verification-p
 | Q-005, #6 | Local acceptance scenarios retained here; [#6](06-verification-plan.md) specifies coverage and workloads | Executable release evidence |
 | Q-008/Q-010, PRD then #3/#10 | Proposal status preserved | No new abuse rate or compatibility obligation until its owning proposal is accepted |
 
-**M005 planning review:** Local document links, requirement/scenario IDs, exact selected capability fields, count fixtures, generation stages and proposal status were checked against clean Git `a257cd1f`. Current baseline checks passed 42 API/storage, 10 AI and 8 frontend component cases, but those are dependency/regression readiness only; no M005 runtime, schema or client evidence exists yet. Shared rules preserve whole-source processing, success-only charging, no saved text, simple LLM chains and the PRD's deferred/proposed distinctions.
+**M005 implementation review:** The implementation working tree based on planning HEAD `75647db` was checked against the selected fields, count fixtures, generation stages and proposal status. Locked checks passed 47 API/storage, 10 Core, 10 AI, 36 frontend unit and 6 published Chromium cases; deterministic contract regeneration and deliberate drift/CLI/zero-test failures behaved correctly. The generated OpenAPI 3.1 document contains only `GET /api/capabilities`, and TypeScript declarations compile. The [package completion record](../specs/005-shared-input-capability-contract/tasks.md#3-completion-record) owns exact commands, artifact hashes, audit and no-effect evidence.
 
-The shared design and M005 package are ready for implementation. Package 005 resolves every wire/tooling question needed for its public capability slice; unrelated selected-slice questions remain explicit and block only their affected handlers/clients. The absence of generated YAML before M005 implementation is expected. Its first implementation task adds actual C# contracts/metadata, then generation/review precedes TypeScript consumption as #0 requires.
+The shared design and completed M005 package now provide the contract-generation baseline for later selected API slices. Unrelated wire/auth/accounting questions remain explicit and block only their affected handlers/clients. Shared rules continue to preserve whole-source processing, success-only charging, no saved text, simple LLM chains and the PRD's deferred/proposed distinctions; M005 did not implement those later behaviors.

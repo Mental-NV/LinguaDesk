@@ -1,7 +1,7 @@
 # 005 — Shared Input and Capability Contract: Selected Specification
 
-**Version:** 1.0 · **Updated:** 2026-09-09
-**State:** Ready for implementation; evidence pending
+**Version:** 1.1 · **Updated:** 2026-09-09
+**State:** Implemented and verified; AC-001–008 passed
 **Milestone/item:** [M005 / BI-005](../../docs/08-backlogs/M005-shared-input-capability-contract.md)
 
 ## 1. Selection and authority
@@ -92,4 +92,4 @@ Run focused MSTest Core/API and Vitest policy tests, locked warning-free builds,
 
 Accepted upstream decisions provide every selected product value and shared behavior. Delegated local decisions above resolve the exact operation, fields, identifiers, visibility, artifact revision and generator staging without changing Q-010 or accepting P-005/P-006. Q-001, Q-004, Q-005 and the auth/accounting remainder of Q-006 block their later owning slices or release gates, not M005.
 
-Ready-for-planning review passed: selected IDs/exclusions are explicit; all stories/scenarios are testable; the formal dependency is complete; nonfunctional/human boundaries are recorded; no behavior question is hidden. [plan.md](plan.md) is coherent and [tasks.md](tasks.md) maps every scenario and prerequisite. Requirements/design review and final consistency analysis have no blocking finding. Implementation evidence is pending.
+Ready-for-planning review passed before execution: selected IDs/exclusions were explicit; all stories/scenarios were testable; the formal dependency was complete; nonfunctional/human boundaries were recorded; and no behavior question was hidden. [plan.md](plan.md) and [tasks.md](tasks.md) mapped every scenario and prerequisite. All eight scenarios subsequently passed; the [completion record](tasks.md#3-completion-record) owns the commands, counts, generated-artifact review, no-effect observations, published-host regression and remaining limitations. Text submission, semantic eligibility, auth, usage/accounting, UI adoption, live-service and release evidence remain pending.

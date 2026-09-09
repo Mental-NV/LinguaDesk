@@ -1,7 +1,7 @@
 # M005 — Shared Input and Capability Contract Backlog
 
-**Document:** #8 · **Version:** 1.0 · **Updated:** 2026-09-09
-**State:** Selected; ready for implementation
+**Document:** #8 · **Version:** 1.1 · **Updated:** 2026-09-09
+**State:** Done; package AC-001–008 passed
 **Roadmap:** [M005 — Shared input and capability contract](../07-roadmap.md#41-basic-infrastructure)
 
 ## 1. Outcome and authoritative inputs
@@ -18,7 +18,7 @@ The inspected repository has the .NET 10 Minimal API host, API and AI tests, the
 
 | Item ID | Outcome/title | Priority | Target milestone | Dependencies/blockers | State | Delivery package |
 | --- | --- | --- | --- | --- | --- | --- |
-| BI-005 | Publish the shared input/capability contract | Next / first product API contract gate | M005 | M001 done; no remaining blocker | selected | [005-shared-input-capability-contract](../../specs/005-shared-input-capability-contract/spec.md) |
+| BI-005 | Publish the shared input/capability contract | Next / first product API contract gate | M005 | M001 done; no remaining blocker | done | [005-shared-input-capability-contract](../../specs/005-shared-input-capability-contract/spec.md) |
 
 ### BI-005 — Publish the shared input/capability contract
 
@@ -38,10 +38,10 @@ The inspected repository has the .NET 10 Minimal API host, API and AI tests, the
 
 No certificate, account, credential, email action, provider access, monetary approval, database content, browser/device review or design approval is needed. There is no planned end-of-milestone human verification. Unexpected human-only dependencies follow [#0's timing rule](../00-SDD-Planning-Workflow.md#selecting-work-and-creating-a-package): continue independent authorized work, prepare the exact action for handoff, and keep affected evidence pending; if no safe independent work remains, report the blocker.
 
-## 4. Selection and readiness
+## 4. Selection and completion
 
-BI-005 is the sole item selected in [package 005](../../specs/005-shared-input-capability-contract/spec.md). The product owners already fixed languages, directions, Chinese scripts/output, whole-input limits, rewriting choices and 30-second operation deadlines. API #5 already fixed `unicode-scalar-v1`, whitespace/no-normalization behavior, UUIDv7's 24-hour validity and five-minute future skew, public capability access and the generated-contract lifecycle. The package makes only delegated local wire/tooling choices and records them explicitly.
+BI-005 was the sole item selected in [package 005](../../specs/005-shared-input-capability-contract/spec.md) and is now complete. The product owners already fixed languages, directions, Chinese scripts/output, whole-input limits, rewriting choices and 30-second operation deadlines. API #5 already fixed `unicode-scalar-v1`, whitespace/no-normalization behavior, UUIDv7's 24-hour validity and five-minute future skew, public capability access and the generated-contract lifecycle. The package made only delegated local wire/tooling choices and records them explicitly.
 
-P-005/NFR-008 and P-006 remain proposed. An unversioned `/api` path and OpenAPI `info.version` artifact revision do not create a compatibility/deprecation promise. Q-001, Q-004 and the account-specific remainder of Q-006 do not affect this public no-effect slice. No unresolved product, behavior or technical question blocks implementation.
+P-005/NFR-008 and P-006 remain proposed. An unversioned `/api` path and OpenAPI `info.version` artifact revision do not create a compatibility/deprecation promise. Q-001, Q-004 and the account-specific remainder of Q-006 do not affect this public no-effect slice. No unresolved product, behavior or technical question blocked implementation.
 
-Eight observable scenarios cover public discovery, the complete accepted catalog, policy/recovery metadata, cross-runtime counting/validation, the first generated contract/types, route/no-effect boundaries and truthful closeout. Every scenario maps to ordered tasks and verification. Requirements/design review and cross-artifact analysis found no missing selected-scope decision or unsupported task; implementation evidence remains pending.
+Eight observable scenarios cover public discovery, the complete accepted catalog, policy/recovery metadata, cross-runtime counting/validation, the first generated contract/types, route/no-effect boundaries and truthful closeout. All passed with 47 API/storage, 10 Core, 10 AI, 36 frontend unit and 6 published Chromium cases; deterministic generation/drift, audit, CLI/zero-test failure and real-process smokes also passed. The [completion record](../../specs/005-shared-input-capability-contract/tasks.md#3-completion-record) owns exact evidence and limitations. No text submission, semantic eligibility, auth, usage/accounting, UI adoption, live-service or release gate is claimed.
