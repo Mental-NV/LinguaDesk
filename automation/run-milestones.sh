@@ -8,10 +8,17 @@ roadmap="$repository_root/docs/07-roadmap.md"
 solution="$repository_root/backend/LinguaDesk.slnx"
 plan_prompt_template="$script_directory/plan.prompt.md"
 implement_prompt_template="$script_directory/implement.prompt.md"
+codex_model="gpt-5.6-sol"
+codex_reasoning_effort="medium"
+claude_model="meta/muse-spark-1.3-contributor"
+claude_effort="high"
+runner="codex"
 
 usage() {
-    echo "Usage: $0 [START_MILESTONE [END_MILESTONE]]" >&2
+    echo "Usage: $0 [-codex|-claude] [START_MILESTONE [END_MILESTONE]]" >&2
     echo "Example: $0 3 10" >&2
+    echo "Example: $0 -claude 3 10" >&2
+    echo "Runners: -codex (default, model '$codex_model') | -claude (ori claude, model '$claude_model')" >&2
 }
 
 fail() {
@@ -63,29 +70,59 @@ has_milestone_commit() {
     return 1
 }
 
-run_codex() {
+run_codex_harness() {
+    codex --model "$codex_model" \
+        --config "model_reasoning_effort=\"$codex_reasoning_effort\"" \
+        exec \
+        --ephemeral \
+        --approve-for-me \
+        --cd "$repository_root" \
+        "$1"
+}
+
+# Claude Code differs from the codex CLI: it has no `exec` subcommand and
+# no --cd/--approve-for-me flags. Non-interactive runs need -p/--print
+# with the prompt as a positional argument, and the working directory
+# comes from a subshell cd. --model is consumed by ori; --effort and
+# --dangerously-skip-permissions pass through to the claude CLI
+# untouched, the latter being the unattended-automation equivalent of
+# codex's --approve-for-me. --human keeps piped stdout as the plain
+# transcript so the status check in run_agent works the same for both
+# harnesses.
+run_claude_harness() {
+    (
+        cd "$repository_root" || exit 1
+        ori --human claude \
+            --model "$claude_model" \
+            --effort "$claude_effort" \
+            -p --dangerously-skip-permissions \
+            "$1"
+    )
+}
+
+run_agent() {
     local template=$1
     local milestone=$2
     local expected_status=$3
     local prompt
     local output
-    local codex_status=0
+    local agent_status=0
     prompt=$(sed "s/{{MILESTONE}}/$milestone/g" "$template")
 
-    output=$(codex exec \
-        --ephemeral \
-        --approve-for-me \
-        --cd "$repository_root" \
-        "$prompt") || codex_status=$?
+    if [ "$runner" = "claude" ]; then
+        output=$(run_claude_harness "$prompt") || agent_status=$?
+    else
+        output=$(run_codex_harness "$prompt") || agent_status=$?
+    fi
 
     printf '%s\n' "$output"
 
-    if [ "$codex_status" -ne 0 ]; then
-        return "$codex_status"
+    if [ "$agent_status" -ne 0 ]; then
+        return "$agent_status"
     fi
 
     if ! grep -Fxq "$expected_status" <<<"$output"; then
-        fail "Codex did not report the required status '$expected_status'. Inspect the working tree before resuming."
+        fail "Agent ($runner) did not report the required status '$expected_status'. Inspect the working tree before resuming."
     fi
 }
 
@@ -94,11 +131,20 @@ commit_changes() {
 
     git -C "$repository_root" add -A
     if git -C "$repository_root" diff --cached --quiet; then
-        fail "Codex produced no tracked changes for commit '$message'."
+        fail "Agent ($runner) produced no tracked changes for commit '$message'."
     fi
 
     git -C "$repository_root" commit -m "$message"
 }
+
+while [ "$#" -gt 0 ]; do
+    case "$1" in
+        -codex|--codex) runner="codex"; shift ;;
+        -claude|--claude) runner="claude"; shift ;;
+        -*) usage; exit 2 ;;
+        *) break ;;
+    esac
+done
 
 if [ "$#" -gt 2 ]; then
     usage
@@ -118,7 +164,12 @@ if [ "$start_milestone" -gt "$end_milestone" ]; then
     fail "START_MILESTONE must not be greater than END_MILESTONE."
 fi
 
-require_command codex
+if [ "$runner" = "claude" ]; then
+    require_command ori
+    require_command claude
+else
+    require_command codex
+fi
 require_command dotnet
 require_command git
 require_command grep
@@ -163,7 +214,7 @@ for ((i=start_milestone; i<=end_milestone; i++)); do
         echo "$milestone already has a planning commit and current context lock. Reusing it."
     else
         echo "Planning $milestone..."
-        run_codex "$plan_prompt_template" "$milestone" "MILESTONE_AUTOMATION_STATUS: READY"
+        run_agent "$plan_prompt_template" "$milestone" "MILESTONE_AUTOMATION_STATUS: READY"
         python3 automation/context.py check "$milestone"
         python3 automation/context.py audit
         commit_changes "$milestone planned"
@@ -171,7 +222,7 @@ for ((i=start_milestone; i<=end_milestone; i++)); do
 
     echo "Implementing $milestone..."
     python3 automation/context.py check "$milestone"
-    run_codex "$implement_prompt_template" "$milestone" "MILESTONE_AUTOMATION_STATUS: COMPLETE"
+    run_agent "$implement_prompt_template" "$milestone" "MILESTONE_AUTOMATION_STATUS: COMPLETE"
     python3 automation/context.py audit
 
     echo "Testing $milestone..."
