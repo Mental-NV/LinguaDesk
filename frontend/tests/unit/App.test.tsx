@@ -1,6 +1,7 @@
 import { render, screen, waitFor } from '@testing-library/react'
+import { useEffect } from 'react'
 import userEvent from '@testing-library/user-event'
-import { MemoryRouter } from 'react-router-dom'
+import { MemoryRouter, useLocation } from 'react-router-dom'
 import { App } from '../../src/shell/App'
 
 function renderRoute(path: string) {
@@ -70,5 +71,53 @@ describe('signed-out shell routes', () => {
     const skipLink = screen.getByRole('link', { name: 'Skip to main content' })
     expect(skipLink).toHaveAttribute('href', '#main-content')
     expect(await screen.findByRole('main')).toHaveAttribute('id', 'main-content')
+  })
+})
+
+describe('unverified verification guard', () => {
+  it('keeps guarded entries on /verify-email while an unverified registration is pending', async () => {
+    const user = userEvent.setup()
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () =>
+        new Response(JSON.stringify({ status: 'verificationRequired' }), {
+          status: 202,
+          headers: { 'Content-Type': 'application/json' },
+        }),
+      ),
+    )
+    try {
+      const seen = { pathname: '' }
+      function Probe() {
+        const location = useLocation()
+        const { pathname } = location
+        useEffect(() => {
+          seen.pathname = pathname
+        }, [pathname])
+        return null
+      }
+      render(
+        <MemoryRouter initialEntries={['/register']}>
+          <App />
+          <Probe />
+        </MemoryRouter>,
+      )
+
+      await user.type(screen.getByLabelText('Email'), 'guard-visitor@example.test')
+      await user.type(screen.getByLabelText('Password'), 'Maple!River2026')
+      await user.type(screen.getByLabelText('Confirm password'), 'Maple!River2026')
+      await user.click(screen.getByRole('button', { name: 'Create account' }))
+      expect(await screen.findByRole('heading', { level: 1, name: 'Verify your email' })).toBeInTheDocument()
+
+      for (const linkName of ['Translation', 'Rewriting', 'LinguaDesk home'] as const) {
+        await user.click(screen.getByRole('link', { name: linkName }))
+        await waitFor(() => expect(seen.pathname).toBe('/verify-email'))
+        expect(
+          screen.getByRole('heading', { level: 1, name: 'Verify your email' }),
+        ).toBeInTheDocument()
+      }
+    } finally {
+      vi.unstubAllGlobals()
+    }
   })
 })

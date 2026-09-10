@@ -7,14 +7,14 @@
       "heading": "Selected milestone",
       "use": "reference",
       "reason": "Mutable current selection authority; M011 done with M012 as the eligible web-access increment",
-      "sha256": "4b89b222ec4e4b1d4f1326712e753ee51f0f550eff507d616538b02d6179cb39"
+      "sha256": "4032c33fd7cc7ed82df06534aec165ae026a4fd7fd34fb8b909cc435276fe031"
     },
     {
       "path": "docs/delivery/current.md",
       "heading": "Completed milestones",
       "use": "reference",
       "reason": "Mutable dependency index confirming M007 and M011 completion",
-      "sha256": "138f2261bbf0626f3d1cee3ce280091c47d40076f6c34c01e6608bab7c7a6f3f"
+      "sha256": "5368367aa71b5620752a2ba81f67ccb863276ec92b581dc725dfafe7835258ad"
     },
     {
       "path": "docs/07-roadmap.md",
@@ -163,7 +163,7 @@
       "heading": "8.2 Local acceptance allocation",
       "use": "excerpt",
       "reason": "V-group allocation for the selected UX scenarios",
-      "sha256": "688ed34c5706735be3ae35b84fc23265b5b5e5b418a966cb11075283caaba330"
+      "sha256": "0999657002c0fb16f7d4cef68e234e22134a37fadc8790a27a66f95649e793d7"
     },
     {
       "path": "docs/verification/readiness.md",
@@ -176,13 +176,13 @@
       "path": "frontend/src/shell/App.tsx",
       "use": "reference",
       "reason": "Current placeholder routes, heading-focus and shell conventions to extend",
-      "sha256": "a5a7892e0b9f86e0f27441454c498a13f1ed92ffdd4bf0b4e2818ddd6bab1bf5"
+      "sha256": "1d276054e0ba666074955b7f18d8b4148aede2b53aff01b8923c4829b96fa565"
     },
     {
       "path": "frontend/src/auth/VerifyEmailEntryPage.tsx",
       "use": "reference",
       "reason": "M011 MSG-034 entry state reworked into the full verification page",
-      "sha256": "52d59b8f99678a19878debac3214e042423c7745957bdd0ad55be4042be10137"
+      "sha256": "4c272084cd2c47b82f7292d80af623ae611654f3db6e00dbc64087f14e388938"
     },
     {
       "path": "frontend/src/auth/RegisterPage.tsx",
@@ -194,7 +194,7 @@
       "path": "frontend/src/api/accounts.ts",
       "use": "reference",
       "reason": "Typed wrapper and result-mapping style extended with resend/confirm/session calls",
-      "sha256": "21e1e857d7ba953e90a5c1ce6ad2550ffb4fca427afa74c0f44f3c30b90df6f3"
+      "sha256": "021031fee5eb7c0994ecdc19b5f313476a51e86c599259a7919ff362a84f725d"
     },
     {
       "path": "frontend/src/api/generated/linguadesk-api.d.ts",
@@ -206,7 +206,7 @@
       "path": "frontend/tests/unit/App.test.tsx",
       "use": "reference",
       "reason": "Current redirect assertions extended with verification routing cases",
-      "sha256": "701eadae301b80befbf6736c90fc338086592c34080656d4fdc72966a25aa0a2"
+      "sha256": "8ce3389eb0c985cbb1eceea2b9b55099ad284eea93275c4633aea2654b86afea"
     },
     {
       "path": "frontend/tests/unit/register.test.tsx",
@@ -246,7 +246,7 @@
     }
   ],
   "source_map_sha256": "c5456facbd4ef1a41f856807b71006921fc1b48cea725bd38a7e04108469e921",
-  "baseline_commit": "611085a3fb90ae9bfe72fee8cbed19eb3931e060",
+  "baseline_commit": "304c95ec776f220e14b9a3ae7f9f1ab57065a303",
   "locked_files": {
     "docs/00-SDD-Planning-Workflow.md": "183ae93148ff594f9f1e021aa7543baa8878e9cc0bcfd69ebc696c28976e2945",
     "docs/00-workflow/execution.md": "f362a1384cefef24ba204e0723e3190857c8cca9bcd91908136932e19c5caf02",

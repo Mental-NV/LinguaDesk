@@ -54,6 +54,12 @@ function NotFoundPage() {
 
 export function App() {
   const [pendingVerificationEmail, setPendingVerificationEmail] = useState<string | null>(null)
+  const guardedEntry =
+    pendingVerificationEmail === null ? (
+      <Navigate to="/login" replace />
+    ) : (
+      <Navigate to="/verify-email" replace />
+    )
 
   return (
     <div className="app-shell">
@@ -68,7 +74,7 @@ export function App() {
         </div>
       </header>
       <Routes>
-        <Route path="/" element={<Navigate to="/login" replace />} />
+        <Route path="/" element={guardedEntry} />
         <Route path="/login" element={<LoginPage />} />
         <Route
           path="/register"
@@ -79,8 +85,8 @@ export function App() {
           }
         />
         <Route path="/verify-email" element={<VerifyEmailPage email={pendingVerificationEmail} />} />
-        <Route path="/translate" element={<Navigate to="/login" replace />} />
-        <Route path="/rewrite" element={<Navigate to="/login" replace />} />
+        <Route path="/translate" element={guardedEntry} />
+        <Route path="/rewrite" element={guardedEntry} />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </div>
