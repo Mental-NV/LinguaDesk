@@ -1,10 +1,13 @@
 # Milestone automation
 
-`automation/run-milestones.sh` plans, implements, verifies and commits milestones sequentially with noninteractive Codex runs. Start only from a clean repository with the automation changes committed and Codex CLI authenticated. Python 3.9+, Git and the documented application toolchains are required.
+`automation/run-milestones.sh` plans, implements, verifies and commits milestones sequentially with noninteractive agent runs. Start only from a clean repository with the automation changes committed and the selected runner's CLI authenticated. Python 3.9+, Git and the documented application toolchains are required.
 
 ```sh
-./automation/run-milestones.sh 15 20
+./automation/run-milestones.sh 15 20            # codex runner (default)
+./automation/run-milestones.sh -claude 15 20   # claude runner via ori
 ```
+
+Switches are `-codex` (default) and `-claude`. The codex runner needs the Codex CLI on PATH; the claude runner needs the `ori` and `claude` CLIs and invokes `ori claude --model <claude_model> --effort <claude_effort> -p --dangerously-skip-permissions`. Runner models/effort are configured via `codex_model`, `codex_reasoning_effort`, `claude_model` and `claude_effort` at the top of the script.
 
 Bounds are inclusive numeric IDs (defaults 1–999). The runner follows numeric order within those bounds; it does not compute the roadmap's recommended dependency order. Consult [current delivery status](../docs/delivery/current.md) and choose eligible bounds. It stops at an undefined milestone, readiness blocker, missing final status, failed context/link check, failed regression or Git error. Existing implementation commits are skipped, including legacy M001/M002 wording.
 
@@ -12,7 +15,7 @@ Each unfinished milestone gets a planning run and `<ID> planned` commit, an impl
 
 The implementation run owns every selected package check and evidence gate. The runner additionally executes backend check/smoke, contract drift, AI check/probe and frontend check/smoke. It does not establish live-provider, email, manual accessibility or release evidence through these deterministic checks. If a run stops with changes, inspect and commit, restore or stash them deliberately before resuming; the clean-tree guard prevents absorbing unrelated work.
 
-Documentation/tooling checks that do not invoke Codex, application services or commits:
+Documentation/tooling checks that do not invoke an agent runner, application services or commits:
 
 ```sh
 python3 automation/context.py audit
