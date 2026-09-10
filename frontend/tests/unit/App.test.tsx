@@ -45,7 +45,7 @@ describe('signed-out shell routes', () => {
     },
   )
 
-  it('renders /forgot-password as a staged state without credential fields', async () => {
+  it('renders /forgot-password as the recovery request form without credential fields', async () => {
     renderRoute('/forgot-password')
 
     const destinationHeading = await screen.findByRole('heading', {
@@ -53,10 +53,27 @@ describe('signed-out shell routes', () => {
       name: 'Forgot password',
     })
     expect(destinationHeading).toHaveFocus()
-    expect(screen.getByText('Password recovery is not available in this build.')).toBeVisible()
+    expect(screen.getByRole('form', { name: 'Forgot password' })).toBeVisible()
+    expect(screen.getByLabelText('Email')).toBeVisible()
+    expect(screen.getByRole('button', { name: 'Send reset link' })).toBeVisible()
     expect(screen.getByRole('link', { name: 'Back to sign in' })).toHaveAttribute('href', '/login')
-    expect(screen.queryByRole('form')).not.toBeInTheDocument()
     expect(screen.queryByLabelText('Password')).not.toBeInTheDocument()
+  })
+
+  it('renders /reset-password without link material as the recovery action', async () => {
+    renderRoute('/reset-password')
+
+    const destinationHeading = await screen.findByRole('heading', {
+      level: 1,
+      name: 'Reset password',
+    })
+    expect(destinationHeading).toHaveFocus()
+    expect(screen.getByText('This reset link is invalid or has expired.')).toBeVisible()
+    expect(screen.getByRole('link', { name: 'Request a new reset link' })).toHaveAttribute(
+      'href',
+      '/forgot-password',
+    )
+    expect(screen.queryByRole('form')).not.toBeInTheDocument()
   })
 
   it('renders unknown paths with a sign-in return action', async () => {

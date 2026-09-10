@@ -5,8 +5,10 @@ import {
   getLocalAccountSession,
   signOutLocalAccount,
 } from '../api/accounts'
+import { ForgotPasswordPage } from '../auth/ForgotPasswordPage'
 import { LoginPage, type SignInCompletionStatus } from '../auth/LoginPage'
 import { RegisterPage } from '../auth/RegisterPage'
+import { ResetPasswordPage } from '../auth/ResetPasswordPage'
 import { VerifyEmailEntryPage } from '../auth/VerifyEmailEntryPage'
 import { isProtectedPath, resolveSafeReturn } from '../auth/safeReturn'
 
@@ -89,13 +91,18 @@ function SignedInPlaceholder({
   )
 }
 
-function ForgotPasswordPage() {
+function ForgotPasswordEntry() {
   return (
     <Page heading="Forgot password">
-      <p>Password recovery is not available in this build.</p>
-      <p className="form-switch">
-        <Link className="primary-link" to="/login">Back to sign in</Link>
-      </p>
+      <ForgotPasswordPage />
+    </Page>
+  )
+}
+
+function ResetPasswordEntry() {
+  return (
+    <Page heading="Reset password">
+      <ResetPasswordPage />
     </Page>
   )
 }
@@ -329,7 +336,8 @@ export function App() {
         <Route path="/login" element={loginEntry} />
         <Route path="/register" element={registerEntry} />
         <Route path="/verify-email" element={verifyEntry} />
-        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+        <Route path="/forgot-password" element={<ForgotPasswordEntry />} />
+        <Route path="/reset-password" element={<ResetPasswordEntry />} />
         <Route path="/translate" element={featureEntry('translate', '/translate')} />
         <Route path="/rewrite" element={featureEntry('rewrite', '/rewrite')} />
         <Route path="*" element={<NotFoundPage />} />

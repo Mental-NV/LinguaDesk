@@ -173,6 +173,102 @@ export async function confirmLocalAccountEmail(
   return { kind: 'retry', status: response.status }
 }
 
+export const FORGOT_PASSWORD_PATH = '/api/accounts/forgot-password' as const
+export const RESET_PASSWORD_PATH = '/api/accounts/reset-password' as const
+
+export type ForgotPasswordPayload =
+  operations['requestLocalAccountPasswordReset']['requestBody']['content']['application/json']
+
+export type ResetPasswordPayload =
+  operations['resetLocalAccountPassword']['requestBody']['content']['application/json']
+
+export type ForgotPasswordResult =
+  | { readonly kind: 'sent'; readonly retryAfterSeconds: number }
+  | { readonly kind: 'field' }
+  | { readonly kind: 'delivery' }
+  | { readonly kind: 'retry'; readonly status: number | null }
+
+export type ResetPasswordResult =
+  | { readonly kind: 'reset' }
+  | { readonly kind: 'invalid' }
+  | { readonly kind: 'field' }
+  | { readonly kind: 'retry'; readonly status: number | null }
+
+function hasFieldErrors(body: unknown): boolean {
+  if (typeof body !== 'object' || body === null) return false
+  const errors = (body as Record<string, unknown>)['errors']
+  return typeof errors === 'object' && errors !== null
+}
+
+function hasFieldError(body: unknown, name: string): boolean {
+  if (!hasFieldErrors(body)) return false
+  const errors = (body as Record<string, unknown>)['errors'] as Record<string, unknown>
+  return Object.hasOwn(errors, name)
+}
+
+export async function requestLocalAccountPasswordReset(
+  payload: ForgotPasswordPayload,
+  options: AccountCallOptions = {},
+): Promise<ForgotPasswordResult> {
+  let response: Response
+  try {
+    response = await fetch(FORGOT_PASSWORD_PATH, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: payload.email }),
+      signal: options.signal,
+    })
+  } catch {
+    return { kind: 'retry', status: null }
+  }
+
+  if (response.status === 202) {
+    let body: unknown = null
+    try {
+      body = await response.json()
+    } catch {
+      body = null
+    }
+    return { kind: 'sent', retryAfterSeconds: readRetryAfterSeconds(body) }
+  }
+  if (response.status === 400) {
+    const problem = await readProblemBody(response)
+    if (hasFieldErrors(problem)) return { kind: 'field' }
+    return { kind: 'retry', status: response.status }
+  }
+  if (response.status === 503) return { kind: 'delivery' }
+  return { kind: 'retry', status: response.status }
+}
+
+export async function resetLocalAccountPassword(
+  payload: ResetPasswordPayload,
+  options: AccountCallOptions = {},
+): Promise<ResetPasswordResult> {
+  let response: Response
+  try {
+    response = await fetch(RESET_PASSWORD_PATH, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        userId: payload.userId,
+        code: payload.code,
+        newPassword: payload.newPassword,
+      }),
+      signal: options.signal,
+    })
+  } catch {
+    return { kind: 'retry', status: null }
+  }
+
+  if (response.status === 200) return { kind: 'reset' }
+  if (response.status === 400) {
+    const problem = await readProblemBody(response)
+    if (hasFieldError(problem, 'newPassword')) return { kind: 'field' }
+    return { kind: 'invalid' }
+  }
+  return { kind: 'retry', status: response.status }
+}
+
 export const ANTIFORGERY_PATH = '/api/accounts/antiforgery' as const
 export const SIGN_IN_PATH = '/api/accounts/sign-in' as const
 export const SIGN_OUT_PATH = '/api/accounts/sign-out' as const
