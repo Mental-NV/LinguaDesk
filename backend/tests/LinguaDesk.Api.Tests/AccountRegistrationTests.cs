@@ -6,11 +6,13 @@ using System.Text;
 using System.Text.Json;
 using LinguaDesk.Api.Features.Identity;
 using LinguaDesk.Api.Features.Identity.Registration;
+using LinguaDesk.Api.Features.Identity.Verification;
 using LinguaDesk.Api.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -348,9 +350,9 @@ public sealed class AccountRegistrationTests
         Assert.IsNotNull(account);
         Assert.IsTrue(await users.VerifyUserTokenAsync(
             account,
-            TokenOptions.DefaultProvider,
+            LinguaDeskEmailConfirmationTokenPolicy.ProviderName,
             UserManager<IdentityUser>.ConfirmEmailTokenPurpose,
-            delivery.Material));
+            Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(delivery.Code))));
     }
 
     [TestMethod]
@@ -402,7 +404,9 @@ internal sealed class AccountWebApplicationFactory(
     string keysPath,
     IAccountConfirmationSender sender,
     string environment = "Testing",
-    IReadOnlyDictionary<string, string?>? configurationOverrides = null) : WebApplicationFactory<Program>
+    IReadOnlyDictionary<string, string?>? configurationOverrides = null,
+    TimeProvider? timeProvider = null,
+    TimeSpan? emailConfirmationTokenLifespan = null) : WebApplicationFactory<Program>
 {
     private readonly string webRoot = Directory.CreateTempSubdirectory("linguadesk-account-webroot-").FullName;
 
@@ -431,6 +435,16 @@ internal sealed class AccountWebApplicationFactory(
             services.RemoveAll<IAccountConfirmationSender>();
             services.AddSingleton(sender);
             services.AddSingleton<IAccountConfirmationSender>(sender);
+            if (timeProvider is not null)
+            {
+                services.RemoveAll<TimeProvider>();
+                services.AddSingleton(timeProvider);
+            }
+            if (emailConfirmationTokenLifespan is not null)
+            {
+                services.Configure<LinguaDeskEmailConfirmationTokenProviderOptions>(options =>
+                    options.TokenLifespan = emailConfirmationTokenLifespan.Value);
+            }
         });
     }
 
@@ -446,13 +460,13 @@ internal sealed class AccountWebApplicationFactory(
 
 internal sealed class CapturingConfirmationSender : IAccountConfirmationSender
 {
-    private readonly ConcurrentQueue<(string Destination, string Material)> deliveries = new();
+    private readonly ConcurrentQueue<AccountConfirmationDelivery> deliveries = new();
 
-    public IReadOnlyCollection<(string Destination, string Material)> Deliveries => deliveries.ToArray();
+    public IReadOnlyCollection<AccountConfirmationDelivery> Deliveries => deliveries.ToArray();
 
-    public Task SendAsync(string destination, string verificationMaterial, CancellationToken cancellationToken)
+    public Task SendAsync(AccountConfirmationDelivery delivery, CancellationToken cancellationToken)
     {
-        deliveries.Enqueue((destination, verificationMaterial));
+        deliveries.Enqueue(delivery);
         return Task.CompletedTask;
     }
 }
@@ -463,7 +477,7 @@ internal sealed class FailingConfirmationSender : IAccountConfirmationSender
 
     public int Attempts => Volatile.Read(ref attempts);
 
-    public Task SendAsync(string destination, string verificationMaterial, CancellationToken cancellationToken)
+    public Task SendAsync(AccountConfirmationDelivery delivery, CancellationToken cancellationToken)
     {
         Interlocked.Increment(ref attempts);
         throw new AccountConfirmationDeliveryException();

@@ -2,8 +2,8 @@
 openapi: 3.1.1
 info:
   title: LinguaDesk API
-  description: Pre-release M006 contract containing only the implemented public capabilities and anonymous local-account registration operations. No compatibility or deprecation guarantee is implied.
-  version: 0.1.0-m006
+  description: Pre-release M007 contract containing only the implemented public capabilities, anonymous local-account registration, and email-verification operations. No compatibility or deprecation guarantee is implied.
+  version: 0.1.0-m007
 paths:
   /api/capabilities:
     get:
@@ -43,7 +43,7 @@ paths:
           description: Accepted
           headers:
             Cache-Control:
-              description: Always `no-store` for registration responses.
+              description: Always `no-store` for local-account mutation responses.
               required: true
               schema:
                 type: string
@@ -55,7 +55,7 @@ paths:
           description: Bad Request
           headers:
             Cache-Control:
-              description: Always `no-store` for registration responses.
+              description: Always `no-store` for local-account mutation responses.
               required: true
               schema:
                 type: string
@@ -67,7 +67,7 @@ paths:
           description: Unsupported Media Type
           headers:
             Cache-Control:
-              description: Always `no-store` for registration responses.
+              description: Always `no-store` for local-account mutation responses.
               required: true
               schema:
                 type: string
@@ -79,7 +79,7 @@ paths:
           description: Service Unavailable
           headers:
             Cache-Control:
-              description: Always `no-store` for registration responses.
+              description: Always `no-store` for local-account mutation responses.
               required: true
               schema:
                 type: string
@@ -87,6 +87,146 @@ paths:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/RegistrationProblemDetails"
+  /api/accounts/confirm-email:
+    post:
+      tags:
+        - VerificationEndpoints
+      summary: Confirm a local account email
+      description: Confirms an unverified local account from delivered opaque material without issuing authentication credentials or redirecting.
+      operationId: confirmLocalAccountEmail
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ConfirmEmailRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+          headers:
+            Cache-Control:
+              description: Always `no-store` for local-account mutation responses.
+              required: true
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ConfirmEmailAccepted"
+        "400":
+          description: Bad Request
+          headers:
+            Cache-Control:
+              description: Always `no-store` for local-account mutation responses.
+              required: true
+              schema:
+                type: string
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/VerificationProblemDetails"
+        "405":
+          description: Method Not Allowed
+          headers:
+            Cache-Control:
+              description: Always `no-store` for local-account mutation responses.
+              required: true
+              schema:
+                type: string
+        "415":
+          description: Unsupported Media Type
+          headers:
+            Cache-Control:
+              description: Always `no-store` for local-account mutation responses.
+              required: true
+              schema:
+                type: string
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/VerificationProblemDetails"
+        "503":
+          description: Service Unavailable
+          headers:
+            Cache-Control:
+              description: Always `no-store` for local-account mutation responses.
+              required: true
+              schema:
+                type: string
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/VerificationProblemDetails"
+  /api/accounts/resend-verification:
+    post:
+      tags:
+        - VerificationEndpoints
+      summary: Request another local-account verification delivery
+      description: Returns one fixed acknowledgment for every syntactically valid email and requests delivery only for an eligible unverified account outside its cooldown.
+      operationId: resendLocalAccountVerification
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ResendVerificationRequest"
+        required: true
+      responses:
+        "202":
+          description: Accepted
+          headers:
+            Cache-Control:
+              description: Always `no-store` for local-account mutation responses.
+              required: true
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResendVerificationAccepted"
+        "400":
+          description: Bad Request
+          headers:
+            Cache-Control:
+              description: Always `no-store` for local-account mutation responses.
+              required: true
+              schema:
+                type: string
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/VerificationProblemDetails"
+        "405":
+          description: Method Not Allowed
+          headers:
+            Cache-Control:
+              description: Always `no-store` for local-account mutation responses.
+              required: true
+              schema:
+                type: string
+        "415":
+          description: Unsupported Media Type
+          headers:
+            Cache-Control:
+              description: Always `no-store` for local-account mutation responses.
+              required: true
+              schema:
+                type: string
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/VerificationProblemDetails"
+        "503":
+          description: Service Unavailable
+          headers:
+            Cache-Control:
+              description: Always `no-store` for local-account mutation responses.
+              required: true
+              schema:
+                type: string
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/VerificationProblemDetails"
 components:
   schemas:
     CapabilitiesResponse:
@@ -148,6 +288,36 @@ components:
           description: Chinese script used for output.
           $ref: "#/components/schemas/ChineseScript"
       description: Accepted Chinese input scripts and required Chinese output script.
+    ConfirmationStatus:
+      enum:
+        - verified
+      type: string
+      description: Always `verified` after a successful or idempotently repeated confirmation.
+    ConfirmEmailAccepted:
+      required:
+        - status
+      type: object
+      properties:
+        status:
+          description: Always `verified` after a successful or idempotently repeated confirmation.
+          $ref: "#/components/schemas/ConfirmationStatus"
+    ConfirmEmailRequest:
+      required:
+        - userId
+        - code
+      type: object
+      properties:
+        userId:
+          maxLength: 450
+          minLength: 1
+          type: string
+          description: Opaque local-account identifier delivered with the verification code. Maximum 450 characters.
+        code:
+          maxLength: 4096
+          minLength: 1
+          type: string
+          description: Unpadded base64url encoding of the delivered email-confirmation token. Maximum 4096 characters.
+          writeOnly: true
     CountingPolicyCapability:
       required:
         - id
@@ -327,6 +497,34 @@ components:
         - verificationRequired
       type: string
       description: Always `verificationRequired` for an accepted new or existing normalized email.
+    ResendVerificationAccepted:
+      required:
+        - status
+        - retryAfterSeconds
+      type: object
+      properties:
+        status:
+          description: Always `verificationRequested` for a syntactically valid request.
+          $ref: "#/components/schemas/ResendVerificationStatus"
+        retryAfterSeconds:
+          type: integer
+          description: Fixed resend interval in seconds; it does not disclose account or cooldown state.
+          format: int32
+    ResendVerificationRequest:
+      required:
+        - email
+      type: object
+      properties:
+        email:
+          maxLength: 254
+          type: string
+          description: Local account email address. Maximum 254 Unicode scalar values; surrounding whitespace is invalid.
+          format: email
+    ResendVerificationStatus:
+      enum:
+        - verificationRequested
+      type: string
+      description: Always `verificationRequested` for a syntactically valid request.
     RewritingCapability:
       required:
         - maximumSourceCharacters
@@ -457,6 +655,46 @@ components:
         target:
           description: Translation target language.
           $ref: "#/components/schemas/LanguageId"
+    VerificationProblemDetails:
+      required:
+        - title
+        - status
+        - detail
+        - category
+        - correlationId
+      type: object
+      properties:
+        type:
+          type:
+            - "null"
+            - string
+          description: RFC 9457 problem type reference.
+        title:
+          type: string
+          description: Short, stable problem summary.
+        status:
+          type: integer
+          description: HTTP status code for this occurrence.
+          format: int32
+        detail:
+          type: string
+          description: Safe explanation that never echoes submitted account or verification values.
+        category:
+          type: string
+          description: "LinguaDesk error category: `invalidRequest`, `invalidOrExpiredVerification`, or `availability`."
+        correlationId:
+          type: string
+          description: Opaque request correlation identifier.
+        errors:
+          type:
+            - "null"
+            - object
+          additionalProperties:
+            type: array
+            items:
+              type: string
+          description: Field messages keyed only by `email`, `userId`, or `code`; present for field validation failures.
 tags:
   - name: CapabilitiesEndpoints
   - name: RegistrationEndpoints
+  - name: VerificationEndpoints

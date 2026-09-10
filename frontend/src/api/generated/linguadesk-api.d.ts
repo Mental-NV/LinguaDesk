@@ -44,6 +44,46 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/accounts/confirm-email": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Confirm a local account email
+         * @description Confirms an unverified local account from delivered opaque material without issuing authentication credentials or redirecting.
+         */
+        post: operations["confirmLocalAccountEmail"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/accounts/resend-verification": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Request another local-account verification delivery
+         * @description Returns one fixed acknowledgment for every syntactically valid email and requests delivery only for an eligible unverified account outside its cooldown.
+         */
+        post: operations["resendLocalAccountVerification"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -77,6 +117,21 @@ export interface components {
             acceptedInput: components["schemas"]["ChineseScript"][];
             /** @description Chinese script used for output. */
             output: components["schemas"]["ChineseScript"];
+        };
+        /**
+         * @description Always `verified` after a successful or idempotently repeated confirmation.
+         * @enum {string}
+         */
+        ConfirmationStatus: "verified";
+        ConfirmEmailAccepted: {
+            /** @description Always `verified` after a successful or idempotently repeated confirmation. */
+            status: components["schemas"]["ConfirmationStatus"];
+        };
+        ConfirmEmailRequest: {
+            /** @description Opaque local-account identifier delivered with the verification code. Maximum 450 characters. */
+            userId: string;
+            /** @description Unpadded base64url encoding of the delivered email-confirmation token. Maximum 4096 characters. */
+            code: string;
         };
         /** @description Canonical decoded-input counting and local rejection policy. */
         CountingPolicyCapability: {
@@ -198,6 +253,27 @@ export interface components {
          * @enum {string}
          */
         RegistrationStatus: "verificationRequired";
+        ResendVerificationAccepted: {
+            /** @description Always `verificationRequested` for a syntactically valid request. */
+            status: components["schemas"]["ResendVerificationStatus"];
+            /**
+             * Format: int32
+             * @description Fixed resend interval in seconds; it does not disclose account or cooldown state.
+             */
+            retryAfterSeconds: number;
+        };
+        ResendVerificationRequest: {
+            /**
+             * Format: email
+             * @description Local account email address. Maximum 254 Unicode scalar values; surrounding whitespace is invalid.
+             */
+            email: string;
+        };
+        /**
+         * @description Always `verificationRequested` for a syntactically valid request.
+         * @enum {string}
+         */
+        ResendVerificationStatus: "verificationRequested";
         /** @description Exclusive rewriting modes, whole-input limit, and overall deadline. */
         RewritingCapability: {
             /**
@@ -272,6 +348,27 @@ export interface components {
             /** @description Translation target language. */
             target: components["schemas"]["LanguageId"];
         };
+        VerificationProblemDetails: {
+            /** @description RFC 9457 problem type reference. */
+            type?: null | string;
+            /** @description Short, stable problem summary. */
+            title: string;
+            /**
+             * Format: int32
+             * @description HTTP status code for this occurrence.
+             */
+            status: number;
+            /** @description Safe explanation that never echoes submitted account or verification values. */
+            detail: string;
+            /** @description LinguaDesk error category: `invalidRequest`, `invalidOrExpiredVerification`, or `availability`. */
+            category: string;
+            /** @description Opaque request correlation identifier. */
+            correlationId: string;
+            /** @description Field messages keyed only by `email`, `userId`, or `code`; present for field validation failures. */
+            errors?: null | {
+                [key: string]: string[];
+            };
+        };
     };
     responses: never;
     parameters: never;
@@ -319,7 +416,7 @@ export interface operations {
             /** @description Accepted */
             202: {
                 headers: {
-                    /** @description Always `no-store` for registration responses. */
+                    /** @description Always `no-store` for local-account mutation responses. */
                     "Cache-Control": string;
                     [name: string]: unknown;
                 };
@@ -330,7 +427,7 @@ export interface operations {
             /** @description Bad Request */
             400: {
                 headers: {
-                    /** @description Always `no-store` for registration responses. */
+                    /** @description Always `no-store` for local-account mutation responses. */
                     "Cache-Control": string;
                     [name: string]: unknown;
                 };
@@ -341,7 +438,7 @@ export interface operations {
             /** @description Unsupported Media Type */
             415: {
                 headers: {
-                    /** @description Always `no-store` for registration responses. */
+                    /** @description Always `no-store` for local-account mutation responses. */
                     "Cache-Control": string;
                     [name: string]: unknown;
                 };
@@ -352,12 +449,148 @@ export interface operations {
             /** @description Service Unavailable */
             503: {
                 headers: {
-                    /** @description Always `no-store` for registration responses. */
+                    /** @description Always `no-store` for local-account mutation responses. */
                     "Cache-Control": string;
                     [name: string]: unknown;
                 };
                 content: {
                     "application/problem+json": components["schemas"]["RegistrationProblemDetails"];
+                };
+            };
+        };
+    };
+    confirmLocalAccountEmail: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ConfirmEmailRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    /** @description Always `no-store` for local-account mutation responses. */
+                    "Cache-Control": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConfirmEmailAccepted"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    /** @description Always `no-store` for local-account mutation responses. */
+                    "Cache-Control": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["VerificationProblemDetails"];
+                };
+            };
+            /** @description Method Not Allowed */
+            405: {
+                headers: {
+                    /** @description Always `no-store` for local-account mutation responses. */
+                    "Cache-Control": string;
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unsupported Media Type */
+            415: {
+                headers: {
+                    /** @description Always `no-store` for local-account mutation responses. */
+                    "Cache-Control": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["VerificationProblemDetails"];
+                };
+            };
+            /** @description Service Unavailable */
+            503: {
+                headers: {
+                    /** @description Always `no-store` for local-account mutation responses. */
+                    "Cache-Control": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["VerificationProblemDetails"];
+                };
+            };
+        };
+    };
+    resendLocalAccountVerification: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ResendVerificationRequest"];
+            };
+        };
+        responses: {
+            /** @description Accepted */
+            202: {
+                headers: {
+                    /** @description Always `no-store` for local-account mutation responses. */
+                    "Cache-Control": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResendVerificationAccepted"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    /** @description Always `no-store` for local-account mutation responses. */
+                    "Cache-Control": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["VerificationProblemDetails"];
+                };
+            };
+            /** @description Method Not Allowed */
+            405: {
+                headers: {
+                    /** @description Always `no-store` for local-account mutation responses. */
+                    "Cache-Control": string;
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unsupported Media Type */
+            415: {
+                headers: {
+                    /** @description Always `no-store` for local-account mutation responses. */
+                    "Cache-Control": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["VerificationProblemDetails"];
+                };
+            };
+            /** @description Service Unavailable */
+            503: {
+                headers: {
+                    /** @description Always `no-store` for local-account mutation responses. */
+                    "Cache-Control": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["VerificationProblemDetails"];
                 };
             };
         };

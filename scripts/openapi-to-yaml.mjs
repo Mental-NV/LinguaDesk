@@ -42,10 +42,19 @@ function assertPropertyDescriptions(document) {
 function validateContract(document) {
   expect(/^3\.1(?:\.|$)/u.test(document.openapi), 'document must use OpenAPI 3.1')
   expect(document.info?.title === 'LinguaDesk API', 'unexpected API title')
-  expect(document.info?.version === '0.1.0-m006', 'unexpected artifact version')
+  expect(document.info?.version === '0.1.0-m007', 'unexpected artifact version')
   expect(typeof document.info?.description === 'string', 'artifact description is required')
 
-  sameValues(Object.keys(document.paths ?? {}), ['/api/capabilities', '/api/accounts/register'], 'document paths')
+  sameValues(
+    Object.keys(document.paths ?? {}),
+    [
+      '/api/capabilities',
+      '/api/accounts/register',
+      '/api/accounts/confirm-email',
+      '/api/accounts/resend-verification',
+    ],
+    'document paths',
+  )
   const pathItem = document.paths['/api/capabilities']
   sameValues(Object.keys(pathItem), ['get'], 'capabilities operations')
   const operation = pathItem.get
@@ -131,6 +140,94 @@ function validateContract(document) {
     Object.keys(registrationProblem.properties),
     ['type', 'title', 'status', 'detail', 'category', 'correlationId', 'errors'],
     'registration Problem Details fields',
+  )
+
+  const verificationOperations = [
+    {
+      path: '/api/accounts/confirm-email',
+      operationId: 'confirmLocalAccountEmail',
+      requestSchema: 'ConfirmEmailRequest',
+      successStatus: '200',
+      successSchema: 'ConfirmEmailAccepted',
+    },
+    {
+      path: '/api/accounts/resend-verification',
+      operationId: 'resendLocalAccountVerification',
+      requestSchema: 'ResendVerificationRequest',
+      successStatus: '202',
+      successSchema: 'ResendVerificationAccepted',
+    },
+  ]
+  for (const item of verificationOperations) {
+    const path = document.paths[item.path]
+    sameValues(Object.keys(path), ['post'], `${item.operationId} operations`)
+    const selectedOperation = path.post
+    expect(selectedOperation.operationId === item.operationId, `unexpected ${item.operationId} operation ID`)
+    expect(selectedOperation.security === undefined, `${item.operationId} must not declare authentication`)
+    expect(
+      typeof selectedOperation.summary === 'string' && typeof selectedOperation.description === 'string',
+      `${item.operationId} descriptions are required`,
+    )
+    sameValues(
+      Object.keys(selectedOperation.responses ?? {}),
+      [item.successStatus, '400', '405', '415', '503'],
+      `${item.operationId} responses`,
+    )
+    expect(selectedOperation.requestBody?.required === true, `${item.operationId} request body must be required`)
+    expect(
+      selectedOperation.requestBody.content?.['application/json']?.schema?.$ref ===
+        `#/components/schemas/${item.requestSchema}`,
+      `${item.operationId} JSON request schema is missing`,
+    )
+    for (const status of [item.successStatus, '400', '405', '415', '503']) {
+      const selectedResponse = selectedOperation.responses[status]
+      expect(selectedResponse.headers?.['Cache-Control']?.required === true, `${item.operationId} ${status} must require Cache-Control`)
+      expect(selectedResponse.headers['Cache-Control'].schema?.type === 'string', `${item.operationId} ${status} Cache-Control must be a string`)
+    }
+    expect(
+      selectedOperation.responses[item.successStatus].content?.['application/json']?.schema?.$ref ===
+        `#/components/schemas/${item.successSchema}`,
+      `${item.operationId} success schema is missing`,
+    )
+    for (const status of ['400', '415', '503']) {
+      expect(
+        selectedOperation.responses[status].content?.['application/problem+json']?.schema?.$ref ===
+          '#/components/schemas/VerificationProblemDetails',
+        `${item.operationId} ${status} Problem Details schema is missing`,
+      )
+    }
+  }
+
+  const confirmationRequest = document.components.schemas.ConfirmEmailRequest
+  sameValues(confirmationRequest.required, ['userId', 'code'], 'confirmation request required fields')
+  sameValues(Object.keys(confirmationRequest.properties), ['userId', 'code'], 'confirmation request fields')
+  expect(confirmationRequest.properties.userId.minLength === 1, 'confirmation user ID minimum is missing')
+  expect(confirmationRequest.properties.userId.maxLength === 450, 'confirmation user ID maximum is missing')
+  expect(confirmationRequest.properties.code.minLength === 1, 'confirmation code minimum is missing')
+  expect(confirmationRequest.properties.code.maxLength === 4096, 'confirmation code maximum is missing')
+  expect(confirmationRequest.properties.code.writeOnly === true, 'confirmation code must be write-only')
+  sameValues(document.components.schemas.ConfirmationStatus.enum, ['verified'], 'confirmation status values')
+
+  const resendRequest = document.components.schemas.ResendVerificationRequest
+  sameValues(resendRequest.required, ['email'], 'resend request required fields')
+  sameValues(Object.keys(resendRequest.properties), ['email'], 'resend request fields')
+  expect(resendRequest.properties.email.format === 'email', 'resend email format is missing')
+  expect(resendRequest.properties.email.maxLength === 254, 'resend email maximum is missing')
+  const resendAccepted = document.components.schemas.ResendVerificationAccepted
+  sameValues(resendAccepted.required, ['status', 'retryAfterSeconds'], 'resend acknowledgment required fields')
+  expect(resendAccepted.properties.retryAfterSeconds.type === 'integer', 'resend retry interval must be integer-only')
+  sameValues(document.components.schemas.ResendVerificationStatus.enum, ['verificationRequested'], 'resend status values')
+
+  const verificationProblem = document.components.schemas.VerificationProblemDetails
+  sameValues(
+    verificationProblem.required,
+    ['title', 'status', 'detail', 'category', 'correlationId'],
+    'verification Problem Details required fields',
+  )
+  sameValues(
+    Object.keys(verificationProblem.properties),
+    ['type', 'title', 'status', 'detail', 'category', 'correlationId', 'errors'],
+    'verification Problem Details fields',
   )
 
   const root = referencedSchema(document, responseSchema.$ref)

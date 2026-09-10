@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Routing;
 using LinguaDesk.Api.Features.Capabilities;
 using LinguaDesk.Api.Features.Identity;
 using LinguaDesk.Api.Features.Identity.Registration;
+using LinguaDesk.Api.Features.Identity.Verification;
 using LinguaDesk.Api.Infrastructure.Persistence;
 using LinguaDesk.Api.Infrastructure.Readiness;
 using LinguaDesk.Api.Infrastructure.Security;
@@ -72,6 +73,7 @@ app.MapHealthChecks(
 
 app.MapCapabilities();
 app.MapRegistration();
+app.MapAccountVerification();
 
 static IResult ApiNotFound() => Results.Problem(
     detail: "The requested API endpoint does not exist.",

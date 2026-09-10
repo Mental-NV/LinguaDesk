@@ -5,6 +5,7 @@ set -euo pipefail
 script_directory=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 repository_root=$(CDPATH= cd -- "$script_directory/.." && pwd)
 api_project="$repository_root/backend/src/LinguaDesk.Api/LinguaDesk.Api.csproj"
+api_project_directory="$repository_root/backend/src/LinguaDesk.Api"
 frontend_directory="$repository_root/frontend"
 openapi_output="$repository_root/docs/05-openapi.yaml"
 types_output="$frontend_directory/src/api/generated/linguadesk-api.d.ts"
@@ -73,8 +74,33 @@ generate_into() {
         --configuration Release \
         --no-restore \
         --no-incremental \
-        -p:OpenApiGenerateDocuments=true \
-        -p:OpenApiDocumentsDirectory="$intermediate"
+        --disable-build-servers
+    dotnet build-server shutdown
+
+    global_packages=$(dotnet nuget locals global-packages --list)
+    nuget_root=${global_packages#global-packages: }
+    getdocument_tool="$nuget_root/microsoft.extensions.apidescription.server/10.0.10/tools/dotnet-getdocument.dll"
+    if [ ! -f "$getdocument_tool" ]; then
+        echo "The pinned OpenAPI extraction tool is missing: $getdocument_tool" >&2
+        exit 1
+    fi
+
+    (
+        cd "$api_project_directory"
+        LINGUADESK_OPENAPI_GENERATION=1 \
+        DOTNET_HOSTBUILDER__RELOADCONFIGONCHANGE=false \
+        dotnet "$getdocument_tool" \
+            --assembly "$api_project_directory/bin/Release/net10.0/LinguaDesk.Api.dll" \
+            --file-list "$api_project_directory/obj/LinguaDesk.Api.OpenApiFiles.cache" \
+            --framework ".NETCoreApp,Version=v10.0" \
+            --output "$intermediate" \
+            --project LinguaDesk.Api \
+            --assets-file "$api_project_directory/obj/project.assets.json" \
+            --platform AnyCPU \
+            --document-name linguadesk \
+            --file-name linguadesk \
+            --openapi-version OpenApi3_1
+    )
 
     if [ ! -f "$generated_json" ]; then
         echo "Build-time generation did not produce the expected document: $generated_json" >&2

@@ -1,4 +1,4 @@
-using System.Security.Cryptography;
+using LinguaDesk.Api.Features.Identity.Verification;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
@@ -7,16 +7,10 @@ namespace LinguaDesk.Api.Features.Identity.Registration;
 
 public sealed class RegistrationCoordinator(
     UserManager<IdentityUser> users,
-    IAccountConfirmationSender sender,
+    AccountVerificationDeliveryCoordinator delivery,
     RegistrationGate gate,
     ILogger<RegistrationCoordinator> logger)
 {
-    private static readonly Action<ILogger, string, Exception?> LogDeliveryUnavailable =
-        LoggerMessage.Define<string>(
-            LogLevel.Warning,
-            new EventId(6001, "AccountConfirmationDeliveryUnavailable"),
-            "Account confirmation delivery failed. Category=deliveryUnavailable CorrelationId={CorrelationId}");
-
     private static readonly Action<ILogger, string, Exception?> LogStorageUnavailable =
         LoggerMessage.Define<string>(
             LogLevel.Warning,
@@ -50,18 +44,11 @@ public sealed class RegistrationCoordinator(
                 return RegistrationOutcome.InvalidPassword;
             }
 
-            try
-            {
-                var material = await users.GenerateEmailConfirmationTokenAsync(user);
-                await sender.SendAsync(request.Email, material, cancellationToken);
-            }
-            catch (Exception exception) when (exception is AccountConfirmationDeliveryException
-                or IOException
-                or UnauthorizedAccessException
-                or CryptographicException)
-            {
-                LogDeliveryUnavailable(logger, correlationId, null);
-            }
+            await delivery.RequestInitialDeliveryWhileGateHeldAsync(
+                user,
+                request.Email,
+                correlationId,
+                cancellationToken);
 
             return RegistrationOutcome.Accepted;
         }

@@ -21,14 +21,14 @@
       "heading": "Selected milestone",
       "use": "reference",
       "reason": "Mutable current selection authority; check before execution without adding it to the stable packet",
-      "sha256": "ec94d4521919368912010c288a40990e04fed19f90afdbf14a4b2904b06e23db"
+      "sha256": "4d35108ac4d7ec5b3bab2bdcdbcb3275894e05e6635c50e28251ce8e9b80687f"
     },
     {
       "path": "docs/delivery/current.md",
       "heading": "Completed milestones",
       "use": "reference",
       "reason": "Mutable dependency index; detailed M006 handoff is selected separately",
-      "sha256": "221726dd0a2f850f4faf79261921d9923dd9212af7a152f848bbee2c74534aec"
+      "sha256": "a22ab060129cf11b215e7d6bef6348d89bc6f04bfbeee2824e008e3184d86509"
     },
     {
       "path": "docs/08-backlogs/M006/backlog.md",
@@ -103,7 +103,7 @@
       "heading": "5.1 Identity",
       "use": "excerpt",
       "reason": "Identity, verification, persistent key and deterministic delivery boundaries",
-      "sha256": "9d074c7c8dfd40385d62d148fee92d12ca95a2b503e52e305d0c1a0d18e6413d"
+      "sha256": "255500a20e3c329dc23b4a03ae097a7444a2b8b348f183eb9f98d808ed1f960a"
     },
     {
       "path": "docs/03-architecture.md",
@@ -131,14 +131,21 @@
       "heading": "3.3 Verification and recovery",
       "use": "excerpt",
       "reason": "Canonical confirmation, resend, expiry, non-enumeration and token-redaction behavior",
-      "sha256": "ed134d907ac7f97a2dcab143b7574b7dbbe11cdb6af24404f9cfc31746682b7f"
+      "sha256": "5bca521c4911290b0d4d1418b1ecdd0f281ac65393047083695aaf87b52988b9"
     },
     {
       "path": "docs/api/accounts.md",
       "heading": "3.4 M006 registration contract",
       "use": "excerpt",
       "reason": "Registration delivery handoff and wire/error invariants that M007 must preserve",
-      "sha256": "27746718dcc7383831a84992edc9ef173a99b59d8d221b8a4231b5b63cf61b0f"
+      "sha256": "e1ff62a094c0de0b79716409c3b8346728e0cf2183a4fa38b61608a536abdd4b"
+    },
+    {
+      "path": "docs/api/accounts.md",
+      "heading": "3.5 M007 confirmation and resend contract",
+      "use": "excerpt",
+      "reason": "Implemented canonical confirmation, resend, token-lifetime and cooldown contract",
+      "sha256": "eacdd5fb260b796ce7679684923286d64c75d16a25f1d8dd163dbec24e658127"
     },
     {
       "path": "docs/05-api-design.md",
@@ -192,19 +199,19 @@
       ],
       "use": "excerpt",
       "reason": "Canonical V-group allocation for the selected API scenario portions",
-      "sha256": "7b46a4e570eba441e83db4719364c41f9d6e977007948dc6f76cd9dda8abade2"
+      "sha256": "a21b1c0f5bf6e72b50716bb3ca40f157bfdf093990663ac13d7c3f67c264d94e"
     },
     {
       "path": "backend/src/LinguaDesk.Api/Program.cs",
       "use": "reference",
       "reason": "Current endpoint ordering, authorization and route fallback composition",
-      "sha256": "b37ea9328a3ffca97df63870cec6268dd4777d33b8a925d7a699d7042b76a729"
+      "sha256": "382d9419752db5659de4da8179e98583702c6e4fe2521df6a3e26da84a88aa76"
     },
     {
       "path": "backend/src/LinguaDesk.Api/Features/Identity/IdentityRegistrationExtensions.cs",
       "use": "reference",
       "reason": "Current Identity service, delivery adapter and authorization registration",
-      "sha256": "53fc251429dd5838bf48fcdffd247a7101413509df5734cb1983fa5c75ce7669"
+      "sha256": "571c82491b1c1a27e8bb88a6c520163c151685735039dab0b30d5c5b9b75b55e"
     },
     {
       "path": "backend/src/LinguaDesk.Api/Features/Identity/VerifiedAccountAuthorization.cs",
@@ -216,7 +223,7 @@
       "path": "backend/src/LinguaDesk.Api/Features/Identity/Registration/IAccountConfirmationSender.cs",
       "use": "reference",
       "reason": "Current delivery seam to refactor into structured confirmation material",
-      "sha256": "79a04bb5993217ebbce6311a12dc649a768bd8d9047ce8901c2e9b53db35b2ec"
+      "sha256": "2a05404d082484708138a0738b88424da556bfdb61917e31521838910fb8a1d1"
     },
     {
       "path": "backend/src/LinguaDesk.Api/Features/Identity/Registration/RegistrationContract.cs",
@@ -228,7 +235,7 @@
       "path": "backend/src/LinguaDesk.Api/Features/Identity/Registration/RegistrationCoordinator.cs",
       "use": "reference",
       "reason": "Current account creation, gate and initial delivery behavior",
-      "sha256": "ada1ac4afca214c5d337fbe130d32578004ab060956679f838a42a0836f942ab"
+      "sha256": "4bdab2634499f61b87119da245debb905211462e492ea8a32b27941affc91348"
     },
     {
       "path": "backend/src/LinguaDesk.Api/Features/Identity/Registration/RegistrationEndpoints.cs",
@@ -240,7 +247,7 @@
       "path": "backend/src/LinguaDesk.Api/Features/Capabilities/OpenApiRegistration.cs",
       "use": "reference",
       "reason": "Current generated document metadata and response-header transformations",
-      "sha256": "59d92ecb71c65650c7ee785b3bca9639e05bd6d3626448afbd956338a02d829a"
+      "sha256": "b54607c2a63bccaaf3dbac1a11573ec9a8ef9beb7172015daf04bfa081416d50"
     },
     {
       "path": "backend/src/LinguaDesk.Api/Infrastructure/Persistence/LinguaDeskDbContext.cs",
@@ -258,7 +265,7 @@
       "path": "backend/tests/LinguaDesk.Api.Tests/AccountRegistrationTests.cs",
       "use": "reference",
       "reason": "Existing real Identity host, capturing/failing sender and regression fixtures",
-      "sha256": "0b208f685a6e6dd58fcc75db41e783434d980beef4cceb20bc3fad5eed59dcc5"
+      "sha256": "deac4c938ae632a85c223d1311e99320773cfe3b19b5b616b233375582b58f3f"
     },
     {
       "path": "backend/Directory.Packages.props",
@@ -270,25 +277,25 @@
       "path": "docs/05-openapi.yaml",
       "use": "reference",
       "reason": "Current generated public wire contract to extend and drift-check",
-      "sha256": "58155b6c9c79fcf3035ae7515d606bee19a43c6afbd9bb116b76c6f32b5d2881"
+      "sha256": "f6734e262cbd213122dad296ba3c251676cfa02722ecaef87a58966d9cf9e001"
     },
     {
       "path": "frontend/src/api/generated/linguadesk-api.d.ts",
       "use": "reference",
       "reason": "Current generated client declaration boundary",
-      "sha256": "eb9723abef6b7a6eceab0d24b6625a429a028fe2bfb95c4679ca98c6bfd0ea1f"
+      "sha256": "032a8625ba9914f7f522c1824e55c3b674e8eeb5585418aab95fca2223a9a9e5"
     },
     {
       "path": "scripts/backend.sh",
       "use": "reference",
       "reason": "Backend aggregate, focused-count and published smoke command surface",
-      "sha256": "90570360603728afd1825d16e84eafff2a4197eaacd9c121e6d1ddc175983610"
+      "sha256": "0842754f13ed7001700a1f732437034ca45c859976c59e3e9290874221da607d"
     },
     {
       "path": "scripts/contract.sh",
       "use": "reference",
       "reason": "Deterministic contract generation and drift command surface",
-      "sha256": "798703fd9454817bd2ddcd0cff920fe4b6fd42c939dd4952e41dda06419eb401"
+      "sha256": "d514721c6a6beca458a884f9af172cda279fbaf36529dc1e1709e76dfb4471b9"
     },
     {
       "path": "scripts/frontend.sh",
@@ -297,8 +304,8 @@
       "sha256": "f5977a5161c09985fc5cdc6eee4b9ddd5614b589d4b49e6fed8add6530b12f15"
     }
   ],
-  "source_map_sha256": "56c713db8d896517078216d2672424128058faa7faff623afc08d2774255a33e",
-  "baseline_commit": "4dafe1d3053b0fe73cee39b8a4dc7b7ae3f2cd18",
+  "source_map_sha256": "9978016973459ceb57b4e73fd098797177177f5cf91a3f3f55d848d60885f060",
+  "baseline_commit": "c8a62d10be2eabbb79bc00edc8b709ec5ed0f3ce",
   "locked_files": {
     "docs/00-SDD-Planning-Workflow.md": "183ae93148ff594f9f1e021aa7543baa8878e9cc0bcfd69ebc696c28976e2945",
     "docs/00-workflow/execution.md": "f362a1384cefef24ba204e0723e3190857c8cca9bcd91908136932e19c5caf02",

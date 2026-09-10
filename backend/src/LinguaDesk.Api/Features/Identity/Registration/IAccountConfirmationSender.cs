@@ -2,12 +2,14 @@ namespace LinguaDesk.Api.Features.Identity.Registration;
 
 public interface IAccountConfirmationSender
 {
-    Task SendAsync(string destination, string verificationMaterial, CancellationToken cancellationToken);
+    Task SendAsync(AccountConfirmationDelivery delivery, CancellationToken cancellationToken);
 }
+
+public sealed record AccountConfirmationDelivery(string Destination, string UserId, string Code);
 
 internal sealed class UnavailableAccountConfirmationSender : IAccountConfirmationSender
 {
-    public Task SendAsync(string destination, string verificationMaterial, CancellationToken cancellationToken) =>
+    public Task SendAsync(AccountConfirmationDelivery delivery, CancellationToken cancellationToken) =>
         throw new AccountConfirmationDeliveryException();
 }
 

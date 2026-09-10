@@ -1,6 +1,6 @@
 # LinguaDesk — API Behavioral Design
 
-**Document:** #5 · **Version:** 1.5 · **Status:** Current design; implementation/evidence status is maintained in delivery/current.md and verification/coverage.md
+**Document:** #5 · **Version:** 1.6 · **Status:** Current design; implementation/evidence status is maintained in delivery/current.md and verification/coverage.md
 **Updated:** 2026-09-09
 
 ## 1. Authority, sources, and artifact lifecycle
@@ -9,7 +9,7 @@ Original authoring inputs are in the [archive](archive/05-api-design-inputs.md).
 
 This document owns shared observable API behavior under Q-003/Q-006, coordinated with #3 for identity, accounting and privacy. The technical choices below use #0's delegated design authority. They do not accept P-005/NFR-008, P-006, a new product feature or a provider privacy requirement. Product values remain canonical in PRD Sections 5–8; configuration exposes those values rather than creating independent defaults here.
 
-M001–M004 established the backend host, published shell, durable-storage boundary and independent AI boundary. [M005 / package 005](08-backlogs/M005/spec.md) has now implemented and verified the first product API slice: its exact public capability operation/fields, shared scalar fixtures and slice-local artifact mechanics are represented by actual C# metadata, generated [`docs/05-openapi.yaml`](05-openapi.yaml) and generated TypeScript declarations. [Verification plan #6](06-verification-plan.md) supplies shared verification methods and coverage. The YAML remains a generated artifact, not a hand-edited source. This document supplies cross-operation rules and behavioral examples, not endpoint signatures or a complete DTO catalog. #6 owns the requirement-to-test/evidence matrix. M005 evidence does not make any language-operation, auth, usage/status, accounting or release behavior complete.
+M001–M004 established the backend host, published shell, durable-storage boundary and independent AI boundary. M005–M007 have implemented and verified the public capability, local registration and deterministic email-verification API slices. Their exact selected operations and fields are represented by actual C# metadata, generated [`docs/05-openapi.yaml`](05-openapi.yaml) and generated TypeScript declarations. [Verification plan #6](06-verification-plan.md) supplies shared verification methods and coverage. The YAML remains a generated artifact, not a hand-edited source. This document supplies cross-operation rules and behavioral examples, not endpoint signatures or a complete DTO catalog. #6 owns the requirement-to-test/evidence matrix. These slices do not make sign-in, password reset, browser/live-email journeys, language operations, usage/accounting or release behavior complete.
 
 For each selected API slice:
 
@@ -129,7 +129,7 @@ P-006 remains proposed: this document does not introduce published-version compa
 
 ## 10. Acceptance scenarios and readiness
 
-These shared scenarios guide selected packages; [#6 Section 8](verification/coverage.md#8-canonical-coverage-and-acceptance-allocation) owns the canonical coverage matrix and check allocation. They are not an all-MVP implementation task list. Only the M005 portions of API-AC-001 and API-AC-014 have passing runtime evidence; all other portions remain pending until selected.
+These shared scenarios guide selected packages; [#6 Section 8](verification/coverage.md#8-canonical-coverage-and-acceptance-allocation) owns the canonical coverage matrix and check allocation. They are not an all-MVP implementation task list. M005 supplies passing API-AC-001 and initial API-AC-014 portions; M006–M007 supply the selected registration/verification portions of API-AC-003/012/014. All remaining portions stay pending until selected.
 
 | ID | Observable outcome | Upstream |
 | --- | --- | --- |
@@ -151,10 +151,10 @@ These shared scenarios guide selected packages; [#6 Section 8](verification/cove
 | Owner / question | Resolved here | Remaining decision and blocking stage |
 | --- | --- | --- |
 | Q-003, #5/#3 | Scalar/whitespace/newline count; identity matching/expiry; interrupted outcomes; daily/monthly attribution and ordered usage. M005 fixes the public count-policy/retry-bound fields and cross-runtime fixtures for its capability slice | Language-operation/accounting wire fields, fingerprint/key cleanup implementation and concurrency evidence before their selected slice completion |
-| Q-006, #5/#3 | Cookie plus Identity opaque bearer; auth precedence/lifecycle; recovery/error semantics; no public cancellation endpoint. M005 fixes capabilities/artifacts; M006 fixes registration wire, email/password policy, generic duplicate/delivery intent and unverified-state guard | Confirmation/resend/status/sign-in/token/antiforgery/usage/language/status operations and any compatibility/versioning policy before their selected handlers/clients; P-006 remains proposed |
+| Q-006, #5/#3 | Cookie plus Identity opaque bearer; auth precedence/lifecycle; recovery/error semantics; no public cancellation endpoint. M005 fixes capabilities/artifacts; M006 fixes registration wire, email/password policy, generic duplicate/delivery intent and unverified-state guard; M007 fixes body-only confirmation/resend, 24-hour email token and 60-second durable cooldown | Account status/sign-in/token/antiforgery/password-reset/usage/language operations, real delivery and any compatibility/versioning policy before their selected handlers/clients; P-006 remains proposed |
 | Q-004, #3/account design/#10 | Bounded operation recovery/stamp behavior; M006 creates durable account/key records without deletion/retention claims | Account deletion, backup/aggregate/unresolved-exposure retention and any further logout guarantees before those related features/launch; not a blocker to M006 creation |
 | Q-001, #4/#3 | Cost-month attribution and conservative unresolved carryover | Serving/billing bounds, attribution verification and actual cap before paid serving |
 | Q-005, #6 | Local acceptance scenarios retained here; [#6](06-verification-plan.md) specifies coverage and workloads | Executable release evidence |
 | Q-008/Q-010, PRD then #3/#10 | Proposal status preserved | No new abuse rate or compatibility obligation until its owning proposal is accepted |
 
-The shared design and completed M005 package now provide the contract-generation baseline for later selected API slices. Unrelated wire/auth/accounting questions remain explicit and block only their affected handlers/clients. Shared rules continue to preserve whole-source processing, success-only charging, no saved text, simple LLM chains and the PRD's deferred/proposed distinctions; M005 did not implement those later behaviors.
+The shared design and completed M005–M007 packages now provide the contract-generation and local verification baseline for later selected API slices. Unrelated wire/auth/accounting questions remain explicit and block only their affected handlers/clients. Shared rules continue to preserve whole-source processing, success-only charging, no saved text, simple LLM chains and the PRD's deferred/proposed distinctions; these packages did not implement those later behaviors.

@@ -6,12 +6,12 @@ Authoritative continuation of [06-verification-plan.md](../06-verification-plan.
 
 ### 8.1 Product and release coverage
 
-This is the sole cross-document product coverage matrix; the source documents retain their behavioral acceptance IDs. Active product rows remain **Unselected / Pending** except for the explicitly linked, passing M005 and M006 portions below; neither narrow allocation satisfies a complete product requirement or release gate. The separately identified M001–M006 rows link completed packages. Once product work is selected, link its actual #8 backlog/package and state partial coverage honestly. Deferred, retired and proposed rows are intentionally not current test gaps or passing gates. Design references plus Section 8.2 connect product rows to local scenario checks without copying their full acceptance prose.
+This is the sole cross-document product coverage matrix; the source documents retain their behavioral acceptance IDs. Active product rows remain **Unselected / Pending** except for the explicitly linked, passing M005–M007 portions below; no narrow allocation satisfies a complete product requirement or release gate. The separately identified M001–M007 rows link completed packages. Once product work is selected, link its actual #8 backlog/package and state partial coverage honestly. Deferred, retired and proposed rows are intentionally not current test gaps or passing gates. Design references plus Section 8.2 connect product rows to local scenario checks without copying their full acceptance prose.
 
 | Requirement / gate | Shared design / acceptance owner | Checks | Backlog/package → evidence/status |
 | --- | --- | --- | --- |
 | FR-001 | UX §9; API §3 | V-004, V-003, V-010 | [M006 / BI-006](../08-backlogs/M006/backlog.md) → [AC-001–003](../08-backlogs/M006/spec.md#4-selected-acceptance) API registration portion → Passed; sign-in and web flow remain unselected |
-| FR-002 | UX §9; API §3 | V-004, V-003, V-016 | [M006 / BI-006](../08-backlogs/M006/backlog.md) → [AC-004/005](../08-backlogs/M006/spec.md#4-selected-acceptance) durable unverified/delivery-intent portion → Passed; confirmation/reset and real email remain unselected |
+| FR-002 | UX §9; API §3 | V-004, V-003, V-016 | [M006 / BI-006](../08-backlogs/M006/backlog.md) durable unverified/delivery-intent portion and [M007 / BI-007](../08-backlogs/M007/backlog.md) → [AC-001–006](../08-backlogs/M007/spec.md#acceptance) deterministic confirmation/resend portion → Passed; sign-in, reset, browser journey and real email remain unselected |
 | FR-003 | UX §3; API §2 | V-003, V-009, V-012 | Unselected → Pending |
 | FR-004 | UX §6–8; AI §3; API §2/4 | V-001, V-002, V-003, V-007, V-009, V-013 | [M005 AC-002/005](../08-backlogs/M005/spec.md#4-selected-acceptance) source-choice discovery/local selector portion → Passed; semantic eligibility/UI remain unselected |
 | FR-005 | AI §3; UX §7–8; API §2 | V-003, V-007, V-009, V-013 | [M005 AC-002](../08-backlogs/M005/spec.md#4-selected-acceptance) supported-language discovery portion → Passed; eligibility/quality/UI remain unselected |
@@ -51,7 +51,7 @@ This is the sole cross-document product coverage matrix; the source documents re
 | NFR-001 | PRD §8; AI §3–5 | V-013 | Unselected → Pending |
 | NFR-002 | PRD §7; AI §6; API §6 | V-014, V-007, V-005 | Unselected → Pending |
 | NFR-003 | UX §6; architecture §7; API §5–7 | V-002, V-005, V-007, V-010, V-016 | Unselected → Pending |
-| NFR-004 | UX §3; architecture §6; AI §8; API §9 | V-015, V-010, V-005 | Unselected → Pending |
+| NFR-004 | UX §3; architecture §6; AI §8; API §9 | V-015, V-010, V-005 | [M007 AC-002/004/006](../08-backlogs/M007/spec.md#acceptance) account-secret/no-store slice → Passed; text lifecycle, browser and operation persistence coverage remain unselected |
 | NFR-005 | UX §4–5/10 | V-003, V-010, V-011 | Unselected → Pending |
 | NFR-006 | architecture §7; AI §5–6; API §7 | V-006, V-008, V-013, V-014 | Unselected → Pending |
 | NFR-007 | UX §4–5; Should priority retained | V-011 | Unselected → Pending |
@@ -70,10 +70,11 @@ This is the sole cross-document product coverage matrix; the source documents re
 | M004 / BI-004 — enabling scope | Architecture §3.2/4.1/8.2; AI §2/4.1/9; host-independent shared boundary and synthetic prompt inspection only | V-007 independent build/prompt/scripted-client portions; V-009/V-012 host/published regressions | [BI-004](../08-backlogs/M004/backlog.md) → [package AC-001–007](../08-backlogs/M004/spec.md#3-selected-acceptance) → [tasks/evidence](../08-backlogs/M004/tasks.md#3-completion-record); Done / Passed — 10 focused AI and 42 retained API/storage cases, deterministic prompt hash/inspection, controlled failures, backend smoke and 8 component/6 published Chromium regressions; M015–M020 and all product/release assertions remain unselected |
 | M005 / BI-005 — product contract slice | PRD FR-004–007/009/012/014/036; API §2/4/9; public discovery, pure local validation and generated contract/types only | V-001 shared scalar/limit/selector fixtures; V-009 public capability HTTP and schema/type drift portions; V-012 route/publish regressions | [BI-005](../08-backlogs/M005/backlog.md) → [package AC-001–008](../08-backlogs/M005/spec.md#4-selected-acceptance) → [tasks/evidence](../08-backlogs/M005/tasks.md#3-completion-record); Done / Passed — 47 API/storage, 10 Core, 10 AI, 36 frontend unit and 6 published Chromium cases plus deterministic generation/drift and failure guards; text submission, auth, usage, AI behavior, accounting, UI adoption and release checks remain unselected |
 | M006 / BI-006 — local registration slice | PRD FR-001/002; architecture §5–6; API §3/9; anonymous local registration, durable unverified state and indispensable account-serving readiness only | V-004 Identity registration/non-enumeration/current-state guard; V-009 independent registration wire/schema/type drift; V-015 secret sentinels; V-016 Identity migration/key/startup/readiness; retained V-003/V-012 shell/publish regressions | [BI-006](../08-backlogs/M006/backlog.md) → [package AC-001–008](../08-backlogs/M006/spec.md#4-selected-acceptance) → [tasks/evidence](../08-backlogs/M006/tasks.md#3-completion-record); Done / Passed — 67 API/storage/Identity/readiness, 10 Core, 10 AI, 36 frontend unit and 6 published Chromium cases plus deterministic generation/drift/startup failure guards; sign-in, confirmation/resend/status/reset, web form, live email, language work, deletion and RG-005 remain outside this slice |
+| M007 / BI-007 — local verification slice | PRD FR-002; architecture §5–6; API §3/9; anonymous durable email confirmation and non-enumerating cooldown-bound resend only | V-004 real Identity confirmation/restart/expiry/cooldown/concurrency/delivery recovery; V-009 generated operation/schema/type drift; V-015 no-store and secret-safe errors; retained V-003/V-012 shell/publish regressions | [BI-007](../08-backlogs/M007/backlog.md) → [package AC-001–008](../08-backlogs/M007/spec.md#acceptance) → [tasks/evidence](../08-backlogs/M007/tasks.md#completion-record); Done / Passed — 78 API/storage/Identity/readiness including 11 focused verification cases, 10 Core, 10 AI, 36 frontend unit and 6 published Chromium cases plus deterministic generation/drift and dependency audits; sign-in/status/reset, browser verification, live email, language work, deletion, full FR-002/RG-005 and release gates remain outside this slice |
 
 ### 8.2 Local acceptance allocation
 
-Read the complete contracts at [UX Section 12](../ux/acceptance.md#12-acceptance-contracts-and-preserved-scenario-ids), [LLM Section 10](../04-llm-specification.md#10-local-acceptance-scenarios-and-handoffs) and [API Section 10](../05-api-design.md#10-acceptance-scenarios-and-readiness). The following indexes allocate every existing scenario. Active checks remain pending except for M005's completed API-AC-001 fixture/local-boundary portion and API-AC-014 first capability-slice portion. Multiple V-IDs split different assertions; they do not require repeating a journey at every layer. For example, UX-AC-106 uses V-002 for ordering, V-003 for display and V-005 for durable snapshot order.
+Read the complete contracts at [UX Section 12](../ux/acceptance.md#12-acceptance-contracts-and-preserved-scenario-ids), [LLM Section 10](../04-llm-specification.md#10-local-acceptance-scenarios-and-handoffs) and [API Section 10](../05-api-design.md#10-acceptance-scenarios-and-readiness). The following indexes allocate every existing scenario. Active checks remain pending except for the explicitly linked M005–M007 portions. Multiple V-IDs split different assertions; they do not require repeating a journey at every layer. For example, UX-AC-106 uses V-002 for ordering, V-003 for display and V-005 for durable snapshot order.
 
 | UX scenario IDs | Current status | Check allocation |
 | --- | --- | --- |
@@ -212,7 +213,7 @@ Read the complete contracts at [UX Section 12](../ux/acceptance.md#12-acceptance
 | --- | --- |
 | API-AC-001 | V-001; M005 AC-004/005 passed for the fixture/local-boundary portion, HTTP submission boundary later |
 | API-AC-002 | V-004 |
-| API-AC-003 | V-004 |
+| API-AC-003 | V-004; M007 AC-001–003 passed the confirmation/current-state portion, credential/reset portions later |
 | API-AC-004 | V-005 |
 | API-AC-005 | V-001, V-005 |
 | API-AC-006 | V-005, V-009, V-015 |
@@ -221,8 +222,8 @@ Read the complete contracts at [UX Section 12](../ux/acceptance.md#12-acceptance
 | API-AC-009 | V-005, V-002, V-003 |
 | API-AC-010 | V-006 |
 | API-AC-011 | V-005, V-002, V-003 |
-| API-AC-012 | V-004, V-015 |
+| API-AC-012 | V-004, V-015; M006 registration duplicate and M007 resend/secret-safe portions passed, reset later |
 | API-AC-013 | V-009 |
-| API-AC-014 | V-009; M005 AC-006/007 passed for the first capability slice |
+| API-AC-014 | V-009; M005 capability, M006 registration and M007 verification contract-generation portions passed |
 
 The UX index contains 86 active scenarios (29 MVP, 57 Amended), 21 Deferred and five Retired, retaining all 112 IDs. The LLM index retains 15 and the API index 14 active scenarios. Deferred alternative branches within active rows do not create current checks. Native browser/AT evidence uses Section 4's representative journeys, not 86 full end-to-end scripts.

@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using System.Reflection;
 using LinguaDesk.Api.Features.Identity.Registration;
+using LinguaDesk.Api.Features.Identity.Verification;
 using Microsoft.AspNetCore.OpenApi;
 using Microsoft.OpenApi;
 
@@ -22,9 +23,9 @@ public static class OpenApiRegistration
                 document.Info = new()
                 {
                     Title = "LinguaDesk API",
-                    Version = "0.1.0-m006",
+                    Version = "0.1.0-m007",
                     Description =
-                        "Pre-release M006 contract containing only the implemented public capabilities and anonymous local-account registration operations. " +
+                        "Pre-release M007 contract containing only the implemented public capabilities, anonymous local-account registration, and email-verification operations. " +
                         "No compatibility or deprecation guarantee is implied.",
                 };
                 return Task.CompletedTask;
@@ -64,6 +65,28 @@ public static class OpenApiRegistration
                         schema.MaxLength = 128;
                         schema.WriteOnly = true;
                     }
+
+                    if (property.DeclaringType == typeof(ConfirmEmailRequest)
+                        && string.Equals(property.Name, nameof(ConfirmEmailRequest.UserId), StringComparison.Ordinal))
+                    {
+                        schema.MinLength = 1;
+                        schema.MaxLength = 450;
+                    }
+
+                    if (property.DeclaringType == typeof(ConfirmEmailRequest)
+                        && string.Equals(property.Name, nameof(ConfirmEmailRequest.Code), StringComparison.Ordinal))
+                    {
+                        schema.MinLength = 1;
+                        schema.MaxLength = 4096;
+                        schema.WriteOnly = true;
+                    }
+
+                    if (property.DeclaringType == typeof(ResendVerificationRequest)
+                        && string.Equals(property.Name, nameof(ResendVerificationRequest.Email), StringComparison.Ordinal))
+                    {
+                        schema.Format = "email";
+                        schema.MaxLength = 254;
+                    }
                 }
 
                 return Task.CompletedTask;
@@ -90,7 +113,9 @@ public static class OpenApiRegistration
                     };
                 }
 
-                if (string.Equals(endpointName, "registerLocalAccount", StringComparison.Ordinal)
+                if ((string.Equals(endpointName, "registerLocalAccount", StringComparison.Ordinal)
+                        || string.Equals(endpointName, "confirmLocalAccountEmail", StringComparison.Ordinal)
+                        || string.Equals(endpointName, "resendLocalAccountVerification", StringComparison.Ordinal))
                     && operation.Responses is not null)
                 {
                     foreach (var registrationResponse in operation.Responses.Values.OfType<OpenApiResponse>())
@@ -98,7 +123,7 @@ public static class OpenApiRegistration
                         registrationResponse.Headers ??= new Dictionary<string, IOpenApiHeader>(StringComparer.OrdinalIgnoreCase);
                         registrationResponse.Headers["Cache-Control"] = new OpenApiHeader
                         {
-                            Description = "Always `no-store` for registration responses.",
+                            Description = "Always `no-store` for local-account mutation responses.",
                             Required = true,
                             Schema = new OpenApiSchema { Type = JsonSchemaType.String },
                         };
