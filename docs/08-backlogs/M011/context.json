@@ -1,0 +1,229 @@
+{
+  "version": 1,
+  "scope": "M011",
+  "sources": [
+    {
+      "path": "docs/delivery/current.md",
+      "heading": "Selected milestone",
+      "use": "reference",
+      "reason": "Mutable current selection authority; verify M011 remains the planned scope before execution",
+      "sha256": "63a42e8070d62461d4f5ba4653773c9fd31071f70386dfd7af0153d9621ebc25"
+    },
+    {
+      "path": "docs/delivery/current.md",
+      "heading": "Completed milestones",
+      "use": "reference",
+      "reason": "Mutable dependency index confirming M002 and M006 completion",
+      "sha256": "ed74890fe8df32b8227f9e3eb108a8508f4ebc8edd232a46ae3d965a069269de"
+    },
+    {
+      "path": "docs/07-roadmap.md",
+      "ids": [
+        "M002",
+        "M006",
+        "M011",
+        "M012"
+      ],
+      "use": "excerpt",
+      "reason": "Selected outcome, dependencies and adjacent verification ownership boundary",
+      "sha256": "f31e01161f70c20173b32d5305e6d6ea41c2961e8ab9051c98529411be91c242"
+    },
+    {
+      "path": "docs/08-backlogs/M002/backlog.md",
+      "use": "reference",
+      "reason": "Completed shell prerequisite: signed-out routes, placeholders and navigation to replace",
+      "sha256": "bd2ebfda778468c612e55b49d9117027ab07d551c2517b11fd8d47b3584328cb"
+    },
+    {
+      "path": "docs/08-backlogs/M006/backlog.md",
+      "use": "reference",
+      "reason": "Completed registration-API prerequisite outcome and explicit web-form handoff",
+      "sha256": "2e4ba5aa3e8eae588b205da683ae0a3f1392ef4685542a44a14bdb603f12f993"
+    },
+    {
+      "path": "docs/01-PRD.md",
+      "ids": [
+        "FR-001",
+        "FR-002"
+      ],
+      "use": "excerpt",
+      "reason": "Selected local registration requirement and unverified-account boundary",
+      "sha256": "7878cc8bb16c65f9b34fb2d290471fb499236497a30c7e84bd43b93257fc17e3"
+    },
+    {
+      "path": "docs/product/open-questions.md",
+      "ids": [
+        "Q-004",
+        "Q-006",
+        "Q-009"
+      ],
+      "use": "excerpt",
+      "reason": "Applicable lifecycle, exact auth-contract and browser/presentation dispositions",
+      "sha256": "60a75b92e44331627acaf5ba70f8da976816ae6012238495a98025603a0d8ed5"
+    },
+    {
+      "path": "docs/02-ux-specification.md",
+      "heading": "9. Local-account and availability flows",
+      "use": "excerpt",
+      "reason": "Canonical registration form, validation, failure and password-clearing behavior",
+      "sha256": "e04b0fae9d96f500a8df34adb10beee3bb38491385e1c6a54956fa1311586809"
+    },
+    {
+      "path": "docs/02-ux-specification.md",
+      "heading": "3.1 Routes and account access",
+      "use": "excerpt",
+      "reason": "Route table and staged-shell handoff replaced by the registration form",
+      "sha256": "3c7ca3b93736cb688c2cd16f1a19902c9149ba495c73a7e14770f12f63aeb836"
+    },
+    {
+      "path": "docs/ux/processing.md",
+      "heading": "6.3 Exact message IDs and disposition",
+      "use": "excerpt",
+      "reason": "Normative registration message copy MSG-034/038-044 and generic failure text",
+      "sha256": "2dc4106342973b68395dd28ee84f7fb38614a0c308d401c747218c13f671632b"
+    },
+    {
+      "path": "docs/ux/acceptance.md",
+      "heading": "12.2–12.9 Scenario disposition and current acceptance",
+      "use": "excerpt",
+      "reason": "Selected UX-AC-006/007/101/102 contracts and deferred/retired boundaries",
+      "sha256": "5f4515441ce70253344cc653186a5c7feaabe67c2fe2d3b077a0652f1d023ada"
+    },
+    {
+      "path": "docs/api/accounts.md",
+      "heading": "3.4 M006 registration contract",
+      "use": "excerpt",
+      "reason": "Exact strict request, policy, non-enumeration and no-credential rules adopted by the form",
+      "sha256": "e1ff62a094c0de0b79716409c3b8346728e0cf2183a4fa38b61608a536abdd4b"
+    },
+    {
+      "path": "docs/03-architecture.md",
+      "heading": "8.1 Explicit actions and plain-text state",
+      "use": "excerpt",
+      "reason": "Explicit-submission, duplicate-guard and in-memory-state rules for the form",
+      "sha256": "ef247e37bdebbf9a2deccce39794e4818d5ba83f381b577fed0a6ef92018e2f5"
+    },
+    {
+      "path": "docs/03-architecture.md",
+      "heading": "8.3 API behavioral design and generated contract",
+      "use": "excerpt",
+      "reason": "Required generated-contract review before client adoption",
+      "sha256": "14eeacbef7471e3cdb6651582e4537db4ec7a30b5525f015c4a08b7d4bfb8660"
+    },
+    {
+      "path": "docs/06-verification-plan.md",
+      "ids": [
+        "V-003",
+        "V-010",
+        "V-015"
+      ],
+      "use": "excerpt",
+      "reason": "Selected component, browser-contract and privacy check groups",
+      "sha256": "2d2399b8d7cced22a2ff3b256665533ca90bb666ceacbd9b3e892f38cdbbfa86"
+    },
+    {
+      "path": "docs/06-verification-plan.md",
+      "heading": "7.1 When to run",
+      "use": "excerpt",
+      "reason": "Required focused, aggregate, contract and published-smoke stages",
+      "sha256": "a4cd1182b2e9c1033cc69af76620424905ec1dcce4499499d9d8c466b7f33b08"
+    },
+    {
+      "path": "docs/06-verification-plan.md",
+      "heading": "7.3 Evidence records and failure handling",
+      "use": "excerpt",
+      "reason": "Evidence fields and truthful pending/blocked/failed handling",
+      "sha256": "baf4f98e4fe09bee51a9a9a4ed94fafccc4e5eb3369aeb08134c124c0fe5575a"
+    },
+    {
+      "path": "docs/verification/frontend.md",
+      "heading": "4.1 Shared UI fixtures",
+      "use": "excerpt",
+      "reason": "Canonical fixtures, password policy shape, request-count and fake-boundary conventions",
+      "sha256": "7b6236fc51c7069628cb2e80b7df5d4f8642279f5a710d0486a1ca2077f0e272"
+    },
+    {
+      "path": "docs/verification/frontend.md",
+      "heading": "4.2 Browser lanes",
+      "use": "excerpt",
+      "reason": "Chromium smoke scope and release-only branded-browser/device evidence boundary",
+      "sha256": "24b0e19b0b330638ecd0d87f0f6f952014faaa60ac4f8e4d404e560029693e04"
+    },
+    {
+      "path": "docs/verification/coverage.md",
+      "heading": "8.2 Local acceptance allocation",
+      "use": "excerpt",
+      "reason": "V-group allocation for the selected UX scenarios",
+      "sha256": "38e04cd5e53e12555c30f959c1f9ddbcad5c977999a050befe19d61c23afffa3"
+    },
+    {
+      "path": "docs/verification/readiness.md",
+      "heading": "9. Readiness and remaining dependencies",
+      "use": "excerpt",
+      "reason": "Registration readiness dependencies and remaining lifecycle/live evidence",
+      "sha256": "73a8b0c91d813cbf40f675b50c08b7895f2964eae66b0f802893e6811ba8f70d"
+    },
+    {
+      "path": "frontend/src/shell/App.tsx",
+      "use": "reference",
+      "reason": "Current placeholder routes, heading-focus and shell conventions to extend",
+      "sha256": "f89b6352cda9b99e7c0d84b3a10edb442f992289542ee16d254774afccc8b90a"
+    },
+    {
+      "path": "frontend/src/api/generated/linguadesk-api.d.ts",
+      "use": "reference",
+      "reason": "Generated registerLocalAccount shape adopted without API change",
+      "sha256": "2f13e433b8839496558b6e060ed25c812cc29527bfc4c9e0c0bb801997dc8805"
+    },
+    {
+      "path": "frontend/src/api/inputPolicy.ts",
+      "use": "reference",
+      "reason": "Shared Unicode-scalar counting approach reused by the policy checklist",
+      "sha256": "6815446695510bfa4ea305e39ca00eb4d1ab539e3c58ca84cc630b02d056af5e"
+    },
+    {
+      "path": "frontend/tests/unit/App.test.tsx",
+      "use": "reference",
+      "reason": "Current placeholder assertions whose /register cases change under M011",
+      "sha256": "8f30adb1a24ff25ca2b2d4cebe6fbafdad83a793939ec0a679ca753440d2bbe4"
+    },
+    {
+      "path": "frontend/tests/e2e/published-shell.spec.ts",
+      "use": "reference",
+      "reason": "Current published-smoke surface extended by the registration trip",
+      "sha256": "045a154dca40ca654486c8d5b0695ad1dba4e366ccde0365736a17eae47d67b6"
+    },
+    {
+      "path": "frontend/playwright.config.ts",
+      "use": "reference",
+      "reason": "Owned-host Chromium lane configuration for the browser trip",
+      "sha256": "f93422d719599d582be3ae302128f4be2964b65d8e787d00babdfe4780367768"
+    },
+    {
+      "path": "frontend/package.json",
+      "use": "reference",
+      "reason": "Pinned Node/npm and frontend verification scripts",
+      "sha256": "6679b8d86b24c87bded9242d2d5a0caed0fc70d1c30ecedffc2382e381fb1b89"
+    },
+    {
+      "path": "scripts/frontend.sh",
+      "use": "reference",
+      "reason": "Frontend type/build and published Chromium verification command",
+      "sha256": "f5977a5161c09985fc5cdc6eee4b9ddd5614b589d4b49e6fed8add6530b12f15"
+    },
+    {
+      "path": "scripts/contract.sh",
+      "use": "reference",
+      "reason": "Canonical OpenAPI/TypeScript drift procedure proving no API change",
+      "sha256": "d514721c6a6beca458a884f9af172cda279fbaf36529dc1e1709e76dfb4471b9"
+    }
+  ],
+  "source_map_sha256": "3f41b24160dc06d6d5afc539506424fd4c1c4da86b6440be64f473a4051d7432",
+  "baseline_commit": "7499a7d6d6d3428cf200ba139fa3e0b06e698269",
+  "locked_files": {
+    "docs/00-SDD-Planning-Workflow.md": "183ae93148ff594f9f1e021aa7543baa8878e9cc0bcfd69ebc696c28976e2945",
+    "docs/00-workflow/execution.md": "f362a1384cefef24ba204e0723e3190857c8cca9bcd91908136932e19c5caf02",
+    "docs/08-backlogs/M011/spec.md": "81eb0b03228fdac675a63a50a10d9ce801212601db6c7a2e30796c6a006cc77d",
+    "docs/08-backlogs/M011/plan.md": "5d15fbea0cd6ffeac1033495f629079bee353c3f645acddbddb4fbdd3959dec2"
+  }
+}
