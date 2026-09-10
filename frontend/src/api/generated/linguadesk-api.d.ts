@@ -84,10 +84,107 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/accounts/antiforgery": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Obtain a browser antiforgery pair
+         * @description Returns a no-store request token and sets only the Secure, HttpOnly, SameSite=Strict __Host-LinguaDesk.Antiforgery cookie.
+         */
+        get: operations["getAccountAntiforgeryToken"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/accounts/sign-in": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Sign in with local credentials
+         * @description Requires the X-LinguaDesk-Antiforgery header and matching Strict cookie. Issues only a Secure, HttpOnly, SameSite=Lax, nonpersistent __Host-LinguaDesk.Session cookie.
+         */
+        post: operations["signInLocalAccount"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/accounts/session": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Read the current browser session
+         * @description Authenticates the current account and security stamp on every request without renewing the fixed ticket.
+         */
+        get: operations["getLocalAccountSession"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/accounts/sign-out": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * End the caller browser session
+         * @description Requires the current antiforgery pair, clears only __Host-LinguaDesk.Session and does not change the account security stamp.
+         */
+        post: operations["signOutLocalAccount"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        AccountSessionResponse: {
+            /** @description Always `signedIn` for a current browser session. */
+            status: components["schemas"]["SessionStatus"];
+            /** @description Current server-side account verification state. */
+            verificationStatus: components["schemas"]["SessionVerificationStatus"];
+            /**
+             * Format: date-time
+             * @description UTC expiry of the fixed eight-hour protected server ticket; the cookie itself is nonpersistent.
+             */
+            expiresAtUtc: string;
+        };
+        AntiforgeryTokenResponse: {
+            /** @description Opaque request token. Send it only in the X-LinguaDesk-Antiforgery header with the matching antiforgery cookie. */
+            requestToken: string;
+            /** @description Always `X-LinguaDesk-Antiforgery`. */
+            headerName: string;
+        };
         CapabilitiesResponse: {
             /**
              * Format: date-time
@@ -311,6 +408,49 @@ export interface components {
          * @enum {string}
          */
         RewritingModeKind: "correction" | "style" | "tone";
+        SessionProblemDetails: {
+            /** @description RFC 9457 problem type reference. */
+            type?: null | string;
+            /** @description Short, stable problem summary. */
+            title: string;
+            /**
+             * Format: int32
+             * @description HTTP status code for this occurrence.
+             */
+            status: number;
+            /** @description Safe explanation that never echoes account or authentication values. */
+            detail: string;
+            /** @description LinguaDesk error category. */
+            category: string;
+            /** @description Opaque request correlation identifier. */
+            correlationId: string;
+            /** @description Field messages keyed only by `email` or `password`. */
+            errors?: null | {
+                [key: string]: string[];
+            };
+        };
+        /**
+         * @description Always `signedIn` for a current browser session.
+         * @enum {string}
+         */
+        SessionStatus: "signedIn";
+        /**
+         * @description Current server-side account verification state.
+         * @enum {string}
+         */
+        SessionVerificationStatus: "verified" | "verificationRequired";
+        SignInRequest: {
+            /**
+             * Format: email
+             * @description Local account email address. Maximum 254 Unicode scalar values; surrounding whitespace is invalid.
+             */
+            email: string;
+            /**
+             * Format: password
+             * @description Write-only password containing 15 to 128 well-formed Unicode scalar values.
+             */
+            password: string;
+        };
         /** @description Accepted source-language values and omission default. */
         SourceSelectionCapability: {
             /** @description Source selection used when a client omits the setting. */
@@ -592,6 +732,237 @@ export interface operations {
                 content: {
                     "application/problem+json": components["schemas"]["VerificationProblemDetails"];
                 };
+            };
+        };
+    };
+    getAccountAntiforgeryToken: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    /** @description Always `no-store` for account-session responses. */
+                    "Cache-Control": string;
+                    /** @description Sets only the Secure, HttpOnly, SameSite=Strict, Path=/ __Host-LinguaDesk.Antiforgery cookie. */
+                    "Set-Cookie": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AntiforgeryTokenResponse"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    /** @description Always `no-store` for account-session responses. */
+                    "Cache-Control": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["SessionProblemDetails"];
+                };
+            };
+            /** @description Method Not Allowed */
+            405: {
+                headers: {
+                    /** @description Always `no-store` for account-session responses. */
+                    "Cache-Control": string;
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    signInLocalAccount: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SignInRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    /** @description Always `no-store` for account-session responses. */
+                    "Cache-Control": string;
+                    /** @description Sets only the Secure, HttpOnly, SameSite=Lax, Path=/ nonpersistent __Host-LinguaDesk.Session cookie. */
+                    "Set-Cookie": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AccountSessionResponse"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    /** @description Always `no-store` for account-session responses. */
+                    "Cache-Control": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["SessionProblemDetails"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    /** @description Always `no-store` for account-session responses. */
+                    "Cache-Control": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["SessionProblemDetails"];
+                };
+            };
+            /** @description Method Not Allowed */
+            405: {
+                headers: {
+                    /** @description Always `no-store` for account-session responses. */
+                    "Cache-Control": string;
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unsupported Media Type */
+            415: {
+                headers: {
+                    /** @description Always `no-store` for account-session responses. */
+                    "Cache-Control": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["SessionProblemDetails"];
+                };
+            };
+            /** @description Service Unavailable */
+            503: {
+                headers: {
+                    /** @description Always `no-store` for account-session responses. */
+                    "Cache-Control": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["SessionProblemDetails"];
+                };
+            };
+        };
+    };
+    getLocalAccountSession: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    /** @description Always `no-store` for account-session responses. */
+                    "Cache-Control": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AccountSessionResponse"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    /** @description Always `no-store` for account-session responses. */
+                    "Cache-Control": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["SessionProblemDetails"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    /** @description Always `no-store` for account-session responses. */
+                    "Cache-Control": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["SessionProblemDetails"];
+                };
+            };
+            /** @description Method Not Allowed */
+            405: {
+                headers: {
+                    /** @description Always `no-store` for account-session responses. */
+                    "Cache-Control": string;
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Service Unavailable */
+            503: {
+                headers: {
+                    /** @description Always `no-store` for account-session responses. */
+                    "Cache-Control": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["SessionProblemDetails"];
+                };
+            };
+        };
+    };
+    signOutLocalAccount: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    /** @description Always `no-store` for account-session responses. */
+                    "Cache-Control": string;
+                    /** @description Expires only the Path=/ __Host-LinguaDesk.Session cookie. */
+                    "Set-Cookie": string;
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    /** @description Always `no-store` for account-session responses. */
+                    "Cache-Control": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["SessionProblemDetails"];
+                };
+            };
+            /** @description Method Not Allowed */
+            405: {
+                headers: {
+                    /** @description Always `no-store` for account-session responses. */
+                    "Cache-Control": string;
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };

@@ -2,15 +2,15 @@
 
 Mutable #7 status owner. Read for selection/dependency checks and closeout; do not include in the stable execution prefix.
 
-**Most recently completed milestone: [M007 — Verify a local account](../08-backlogs/M007/backlog.md).** State: **Done**. [Package 007](../08-backlogs/M007/spec.md) AC-001–008 passed durable deterministic confirmation, dedicated email-token policy, non-enumerating cooldown-bound resend, delivery recovery, strict anonymous wire behavior and generated-contract updates. Its [completion record](../08-backlogs/M007/tasks.md#completion-record) owns the exact evidence. M012 browser verification UX and M034 real email delivery/click evidence remain pending.
+**Most recently completed milestone: [M008 — Browser session access](../08-backlogs/M008/backlog.md).** State: **Done**. [Package 008](../08-backlogs/M008/spec.md) AC-001–008 passed real Identity cookie sign-in/session/sign-out, antiforgery, fixed expiry, current stamp/account invalidation, strict secret-safe boundaries and generated-contract regressions. Its [completion record](../08-backlogs/M008/tasks.md#completion-record) owns the exact evidence. Bearer access (M009), password recovery (M010), browser account UX/privacy evidence (M013) and live email (M034) remain pending.
 
 ## Selected milestone
 
 | ID | State | Dependency/readiness | Package |
 | --- | --- | --- | --- |
-| M008 | Selected | M007 is done; the reviewed package has no blocking question or human gate. | [Package](../08-backlogs/M008/backlog.md) |
+| — | None | M008 is done; no subsequent milestone is selected by this execution. | — |
 
-M008 was selected by the milestone-planning request. M015 remains the next recommended independent-track candidate under the roadmap priority policy; it is not selected.
+M015 remains the next recommended independent-track candidate under the roadmap priority policy; it is not selected. M009 is newly dependency-ready but is also not selected.
 
 ## Completed milestones
 
@@ -23,5 +23,6 @@ M008 was selected by the milestone-planning request. M015 remains the next recom
 | M005 | Done | [Backlog](../08-backlogs/M005/backlog.md), [spec](../08-backlogs/M005/spec.md), [tasks/evidence](../08-backlogs/M005/tasks.md#3-completion-record) |
 | M006 | Done | [Backlog](../08-backlogs/M006/backlog.md), [spec](../08-backlogs/M006/spec.md), [tasks/evidence](../08-backlogs/M006/tasks.md#3-completion-record) |
 | M007 | Done | [Backlog](../08-backlogs/M007/backlog.md), [spec](../08-backlogs/M007/spec.md), [tasks/evidence](../08-backlogs/M007/tasks.md#completion-record) |
+| M008 | Done | [Backlog](../08-backlogs/M008/backlog.md), [spec](../08-backlogs/M008/spec.md), [tasks/evidence](../08-backlogs/M008/tasks.md#completion-record) |
 
-All roadmap milestones other than completed M001–M007 are Candidate with no selected package and evidence pending. M015 is recommended, not selected. Full product and release evidence remains pending in #6 coverage.
+All roadmap milestones other than completed M001–M008 are Candidate with no selected package and evidence pending. M015 is recommended, not selected. Full product and release evidence remains pending in #6 coverage.

@@ -10,7 +10,7 @@ api_test_project="$repository_root/backend/tests/LinguaDesk.Api.Tests/LinguaDesk
 core_test_project="$repository_root/backend/tests/LinguaDesk.Core.Tests/LinguaDesk.Core.Tests.csproj"
 ai_test_project="$repository_root/backend/tests/LinguaDesk.Infrastructure.Ai.Tests/LinguaDesk.Infrastructure.Ai.Tests.csproj"
 expected_sdk="10.0.302"
-expected_minimum_api_tests=78
+expected_minimum_api_tests=89
 expected_minimum_core_tests=8
 configuration="Release"
 
@@ -124,6 +124,7 @@ check() {
     validate_report "$api_report" "API/storage" "$expected_minimum_api_tests"
     validate_class_count "$api_report" "LinguaDesk.Api.Tests.AccountRegistrationTests" 10 "account registration"
     validate_class_count "$api_report" "LinguaDesk.Api.Tests.AccountVerificationTests" 11 "account verification"
+    validate_class_count "$api_report" "LinguaDesk.Api.Tests.AccountSessionTests" 11 "account session"
     validate_class_count "$api_report" "LinguaDesk.Api.Tests.AccountReadinessTests" 9 "account readiness"
     validate_class_count "$api_report" "LinguaDesk.Api.Tests.StorageMigrationTests" 7 "storage migration"
     validate_report "$core_report" "Core input policy" "$expected_minimum_core_tests"

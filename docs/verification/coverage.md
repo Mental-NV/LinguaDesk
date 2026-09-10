@@ -6,12 +6,12 @@ Authoritative continuation of [06-verification-plan.md](../06-verification-plan.
 
 ### 8.1 Product and release coverage
 
-This is the sole cross-document product coverage matrix; the source documents retain their behavioral acceptance IDs. Active product rows remain **Unselected / Pending** except for the explicitly linked, passing M005–M007 portions below; no narrow allocation satisfies a complete product requirement or release gate. The separately identified M001–M007 rows link completed packages. Once product work is selected, link its actual #8 backlog/package and state partial coverage honestly. Deferred, retired and proposed rows are intentionally not current test gaps or passing gates. Design references plus Section 8.2 connect product rows to local scenario checks without copying their full acceptance prose.
+This is the sole cross-document product coverage matrix; the source documents retain their behavioral acceptance IDs. Active product rows remain **Unselected / Pending** except for the explicitly linked, passing M005–M008 portions below; no narrow allocation satisfies a complete product requirement or release gate. The separately identified M001–M008 rows link completed packages. Once product work is selected, link its actual #8 backlog/package and state partial coverage honestly. Deferred, retired and proposed rows are intentionally not current test gaps or passing gates. Design references plus Section 8.2 connect product rows to local scenario checks without copying their full acceptance prose.
 
 | Requirement / gate | Shared design / acceptance owner | Checks | Backlog/package → evidence/status |
 | --- | --- | --- | --- |
-| FR-001 | UX §9; API §3 | V-004, V-003, V-010 | [M006 / BI-006](../08-backlogs/M006/backlog.md) → [AC-001–003](../08-backlogs/M006/spec.md#4-selected-acceptance) API registration portion → Passed; sign-in and web flow remain unselected |
-| FR-002 | UX §9; API §3 | V-004, V-003, V-016 | [M006 / BI-006](../08-backlogs/M006/backlog.md) durable unverified/delivery-intent portion and [M007 / BI-007](../08-backlogs/M007/backlog.md) → [AC-001–006](../08-backlogs/M007/spec.md#acceptance) deterministic confirmation/resend portion → Passed; sign-in, reset, browser journey and real email remain unselected |
+| FR-001 | UX §9; API §3 | V-004, V-003, V-010 | [M006 / BI-006](../08-backlogs/M006/backlog.md) registration portion and [M008 / BI-008](../08-backlogs/M008/backlog.md) → [AC-001–008](../08-backlogs/M008/spec.md#acceptance) cookie sign-in/session/sign-out portion → Passed; browser flow remains unselected |
+| FR-002 | UX §9; API §3 | V-004, V-003, V-016 | [M006 / BI-006](../08-backlogs/M006/backlog.md) durable unverified/delivery-intent portion, [M007 / BI-007](../08-backlogs/M007/backlog.md) confirmation/resend portion and [M008 / BI-008](../08-backlogs/M008/backlog.md) unverified-session/current-state portion → Passed; reset, browser journey and real email remain unselected |
 | FR-003 | UX §3; API §2 | V-003, V-009, V-012 | Unselected → Pending |
 | FR-004 | UX §6–8; AI §3; API §2/4 | V-001, V-002, V-003, V-007, V-009, V-013 | [M005 AC-002/005](../08-backlogs/M005/spec.md#4-selected-acceptance) source-choice discovery/local selector portion → Passed; semantic eligibility/UI remain unselected |
 | FR-005 | AI §3; UX §7–8; API §2 | V-003, V-007, V-009, V-013 | [M005 AC-002](../08-backlogs/M005/spec.md#4-selected-acceptance) supported-language discovery portion → Passed; eligibility/quality/UI remain unselected |
@@ -212,8 +212,8 @@ Read the complete contracts at [UX Section 12](../ux/acceptance.md#12-acceptance
 | API scenario | Check allocation |
 | --- | --- |
 | API-AC-001 | V-001; M005 AC-004/005 passed for the fixture/local-boundary portion, HTTP submission boundary later |
-| API-AC-002 | V-004 |
-| API-AC-003 | V-004; M007 AC-001–003 passed the confirmation/current-state portion, credential/reset portions later |
+| API-AC-002 | V-004; M008 AC-001–005 passed the cookie/antiforgery/session-invalidation portion, bearer portion later |
+| API-AC-003 | V-004; M007 AC-001–003 passed confirmation/current-state and M008 AC-002–004 passed cookie credential/verified-state portions, bearer/reset portions later |
 | API-AC-004 | V-005 |
 | API-AC-005 | V-001, V-005 |
 | API-AC-006 | V-005, V-009, V-015 |
@@ -222,8 +222,8 @@ Read the complete contracts at [UX Section 12](../ux/acceptance.md#12-acceptance
 | API-AC-009 | V-005, V-002, V-003 |
 | API-AC-010 | V-006 |
 | API-AC-011 | V-005, V-002, V-003 |
-| API-AC-012 | V-004, V-015; M006 registration duplicate and M007 resend/secret-safe portions passed, reset later |
+| API-AC-012 | V-004, V-015; M006 registration duplicate, M007 resend, and M008 invalid-credential/strict secret-safe portions passed, reset later |
 | API-AC-013 | V-009 |
-| API-AC-014 | V-009; M005 capability, M006 registration and M007 verification contract-generation portions passed |
+| API-AC-014 | V-009; M005 capability, M006 registration, M007 verification and M008 browser-session contract-generation portions passed |
 
 The UX index contains 86 active scenarios (29 MVP, 57 Amended), 21 Deferred and five Retired, retaining all 112 IDs. The LLM index retains 15 and the API index 14 active scenarios. Deferred alternative branches within active rows do not create current checks. Native browser/AT evidence uses Section 4's representative journeys, not 86 full end-to-end scripts.

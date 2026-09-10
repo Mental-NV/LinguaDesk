@@ -2,8 +2,8 @@
 openapi: 3.1.1
 info:
   title: LinguaDesk API
-  description: Pre-release M007 contract containing only the implemented public capabilities, anonymous local-account registration, and email-verification operations. No compatibility or deprecation guarantee is implied.
-  version: 0.1.0-m007
+  description: Pre-release M008 contract containing implemented public capabilities, local-account registration/verification, and browser cookie-session operations. No compatibility or deprecation guarantee is implied.
+  version: 0.1.0-m008
 paths:
   /api/capabilities:
     get:
@@ -227,8 +227,282 @@ paths:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/VerificationProblemDetails"
+  /api/accounts/antiforgery:
+    get:
+      tags:
+        - SessionEndpoints
+      summary: Obtain a browser antiforgery pair
+      description: Returns a no-store request token and sets only the Secure, HttpOnly, SameSite=Strict __Host-LinguaDesk.Antiforgery cookie.
+      operationId: getAccountAntiforgeryToken
+      responses:
+        "200":
+          description: OK
+          headers:
+            Cache-Control:
+              description: Always `no-store` for account-session responses.
+              required: true
+              schema:
+                type: string
+            Set-Cookie:
+              description: Sets only the Secure, HttpOnly, SameSite=Strict, Path=/ __Host-LinguaDesk.Antiforgery cookie.
+              required: true
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AntiforgeryTokenResponse"
+        "400":
+          description: Bad Request
+          headers:
+            Cache-Control:
+              description: Always `no-store` for account-session responses.
+              required: true
+              schema:
+                type: string
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/SessionProblemDetails"
+        "405":
+          description: Method Not Allowed
+          headers:
+            Cache-Control:
+              description: Always `no-store` for account-session responses.
+              required: true
+              schema:
+                type: string
+  /api/accounts/sign-in:
+    post:
+      tags:
+        - SessionEndpoints
+      summary: Sign in with local credentials
+      description: Requires the X-LinguaDesk-Antiforgery header and matching Strict cookie. Issues only a Secure, HttpOnly, SameSite=Lax, nonpersistent __Host-LinguaDesk.Session cookie.
+      operationId: signInLocalAccount
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SignInRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+          headers:
+            Cache-Control:
+              description: Always `no-store` for account-session responses.
+              required: true
+              schema:
+                type: string
+            Set-Cookie:
+              description: Sets only the Secure, HttpOnly, SameSite=Lax, Path=/ nonpersistent __Host-LinguaDesk.Session cookie.
+              required: true
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AccountSessionResponse"
+        "400":
+          description: Bad Request
+          headers:
+            Cache-Control:
+              description: Always `no-store` for account-session responses.
+              required: true
+              schema:
+                type: string
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/SessionProblemDetails"
+        "401":
+          description: Unauthorized
+          headers:
+            Cache-Control:
+              description: Always `no-store` for account-session responses.
+              required: true
+              schema:
+                type: string
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/SessionProblemDetails"
+        "405":
+          description: Method Not Allowed
+          headers:
+            Cache-Control:
+              description: Always `no-store` for account-session responses.
+              required: true
+              schema:
+                type: string
+        "415":
+          description: Unsupported Media Type
+          headers:
+            Cache-Control:
+              description: Always `no-store` for account-session responses.
+              required: true
+              schema:
+                type: string
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/SessionProblemDetails"
+        "503":
+          description: Service Unavailable
+          headers:
+            Cache-Control:
+              description: Always `no-store` for account-session responses.
+              required: true
+              schema:
+                type: string
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/SessionProblemDetails"
+      security:
+        - antiforgeryHeader: []
+          antiforgeryCookie: []
+  /api/accounts/session:
+    get:
+      tags:
+        - SessionEndpoints
+      summary: Read the current browser session
+      description: Authenticates the current account and security stamp on every request without renewing the fixed ticket.
+      operationId: getLocalAccountSession
+      responses:
+        "200":
+          description: OK
+          headers:
+            Cache-Control:
+              description: Always `no-store` for account-session responses.
+              required: true
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AccountSessionResponse"
+        "400":
+          description: Bad Request
+          headers:
+            Cache-Control:
+              description: Always `no-store` for account-session responses.
+              required: true
+              schema:
+                type: string
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/SessionProblemDetails"
+        "401":
+          description: Unauthorized
+          headers:
+            Cache-Control:
+              description: Always `no-store` for account-session responses.
+              required: true
+              schema:
+                type: string
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/SessionProblemDetails"
+        "405":
+          description: Method Not Allowed
+          headers:
+            Cache-Control:
+              description: Always `no-store` for account-session responses.
+              required: true
+              schema:
+                type: string
+        "503":
+          description: Service Unavailable
+          headers:
+            Cache-Control:
+              description: Always `no-store` for account-session responses.
+              required: true
+              schema:
+                type: string
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/SessionProblemDetails"
+      security:
+        - sessionCookie: []
+  /api/accounts/sign-out:
+    post:
+      tags:
+        - SessionEndpoints
+      summary: End the caller browser session
+      description: Requires the current antiforgery pair, clears only __Host-LinguaDesk.Session and does not change the account security stamp.
+      operationId: signOutLocalAccount
+      responses:
+        "204":
+          description: No Content
+          headers:
+            Cache-Control:
+              description: Always `no-store` for account-session responses.
+              required: true
+              schema:
+                type: string
+            Set-Cookie:
+              description: Expires only the Path=/ __Host-LinguaDesk.Session cookie.
+              required: true
+              schema:
+                type: string
+        "400":
+          description: Bad Request
+          headers:
+            Cache-Control:
+              description: Always `no-store` for account-session responses.
+              required: true
+              schema:
+                type: string
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/SessionProblemDetails"
+        "405":
+          description: Method Not Allowed
+          headers:
+            Cache-Control:
+              description: Always `no-store` for account-session responses.
+              required: true
+              schema:
+                type: string
+      security:
+        - antiforgeryHeader: []
+          antiforgeryCookie: []
 components:
   schemas:
+    AccountSessionResponse:
+      required:
+        - status
+        - verificationStatus
+        - expiresAtUtc
+      type: object
+      properties:
+        status:
+          description: Always `signedIn` for a current browser session.
+          $ref: "#/components/schemas/SessionStatus"
+        verificationStatus:
+          description: Current server-side account verification state.
+          $ref: "#/components/schemas/SessionVerificationStatus"
+        expiresAtUtc:
+          type: string
+          description: UTC expiry of the fixed eight-hour protected server ticket; the cookie itself is nonpersistent.
+          format: date-time
+    AntiforgeryTokenResponse:
+      required:
+        - requestToken
+        - headerName
+      type: object
+      properties:
+        requestToken:
+          type: string
+          description: Opaque request token. Send it only in the X-LinguaDesk-Antiforgery header with the matching antiforgery cookie.
+        headerName:
+          type: string
+          description: Always `X-LinguaDesk-Antiforgery`.
     CapabilitiesResponse:
       required:
         - serverTimeUtc
@@ -590,6 +864,74 @@ components:
         - tone
       type: string
       description: Correction, writing-style, or tone category.
+    SessionProblemDetails:
+      required:
+        - title
+        - status
+        - detail
+        - category
+        - correlationId
+      type: object
+      properties:
+        type:
+          type:
+            - "null"
+            - string
+          description: RFC 9457 problem type reference.
+        title:
+          type: string
+          description: Short, stable problem summary.
+        status:
+          type: integer
+          description: HTTP status code for this occurrence.
+          format: int32
+        detail:
+          type: string
+          description: Safe explanation that never echoes account or authentication values.
+        category:
+          type: string
+          description: LinguaDesk error category.
+        correlationId:
+          type: string
+          description: Opaque request correlation identifier.
+        errors:
+          type:
+            - "null"
+            - object
+          additionalProperties:
+            type: array
+            items:
+              type: string
+          description: Field messages keyed only by `email` or `password`.
+    SessionStatus:
+      enum:
+        - signedIn
+      type: string
+      description: Always `signedIn` for a current browser session.
+    SessionVerificationStatus:
+      enum:
+        - verified
+        - verificationRequired
+      type: string
+      description: Current server-side account verification state.
+    SignInRequest:
+      required:
+        - email
+        - password
+      type: object
+      properties:
+        email:
+          maxLength: 254
+          type: string
+          description: Local account email address. Maximum 254 Unicode scalar values; surrounding whitespace is invalid.
+          format: email
+        password:
+          maxLength: 128
+          minLength: 15
+          type: string
+          description: Write-only password containing 15 to 128 well-formed Unicode scalar values.
+          format: password
+          writeOnly: true
     SourceSelectionCapability:
       required:
         - default
@@ -694,7 +1036,24 @@ components:
             items:
               type: string
           description: Field messages keyed only by `email`, `userId`, or `code`; present for field validation failures.
+  securitySchemes:
+    sessionCookie:
+      type: apiKey
+      description: Secure, HttpOnly, SameSite=Lax, host-scoped nonpersistent browser session cookie.
+      name: __Host-LinguaDesk.Session
+      in: cookie
+    antiforgeryHeader:
+      type: apiKey
+      description: Opaque request token paired with the Secure, HttpOnly, SameSite=Strict __Host-LinguaDesk.Antiforgery cookie.
+      name: X-LinguaDesk-Antiforgery
+      in: header
+    antiforgeryCookie:
+      type: apiKey
+      description: Secure, HttpOnly, SameSite=Strict host-scoped cookie paired with X-LinguaDesk-Antiforgery.
+      name: __Host-LinguaDesk.Antiforgery
+      in: cookie
 tags:
   - name: CapabilitiesEndpoints
   - name: RegistrationEndpoints
   - name: VerificationEndpoints
+  - name: SessionEndpoints

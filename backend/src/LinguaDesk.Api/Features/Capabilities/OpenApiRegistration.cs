@@ -2,6 +2,7 @@ using System.ComponentModel;
 using System.Reflection;
 using LinguaDesk.Api.Features.Identity.Registration;
 using LinguaDesk.Api.Features.Identity.Verification;
+using LinguaDesk.Api.Features.Identity.Session;
 using Microsoft.AspNetCore.OpenApi;
 using Microsoft.OpenApi;
 
@@ -23,10 +24,33 @@ public static class OpenApiRegistration
                 document.Info = new()
                 {
                     Title = "LinguaDesk API",
-                    Version = "0.1.0-m007",
+                    Version = "0.1.0-m008",
                     Description =
-                        "Pre-release M007 contract containing only the implemented public capabilities, anonymous local-account registration, and email-verification operations. " +
+                        "Pre-release M008 contract containing implemented public capabilities, local-account registration/verification, and browser cookie-session operations. " +
                         "No compatibility or deprecation guarantee is implied.",
+                };
+                document.Components ??= new OpenApiComponents();
+                document.Components.SecuritySchemes ??= new Dictionary<string, IOpenApiSecurityScheme>();
+                document.Components.SecuritySchemes["sessionCookie"] = new OpenApiSecurityScheme
+                {
+                    Type = SecuritySchemeType.ApiKey,
+                    In = ParameterLocation.Cookie,
+                    Name = SessionAuthentication.SessionCookieName,
+                    Description = "Secure, HttpOnly, SameSite=Lax, host-scoped nonpersistent browser session cookie.",
+                };
+                document.Components.SecuritySchemes["antiforgeryHeader"] = new OpenApiSecurityScheme
+                {
+                    Type = SecuritySchemeType.ApiKey,
+                    In = ParameterLocation.Header,
+                    Name = SessionAuthentication.AntiforgeryHeaderName,
+                    Description = "Opaque request token paired with the Secure, HttpOnly, SameSite=Strict __Host-LinguaDesk.Antiforgery cookie.",
+                };
+                document.Components.SecuritySchemes["antiforgeryCookie"] = new OpenApiSecurityScheme
+                {
+                    Type = SecuritySchemeType.ApiKey,
+                    In = ParameterLocation.Cookie,
+                    Name = SessionAuthentication.AntiforgeryCookieName,
+                    Description = "Secure, HttpOnly, SameSite=Strict host-scoped cookie paired with X-LinguaDesk-Antiforgery.",
                 };
                 return Task.CompletedTask;
             });
@@ -59,6 +83,22 @@ public static class OpenApiRegistration
 
                     if (property.DeclaringType == typeof(RegistrationRequest)
                         && string.Equals(property.Name, nameof(RegistrationRequest.Password), StringComparison.Ordinal))
+                    {
+                        schema.Format = "password";
+                        schema.MinLength = 15;
+                        schema.MaxLength = 128;
+                        schema.WriteOnly = true;
+                    }
+
+                    if (property.DeclaringType == typeof(SignInRequest)
+                        && string.Equals(property.Name, nameof(SignInRequest.Email), StringComparison.Ordinal))
+                    {
+                        schema.Format = "email";
+                        schema.MaxLength = 254;
+                    }
+
+                    if (property.DeclaringType == typeof(SignInRequest)
+                        && string.Equals(property.Name, nameof(SignInRequest.Password), StringComparison.Ordinal))
                     {
                         schema.Format = "password";
                         schema.MinLength = 15;
@@ -127,6 +167,66 @@ public static class OpenApiRegistration
                             Required = true,
                             Schema = new OpenApiSchema { Type = JsonSchemaType.String },
                         };
+                    }
+                }
+
+                if (endpointName is "getAccountAntiforgeryToken" or "signInLocalAccount"
+                    or "getLocalAccountSession" or "signOutLocalAccount")
+                {
+                    if (operation.Responses is not null)
+                    {
+                        foreach (var accountResponse in operation.Responses.Values.OfType<OpenApiResponse>())
+                        {
+                            accountResponse.Headers ??= new Dictionary<string, IOpenApiHeader>(StringComparer.OrdinalIgnoreCase);
+                            accountResponse.Headers["Cache-Control"] = new OpenApiHeader
+                            {
+                                Description = "Always `no-store` for account-session responses.",
+                                Required = true,
+                                Schema = new OpenApiSchema { Type = JsonSchemaType.String },
+                            };
+                        }
+                    }
+
+                    if (endpointName is "getAccountAntiforgeryToken" or "signInLocalAccount" or "signOutLocalAccount")
+                    {
+                        var successStatus = endpointName == "signOutLocalAccount" ? "204" : "200";
+                        if (operation.Responses?.TryGetValue(successStatus, out var success) == true
+                            && success is OpenApiResponse successResponse)
+                        {
+                            successResponse.Headers ??= new Dictionary<string, IOpenApiHeader>(StringComparer.OrdinalIgnoreCase);
+                            successResponse.Headers["Set-Cookie"] = new OpenApiHeader
+                            {
+                                Description = endpointName == "getAccountAntiforgeryToken"
+                                    ? "Sets only the Secure, HttpOnly, SameSite=Strict, Path=/ __Host-LinguaDesk.Antiforgery cookie."
+                                    : endpointName == "signInLocalAccount"
+                                        ? "Sets only the Secure, HttpOnly, SameSite=Lax, Path=/ nonpersistent __Host-LinguaDesk.Session cookie."
+                                        : "Expires only the Path=/ __Host-LinguaDesk.Session cookie.",
+                                Required = true,
+                                Schema = new OpenApiSchema { Type = JsonSchemaType.String },
+                            };
+                        }
+                    }
+
+                    if (endpointName is "signInLocalAccount" or "signOutLocalAccount")
+                    {
+                        operation.Security =
+                        [
+                            new OpenApiSecurityRequirement
+                            {
+                                [new OpenApiSecuritySchemeReference("antiforgeryHeader", context.Document)] = [],
+                                [new OpenApiSecuritySchemeReference("antiforgeryCookie", context.Document)] = [],
+                            },
+                        ];
+                    }
+                    else if (endpointName == "getLocalAccountSession")
+                    {
+                        operation.Security =
+                        [
+                            new OpenApiSecurityRequirement
+                            {
+                                [new OpenApiSecuritySchemeReference("sessionCookie", context.Document)] = [],
+                            },
+                        ];
                     }
                 }
 

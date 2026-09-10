@@ -52,6 +52,7 @@ public static class PersistenceRegistrationExtensions
         {
             identity.AddDefaultTokenProviders();
         }
+        identity.AddSignInManager();
         services.RemoveAll<IPasswordValidator<IdentityUser>>();
         services.AddSingleton<IPasswordValidator<IdentityUser>, LinguaDeskPasswordValidator>();
 

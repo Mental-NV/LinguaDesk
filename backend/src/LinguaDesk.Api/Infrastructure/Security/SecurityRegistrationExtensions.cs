@@ -18,6 +18,17 @@ public static class SecurityRegistrationExtensions
             serviceProvider.GetRequiredService<IHostEnvironment>().ContentRootPath));
         if (isContractGeneration)
         {
+            services.AddDataProtection().UseEphemeralDataProtectionProvider();
+            foreach (var hostedService in services
+                .Where(static descriptor => descriptor.ServiceType == typeof(IHostedService)
+                    && string.Equals(
+                        descriptor.ImplementationType?.FullName,
+                        "Microsoft.AspNetCore.DataProtection.Internal.DataProtectionHostedService",
+                        StringComparison.Ordinal))
+                .ToArray())
+            {
+                services.Remove(hostedService);
+            }
             return services;
         }
 

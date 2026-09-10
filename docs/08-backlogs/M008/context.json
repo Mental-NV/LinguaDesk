@@ -20,14 +20,14 @@
       "heading": "Selected milestone",
       "use": "reference",
       "reason": "Mutable current selection authority; verify M008 remains selected before execution",
-      "sha256": "f3231beb069c28e642b61ba6684c4077ad0de59aee94da21ef737574d6a2dc67"
+      "sha256": "8d3e47ec225ce6e205e0bea08f8d4d8891aecd74cee3088137be6d4511368255"
     },
     {
       "path": "docs/delivery/current.md",
       "heading": "Completed milestones",
       "use": "reference",
       "reason": "Mutable dependency index confirming M007 completion",
-      "sha256": "a22ab060129cf11b215e7d6bef6348d89bc6f04bfbeee2824e008e3184d86509"
+      "sha256": "7443a1c5c3d64977614720c2db26ccd9cb7d9e0379bbb4ade38f5283d0122a51"
     },
     {
       "path": "docs/08-backlogs/M007/backlog.md",
@@ -107,7 +107,7 @@
       "heading": "5.1 Identity",
       "use": "excerpt",
       "reason": "Canonical Identity, cookie, antiforgery, stamp and persistent-key boundaries",
-      "sha256": "255500a20e3c329dc23b4a03ae097a7444a2b8b348f183eb9f98d808ed1f960a"
+      "sha256": "16321de4d0c157cc1cc641392b9e0cdd53e96fabbe51a3f137e57a7cdd019f52"
     },
     {
       "path": "docs/03-architecture.md",
@@ -214,7 +214,7 @@
       ],
       "use": "excerpt",
       "reason": "Current prior evidence and V-group allocation for selected scenario portions",
-      "sha256": "c638cfd83f946b7aef03dfddd60029ee2628d2a0095957efab6117c808418b6e"
+      "sha256": "33012e8b4b5d17e984a079d2b0791adf6c8ac0aa993c9baed919453f20a6e3c1"
     },
     {
       "path": "docs/verification/readiness.md",
@@ -227,19 +227,19 @@
       "path": "backend/src/LinguaDesk.Api/Program.cs",
       "use": "reference",
       "reason": "Current middleware and endpoint/fallback ordering",
-      "sha256": "382d9419752db5659de4da8179e98583702c6e4fe2521df6a3e26da84a88aa76"
+      "sha256": "df814302e2e108bf980d8fae5bdccffeb246ae5377796bf495f599ec0c7f69ce"
     },
     {
       "path": "backend/src/LinguaDesk.Api/Features/Identity/IdentityRegistrationExtensions.cs",
       "use": "reference",
       "reason": "Current Identity services and authorization registration to extend",
-      "sha256": "571c82491b1c1a27e8bb88a6c520163c151685735039dab0b30d5c5b9b75b55e"
+      "sha256": "806a37622ca99cf8ab4945e3c26b0831a077f5eff18457360746febc0cb81f2b"
     },
     {
       "path": "backend/src/LinguaDesk.Api/Infrastructure/Persistence/PersistenceRegistrationExtensions.cs",
       "use": "reference",
       "reason": "Current IdentityCore/store/password configuration and contract-generation branch",
-      "sha256": "ef65cdd3352fb75db9fd5b9a36e03270bd5a2240616cbc8608e91c3191622cfd"
+      "sha256": "31a34ae643821720c203910ac796e77383afeddb9fc242f6ccb770f586ccf9f5"
     },
     {
       "path": "backend/src/LinguaDesk.Api/Features/Identity/VerifiedAccountAuthorization.cs",
@@ -263,13 +263,13 @@
       "path": "backend/src/LinguaDesk.Api/Features/Capabilities/OpenApiRegistration.cs",
       "use": "reference",
       "reason": "Current generated document transforms and account response headers",
-      "sha256": "b54607c2a63bccaaf3dbac1a11573ec9a8ef9beb7172015daf04bfa081416d50"
+      "sha256": "982438381ce6e87c87cefeb02f39afe9cf63a8ca474aa709ac9d7f977a8f2581"
     },
     {
       "path": "backend/src/LinguaDesk.Api/Infrastructure/Security/SecurityRegistrationExtensions.cs",
       "use": "reference",
       "reason": "Existing persistent Data Protection application/key configuration and generation boundary",
-      "sha256": "84d1c331035e2e44c50cd456e460fa238df406c383a06f7017e723cdecd64af9"
+      "sha256": "d86270811d34f4f980a7621d34af5b6baa00f35a982c3edd067bf9fa0c060872"
     },
     {
       "path": "backend/tests/LinguaDesk.Api.Tests/AccountVerificationTests.cs",
@@ -281,13 +281,13 @@
       "path": "docs/05-openapi.yaml",
       "use": "reference",
       "reason": "Current generated public contract baseline whose selected path set and security metadata will change",
-      "sha256": "f6734e262cbd213122dad296ba3c251676cfa02722ecaef87a58966d9cf9e001"
+      "sha256": "7b7db3aedbdf2d04080dca39b1beac88ae16e92c95efd7c9545ee72a8400172c"
     },
     {
       "path": "frontend/src/api/generated/linguadesk-api.d.ts",
       "use": "reference",
       "reason": "Current generated client declaration baseline regenerated from the reviewed contract",
-      "sha256": "032a8625ba9914f7f522c1824e55c3b674e8eeb5585418aab95fca2223a9a9e5"
+      "sha256": "7cc0935e5e69ffc86c58f2a59a63806a31978245ec0589876a343ad0cd213f8f"
     },
     {
       "path": "backend/Directory.Packages.props",
@@ -311,7 +311,7 @@
       "path": "scripts/backend.sh",
       "use": "reference",
       "reason": "Aggregate backend, focused-suite guard and published host verification command",
-      "sha256": "0842754f13ed7001700a1f732437034ca45c859976c59e3e9290874221da607d"
+      "sha256": "b524ace79ebf44bd49a75299c8089cdb331d9dadb34592e8ba2e6e0028d7f6bc"
     },
     {
       "path": "scripts/contract.sh",
@@ -327,7 +327,7 @@
     }
   ],
   "source_map_sha256": "b1b784c5250806b5947b5b92ddb540fa2a8236f3012b73b176762b713a895288",
-  "baseline_commit": "bd3ebe70ebd95ce168e3751250c58a1694ad29fd",
+  "baseline_commit": "4b34f465998f1121327d6c9c79a42c5325f8390c",
   "locked_files": {
     "docs/00-SDD-Planning-Workflow.md": "183ae93148ff594f9f1e021aa7543baa8878e9cc0bcfd69ebc696c28976e2945",
     "docs/00-workflow/execution.md": "f362a1384cefef24ba204e0723e3190857c8cca9bcd91908136932e19c5caf02",

@@ -15,7 +15,7 @@ function expect(condition, message) {
 
 function sameValues(actual, expected, label) {
   expect(Array.isArray(actual), `${label} must be an array`)
-  expect(JSON.stringify(actual) === JSON.stringify(expected), `${label} has unexpected values`)
+  expect(JSON.stringify(actual) === JSON.stringify(expected), `${label} has unexpected values: ${JSON.stringify(actual)}`)
 }
 
 function referencedSchema(document, reference) {
@@ -42,7 +42,7 @@ function assertPropertyDescriptions(document) {
 function validateContract(document) {
   expect(/^3\.1(?:\.|$)/u.test(document.openapi), 'document must use OpenAPI 3.1')
   expect(document.info?.title === 'LinguaDesk API', 'unexpected API title')
-  expect(document.info?.version === '0.1.0-m007', 'unexpected artifact version')
+  expect(document.info?.version === '0.1.0-m008', 'unexpected artifact version')
   expect(typeof document.info?.description === 'string', 'artifact description is required')
 
   sameValues(
@@ -52,6 +52,10 @@ function validateContract(document) {
       '/api/accounts/register',
       '/api/accounts/confirm-email',
       '/api/accounts/resend-verification',
+      '/api/accounts/antiforgery',
+      '/api/accounts/sign-in',
+      '/api/accounts/session',
+      '/api/accounts/sign-out',
     ],
     'document paths',
   )
@@ -229,6 +233,44 @@ function validateContract(document) {
     ['type', 'title', 'status', 'detail', 'category', 'correlationId', 'errors'],
     'verification Problem Details fields',
   )
+
+  const sessionOperations = [
+    { path: '/api/accounts/antiforgery', method: 'get', id: 'getAccountAntiforgeryToken', responses: ['200', '400', '405'] },
+    { path: '/api/accounts/sign-in', method: 'post', id: 'signInLocalAccount', responses: ['200', '400', '401', '405', '415', '503'] },
+    { path: '/api/accounts/session', method: 'get', id: 'getLocalAccountSession', responses: ['200', '400', '401', '405', '503'] },
+    { path: '/api/accounts/sign-out', method: 'post', id: 'signOutLocalAccount', responses: ['204', '400', '405'] },
+  ]
+  for (const item of sessionOperations) {
+    const path = document.paths[item.path]
+    sameValues(Object.keys(path), [item.method], `${item.id} operations`)
+    const selectedOperation = path[item.method]
+    expect(selectedOperation.operationId === item.id, `unexpected ${item.id} operation ID`)
+    expect(typeof selectedOperation.summary === 'string' && typeof selectedOperation.description === 'string', `${item.id} descriptions are required`)
+    sameValues(Object.keys(selectedOperation.responses ?? {}), item.responses, `${item.id} responses`)
+    for (const response of Object.values(selectedOperation.responses)) {
+      expect(response.headers?.['Cache-Control']?.required === true, `${item.id} response must require Cache-Control`)
+    }
+  }
+  expect(document.components.securitySchemes.sessionCookie.type === 'apiKey', 'session cookie scheme is missing')
+  expect(document.components.securitySchemes.sessionCookie.in === 'cookie', 'session cookie scheme must be a cookie')
+  expect(document.components.securitySchemes.sessionCookie.name === '__Host-LinguaDesk.Session', 'session cookie name is wrong')
+  expect(document.components.securitySchemes.antiforgeryHeader.type === 'apiKey', 'antiforgery scheme is missing')
+  expect(document.components.securitySchemes.antiforgeryHeader.in === 'header', 'antiforgery scheme must be a header')
+  expect(document.components.securitySchemes.antiforgeryHeader.name === 'X-LinguaDesk-Antiforgery', 'antiforgery header name is wrong')
+  expect(document.components.securitySchemes.antiforgeryCookie.type === 'apiKey', 'antiforgery cookie scheme is missing')
+  expect(document.components.securitySchemes.antiforgeryCookie.in === 'cookie', 'antiforgery cookie scheme must be a cookie')
+  expect(document.components.securitySchemes.antiforgeryCookie.name === '__Host-LinguaDesk.Antiforgery', 'antiforgery cookie name is wrong')
+  expect(document.paths['/api/accounts/session'].get.security?.[0]?.sessionCookie !== undefined, 'session cookie security is missing')
+  expect(document.paths['/api/accounts/sign-in'].post.security?.[0]?.antiforgeryHeader !== undefined, 'sign-in antiforgery security is missing')
+  expect(document.paths['/api/accounts/sign-in'].post.security?.[0]?.antiforgeryCookie !== undefined, 'sign-in antiforgery cookie security is missing')
+  expect(document.paths['/api/accounts/sign-out'].post.security?.[0]?.antiforgeryHeader !== undefined, 'sign-out antiforgery security is missing')
+  expect(document.paths['/api/accounts/sign-out'].post.security?.[0]?.antiforgeryCookie !== undefined, 'sign-out antiforgery cookie security is missing')
+  expect(document.paths['/api/accounts/antiforgery'].get.security === undefined, 'bootstrap must remain anonymous')
+  expect(document.paths['/api/accounts/sign-in'].post.requestBody?.content?.['application/json']?.schema?.$ref === '#/components/schemas/SignInRequest', 'sign-in request schema is missing')
+  const signInRequest = document.components.schemas.SignInRequest
+  sameValues(signInRequest.required, ['email', 'password'], 'sign-in required fields')
+  expect(signInRequest.properties.email.format === 'email' && signInRequest.properties.email.maxLength === 254, 'sign-in email constraints are missing')
+  expect(signInRequest.properties.password.format === 'password' && signInRequest.properties.password.minLength === 15 && signInRequest.properties.password.maxLength === 128 && signInRequest.properties.password.writeOnly === true, 'sign-in password constraints are missing')
 
   const root = referencedSchema(document, responseSchema.$ref)
   const topLevelFields = [

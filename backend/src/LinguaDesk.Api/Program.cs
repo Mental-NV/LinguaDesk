@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Routing;
 using LinguaDesk.Api.Features.Capabilities;
 using LinguaDesk.Api.Features.Identity;
 using LinguaDesk.Api.Features.Identity.Registration;
+using LinguaDesk.Api.Features.Identity.Session;
 using LinguaDesk.Api.Features.Identity.Verification;
 using LinguaDesk.Api.Infrastructure.Persistence;
 using LinguaDesk.Api.Infrastructure.Readiness;
@@ -22,6 +23,7 @@ var isContractGeneration =
 builder.Logging.AddFilter(
     "Microsoft.AspNetCore.DataProtection.Repositories.FileSystemXmlRepository",
     LogLevel.Warning);
+builder.Logging.AddFilter("Microsoft.AspNetCore.Hosting.Diagnostics", LogLevel.Warning);
 
 builder.Services.AddProblemDetails();
 builder.Services.AddSingleton(TimeProvider.System);
@@ -30,13 +32,14 @@ builder.Services.AddLinguaDeskPersistence(
     builder.Configuration,
     builder.Environment,
     isContractGeneration);
-builder.Services.AddLinguaDeskSecurity(builder.Configuration, isContractGeneration);
 builder.Services.AddLinguaDeskAccounts();
+builder.Services.AddLinguaDeskSecurity(builder.Configuration, isContractGeneration);
 builder.Services.AddLinguaDeskReadiness(builder.Environment, isContractGeneration);
 
 var app = builder.Build();
 
 app.UseStaticFiles();
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.Use(static async (context, next) =>
@@ -74,6 +77,7 @@ app.MapHealthChecks(
 app.MapCapabilities();
 app.MapRegistration();
 app.MapAccountVerification();
+app.MapAccountSession();
 
 static IResult ApiNotFound() => Results.Problem(
     detail: "The requested API endpoint does not exist.",
