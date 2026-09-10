@@ -19,7 +19,7 @@
       "heading": "Completed milestones",
       "use": "reference",
       "reason": "Mutable dependency index confirming M008 and M012 completion",
-      "sha256": "5368367aa71b5620752a2ba81f67ccb863276ec92b581dc725dfafe7835258ad"
+      "sha256": "cb81575e02cf0ebb7291cad4561641c876ac06bffb311e4db028135f6bfe99a9"
     },
     {
       "path": "docs/08-backlogs/M008/backlog.md",
@@ -173,13 +173,13 @@
       "heading": "8.2 Local acceptance allocation",
       "use": "excerpt",
       "reason": "V-group allocation for the selected UX scenarios",
-      "sha256": "0999657002c0fb16f7d4cef68e234e22134a37fadc8790a27a66f95649e793d7"
+      "sha256": "2e9fdafe84c33fdc18294df31500a86dc487fa7590167329cd9a0c1b996988a2"
     },
     {
       "path": "frontend/src/shell/App.tsx",
       "use": "reference",
       "reason": "Current placeholder routes, heading-focus and shell conventions to extend",
-      "sha256": "1d276054e0ba666074955b7f18d8b4148aede2b53aff01b8923c4829b96fa565"
+      "sha256": "ee7a32b7c7469a3698456dc7dbe6c6d12cd7164510fe730e8a539df155d5fb07"
     },
     {
       "path": "frontend/src/auth/RegisterPage.tsx",
@@ -191,13 +191,13 @@
       "path": "frontend/src/auth/VerifyEmailEntryPage.tsx",
       "use": "reference",
       "reason": "Continuation variants and single-read session style kept consistent",
-      "sha256": "4c272084cd2c47b82f7292d80af623ae611654f3db6e00dbc64087f14e388938"
+      "sha256": "3c873b211b939bfb6ff46935ab4abeb2663a885aa7dc09338a0e080e6da44270"
     },
     {
       "path": "frontend/src/api/accounts.ts",
       "use": "reference",
       "reason": "Typed wrapper and result-mapping style extended with antiforgery/sign-in/sign-out calls",
-      "sha256": "021031fee5eb7c0994ecdc19b5f313476a51e86c599259a7919ff362a84f725d"
+      "sha256": "78064f20cce5a6591262be0380ea5547feb707fa7c9531a0c1975db957eded77"
     },
     {
       "path": "frontend/src/api/generated/linguadesk-api.d.ts",
@@ -209,7 +209,7 @@
       "path": "frontend/tests/unit/App.test.tsx",
       "use": "reference",
       "reason": "Current guard assertions extended with sign-in routing cases",
-      "sha256": "8ce3389eb0c985cbb1eceea2b9b55099ad284eea93275c4633aea2654b86afea"
+      "sha256": "7bf07f677f03ccb3a489be9563173028ea2151618c198d141ef9fe5f791dcec7"
     },
     {
       "path": "frontend/tests/unit/register.test.tsx",
@@ -227,19 +227,19 @@
       "path": "frontend/playwright.config.ts",
       "use": "reference",
       "reason": "Owned-host Chromium lane configuration for the browser trip",
-      "sha256": "f93422d719599d582be3ae302128f4be2964b65d8e787d00babdfe4780367768"
+      "sha256": "f344fc34c3faa0f00e36d3891dd3164da5d2e36c6ce2b83b5d59e4c74b16c18a"
     },
     {
       "path": "frontend/package.json",
       "use": "reference",
       "reason": "Pinned Node/npm and frontend verification scripts",
-      "sha256": "6679b8d86b24c87bded9242d2d5a0caed0fc70d1c30ecedffc2382e381fb1b89"
+      "sha256": "8a1d96b866b77c346131b834a6dab77f3a2500d0a882f8a0a837dee4957a0df7"
     },
     {
       "path": "scripts/frontend.sh",
       "use": "reference",
       "reason": "Frontend type/build and published Chromium verification command",
-      "sha256": "f5977a5161c09985fc5cdc6eee4b9ddd5614b589d4b49e6fed8add6530b12f15"
+      "sha256": "6aedc272146d6fd076f4b92e9d322f49b76b1ae74ee535d28534dc13293d1d97"
     },
     {
       "path": "scripts/contract.sh",
@@ -251,15 +251,39 @@
       "path": "scripts/backend.sh",
       "use": "reference",
       "reason": "Aggregate backend regression command for AC-008",
-      "sha256": "d7ca3bed9aa2fbdd0a279d9d369725e922c80f2d34c31bf086b59ce0d0241d77"
+      "sha256": "377c9652f76ace23925039451b1b545eb31c9b24fa7af6fe6c3ffb0d699699fa"
+    },
+    {
+      "path": "backend/src/LinguaDesk.Api/Program.cs",
+      "use": "reference",
+      "reason": "Pre-host smoke seed mode and forwarded-header middleware ordering",
+      "sha256": "fd5d2aa4f5ab94999acce9449d8a93e4a6d40eebd582f40dd14dbaf4057cc4e8"
+    },
+    {
+      "path": "backend/src/LinguaDesk.Api/Infrastructure/Security/SecurityRegistrationExtensions.cs",
+      "use": "reference",
+      "reason": "Trusted reverse-proxy scheme configuration required by the HTTPS amendment",
+      "sha256": "31678f3fa657555b0d54754e160c3d33564cdcf7c710ab7e23904ba26a74c960"
+    },
+    {
+      "path": "backend/src/LinguaDesk.Api/Infrastructure/Smoke/SmokeAccountSeeder.cs",
+      "use": "reference",
+      "reason": "Smoke-only deterministic verified and unverified account setup with no endpoint",
+      "sha256": "9ad13f4c4aeb527211694265432f5fcd56c1481eff7012f20de93367c024fb8c"
+    },
+    {
+      "path": "frontend/vite.config.ts",
+      "use": "reference",
+      "reason": "HTTPS development server and HTTPS backend proxy configuration",
+      "sha256": "d72a9ad6fac7fcd50deb02c63d08618f68b8f03f93a0349322c39fe22be76801"
     }
   ],
-  "source_map_sha256": "4f18a3fd895852719c614035768ffa43381d88d63806b582c9345c8f5c28f614",
-  "baseline_commit": "84127e9a652871bf19e8b4cfc9a2ace083cbd99b",
+  "source_map_sha256": "5bca7e41a38254c187a81f2c75b6ac9404ca821d178010e02b5654b65ea7a8ad",
+  "baseline_commit": "3111aeadc11737c951aa2d3fa3afad597e6e7756",
   "locked_files": {
     "docs/00-SDD-Planning-Workflow.md": "183ae93148ff594f9f1e021aa7543baa8878e9cc0bcfd69ebc696c28976e2945",
     "docs/00-workflow/execution.md": "f362a1384cefef24ba204e0723e3190857c8cca9bcd91908136932e19c5caf02",
     "docs/08-backlogs/M013/spec.md": "554c82800bf43006a447f163862ff2c06123b77692951ed154e57cc5295a8daa",
-    "docs/08-backlogs/M013/plan.md": "1ba20db0cf5dcb5c067737d62039fdf568dd5f23f2df850ecdcc5c814143133a"
+    "docs/08-backlogs/M013/plan.md": "dd471760afdaf2711dc439e58730a57b6e38f01e7ab2a8f8b5071c2e0865741b"
   }
 }

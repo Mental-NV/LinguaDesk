@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.DataProtection.KeyManagement;
 using Microsoft.AspNetCore.DataProtection.Repositories;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.Options;
 
 namespace LinguaDesk.Api.Infrastructure.Security;
@@ -13,6 +14,30 @@ public static class SecurityRegistrationExtensions
         bool isContractGeneration)
     {
         services.AddOptions<SecurityOptions>().BindConfiguration(SecurityOptions.SectionName);
+        services.Configure<ForwardedHeadersOptions>(options =>
+        {
+            options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+            options.ForwardLimit = 1;
+            options.RequireHeaderSymmetry = true;
+
+            var configuredNetworks = configuration
+                .GetSection($"{SecurityOptions.SectionName}:ForwardedHeaderTrustedNetworks")
+                .Get<string[]>() ?? [];
+            if (configuredNetworks.Length == 0)
+            {
+                return;
+            }
+
+            options.KnownIPNetworks.Clear();
+            foreach (var configuredNetwork in configuredNetworks)
+            {
+                if (!System.Net.IPNetwork.TryParse(configuredNetwork, out var network))
+                {
+                    throw new InvalidOperationException("A trusted forwarded-header network is invalid.");
+                }
+                options.KnownIPNetworks.Add(network);
+            }
+        });
         services.AddSingleton(serviceProvider => DataProtectionKeyPathPolicy.Resolve(
             serviceProvider.GetRequiredService<IOptions<SecurityOptions>>().Value.DataProtectionKeysPath,
             serviceProvider.GetRequiredService<IHostEnvironment>().ContentRootPath));

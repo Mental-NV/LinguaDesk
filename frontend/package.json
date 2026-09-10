@@ -9,7 +9,7 @@
   },
   "scripts": {
     "build": "vite build",
-    "dev": "vite --host 127.0.0.1",
+    "dev": "vite --host localhost",
     "lint": "eslint .",
     "test": "vitest run --reporter=default --reporter=junit --outputFile.junit=../artifacts/test-results/frontend-unit.xml",
     "test:e2e": "playwright test",

@@ -6,6 +6,11 @@ if (!baseURL) {
   throw new Error('LINGUADESK_PUBLISHED_URL must identify the owned published host.')
 }
 
+const publishedUrl = new URL(baseURL)
+if (publishedUrl.protocol !== 'https:' || publishedUrl.hostname !== '127.0.0.1') {
+  throw new Error('LINGUADESK_PUBLISHED_URL must identify the owned HTTPS loopback host.')
+}
+
 export default defineConfig({
   testDir: './tests/e2e',
   outputDir: '../artifacts/playwright',
@@ -21,6 +26,7 @@ export default defineConfig({
   ],
   use: {
     baseURL,
+    ignoreHTTPSErrors: true,
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
   },

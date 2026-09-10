@@ -13,23 +13,59 @@ function renderRoute(path: string) {
 }
 
 describe('signed-out shell routes', () => {
-  it.each([
-    ['/', 'Sign in', 'Sign-in is not available in this build.'],
-    ['/login', 'Sign in', 'Sign-in is not available in this build.'],
-    ['/translate', 'Sign in', 'Sign-in is not available in this build.'],
-    ['/rewrite', 'Sign in', 'Sign-in is not available in this build.'],
-    ['/unknown-page', 'Page not found', 'The page you requested does not exist.'],
-  ])('renders %s without exposing unavailable forms', async (path, heading, message) => {
-    renderRoute(path)
+  it('renders /login with the sign-in form and heading focus', async () => {
+    renderRoute('/login')
 
-    const destinationHeading = await screen.findByRole('heading', { level: 1, name: heading })
+    const destinationHeading = await screen.findByRole('heading', { level: 1, name: 'Sign in' })
     expect(destinationHeading).toHaveFocus()
-    expect(screen.getByText(message)).toBeVisible()
+    expect(screen.getByRole('form', { name: 'Sign in' })).toBeVisible()
+    expect(screen.getByLabelText('Email')).toBeVisible()
+    expect(screen.getByLabelText('Password')).toBeVisible()
+    expect(screen.getByRole('button', { name: 'Show password' })).toBeVisible()
+    expect(screen.getByRole('button', { name: 'Sign in' })).toBeVisible()
+    expect(screen.getByRole('link', { name: 'Forgot password' })).toHaveAttribute(
+      'href',
+      '/forgot-password',
+    )
+    expect(screen.getByRole('link', { name: 'Create account' })).toHaveAttribute('href', '/register')
+    expect(screen.queryByText('Signing out…')).not.toBeInTheDocument()
     expect(screen.getAllByRole('main')).toHaveLength(1)
     expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1)
+  })
+
+  it.each([['/'], ['/translate'], ['/rewrite']])(
+    'redirects signed-out %s to the sign-in form without a session',
+    async (path) => {
+      renderRoute(path)
+
+      const destinationHeading = await screen.findByRole('heading', { level: 1, name: 'Sign in' })
+      expect(destinationHeading).toBeInTheDocument()
+      expect(screen.getByRole('form', { name: 'Sign in' })).toBeVisible()
+      expect(screen.queryByRole('textbox', { name: 'Source text' })).not.toBeInTheDocument()
+    },
+  )
+
+  it('renders /forgot-password as a staged state without credential fields', async () => {
+    renderRoute('/forgot-password')
+
+    const destinationHeading = await screen.findByRole('heading', {
+      level: 1,
+      name: 'Forgot password',
+    })
+    expect(destinationHeading).toHaveFocus()
+    expect(screen.getByText('Password recovery is not available in this build.')).toBeVisible()
+    expect(screen.getByRole('link', { name: 'Back to sign in' })).toHaveAttribute('href', '/login')
     expect(screen.queryByRole('form')).not.toBeInTheDocument()
-    expect(screen.queryByRole('textbox')).not.toBeInTheDocument()
-    expect(screen.queryByRole('button')).not.toBeInTheDocument()
+    expect(screen.queryByLabelText('Password')).not.toBeInTheDocument()
+  })
+
+  it('renders unknown paths with a sign-in return action', async () => {
+    renderRoute('/unknown-page')
+
+    const destinationHeading = await screen.findByRole('heading', { level: 1, name: 'Page not found' })
+    expect(destinationHeading).toHaveFocus()
+    expect(screen.getByText('The page you requested does not exist.')).toBeVisible()
+    expect(screen.getByRole('link', { name: 'Go to sign in' })).toHaveAttribute('href', '/login')
   })
 
   it('renders /register with the registration form and no protected workspace', async () => {
@@ -56,13 +92,16 @@ describe('signed-out shell routes', () => {
     const user = userEvent.setup()
     renderRoute('/login')
 
-    const accountLink = await screen.findByRole('link', { name: 'Create account' })
-    expect(accountLink).toHaveAttribute('href', '/register')
+    const recoveryLink = await screen.findByRole('link', { name: 'Forgot password' })
+    expect(recoveryLink).toHaveAttribute('href', '/forgot-password')
     expect(screen.getByRole('link', { name: 'Translation' })).toHaveAttribute('href', '/translate')
     expect(screen.getByRole('link', { name: 'Rewriting' })).toHaveAttribute('href', '/rewrite')
 
-    await user.click(accountLink)
-    await waitFor(() => expect(screen.getByRole('heading', { name: 'Create account' })).toHaveFocus())
+    await user.click(recoveryLink)
+    await waitFor(() => expect(screen.getByRole('heading', { name: 'Forgot password' })).toHaveFocus())
+
+    await user.click(screen.getByRole('link', { name: 'Back to sign in' }))
+    await waitFor(() => expect(screen.getByRole('heading', { name: 'Sign in' })).toHaveFocus())
   })
 
   it('provides a skip link to the single main landmark', async () => {

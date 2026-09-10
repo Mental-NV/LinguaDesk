@@ -1,11 +1,11 @@
 # M013 — Sign in and leave safely
 
-Status: selected; detailed scenarios live only in [spec](spec.md)
+Status: done; completion evidence in [tasks.md](tasks.md#completion-record)
 Milestone: [M013 — Sign in and leave safely](../../07-roadmap.md#42-local-access)
 
 | Item | Outcome/value | Priority | Dependencies/blockers | State | Selected scope |
 | --- | --- | --- | --- | --- | --- |
-| BI-013 | A user can sign in, follow a safe return route, sign out and recover from expiry without restoring private workspace text. | Selected web-access increment | M012 done; M008 done; no blocker | selected | [spec](spec.md) |
+| BI-013 | A user can sign in, follow a safe return route, sign out and recover from expiry without restoring private workspace text. | Selected web-access increment | M012 done; M008 done; HTTPS published-browser and deterministic-account evidence complete, see [tasks](tasks.md#completion-record) | done | [spec](spec.md) |
 
 Acceptance summary: the `/login` route exposes the local sign-in form wired to the completed M008 session operations with single-submission guards; valid verified credentials reach the remembered safe protected route with heading focus; invalid credentials show MSG-028 with cleared passwords and email focus; unverified credentials continue to `/verify-email`; session expiry clears in-memory auth state before login renders with MSG-037; inline sign out follows the §3.4 pending/failure/success states with auth-only retry; stale completions cannot redirect or restore cleared state; safe return admits only internal protected paths; no password or secret reaches storage, history, logs or reports. Detailed ACs are in [spec](spec.md).
 

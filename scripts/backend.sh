@@ -255,7 +255,12 @@ run() {
         echo "Prepared persistent local-development storage in $development_data_directory"
     fi
 
-    listen_url=${LINGUADESK_URL:-http://127.0.0.1:5080}
+    if [ -z "${LINGUADESK_URL:-}" ] && ! dotnet dev-certs https --check --trust >/dev/null 2>&1; then
+        echo "A trusted ASP.NET Core development certificate is required. Run 'dotnet dev-certs https --trust', then retry." >&2
+        exit 1
+    fi
+
+    listen_url=${LINGUADESK_URL:-https://localhost:5080}
     echo "Starting LinguaDesk.Api on $listen_url"
     Storage__DatabasePath="$database_path" \
     Security__DataProtectionKeysPath="$keys_path" \

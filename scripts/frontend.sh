@@ -95,7 +95,25 @@ check() {
 
 dev() {
     check_toolchain
+    require_command dotnet
+    development_https_directory="$repository_root/artifacts/development/https"
+    development_certificate="$development_https_directory/linguadesk.pem"
+    development_certificate_key="$development_https_directory/linguadesk.key"
+    mkdir -p "$development_https_directory"
+    chmod 700 "$development_https_directory"
+    if ! dotnet dev-certs https --check --trust >/dev/null 2>&1; then
+        echo "A trusted ASP.NET Core development certificate is required. Run 'dotnet dev-certs https --trust', then retry." >&2
+        exit 1
+    fi
+    dotnet dev-certs https \
+        --export-path "$development_certificate" \
+        --format Pem \
+        --no-password \
+        --quiet
+    chmod 600 "$development_certificate" "$development_certificate_key"
     cd "$frontend_directory"
+    LINGUADESK_DEVELOPMENT_CERTIFICATE_PATH="$development_certificate" \
+    LINGUADESK_DEVELOPMENT_CERTIFICATE_KEY_PATH="$development_certificate_key" \
     exec npm run dev
 }
 
@@ -115,6 +133,9 @@ smoke() {
     smoke_log="$smoke_directory/host.log"
     smoke_database="$smoke_directory/linguadesk.db"
     smoke_keys="$smoke_directory/keys"
+    smoke_certificate="$smoke_directory/loopback.crt"
+    smoke_certificate_key="$smoke_directory/loopback.key"
+    smoke_seed_log="$smoke_directory/seed.log"
     smoke_process_id=""
     smoke_deadline=$((SECONDS + 90))
 
@@ -134,6 +155,15 @@ smoke() {
     trap 'exit 129' HUP
 
     mkdir -p "$smoke_keys"
+    require_command openssl
+    openssl req -x509 -newkey rsa:2048 -sha256 -nodes \
+        -keyout "$smoke_certificate_key" \
+        -out "$smoke_certificate" \
+        -days 1 \
+        -subj "/CN=localhost" \
+        -addext "subjectAltName=DNS:localhost,IP:127.0.0.1" \
+        >/dev/null 2>&1
+    chmod 600 "$smoke_certificate" "$smoke_certificate_key"
     dotnet tool restore
     dotnet ef database update \
         --project "$repository_root/backend/src/LinguaDesk.Api/LinguaDesk.Api.csproj" \
@@ -143,9 +173,24 @@ smoke() {
         -- \
         --database-path "$smoke_database"
 
+    smoke_verified_email="m013-verified@example.test"
+    smoke_unverified_email="m013-unverified@example.test"
+    smoke_account_password="Maple!River2026"
+
     cd "$isolated_publish"
     ASPNETCORE_ENVIRONMENT=Smoke \
-        ASPNETCORE_URLS=http://127.0.0.1:0 \
+        Storage__DatabasePath="$smoke_database" \
+        Security__DataProtectionKeysPath="$smoke_keys" \
+        LINGUADESK_SMOKE_SEED_ACCOUNTS=1 \
+        LINGUADESK_SMOKE_VERIFIED_EMAIL="$smoke_verified_email" \
+        LINGUADESK_SMOKE_UNVERIFIED_EMAIL="$smoke_unverified_email" \
+        LINGUADESK_SMOKE_ACCOUNT_PASSWORD="$smoke_account_password" \
+        dotnet "$api_dll" >"$smoke_seed_log" 2>&1
+
+    ASPNETCORE_ENVIRONMENT=Smoke \
+        ASPNETCORE_URLS=https://127.0.0.1:0 \
+        Kestrel__Certificates__Default__Path="$smoke_certificate" \
+        Kestrel__Certificates__Default__KeyPath="$smoke_certificate_key" \
         Storage__DatabasePath="$smoke_database" \
         Security__DataProtectionKeysPath="$smoke_keys" \
         dotnet "$api_dll" >"$smoke_log" 2>&1 &
@@ -159,7 +204,7 @@ smoke() {
             return 1
         fi
 
-        listen_url=$(grep -Eo 'http://127\.0\.0\.1:[0-9]+' "$smoke_log" | tail -1 || true)
+        listen_url=$(grep -Eo 'https://127\.0\.0\.1:[0-9]+' "$smoke_log" | tail -1 || true)
         if [ -n "$listen_url" ]; then
             break
         fi
@@ -174,7 +219,16 @@ smoke() {
 
     cd "$frontend_directory"
     rm -f "$repository_root/artifacts/test-results/frontend-e2e.xml"
-    LINGUADESK_PUBLISHED_URL="$listen_url" ./node_modules/.bin/playwright test
+    LINGUADESK_PUBLISHED_URL="$listen_url" \
+        LINGUADESK_SMOKE_VERIFIED_EMAIL="$smoke_verified_email" \
+        LINGUADESK_SMOKE_UNVERIFIED_EMAIL="$smoke_unverified_email" \
+        LINGUADESK_SMOKE_ACCOUNT_PASSWORD="$smoke_account_password" \
+        ./node_modules/.bin/playwright test
+    if grep -Fq "$smoke_account_password" "$smoke_seed_log" "$smoke_log" \
+        "$repository_root/artifacts/test-results/frontend-e2e.xml"; then
+        echo "Published smoke output contained synthetic credential material." >&2
+        return 1
+    fi
     echo "Published shell smoke passed against $listen_url."
 }
 

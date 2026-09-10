@@ -11,6 +11,7 @@ using LinguaDesk.Api.Features.Identity.Verification;
 using LinguaDesk.Api.Infrastructure.Persistence;
 using LinguaDesk.Api.Infrastructure.Readiness;
 using LinguaDesk.Api.Infrastructure.Security;
+using LinguaDesk.Api.Infrastructure.Smoke;
 
 var builder = WebApplication.CreateBuilder(args);
 var isContractGeneration =
@@ -40,7 +41,15 @@ builder.Services.AddLinguaDeskReadiness(builder.Environment, isContractGeneratio
 
 var app = builder.Build();
 
+if (SmokeAccountSeeder.IsRequested())
+{
+    await SmokeAccountSeeder.SeedAsync(app);
+    await app.DisposeAsync();
+    return;
+}
+
 app.UseStaticFiles();
+app.UseForwardedHeaders();
 app.UseAuthentication();
 app.UseAuthorization();
 

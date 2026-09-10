@@ -19,11 +19,14 @@ test('navigates with native history and focuses each destination heading', async
   await expect(page.getByRole('heading', { name: 'Create account' })).toBeFocused()
 })
 
-test('renders protected and unknown deep links without forms or editor controls', async ({ page }) => {
+test('routes protected deep links to the sign-in form without workspace controls', async ({ page }) => {
   await page.goto('/translate')
   await expect(page).toHaveURL(/\/login$/)
-  await expect(page.getByText('Sign-in is not available in this build.')).toBeVisible()
-  await expect(page.locator('form, input, textarea, button')).toHaveCount(0)
+  await expect(page.getByRole('heading', { name: 'Sign in' })).toBeFocused()
+  await expect(page.getByRole('form', { name: 'Sign in' })).toBeVisible()
+  await expect(page.getByLabel('Email')).toBeVisible()
+  await expect(page.getByLabel('Password')).toBeVisible()
+  await expect(page.locator('textarea')).toHaveCount(0)
 
   await page.goto('/an-unknown-client-page')
   await expect(page.getByRole('heading', { name: 'Page not found' })).toBeFocused()

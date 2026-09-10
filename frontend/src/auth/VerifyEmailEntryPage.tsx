@@ -5,6 +5,7 @@ import {
   getLocalAccountSession,
   resendLocalAccountVerification,
 } from '../api/accounts'
+import { resolveSafeReturn } from './safeReturn'
 
 const STATUS_MESSAGE = 'Check your email to verify your account.' as const
 const CONFIRMING_MESSAGE = 'Confirming your email…' as const
@@ -47,9 +48,15 @@ type StatusPhase = 'idle' | 'checking' | 'unverified' | 'signedOut' | 'retry'
 
 interface VerifyEmailEntryPageProps {
   readonly email: string | null
+  readonly allowUnverifiedEntry?: boolean
+  readonly protectedContinuationPath?: string
 }
 
-export function VerifyEmailEntryPage({ email }: VerifyEmailEntryPageProps) {
+export function VerifyEmailEntryPage({
+  email,
+  allowUnverifiedEntry = false,
+  protectedContinuationPath = '/translate',
+}: VerifyEmailEntryPageProps) {
   const [searchParams, setSearchParams] = useSearchParams()
   const [material] = useState<LinkMaterial>(() => classifyLinkMaterial(searchParams))
   const [confirmPhase, setConfirmPhase] = useState<ConfirmPhase>(
@@ -153,7 +160,13 @@ export function VerifyEmailEntryPage({ email }: VerifyEmailEntryPageProps) {
     return () => clearInterval(timer)
   }, [coolingDown])
 
-  if (email === null && material.kind === 'none') return <Navigate to="/register" replace />
+  if (email === null && material.kind === 'none' && !allowUnverifiedEntry) {
+    return <Navigate to="/register" replace />
+  }
+
+  const continuationPath = resolveSafeReturn(protectedContinuationPath)
+  const continuationLabel =
+    continuationPath === '/rewrite' ? 'Continue to Rewriting' : 'Continue to Translation'
 
   const cooldownActive = cooldownSeconds > 0
   const showInvalid = confirmPhase === 'invalid' || material.kind === 'malformed'
@@ -240,8 +253,8 @@ export function VerifyEmailEntryPage({ email }: VerifyEmailEntryPageProps) {
           <p>{VERIFIED_MESSAGE}</p>
           <p className="form-switch">
             {continuation === 'protected' ? (
-              <Link className="primary-link" to="/translate">
-                Continue to Translation
+              <Link className="primary-link" to={continuationPath}>
+                {continuationLabel}
               </Link>
             ) : (
               <Link className="primary-link" to="/login">

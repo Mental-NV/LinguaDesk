@@ -18,8 +18,10 @@ protected paths, immediate in-memory teardown on sign-out or observed
 `401 authenticationRequired` with MSG-037, a bounded signed-in
 placeholder for `/translate` and `/rewrite` carrying the inline Sign out
 control, and a staged no-form `/forgot-password` informational state for
-M014 to replace. No API, migration, package, auth scheme or persistence
-change is planned.
+M014 to replace. No API operation, migration, package dependency, auth
+scheme or persistent product state changes. Per the owner-approved T004
+amendment, the development/published-smoke serving configuration changes
+to HTTPS and gains a Smoke-only, pre-host account seeder.
 
 The repository pins .NET SDK 10.0.302, Node 24.20.0 and npm 11.11.0.
 Execution begins by checking the locked packet, selection, clean/understood
@@ -67,10 +69,15 @@ drift requires impact review and re-lock rather than an assumed pass.
    credentials return the real shared 401 and show MSG-028; real sign-out
    returns the real 204 with immediate clearing and no Back exposure;
    expired-cookie entry shows MSG-037; reload clears the form; 320px/390px
-   geometry. Seeded verified/unverified `example.test` accounts use only
-   the existing deterministic registration/confirmation support with no
-   new test endpoint; otherwise record the gap and carry the affected AC
-   on component evidence plus the real-API invalid-credential path.
+   geometry. Generate an owned one-day loopback certificate, start Kestrel
+   on an OS-assigned HTTPS port and let only this Playwright configuration
+   ignore that certificate's trust error. Seed verified/unverified
+   `example.test` accounts through a Smoke-environment process mode that
+   resolves real Identity services against the isolated migrated database,
+   exits before hosting and exposes no route or credential output.
+   Development wrappers require the trusted ASP.NET certificate, serve Vite
+   and its Kestrel target on HTTPS, and process forwarded scheme headers only
+   from explicitly configured trusted proxy networks before authentication.
 6. Run focused and aggregate checks, published smoke and dependency audits.
    Inspect rendered output, processes, logs and the diff for echoed
    emails, passwords, tokens, new routes or side effects.
@@ -100,12 +107,14 @@ design owner and this package, review and re-lock before proceeding.
 
 ## Migration, rollout and rollback
 
-No migration, package, service or configuration change is expected. The
-slice is a pure frontend increment served through the existing published
-artifact; rolling back restores the M012 informational `/login` state
-while the M008 API contracts stand unchanged. No account, key, session
-or text data is created by the slice itself beyond the explicit
-bootstrap/sign-in/sign-out/session requests the visitor triggers.
+No migration, package dependency, auth scheme or API-contract change is
+expected. The selected serving configuration changes from cleartext to HTTPS
+for development and published smoke. The smoke lane creates a temporary
+certificate, database, keys and two synthetic accounts, then removes its owned
+directory. Rolling back restores the M012 informational `/login` state and the
+old cleartext harness while the M008 API contracts stand unchanged. Product
+runtime creates no seeded account; the seed mode rejects non-Smoke environments
+and exits before a listener or route can exist.
 
 ## Context boundaries and risks
 
@@ -139,9 +148,13 @@ Principal risks and controls:
 - The adopted generated types can drift from the contracts. Run the
   canonical drift check before adoption and keep the API surface unchanged.
 - Real-API browser evidence needs seeded verified/unverified accounts.
-  Attempt it only through existing deterministic support with no new
-  endpoint; otherwise record the gap and carry the affected AC on
-  component evidence plus the real-API invalid-credential browser path.
+  Create them only in the isolated migrated smoke database through real
+  Identity services before the host starts; accept configuration only from
+  the owned process environment, expose no endpoint and print no material.
+- Forwarded scheme headers can be spoofed if arbitrary proxies are trusted.
+  Keep a one-hop symmetric header limit, retain the framework loopback default
+  for local use and require explicit CIDR configuration for deployment proxies;
+  run forwarded-header middleware before authentication.
 
 Human actions: None. Routine restores, owned temporary databases/keys and
 deterministic local hosts suffice. Missing locked dependencies or an

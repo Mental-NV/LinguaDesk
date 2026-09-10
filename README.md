@@ -1,6 +1,6 @@
 # LinguaDesk
 
-LinguaDesk contains a minimal ASP.NET Core host, the M002 published signed-out web shell, explicit SQLite persistence, an independent offline AI development boundary, the M005 shared input/capability contract, and the M006–M009 local-account registration, email-verification, browser-session and bearer-access API slices. The React shell still provides informational sign-in and registration routes only. An independent client can register a durable unverified account, submit captured confirmation material, request another verification delivery, establish/read/end a secure cookie session, or sign in for opaque bearer access/refresh credentials and read current-account status through the account API. The runtime delivery adapter intentionally remains unavailable until M034 supplies real email, while deterministic tests inject capturing/failing adapters. Password reset, account-status UI, live email, editors, language-operation submissions, eligibility decisions, provider integrations, usage/accounting, and release deployment remain unimplemented.
+LinguaDesk contains a minimal ASP.NET Core host, the M002 published signed-out web shell, explicit SQLite persistence, an independent offline AI development boundary, the M005 shared input/capability contract, and the M006–M009 local-account registration, email-verification, browser-session and bearer-access API slices. The React shell provides the local sign-in form (M013), registration (M011) and email-verification (M012) routes with guarded Translation/Rewriting placeholders pending M028/M029; recovery forms remain staged until M014. An independent client can register a durable unverified account, submit captured confirmation material, request another verification delivery, establish/read/end a secure cookie session, or sign in for opaque bearer access/refresh credentials and read current-account status through the account API. The runtime delivery adapter intentionally remains unavailable until M034 supplies real email, while deterministic tests inject capturing/failing adapters. Password reset, account-status UI, live email, editors, language-operation submissions, eligibility decisions, provider integrations, usage/accounting, and release deployment remain unimplemented.
 
 ## Prerequisites
 
@@ -23,8 +23,9 @@ bash scripts/backend.sh setup
 # that the machine-readable report contains discovered tests and no failures.
 bash scripts/backend.sh check
 
-# Explicitly prepare/update persistent local-development storage, then start
-# the backend in the foreground at http://127.0.0.1:5080.
+# Trust the shared local HTTPS certificate once, then explicitly prepare/update
+# persistent local-development storage and start the backend at https://localhost:5080.
+dotnet dev-certs https --trust
 bash scripts/backend.sh run
 
 # Build and start the real host on an OS-assigned loopback port, probe it,
@@ -36,7 +37,7 @@ With no storage environment variables, `run` applies the migrations and creates 
 
 ```sh
 LINGUADESK_DEVELOPMENT_DATA_PATH="/absolute/path/to/linguadesk-development" \
-LINGUADESK_URL=http://127.0.0.1:5090 \
+LINGUADESK_URL=https://localhost:5090 \
 bash scripts/backend.sh run
 ```
 
@@ -66,7 +67,7 @@ bash scripts/contract.sh check
 
 The committed generated views are `docs/05-openapi.yaml` and `frontend/src/api/generated/linguadesk-api.d.ts`; do not edit either by hand. The document contains `GET /api/capabilities`, the three registration/verification operations, `GET /api/accounts/antiforgery`, `POST /api/accounts/sign-in`, `GET /api/accounts/session`, `POST /api/accounts/sign-out`, `POST /api/accounts/bearer-sign-in`, `POST /api/accounts/bearer-refresh`, `GET /api/accounts/me`, `POST /api/accounts/forgot-password`, and `POST /api/accounts/reset-password`. It uses pre-release artifact revision `0.1.0-m010` and is not served as a runtime documentation endpoint. The generated security schemes document the host-scoped session and antiforgery cookies, the antiforgery header, and the opaque Identity bearer scheme. All account responses are no-store. Contract generation registers real endpoint metadata without opening storage, writing filesystem keys/cooldown state, sending email, issuing cookies, or starting a listener. Its revision does not promise API compatibility or a deprecation period.
 
-Browser-session calls must use HTTPS so the `__Host-` Secure cookies are accepted. Bootstrap with `GET /api/accounts/antiforgery`, retain its HttpOnly cookie, and send the returned request token in `X-LinguaDesk-Antiforgery` on sign-in/sign-out. After identity changes, bootstrap again before the next mutation. Sign-in accepts only `{ "email", "password" }`; session cookies are nonpersistent and the protected ticket expires eight hours after issue without renewal. Independent clients sign in with only `{ "email", "password" }` at `POST /api/accounts/bearer-sign-in`, receive an opaque 15-minute access / 7-day refresh pair with `expiresIn` 900 and `tokenType` Bearer, refresh with the held `{ "refreshToken", "accessToken" }` pair, and read `GET /api/accounts/me` with `Authorization: Bearer ...`; bearer calls need no antiforgery token and never set cookies. Deploy behind HTTPS, or explicitly configure a local HTTPS Kestrel certificate/reverse proxy; the default HTTP development URL is suitable for non-cookie endpoints but cannot exercise browser session cookies.
+Browser-session calls must use HTTPS so the `__Host-` Secure cookies are accepted. Bootstrap with `GET /api/accounts/antiforgery`, retain its HttpOnly cookie, and send the returned request token in `X-LinguaDesk-Antiforgery` on sign-in/sign-out. After identity changes, bootstrap again before the next mutation. Sign-in accepts only `{ "email", "password" }`; session cookies are nonpersistent and the protected ticket expires eight hours after issue without renewal. Independent clients sign in with only `{ "email", "password" }` at `POST /api/accounts/bearer-sign-in`, receive an opaque 15-minute access / 7-day refresh pair with `expiresIn` 900 and `tokenType` Bearer, refresh with the held `{ "refreshToken", "accessToken" }` pair, and read `GET /api/accounts/me` with `Authorization: Bearer ...`; bearer calls need no antiforgery token and never set cookies. Direct deployments terminate HTTPS in Kestrel. A deployment that terminates TLS at a reverse proxy must set `Security__ForwardedHeaderTrustedNetworks__0` (and subsequent entries) to the proxy's exact CIDR networks; only one symmetric `X-Forwarded-For`/`X-Forwarded-Proto` hop from those networks is honored before authentication.
 
 ## Independent AI development commands
 
@@ -132,7 +133,8 @@ bash scripts/frontend.sh setup
 # Run strict TypeScript, ESLint, component/input-policy tests, and a production Vite build.
 bash scripts/frontend.sh check
 
-# Start Vite on loopback; /api and /health proxy to http://127.0.0.1:5080.
+# Export the trusted development certificate and start Vite at https://localhost:5173;
+# /api and /health proxy to https://localhost:5080.
 bash scripts/frontend.sh dev
 
 # Produce one clean artifact containing LinguaDesk.Api and generated web assets.
@@ -142,7 +144,7 @@ bash scripts/publish.sh
 bash scripts/frontend.sh smoke
 ```
 
-Start the development API separately with `bash scripts/backend.sh run`. Override the Vite proxy only when needed with `LINGUADESK_API_BASE_URL`. The published shell needs neither Vite nor Node at runtime. Frontend JUnit reports are written to `artifacts/test-results/frontend-unit.xml` and `frontend-e2e.xml`; Playwright screenshots/traces use `artifacts/playwright/`. The published smoke also verifies the real capability route remains JSON/no-store and rejects POST without making the UI consume it. M002 evidence is tracked in [`docs/08-backlogs/M002/tasks.md`](docs/08-backlogs/M002/tasks.md); M005 contract evidence is tracked in [`docs/08-backlogs/M005/tasks.md`](docs/08-backlogs/M005/tasks.md).
+Start the development API separately with `bash scripts/backend.sh run` after trusting the certificate once with `dotnet dev-certs https --trust`. Both wrappers fail with a concise instruction when the trusted certificate is absent. Override the Vite proxy only when needed with an HTTPS `LINGUADESK_API_BASE_URL`. The published shell needs neither Vite nor Node at runtime. Frontend JUnit reports are written to `artifacts/test-results/frontend-unit.xml` and `frontend-e2e.xml`; Playwright screenshots/traces use `artifacts/playwright/`. The published smoke creates an owned one-day loopback certificate, trusts it only in its Playwright process, seeds verified and unverified synthetic accounts into its isolated migrated database through a non-hosting Smoke-only process mode, and verifies the real capability and account routes without exposing a test endpoint. M002 evidence is tracked in [`docs/08-backlogs/M002/tasks.md`](docs/08-backlogs/M002/tasks.md); M005 contract evidence is tracked in [`docs/08-backlogs/M005/tasks.md`](docs/08-backlogs/M005/tasks.md).
 
 ## Documentation and milestone context
 
