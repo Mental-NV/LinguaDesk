@@ -1,7 +1,7 @@
 # LinguaDesk — LLM Behavior and Routing Specification
 
-**Document:** #4 · **Version:** 1.5 · **Status:** Current design; implementation/evidence status is maintained in delivery/current.md and verification/coverage.md
-**Updated:** 2026-09-09
+**Document:** #4 · **Version:** 1.8 · **Status:** Current design; implementation/evidence status is maintained in delivery/current.md and verification/coverage.md
+**Updated:** 2026-09-11
 
 ## 1. Authority, inputs, and scope
 
@@ -11,7 +11,7 @@ This document owns prompts, provider settings/adapters, language eligibility, fa
 
 Current implemented boundaries and evidence are indexed in [delivery status](delivery/current.md). [API design #5](05-api-design.md) owns shared semantics; the generated OpenAPI covers only selected implemented routes. [Verification #6](06-verification-plan.md) owns evaluation methods.
 
-Scope is the current Translation and Rewriting MVP: FR-004–014, active FR-016–018/022–024, FR-026–030/032–038 and applicable NFR-001–006. Preserve the PRD's exact language/mode catalog, input limits, allowance values and performance/quality thresholds by reference to Sections 5–8. DF-001–DF-007, retired sentence preservation and the duplicate correction toggle create no work here. P-005/NFR-008 and P-006 remain proposed; this design does not select new abuse rates, content restrictions, API compatibility promises or provider privacy gates.
+Scope is the current Translation and Rewriting MVP: FR-004–014, active FR-016–018/022–024, FR-026–030/032–038 and applicable NFR-001–006. Preserve the PRD's exact language/mode catalog, input limits, allowance values and performance/quality thresholds by reference to Sections 5–8. D-19 records later route-specific providers and bounded multi-candidate fallbacks, but DF-001–DF-007, retired sentence preservation and the duplicate correction toggle create no current MVP work here. P-005/NFR-008 and P-006 remain proposed; this design does not select new abuse rates, content restrictions, API compatibility promises or provider privacy gates.
 
 ## 2. Shared AI component and abstraction
 
@@ -148,9 +148,11 @@ This resolves what the runtime checks guarantee without pretending to detect eve
 
 ## 5. Provider configuration and capability evidence
 
-### 5.1 Two typed chains
+### 5.1 Active chains and candidate registry
 
-Configuration contains exactly `Translation { Primary, Fallback? }` and `Rewriting { Primary, Fallback? }`, referencing named immutable candidate profiles. Both families may reference the same candidate. Reject identical primary/fallback profiles within a family; repeating a candidate is a hidden retry. Language/route/mode selection never changes the family chain. There are no priorities, weights, match predicates, arbitrary candidate arrays or client-controlled model settings.
+The current serving snapshot contains exactly `Translation { Primary, Fallback? }` and `Rewriting { Primary, Fallback? }`, referencing named immutable candidate profiles. Both families may reference the same candidate. Reject identical primary/fallback profiles within a family; repeating a candidate is a hidden retry. Language/route/mode selection does not change the current family chain. There are no active priorities, weights, match predicates, arbitrary serving arrays or client-controlled model settings.
+
+The candidate registry and evaluator are not limited to the candidates activated in those two chains. They may hold multiple non-secret profiles and evaluate each against explicit routes, while serving startup activates only the current bounded snapshot. Do not model credentials as family- or route-owned: profiles reference a provider credential, and the same `CredentialRef` can be used by eligibility, Translation, Rewriting, evaluation and later route-specific chains. D-19/DF-004 may later introduce a server-controlled route table and bounded ordered candidate lists. That later selection must define route keys/defaults/precedence, finite candidate and dispatch caps, deadline feasibility and cost admission before changing Section 6's three-dispatch bound; M019 does not implement that routing engine.
 
 | Candidate/profile fields | Required validation |
 | --- | --- |
@@ -164,13 +166,42 @@ Configuration contains exactly `Translation { Primary, Fallback? }` and `Rewriti
 
 Fail live-serving startup on structurally invalid chains, missing credentials/cost bounds, incompatible profiles or absent required qualification. A live **evaluation** profile may exercise an unqualified candidate, but still needs supported wire settings, finite cost/context bounds and an explicit evaluation budget. An offline profile uses scripted clients without production secrets or provider network access. An evaluation override/fake is never selectable through the public API or production configuration.
 
-Settings do not inherit silently from provider defaults. The first qualification candidate uses the PRD's DeepSeek V4 Flash non-thinking preference, with explicit temperature `0`, no `top_p` override, no tools, and bounded JSON output. Temperature is an initial engineering setting to evaluate, not a guarantee of deterministic generations. Other supported settings may qualify as separate candidate revisions. Thinking-mode candidates require explicit supported controls and bounded reasoning exposure; do not enable thinking through omission or silently switch the selected default's mode.
+Settings do not inherit silently from provider defaults. The first evaluation candidate is named `DeepSeek-V4.1-Flash` and requests `deepseek-flash` from `https://api.deepseek.com`, following the PRD's DeepSeek Flash non-thinking preference. It uses explicit temperature `0`, no `top_p` override, no tools, explicit `thinking: {"type":"disabled"}` and bounded JSON output. Temperature is an initial engineering setting to evaluate, not a guarantee of deterministic generations. Other supported settings may qualify as separate candidate revisions. Thinking-mode candidates require explicit supported controls and bounded reasoning exposure; do not enable thinking through omission or silently switch the selected default's mode.
 
-### 5.2 DeepSeek documentation checked on 2026-09-08
+### 5.2 Evaluation profiles and credentials
 
-See [DeepSeek candidate documentation snapshot](research/deepseek-2026-09-08.md#52-deepseek-documentation-checked-on-2026-09-08).
+Keep provider credentials separate from candidate identity. A non-secret candidate profile contains the candidate/adapter ID, display name, HTTPS endpoint, model, effective settings, prompt/checker revisions, bounds, billing data and an opaque `CredentialRef`. The credential resolver maps that reference to secret material only in the evaluation or serving composition. It must not bake a provider key into the shared pipeline. Multiple profiles may reference one credential, and multiple credential references may target the same OpenAI-compatible provider for access testing, but reports identify only the reference and never its value or a key-derived fingerprint.
 
-### 5.3 Context and monetary bounds
+The initial evaluation profile is:
+
+| Field | Value |
+| --- | --- |
+| Name | `DeepSeek-V4.1-Flash` |
+| Adapter | DeepSeek dialect over OpenAI-compatible Chat Completions |
+| Base URL | `https://api.deepseek.com` |
+| Model | `deepseek-flash` |
+| CredentialRef | `deepseek` |
+
+The DeepSeek API key is supplied to the evaluator through the already configured process environment variable `LINGUADESK_AIEVALUATION__CREDENTIALS__DEEPSEEK__APIKEY`. The runner loads the `LINGUADESK_`-prefixed environment source and maps double underscores to configuration separators, yielding `AiEvaluation:Credentials:deepseek:ApiKey`. The owner has selected the same actual provider credential for evaluation and every LinguaDesk operation routed to DeepSeek; the later serving host may bind that credential to the same logical reference without making the evaluation variable a public API contract. Other providers use the same reference pattern with their own credential source, for example a logical `openai` or `muse_spark` reference; a candidate profile selects the matching reference.
+
+Do not put the key in `appsettings*.json`, candidate/profile JSON, `.runsettings`, source, scripts, command defaults, test snapshots or reports, and do not pass it as a runner command-line option. Environment values can be exposed by a compromised process or host; rotate the shared key if exposed. Because this is not an evaluation-isolated billing scope, all LinguaDesk dispatches using it share access, throttling, balance and cost risk. A live evaluation budget protects only admitted LinguaDesk evaluation work unless it participates in the same global admission used by concurrent serving; it cannot control unrelated use of the provider account.
+
+Credential loading is opt-in for explicit live commands. Offline tests, prompt inspection and scripted probes do not read provider credential variables and run with provider networking disabled. A requested live run with a missing/blank credential is a blocked/non-success result and cannot fall back to scripted output. Diagnostics may report `credentialRef` and `credentialPresent`; they never print, list, hash, serialize or echo the value. Configuration binding keeps the API key in the narrow transport credential type rather than the candidate/report model.
+
+The evaluation tool exposes two distinct live workflows after M019/M020 implement them:
+
+- **Credential/access verification:** an explicit profile selection makes at most one low-output, fixed-synthetic, budget-admitted Chat Completions request through that profile's actual endpoint, model, authentication, required settings and response parser. It proves only that the key can access that path at that moment; it does not qualify language quality, context limits, price, caching or production serving.
+- **Behavior evaluation:** the same profile and production pipeline execute versioned development or qualification cases under declared dispatch/spend bounds. This is the evidence used for language behavior; a successful access verification is not a substitute.
+
+The first adapter supports the required OpenAI-compatible Chat Completions subset through profile-selected endpoint/model/credential references, while isolating provider dialect fields and capability checks. DeepSeek's explicit `thinking` control is one such dialect requirement. Compatibility branding alone does not authorize silently dropping provider-specific settings: another provider can use the base adapter only when transport fixtures and a live access check prove the required contract, otherwise it needs a separate adapter ID. This lets the tool test DeepSeek, OpenAI and other compatible credentials without making the product configuration client-selectable or pretending all compatible APIs are identical.
+
+Muse Spark 1.3 is a later candidate example, not a selected English-route provider. Public release material describes availability through Meta Model API and focuses on agentic/coding behavior; it is not evidence of LinguaDesk translation quality, a compatible wire dialect, non-thinking support, latency or effective cost. Record an exact endpoint/model/credential profile and complete the same adapter/access/route qualification before assigning it to any route. [Meta release note](https://research.meta.ai/blog/introducing-muse-spark-1-3)
+
+### 5.3 DeepSeek documentation checked on 2026-09-11
+
+See [DeepSeek candidate documentation snapshot](research/deepseek-2026-09-08.md#53-deepseek-documentation-checked-on-2026-09-11).
+
+### 5.4 Context and monetary bounds
 
 Each eligibility or transformation request includes only the current full source, validated task parameters, static instructions and bounded synthetic examples. No conversation, prior result, adjacent sentence context, retrieval, repair transcript or another user's data is included. Alternative context bounds remain deferred with DF-001.
 
@@ -182,7 +213,7 @@ Before every network dispatch, the attempt-admission implementation atomically r
 
 `upper-bound input cost + upper-bound generated/reasoning cost + other billable attempt charges`
 
-The billing profile defines whether reasoning is included in or additional to completion usage, avoiding double counting. Reserve at cache-miss and highest applicable rates unless stronger billing evidence applies. The architecture's global ceiling equation includes known spend and unresolved exposure; use fixed-point arithmetic rounded conservatively. Failed detection, rejected output, fallback, timeouts and potentially billed cancelled calls all contribute exposure. Never infer zero provider cost from zero character charge.
+The billing profile defines whether reasoning is included in or additional to completion usage, avoiding double counting. For DeepSeek, reserve each attempt at the published peak cache-miss rate and the configured maximum output at the peak output rate; assume no cache saving until authoritative usage proves it. The architecture's global ceiling equation includes known spend and unresolved exposure across every operation sharing the credential; use fixed-point arithmetic rounded conservatively. Failed detection, rejected output, fallback, timeouts and potentially billed cancelled calls all contribute exposure. Missing or inconsistent usage retains the full reservation. Never infer zero provider cost from zero character charge.
 
 Record normalized usage and settle exposure only against authoritative billing evidence. Retain the conservative reservation when usage/tariff evidence is missing or inconsistent; do not turn a useful validated output into a language error merely because usage is absent. Evidence of a breached bound invalidates the profile for subsequent paid dispatch and requires reconciliation. The operation's character charge still follows its durable terminal state. Period assignment and unresolved-exposure carryover follow #5 Section 7; Ai uses the admission context rather than rolling its own period.
 
@@ -240,7 +271,7 @@ The adapter returns safe internal categories. #5 maps them to public errors/stat
 
 DeepSeek documents 400/422 for invalid requests/settings, 401 for provider authentication, 402 for balance, 429 for throttling, and 500/503 for service errors. These inform adapter classification rather than the API's public status codes. [DeepSeek error codes](https://api-docs.deepseek.com/quick_start/error_codes/)
 
-Provider-specific codes and documented finish metadata take precedence over guessing from free-form error text. A provider 400 does not prove the user's language input is invalid. A valid eligibility rejection is different from refusal or malformed classification. For a rate limit or balance failure affecting shared credentials, do not dispatch the fallback through the same known-blocked scope; skip it and finish unavailable. Honor applicable `Retry-After` before using the affected scope, without exceeding the deadline or retrying a candidate. A separate unaffected provider need not inherit that delay.
+Provider-specific codes and documented finish metadata take precedence over guessing from free-form error text. A provider 400 does not prove the user's language input is invalid. A valid eligibility rejection is different from refusal or malformed classification. For authentication, rate-limit or balance failure affecting a shared `CredentialRef`, do not dispatch another candidate through that known-blocked credential scope, even on a different route or family; skip those candidates and finish unavailable unless a separately credentialed provider is eligible. Honor applicable `Retry-After` before using the affected scope, without exceeding the deadline or retrying a candidate. A separate unaffected provider need not inherit that delay.
 
 When all eligible candidates fail, return a processing category; if the overall time budget ends first, return the deadline category. All definitive overall failures have zero character charge. Successful fallback is indistinguishable from primary success in user-visible output/usage. Ambiguous delivery uses the existing operation key and status recovery, which never dispatches another LLM call. New explicit submissions are distinct operations.
 
@@ -258,13 +289,15 @@ Provider-managed caching remains permitted. Do not install `UseDistributedCache`
 
 The standalone `LinguaDesk.Ai.Evaluation` runner is a development tool. M004 implements its fixed synthetic `inspect` and scripted `probe` modes using the shared prompt composition and complete-response boundary, without Api, migrations, accounts, frontend or production data. Configuration validators, adapters, live-candidate and chain workflows remain later slices under [verification plan Section 3.3](verification/backend.md#33-independent-ai-workflows). Verified current commands and limitations are documented in [#10](../README.md#independent-ai-development-commands).
 
+M019 is the enabling milestone for the provider-neutral profile/credential resolver, adapter transport and explicit live access check; it therefore precedes behavior milestones M015–M018 even though milestone IDs are permanent identities rather than execution order. M015–M017 retain comprehensive scripted tests but also require bounded live development evidence through the selected profile for eligibility, every Translation direction, and every Rewriting language/mode cell respectively. M018 proves exhaustive fault, fallback, deadline and dispatch-count behavior deterministically and adds only a small natural live no-fallback path where the real provider can add evidence; it does not manufacture provider faults or require a qualified fallback. M020 persists clearly labeled fixture and live observations with spend/exposure metadata. These development runs expose integration and prompt risks early; they do not replace #6's frozen-corpus qualification or API performance gates.
+
 ### 9.2 Evaluation ownership and data boundary
 
 [#6 Sections 5–7](verification/llm-evaluation.md#5-llm-quality-and-candidate-qualification-q-005) own Q-005: corpus construction, grading/human review, API workloads, optional evaluation tooling and report requirements. Runner-only grading/report dependencies do not enter the serving library. Production text must never become an evaluation dataset or persistent report; Section 8 and #3 retain application privacy authority. Live evaluation requires bounded monetary admission including graders and unresolved exposure; #6 specifies execution and billing isolation.
 
 ### 9.3 Candidate eligibility
 
-Every serving candidate must demonstrate adapter/settings capability, finite monetary/context bounds, full-family eligibility and transformation quality, runtime-validator behavior and applicable performance. Qualification binds evidence to the exact candidate/bundle revisions under [#6 Section 5.4](verification/llm-evaluation.md#54-qualification-and-changes). A fallback is optional; configure none until one qualifies. No per-route exception may hide a failing candidate. Startup validation remains Section 5's runtime contract; qualification is evidence with limitations, not a guarantee of every future response.
+Every current MVP serving candidate must demonstrate adapter/settings capability, finite monetary/context bounds, full-family eligibility and transformation quality, runtime-validator behavior and applicable performance. Qualification binds evidence to the exact candidate/bundle revisions under [#6 Section 5.4](verification/llm-evaluation.md#54-qualification-and-changes). A fallback is optional; configure none until one qualifies. If DF-004 is later selected, a candidate may instead qualify only for its explicit assigned routes, but no unqualified route may be hidden by aggregation or fallback. Startup validation remains Section 5's runtime contract; qualification is evidence with limitations, not a guarantee of every future response.
 
 ## 10. Local acceptance scenarios and handoffs
 
@@ -287,11 +320,12 @@ These IDs describe checks for #4, not a duplicate product coverage catalog or im
 | LLM-AC-013 | Runner reuses production bundle/pipeline; fixtures, live calls and missing credentials have distinct outcomes; grader cost counts toward run budget | NFR-001/002/006, Q-005 |
 | LLM-AC-014 | Each candidate and configured chain has route/mode evidence; failed calls stay in results; standalone timing is distinct from API benchmark | FR-009/012/034, RG-002/003 |
 | LLM-AC-015 | Fallback success returns complete plain text only; API commits once; stale/manual-edit/unknown-delivery behavior follows owning contracts | FR-011/018/022–024/026–028/037 |
+| LLM-AC-016 | Candidate profiles resolve opaque credential references from the named environment source; a one-dispatch live access check works for each supported OpenAI-compatible profile without exposing the key, and does not claim language qualification | Q-001/Q-007, NFR-004/006 |
 
 | Question / owner | Decision status and remaining deliverable | Stage blocked |
 | --- | --- | --- |
 | Q-007, #4 with selected AI package | Eligibility/response contracts, error categories, traversal and deadline policy specified here. M004 implements only the executable `eligibility.v1` snapshot and scripted call boundary; parsers/checkers, remaining prompts and selected adapter/token-bound proof remain later deliverables | Live provider orchestration readiness; M004 offline infrastructure is complete |
-| Q-001, #4/#6 with owner configuration | Direct DeepSeek capability/tariff documentation checked; provider/credentials, token/byte bounds, model/fallback qualification and actual monetary cap remain unset | Paid serving and launch |
+| Q-001, #4/#6 with owner configuration | Initial DeepSeek evaluation profile and environment credential source are set and public capability/tariff documentation is checked; live access, token/byte bounds, model/fallback qualification and actual monetary cap remain unset | Paid serving and launch |
 | Q-003/Q-006, #5 with #3 | Shared counting/recovery/auth/error/period semantics specified in #5; selected wire operations/fields and auth details remain | Selected accounting/API handlers and dependent clients; no YAML prerequisite for independent AI development |
 | Q-005, #6 | Corpus/rubric/human coverage and workloads specified in [#6](06-verification-plan.md); actual cases, reviews and execution evidence pending | Candidate acceptance and release gates |
 | Q-004, #3/#5/#10 | Operational metadata retention/reconciliation windows, account lifecycle and provider disclosure; source/result storage policy remains unchanged | Related retention/account implementation and launch |

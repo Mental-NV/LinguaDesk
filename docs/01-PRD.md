@@ -1,6 +1,6 @@
 # LinguaDesk — Product Requirements Document
 
-**Version:** 0.6 · **Status:** Simplified MVP product baseline; verification ownership/handoffs updated; deferred scope explicit; P-005/P-006 remain proposed · **Updated:** September 8, 2026 (UTC)
+**Version:** 0.7 · **Status:** Simplified MVP product baseline; verification ownership/handoffs updated; deferred scope explicit; P-005/P-006 remain proposed · **Updated:** September 11, 2026 (UTC)
 
 This document consolidates the discovery decisions. It specifies product outcomes for later UX, architecture, API, and feature specifications. It contains no implementation plan or development task breakdown.
 
@@ -162,7 +162,7 @@ The limits are configuration-controlled product values rather than fixed client 
 | FR-033 | Eligible fallback triggers | Try the next candidate for provider failures, including timeouts/throttling/service errors, and clearly invalid outputs such as empty or unusable responses. Invalid user input, user authentication failures, and exhausted allowances end the request without model fallback. |
 | FR-034 | Quality and failure outcomes | Every candidate must pass the same applicable minimum quality criteria. Successful fallback is invisible to users. Exhaustion or deadline expiry produces a clear failure, preserves work, and consumes no character allowance. |
 
-**Initial default (unchanged discovery choice):** DeepSeek V4 Flash in non-thinking mode. The prior discovery review recorded non-thinking support and the need to disable default thinking explicitly; this scope-only revision does not reverify current provider behavior. #4 must verify the actual serving configuration before relying on it. This is not evidence of LinguaDesk’s quality, latency, or cost eligibility. [DeepSeek thinking-mode documentation](https://api-docs.deepseek.com/guides/thinking_mode/)
+**Initial default (updated provider alias):** DeepSeek-V4.1-Flash via `deepseek-flash` in non-thinking mode. #4 records the current public provider evidence, explicit thinking control and owner-supplied evaluation credential binding. It must still verify the actual serving configuration before relying on it. This is not evidence of LinguaDesk’s quality, latency, or cost eligibility. [DeepSeek thinking-mode documentation](https://api-docs.deepseek.com/guides/thinking_mode/)
 
 The serving arrangement, supported model settings, quality/performance evaluation and monetary bounds remain pre-launch dependencies. Under D-18, provider retention and no-training guarantees are not selection or launch requirements. Low-cost models and provider-managed caching are permitted when they satisfy the remaining functional, quality, performance and cost requirements; this does not assert any provider data-use guarantee.
 
@@ -263,12 +263,13 @@ Accepted and amended dispositions below are incorporated into the confirmed requ
 
 ### Historical decision log and current amendment
 
-D-01–D-16 are preserved in the [discovery archive](archive/product-discovery.md). Their automatic processing, alternatives/comparison, prefix translation, Google, targeted invalidation, and advanced routing clauses are **superseded or deferred by D-17 / Sections 3 and 5**; they are not current MVP instructions. D-18 additionally supersedes D-10’s provider no-training/retention clauses. Unaffected product choices remain, including the default model preference subject to the remaining quality/performance/cost criteria.
+D-01–D-16 are preserved in the [discovery archive](archive/product-discovery.md). Their automatic processing, alternatives/comparison, prefix translation, Google, targeted invalidation, and advanced routing clauses are **superseded or deferred by D-17 / Sections 3 and 5**; they are not current MVP instructions. D-18 additionally supersedes D-10’s provider no-training/retention clauses. D-19 confirms the later advanced-routing and shared-provider-credential direction without reactivating DF-004. Unaffected product choices remain, including the default model preference subject to the remaining quality/performance/cost criteria.
 
 | ID | Confirmed decision / superseded alternative |
 | --- | --- |
 | D-17 | **2026-09-08 user approval:** adopt all ten dispositions in Section 3.2. MVP uses explicit buttons, plain editable output, single dropdown, native/inline controls, whole-input limits, local accounts, two simple chains, and the independent API. DF-001–DF-007 are later-phase scope; targeted invalidation and the duplicate toggle are retired. |
 | D-18 | **2026-09-08 user approval:** remove LLM-provider retention/no-training eligibility requirements from Q-001, NFR-004 and RG-007. Favor low-cost serving and allow provider caching subject to existing quality/performance/cost criteria. The user clarified that caching is **provider-managed**; no LinguaDesk completed-response cache is selected and per-tab text teardown is unchanged. #4 verifies provider cache capabilities/pricing; successful-character accounting remains unchanged. |
+| D-19 | **2026-09-11 user direction:** a provider credential may be shared by evaluation and every LinguaDesk operation using that provider. Later routing is expected to support route-specific providers and more than one fallback; for example, a Chinese Translation route may prefer DeepSeek while an English route evaluates Muse Spark 1.3. This confirms later-phase intent under DF-004 without adding advanced routing to the current MVP. Reactivation must keep routing server-controlled and bound candidates, dispatches, deadlines and aggregate provider-account exposure conservatively. |
 
 ### Open questions and their scope
 
@@ -285,4 +286,4 @@ The primary source is the confirmed discovery conversation. External verificatio
 - [DeepSeek Open Platform terms](https://cdn.deepseek.com/policies/en-US/deepseek-open-platform-terms-of-service.html) — historical discovery reference; provider retention/no-training eligibility checks were removed by D-18. No provider privacy guarantee is asserted here.
 - [User-supplied rewriting widget](https://chatgpt.com/s/w_6a9c7faf64148191abb437fe326d861c) — not accessible during discovery. The user’s written six-rule behavior description is the confirmed source, not an inferred widget implementation.
 
-**Review outcome:** The product owner approved the ten scope dispositions in Section 3.2 on September 8, 2026, superseding affected discovery decisions and P-001–P-004 clauses. D-18 subsequently removes provider retention/no-training eligibility gates and records the clarified choice of provider-managed caching. Current behavior is specified in Sections 3–8; DF-001–DF-007 preserve later intent without blocking MVP. P-005/P-006 remain proposed. This baseline is ready for scoped planning, not evidence of implementation or release readiness.
+**Review outcome:** The product owner approved the ten scope dispositions in Section 3.2 on September 8, 2026, superseding affected discovery decisions and P-001–P-004 clauses. D-18 subsequently removes provider retention/no-training eligibility gates and records the clarified choice of provider-managed caching. D-19 records shared provider credentials and route-specific multi-candidate routing as later intent while leaving DF-004 deferred. Current behavior is specified in Sections 3–8; DF-001–DF-007 preserve later intent without blocking MVP. P-005/P-006 remain proposed. This baseline is ready for scoped planning, not evidence of implementation or release readiness.

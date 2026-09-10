@@ -1,11 +1,11 @@
 # LinguaDesk — UX/UI Specification
 
-**Document:** #2 · **Version:** 1.6 · **Status:** Simplified MVP ready for scoped planning; verification methods consolidated in #6; runtime evidence pending
-**Updated:** September 8, 2026 (UTC)
+**Document:** #2 · **Version:** 1.7 · **Status:** Simplified MVP ready for scoped planning; verification methods consolidated in #6; runtime evidence pending
+**Updated:** September 11, 2026 (UTC)
 
 ## 1. Authority, inputs, and scope
 
-[Document #0](00-SDD-Planning-Workflow.md) owns process; [PRD](01-PRD.md) owns active and deferred product scope and D-17/D-18. Current shared API behavior is in [#5](05-api-design.md). Runtime evidence is tracked separately in [delivery status](delivery/current.md).
+[Document #0](00-SDD-Planning-Workflow.md) owns process; [PRD](01-PRD.md) owns active and deferred product scope and D-17–D-19. Current shared API behavior is in [#5](05-api-design.md). Runtime evidence is tracked separately in [delivery status](delivery/current.md).
 
 This document owns current routes, layout, controls, messages, state transitions and acceptance contracts. `Must` is binding for the **active MVP**; rows marked **Deferred** or **Retired** impose no current implementation/test gate. The 17 UX-US, 112 UX-AC, and original 44 UX-MSG IDs remain traceable; some are amended and some inactive. In compact references, AC/US/MSG mean UX-AC/UX-US/UX-MSG. IDs are never reused for unrelated behavior.
 

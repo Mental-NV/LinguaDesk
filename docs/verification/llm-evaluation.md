@@ -4,6 +4,28 @@ Authoritative continuation of [06-verification-plan.md](../06-verification-plan.
 
 ## 5. LLM quality and candidate qualification (Q-005)
 
+### 5.0 Evidence layers and live-development gate
+
+Use the cheapest layer that can prove the claim, but do not use a cheaper layer to claim behavior it cannot observe:
+
+| Layer | Required use | What it proves / does not prove |
+| --- | --- | --- |
+| Offline unit and pipeline fixtures | Default local/CI suite and every behavior change | Deterministic parsing, validation, prompts, traversal, admission, timeout and error permutations with zero provider calls; cannot prove provider access or model behavior |
+| Sanitized transport contract tests | Every adapter/dialect/settings change | Exact URI/headers/body, explicit output/thinking controls, response/error/usage mapping and one-dispatch behavior through a fake HTTP transport; never includes a real key and cannot prove the provider honors the request |
+| Live credential/access check | Before live behavior work for each candidate/profile/credential reference | At most one fixed-synthetic, low-output, budget-admitted request proves current authentication plus endpoint/model/required-settings access; does not qualify quality, cost, limits or reliability |
+| Live development behavior batch | Required evidence to complete M015–M018 and for affected prompt/checker changes | The real model executes the production prompt/pipeline on versioned non-production development cases; small coverage exposes integration and behavior risk but is not release qualification |
+| Frozen-corpus qualification and live API workload | G1/G2 through M035–M037 and successors | Full Section 5 quality/human evidence and Section 6 serving performance; cannot be replaced by earlier smoke results |
+
+M019 first supplies the profile-selected adapter and credential/access workflow. M015's live development slice covers each supported language plus each model-decided negative class relevant to both families; deterministic local-invalid cases continue to prove zero calls. M016 runs at least one reviewed development case in each of the 12 Translation directions. M017 runs at least one reviewed development case in every language/mode cell. M018 keeps exhaustive failure/fallback/deadline permutations scripted, while a small live no-fallback path confirms the same bounds/metadata around natural provider calls; do not provoke provider abuse, deliberately spend against an invalid credential, or claim that unobserved live failures were tested. M020 emits the combined report. These are minimum smoke strata, not corpus-size reductions or product pass thresholds.
+
+Live checks are explicit, non-default and excluded from the ordinary offline test target because they are paid, variable and depend on external service state. Nevertheless their recorded success is a milestone completion requirement, not optional evidence. A missing credential, denied budget or unavailable provider blocks only the live gate and is reported as such; it must not skip cases, substitute a mock, or turn the offline suite red when no live run was requested. Routine pull requests run the offline and transport layers; rerun the affected live layer when a prompt, model/profile, adapter, provider dialect, output checker or effective setting changes and before accepting its milestone/evidence.
+
+The runner resolves `CredentialRef` as specified by [#4 Section 5.2](../04-llm-specification.md#52-evaluation-profiles-and-credentials). Each live command requires an explicit candidate profile, maximum dispatches and maximum spend; the credential check hard-limits dispatches to one. A profile may target DeepSeek, OpenAI or another provider implementing the required OpenAI-compatible Chat Completions subset. Test compatibility per profile: shared request shape is not evidence that provider-specific controls, finish reasons, usage or errors are portable.
+
+The DeepSeek credential is intentionally shared with all LinguaDesk operations routed to that provider. Therefore live evaluation uses the same global monetary admission as concurrent serving when it exists, or records that serving was quiescent for the run. Apply public peak, cache-miss and configured maximum-output assumptions before dispatch; retain full unresolved exposure when usage is missing. A runner-local maximum remains a useful per-run stop but is not evidence that the shared provider account or unrelated use stayed below the product ceiling.
+
+Reports label every observation `offline_fixture`, `transport_fixture`, `live_access`, `live_development`, `live_qualification` or `fault_injected`. They record candidate/profile/adapter/model/endpoint identity, credential reference, shared-scope/quiescence status, bundle/settings/checker revisions, time, dispatch count, usage, admitted/settled/unresolved exposure and sanitized outcome. They never contain the API key, authorization header, environment dump, key fingerprint, raw provider body or unrestricted prompt/output. Development case IDs may link to separately controlled source/review material; production text is never captured.
+
 ### 5.1 Versioned corpus and reference construction
 
 Create a frozen release corpus of **600 eligible quality cases**, separate from development/calibration cases. These counts are the initial verification design; changing them requires a reviewed #6 revision and a recorded reason, never removal of failing cases to obtain a pass.
@@ -47,6 +69,8 @@ Translation reviewers must understand source and target; Rewriting reviewers mus
 ### 5.4 Qualification and changes
 
 Qualify each primary and optional fallback directly for the entire family it serves using the same corpus, rubric and product thresholds. A candidate serving both families needs both reports. Candidate-only evaluation disables fallback rescue while preserving the production eligibility/transformation pipeline. Then exercise the configured chain normally and with controlled primary failures, including both three-dispatch paths, terminal user validation, eligibility reuse and deadline exhaustion. Fault-injected results are labeled separately from natural live results.
+
+If DF-004 is later selected, qualify each candidate on every directed route or rewriting cell it may serve rather than assuming provider-wide quality. Route-specific evidence may narrow an assignment, but no strong route may average away a weak assigned route. Each longer configured chain also needs bounded traversal, correlated-credential failure, deadline and conservative aggregate-cost evidence. Muse Spark 1.3 is currently only an example candidate; publisher agent/coding claims are not LinguaDesk language-quality evidence.
 
 Qualification links adapter capability/settings, finite context/output/cost bounds, runtime checker behavior, quality/human review and applicable API performance to exact revisions. Startup admission remains #4's responsibility. No qualified fallback means configure none. Record failed runs; after prompt/model/checker changes, create a new candidate revision and rerun the affected family, retaining earlier failures and stable cases. Do not tune on the release set and then claim it is unseen; record exposure and add fresh held-out cases in the next reviewed corpus revision.
 

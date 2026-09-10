@@ -10,7 +10,7 @@ Mutable #7 status owner. Read for selection/dependency checks and closeout; do n
 | --- | --- | --- | --- |
 | — | None | M014 completed; select and lock the next milestone before implementation | — |
 
-M015 remains the next recommended independent-track candidate under the roadmap priority policy; it is not selected.
+M019 is the next recommended independent-track candidate under the roadmap priority policy because it enables the explicit live provider path required by M015–M018; it is not selected. The owner reports that the `DeepSeek-V4.1-Flash` credential is present in the specified evaluation environment variable and that the same actual key will serve every LinguaDesk operation routed to DeepSeek. Adapter access, model identity, shared-scope accounting and billing remain unverified until M019 records its bounded live check. D-19's route-specific providers and longer fallback chains remain later DF-004 work.
 
 ## Completed milestones
 
@@ -31,4 +31,4 @@ M015 remains the next recommended independent-track candidate under the roadmap 
 | M013 | Done | [Backlog](../08-backlogs/M013/backlog.md), [spec](../08-backlogs/M013/spec.md), [tasks/evidence](../08-backlogs/M013/tasks.md#completion-record) |
 | M014 | Done | [Backlog](../08-backlogs/M014/backlog.md), [spec](../08-backlogs/M014/spec.md), [tasks/evidence](../08-backlogs/M014/tasks.md#completion-record) |
 
-All roadmap milestones other than completed M001–M014 are Candidate with no selected package and evidence pending. M015 is recommended, not selected. Full product and release evidence remains pending in #6 coverage.
+All roadmap milestones other than completed M001–M014 are Candidate with no selected package and evidence pending. M019 is recommended, not selected. Full product and release evidence remains pending in #6 coverage.

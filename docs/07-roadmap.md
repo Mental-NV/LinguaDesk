@@ -1,7 +1,7 @@
 # LinguaDesk — Roadmap and Milestone Plan
 
-**Document:** #7 · **Version:** 1.12 · **Status:** Current design; implementation/evidence status is maintained in delivery/current.md and verification/coverage.md
-**Updated:** 2026-09-09
+**Document:** #7 · **Version:** 1.15 · **Status:** Current design; implementation/evidence status is maintained in delivery/current.md and verification/coverage.md
+**Updated:** 2026-09-11
 
 ## 1. Authority and planning basis
 
@@ -28,7 +28,7 @@ Read [current delivery status](delivery/current.md) for the latest completion, s
 The numbered sections below group related outcomes; **M IDs are identities, not execution positions**. The current priority policy is:
 
 1. Complete M001 first, then establish only the infrastructure needed by the next chosen outcome (M002–M005).
-2. Bring forward the independent AI path M015–M020 as soon as its dependencies permit, to expose provider/prompt risks while local access and accounting are developed. It does not wait for React or a production database. This ordering does not request concurrent agents.
+2. Bring forward the independent AI path M015–M020 as soon as its dependencies permit, beginning with enabling milestone M019 and then M015–M018/M020. This deliberately puts a bounded real-provider path ahead of language behavior so each behavior increment has live development evidence as well as deterministic coverage. It does not wait for React or a production database. This ordering does not request concurrent agents.
 3. Enable a verified independent API operation with durable limits and recovery, then connect its web journey. Prefer demonstrated Translation followed by Rewriting over polishing all account screens or all visuals first.
 4. Integrate accessibility, privacy and failure checks with each feature. Begin bounded corpus/evaluation and operational preparation as soon as inputs are available; do not leave qualification risk until the final release review.
 
@@ -68,12 +68,12 @@ The exit column describes the increment's observable value. #8 supplies concrete
 
 | ID | Outcome | Exit criterion | Prerequisites | Basis / verification |
 | --- | --- | --- | --- | --- |
-| M015 | Validate language eligibility | The shared pipeline classifies synthetic eligibility outcomes correctly and never transforms locally invalid or rejected input. | M004, M005 | FR-004–007; AI §3–4; V-001/V-007 |
-| M016 | Translate complete text through the AI boundary | A caller receives a validated complete Translation outcome from scripted providers; meaning/script expectations are represented in prompt/checker fixtures. | M015 | FR-008–011; AI §3–4; V-007 |
-| M017 | Rewrite with one requested mode | A caller receives a validated full rewrite through the shared boundary; correction and the exclusive mode catalog are represented in fixtures. | M015 | FR-012–014/016; AI §3–4; V-007 |
-| M018 | Bound failures and fallback | Both family pipelines obey eligible fallback, dispatch/admission bounds and the original deadline under controlled failures. | M016, M017 | FR-029/030/032–034; AI §5–7; V-007 |
-| M019 | Connect one candidate adapter | One selected adapter proves its actual request settings, output/error/usage mapping and single-dispatch behavior with sanitized transport fixtures. | M018 | AI §5; Q-001/Q-007; V-008 |
-| M020 | Produce trustworthy evaluation reports | An evaluator can run a bounded synthetic batch and obtain a versioned report distinguishing fixtures, live requests, failures and unresolved cost. | M018 | AI §9; verification §3/7; V-006/V-007/V-013 |
+| M019 | Connect and verify configurable candidate access | A multi-profile candidate registry, provider-neutral credential references and the first OpenAI-compatible Chat Completions adapter pass sanitized transport conformance; an explicit one-dispatch live access check uses the configured shared credential and succeeds for `DeepSeek-V4.1-Flash` / `deepseek-flash` at `https://api.deepseek.com` without exposing its key. The evaluator can select separately configured providers/routes without implementing deferred serving rules or assuming one credential per family. | M004, M005 | AI §5; Q-001/Q-007; V-008 |
+| M015 | Validate language eligibility | The shared pipeline passes deterministic eligibility/zero-dispatch cases and a bounded, reviewed live development slice covering the supported languages and model-decided negative classes without transforming rejected input. | M004, M005, M019 | FR-004–007; AI §3–5; V-001/V-007/V-008 |
+| M016 | Translate complete text through the AI boundary | Scripted edge cases and at least one reviewed live development case in every Translation direction produce validated complete outcomes through the same prompt/pipeline, with failures retained as evidence. | M015 | FR-008–011; AI §3–5; V-007/V-008 |
+| M017 | Rewrite with one requested mode | Scripted edge cases and at least one reviewed live development case in every language/mode cell exercise correction and the exclusive mode catalog through the same prompt/pipeline, with failures retained as evidence. | M015 | FR-012–014/016; AI §3–5; V-007/V-008 |
+| M018 | Bound failures and fallback | Deterministic fault cases prove both family pipelines obey fallback, dispatch/admission bounds and the original deadline; a small live no-fallback path records the same bounds/metadata around natural provider calls without treating mocks as live evidence. | M016, M017 | FR-029/030/032–034; AI §5–7; V-007/V-008 |
+| M020 | Produce trustworthy evaluation reports | An evaluator can run the bounded fixture and live development batches and obtain a versioned report that distinguishes access, behavior, injected failures, missing credentials and unresolved cost without capturing secrets. | M018, M019 | AI §5/9; verification §3/5/7; V-006/V-007/V-008/V-013 |
 
 ### 4.4 Shared allowance, cost and recovery behavior
 
@@ -114,7 +114,7 @@ The exit column describes the increment's observable value. #8 supplies concrete
 
 M005 is the first completed product API contract increment in this ordering. It generated and reviewed OpenAPI from actual C# contracts before dependent client adoption. Subsequent API milestones extend and review those generated artifacts under #0/#5; they must not replace them with a provisional all-MVP schema or contract-only host.
 
-M026–M029 establish integrated behavior with deterministic external adapters. They do not permit unqualified live serving. M019 supplies adapter conformance, not full model acceptance; a structurally valid evaluation profile may test an unqualified candidate under #4's budget rules. Production startup still requires qualification and monetary bounds. Core edit/stale/failure guards are part of the first consuming feature, while M030–M032 add cross-feature/native/restoration evidence.
+M026–M029 establish integrated behavior with deterministic external adapters. They do not permit unqualified live serving. M019 supplies adapter conformance and a bounded live access check, not model acceptance; M015–M018 add shallow live development evidence, not frozen-corpus qualification. A structurally valid evaluation profile may test an unqualified candidate under #4's budget rules. Production startup still requires qualification and monetary bounds. Core edit/stale/failure guards are part of the first consuming feature, while M030–M032 add cross-feature/native/restoration evidence.
 
 M035–M039 are deliberately **one bounded batch or journey group each**, not labels for finishing the entire corpus, all providers, every browser or all release measurements. #8 chooses that first group's scope. Allocate new stable successor milestone IDs for remaining batches/groups after measuring the first; retain the overall coverage/workload in #6. The roadmap intentionally does not invent hundreds of future review tasks. Every required uncovered case/browser/gate remains pending until those successors or qualified external evidence close it. A harness rehearsal is not a live performance pass, and a recorded manual gap is not browser-support evidence.
 

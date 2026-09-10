@@ -2,6 +2,12 @@
 
 Historical notes. Package tasks own detailed evidence; [current delivery status](../delivery/current.md) owns current progress.
 
+**Shared provider credential and later routing direction — 2026-09-11:** Recorded that the actual DeepSeek key is shared by evaluation and every LinguaDesk operation routed to that provider. Conservative exposure must therefore aggregate all admitted uses of the credential and cannot assume an isolated evaluation account. PRD D-19 confirms later route-specific providers and bounded multi-candidate fallbacks, with DeepSeek-for-Chinese and Muse-Spark-for-English retained only as unqualified examples under DF-004. M019 gains a multi-profile evaluation registry but no deferred serving rule engine.
+
+**DeepSeek V4.1 evaluation profile update — 2026-09-11:** Recorded the owner-supplied environment credential contract and the now documented `DeepSeek-V4.1-Flash` / `deepseek-flash` / `https://api.deepseek.com` profile. Removed the unused local secret-store proposal. Credential presence is not access or qualification evidence; M019 still owns the bounded live check and sanitized adapter proof.
+
+**Independent AI live-evidence reorder — 2026-09-10:** Following completion of M001–M014, moved enabling M019 ahead of M015–M018 without renumbering milestones. M019 now owns provider-neutral evaluation credentials/profiles, sanitized adapter conformance and a one-dispatch live access check. M015–M017 require bounded live development behavior evidence alongside deterministic suites; M018 retains scripted exhaustive fault coverage plus a small natural live path; M020 reports both without confusing them with later frozen-corpus qualification. M019 is the next recommended candidate; no milestone was selected by this design update.
+
 **Initial change record — 2026-09-08:** Created M001–M042 as provisional small outcome boundaries. M001 is recommended first; no backlog item/package was selected. G1–G4 distinguish aggregate external/release evidence from bounded engineering execution. New successor IDs will be allocated as evidence batches and actual scope become known.
 
 **Selection update — 2026-09-08:** Created M001 backlog/BI-001 and package 001 with six acceptance scenarios and six unchecked execution tasks. Added the initial/end human-step rule from #0 v1.6; no human action is required for M001 as scoped. Updated its check references to the actual host portions of V-009/V-012; independent AI verification remains M004.
