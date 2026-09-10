@@ -124,7 +124,7 @@ run_muse_once() {
             --trust-workspace \
             --disable-approval \
             --disable-sandbox \
-            "$1" 2>&1 | python3 -u "$muse_stream_renderer"
+            "$1" 2>&1 | python3 -u "$muse_stream_renderer" --color
     )
 }
 
