@@ -59,10 +59,11 @@ class MuseStreamTests(unittest.TestCase):
 
         self.assertEqual(
             output.getvalue(),
-            'muse: workspace trusted\nworking...\n'
+            'muse: workspace trusted\n'
+            '[muse:assistant] Response:\nworking...\n'
             'MILESTONE_AUTOMATION_STATUS: READY\n',
         )
-        self.assertGreaterEqual(output.flushes, 4)
+        self.assertGreaterEqual(output.flushes, 5)
 
     def test_terminal_text_is_used_when_no_deltas_are_available(self):
         event = json.dumps({
@@ -73,7 +74,10 @@ class MuseStreamTests(unittest.TestCase):
 
         muse_stream.render([event], output)
 
-        self.assertEqual(output.getvalue(), 'final only\n')
+        self.assertEqual(
+            output.getvalue(),
+            '[muse:assistant] Response:\nfinal only\n',
+        )
 
     def test_lifecycle_and_tool_events_render_live_progress(self):
         events = [
@@ -89,7 +93,7 @@ class MuseStreamTests(unittest.TestCase):
                 'payload_type': 'tool.result',
                 'payload': {
                     'text': json.dumps({
-                        'command': 'printf super-secret',
+                        'command': 'curl --token super-secret',
                         'description': 'Check the project',
                         'terminal_status': 'completed',
                         'exit_code': 0,
@@ -101,6 +105,10 @@ class MuseStreamTests(unittest.TestCase):
                     },
                 },
             }) + '\n',
+            json.dumps({
+                'payload_type': 'task.lifecycle.proposed',
+                'payload': {'event': {'task_kind': 'model.meta.response'}},
+            }) + '\n',
         ]
         output = FlushingBuffer()
 
@@ -108,11 +116,57 @@ class MuseStreamTests(unittest.TestCase):
 
         self.assertEqual(
             output.getvalue(),
-            '[muse] Model step started.\n'
-            '[muse] Running bash...\n'
-            '[muse] Check the project — completed (exit 0)\n',
+            '[muse:assistant] Analyzing request…\n'
+            '[muse:tool] Running command…\n'
+            '[muse:tool] bash: curl --token <redacted> — completed (exit 0)\n'
+            '[muse:assistant] Reviewing 1 tool result…\n',
         )
         self.assertNotIn('super-secret', output.getvalue())
+
+    def test_file_and_skill_results_include_brief_targets(self):
+        events = [
+            json.dumps({
+                'payload_type': 'tool.result',
+                'payload': {
+                    'text': f'Read text file `{Path.cwd() / "frontend/src/App.tsx"}`.\ncontents',
+                    'correlation_facts': {'tool_name': 'read_file', 'outcome': 'success'},
+                },
+            }) + '\n',
+            json.dumps({
+                'payload_type': 'tool.result',
+                'payload': {
+                    'text': '<read-skill-result name="bundled:plan" status="ok">\ncontents',
+                    'correlation_facts': {'tool_name': 'read_skill', 'outcome': 'success'},
+                },
+            }) + '\n',
+        ]
+        output = FlushingBuffer()
+
+        muse_stream.render(events, output)
+
+        self.assertEqual(
+            output.getvalue(),
+            '[muse:tool] read_file: frontend/src/App.tsx — success\n'
+            '[muse:tool] read_skill: bundled:plan — success\n',
+        )
+
+    def test_role_lines_have_distinct_colors_when_enabled(self):
+        events = [
+            json.dumps({
+                'payload_type': 'task.lifecycle.proposed',
+                'payload': {'event': {'task_kind': 'model.meta.response'}},
+            }) + '\n',
+            json.dumps({
+                'payload_type': 'task.lifecycle.proposed',
+                'payload': {'event': {'task_kind': 'tool.read_file'}},
+            }) + '\n',
+        ]
+        output = FlushingBuffer()
+
+        muse_stream.render(events, output, color=True)
+
+        self.assertIn('\033[35m[muse:assistant]', output.getvalue())
+        self.assertIn('\033[36m[muse:tool]', output.getvalue())
 
     def test_provider_failure_events_are_visible(self):
         events = [
@@ -134,8 +188,8 @@ class MuseStreamTests(unittest.TestCase):
 
         self.assertEqual(
             output.getvalue(),
-            '[muse] failed meta model stream attempt 1/10\n'
-            '[muse] Run failed: server_error: error code: 504\n',
+            '[muse:error] failed meta model stream attempt 1/10\n'
+            '[muse:error] Run failed: server_error: error code: 504\n',
         )
 
 
@@ -406,12 +460,15 @@ class RunnerTests(unittest.TestCase):
 
     def test_muse_ready_without_lock_cannot_commit_or_implement(self):
         with self.fixture() as (root, env, git):
+            env.pop('NO_COLOR', None)
+            env['TERM'] = 'xterm-256color'
             before = git('rev-parse', 'HEAD')
             result = self.run_fixture(root, env, '--muse')
             self.assertNotEqual(result.returncode, 0)
             self.assertIn('MILESTONE_AUTOMATION_STATUS: READY', result.stdout, result.stderr)
             self.assertIn('muse working...', result.stdout)
-            self.assertIn('[muse] Model step started.', result.stdout)
+            self.assertIn('[muse:assistant] Analyzing request…', result.stdout)
+            self.assertIn('\033[35m', result.stdout)
             self.assertNotIn('Implementing M015', result.stdout)
             self.assertEqual(before, git('rev-parse', 'HEAD'))
             for flag in (
