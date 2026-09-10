@@ -15,6 +15,8 @@ claude_model="meta/muse-spark-1.3-contributor"
 claude_effort="high"
 muse_model="meta/muse-spark-1.3-contributor"
 muse_reasoning_effort="high"
+muse_max_attempts=${MUSE_RUNNER_MAX_ATTEMPTS:-3}
+muse_retry_delay_seconds=${MUSE_RUNNER_RETRY_DELAY_SECONDS:-5}
 runner="codex"
 
 usage() {
@@ -109,9 +111,9 @@ run_claude_harness() {
 # is rooted with --workspace. Unattended runs trust the repository and disable
 # both approval prompts and the sandbox: milestone verification needs registry
 # access and loopback sockets, and a headless run cannot approve an escalation.
-# JSONL mode exposes incremental output events; the unbuffered renderer turns
-# them back into a plain live transcript for tee and the final status check.
-run_muse_harness() {
+# JSONL mode exposes model/tool lifecycle events as well as final output. The
+# unbuffered renderer turns them into a concise live transcript.
+run_muse_once() {
     (
         cd "$repository_root" || exit 1
         muse exec \
@@ -122,8 +124,53 @@ run_muse_harness() {
             --trust-workspace \
             --disable-approval \
             --disable-sandbox \
-            "$1" | python3 -u "$muse_stream_renderer"
+            "$1" 2>&1 | python3 -u "$muse_stream_renderer"
     )
+}
+
+is_transient_muse_failure() {
+    grep -Eiq \
+        'server_error: error code: (408|429|500|502|503|504)|timed? out|timeout|connection (reset|closed)|temporarily unavailable|service unavailable' \
+        "$1"
+}
+
+run_muse_harness() {
+    local prompt=$1
+    local output_file=$2
+    local attempt=1
+    local attempt_prompt=$prompt
+    local agent_status=0
+    local retry_delay
+
+    case "$muse_max_attempts" in
+        ""|*[!0-9]*|0) fail "MUSE_RUNNER_MAX_ATTEMPTS must be a positive integer." ;;
+    esac
+    case "$muse_retry_delay_seconds" in
+        ""|*[!0-9]*) fail "MUSE_RUNNER_RETRY_DELAY_SECONDS must be a non-negative integer." ;;
+    esac
+
+    while true; do
+        : > "$output_file"
+        agent_status=0
+        run_muse_once "$attempt_prompt" | tee "$output_file" || agent_status=$?
+
+        if [ "$agent_status" -eq 0 ]; then
+            return 0
+        fi
+        if [ "$attempt" -ge "$muse_max_attempts" ] || ! is_transient_muse_failure "$output_file"; then
+            return "$agent_status"
+        fi
+
+        retry_delay=$((muse_retry_delay_seconds * attempt))
+        attempt=$((attempt + 1))
+        echo "[muse] Transient provider failure; retrying attempt $attempt/$muse_max_attempts in ${retry_delay}s."
+        if [ "$retry_delay" -gt 0 ]; then
+            sleep "$retry_delay"
+        fi
+        attempt_prompt="A previous attempt at this milestone stage ended with a transient provider failure. Reinspect the current working tree and task evidence, preserve valid completed work, and resume without repeating irreversible effects.
+
+$prompt"
+    done
 }
 
 run_agent() {
@@ -141,7 +188,9 @@ run_agent() {
     if [ "$runner" = "claude" ]; then
         run_claude_harness "$prompt" 2>&1 | tee "$output_file" || agent_status=$?
     elif [ "$runner" = "muse" ]; then
-        run_muse_harness "$prompt" 2>&1 | tee "$output_file" || agent_status=$?
+        # The Muse harness owns tee so each retry replaces the status-check
+        # capture while every attempt remains visible in the terminal.
+        run_muse_harness "$prompt" "$output_file" || agent_status=$?
     else
         run_codex_harness "$prompt" 2>&1 | tee "$output_file" || agent_status=$?
     fi

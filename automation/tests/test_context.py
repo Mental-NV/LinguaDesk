@@ -75,6 +75,69 @@ class MuseStreamTests(unittest.TestCase):
 
         self.assertEqual(output.getvalue(), 'final only\n')
 
+    def test_lifecycle_and_tool_events_render_live_progress(self):
+        events = [
+            json.dumps({
+                'payload_type': 'task.lifecycle.proposed',
+                'payload': {'event': {'task_kind': 'model.meta.response'}},
+            }) + '\n',
+            json.dumps({
+                'payload_type': 'task.lifecycle.proposed',
+                'payload': {'event': {'task_kind': 'tool.bash'}},
+            }) + '\n',
+            json.dumps({
+                'payload_type': 'tool.result',
+                'payload': {
+                    'text': json.dumps({
+                        'command': 'printf super-secret',
+                        'description': 'Check the project',
+                        'terminal_status': 'completed',
+                        'exit_code': 0,
+                        'output': 'super-secret',
+                    }),
+                    'correlation_facts': {
+                        'tool_name': 'bash',
+                        'outcome': 'success',
+                    },
+                },
+            }) + '\n',
+        ]
+        output = FlushingBuffer()
+
+        muse_stream.render(events, output)
+
+        self.assertEqual(
+            output.getvalue(),
+            '[muse] Model step started.\n'
+            '[muse] Running bash...\n'
+            '[muse] Check the project — completed (exit 0)\n',
+        )
+        self.assertNotIn('super-secret', output.getvalue())
+
+    def test_provider_failure_events_are_visible(self):
+        events = [
+            json.dumps({
+                'payload_type': 'task.lifecycle.status',
+                'payload': {'event': {
+                    'message': 'failed meta model stream attempt 1/10',
+                    'details': {'phase': 'stream_failed'},
+                }},
+            }) + '\n',
+            json.dumps({
+                'payload_type': 'run.terminal.failed',
+                'payload': {'reason': 'server_error: error code: 504'},
+            }) + '\n',
+        ]
+        output = FlushingBuffer()
+
+        muse_stream.render(events, output)
+
+        self.assertEqual(
+            output.getvalue(),
+            '[muse] failed meta model stream attempt 1/10\n'
+            '[muse] Run failed: server_error: error code: 504\n',
+        )
+
 
 class ContextTests(unittest.TestCase):
     def setUp(self):
@@ -225,7 +288,30 @@ class RunnerTests(unittest.TestCase):
                 'dotnet': 'exit 0',
                 'codex': 'echo MILESTONE_AUTOMATION_STATUS: READY',
                 'muse': (
+                    'count=1\n'
+                    'if [ -n "${MUSE_FIXTURE_COUNT_FILE:-}" ]; then\n'
+                    '  if [ -f "$MUSE_FIXTURE_COUNT_FILE" ]; then count=$(( $(cat "$MUSE_FIXTURE_COUNT_FILE") + 1 )); fi\n'
+                    '  echo "$count" > "$MUSE_FIXTURE_COUNT_FILE"\n'
+                    'fi\n'
+                    'if [ "${MUSE_FIXTURE_MODE:-}" = "transient-once" ] && [ "$count" -eq 1 ]; then\n'
+                    "  echo '{\"payload_type\":\"run.terminal.failed\",\"payload\":{\"reason\":\"server_error: error code: 504\"}}'\n"
+                    '  exit 1\n'
+                    'fi\n'
+                    'if [ "${MUSE_FIXTURE_MODE:-}" = "stale-status" ] && [ "$count" -eq 1 ]; then\n'
+                    "  echo '{\"payload_type\":\"run.output.delta\",\"payload\":{\"text\":\"MILESTONE_AUTOMATION_STATUS: READY\"}}'\n"
+                    "  echo '{\"payload_type\":\"run.terminal.failed\",\"payload\":{\"reason\":\"server_error: error code: 504\"}}'\n"
+                    '  exit 1\n'
+                    'fi\n'
+                    'if [ "${MUSE_FIXTURE_MODE:-}" = "stale-status" ]; then\n'
+                    "  echo '{\"payload_type\":\"run.output.delta\",\"payload\":{\"text\":\"finished without a status\"}}'\n"
+                    '  exit 0\n'
+                    'fi\n'
+                    'if [ "${MUSE_FIXTURE_MODE:-}" = "permanent" ]; then\n'
+                    "  echo '{\"payload_type\":\"run.terminal.failed\",\"payload\":{\"reason\":\"invalid request\"}}'\n"
+                    '  exit 1\n'
+                    'fi\n'
                     'echo \"muse-harness-args: $*\" >&2\n'
+                    "echo '{\"payload_type\":\"task.lifecycle.proposed\",\"payload\":{\"event\":{\"task_kind\":\"model.meta.response\"}}}'\n"
                     "echo '{\"payload_type\":\"run.output.delta\",\"payload\":{\"text\":\"muse working...\\nMILESTONE_AUTOMATION_STATUS: READY\"}}'"
                 ),
             }
@@ -304,6 +390,7 @@ class RunnerTests(unittest.TestCase):
             self.assertNotEqual(result.returncode, 0)
             self.assertIn('MILESTONE_AUTOMATION_STATUS: READY', result.stdout, result.stderr)
             self.assertIn('muse working...', result.stdout)
+            self.assertIn('[muse] Model step started.', result.stdout)
             self.assertNotIn('Implementing M015', result.stdout)
             self.assertEqual(before, git('rev-parse', 'HEAD'))
             for flag in (
@@ -312,6 +399,54 @@ class RunnerTests(unittest.TestCase):
                 '--disable-sandbox',
             ):
                 self.assertIn(flag, result.stdout)
+
+    def test_muse_retries_a_transient_provider_failure(self):
+        with self.fixture() as (root, env, git):
+            count_file = root / 'muse-count'
+            env.update({
+                'MUSE_FIXTURE_MODE': 'transient-once',
+                'MUSE_FIXTURE_COUNT_FILE': str(count_file),
+                'MUSE_RUNNER_RETRY_DELAY_SECONDS': '0',
+            })
+            before = git('rev-parse', 'HEAD')
+
+            result = self.run_fixture(root, env, '--muse')
+
+            self.assertNotEqual(result.returncode, 0)
+            self.assertEqual(count_file.read_text().strip(), '2')
+            self.assertIn('Transient provider failure; retrying attempt 2/3', result.stdout)
+            self.assertIn('MILESTONE_AUTOMATION_STATUS: READY', result.stdout)
+            self.assertEqual(before, git('rev-parse', 'HEAD'))
+
+    def test_muse_does_not_retry_a_permanent_failure(self):
+        with self.fixture() as (root, env, git):
+            count_file = root / 'muse-count'
+            env.update({
+                'MUSE_FIXTURE_MODE': 'permanent',
+                'MUSE_FIXTURE_COUNT_FILE': str(count_file),
+                'MUSE_RUNNER_RETRY_DELAY_SECONDS': '0',
+            })
+
+            result = self.run_fixture(root, env, '--muse')
+
+            self.assertNotEqual(result.returncode, 0)
+            self.assertEqual(count_file.read_text().strip(), '1')
+            self.assertNotIn('Transient provider failure', result.stdout)
+
+    def test_muse_validates_only_the_successful_retry_output(self):
+        with self.fixture() as (root, env, git):
+            count_file = root / 'muse-count'
+            env.update({
+                'MUSE_FIXTURE_MODE': 'stale-status',
+                'MUSE_FIXTURE_COUNT_FILE': str(count_file),
+                'MUSE_RUNNER_RETRY_DELAY_SECONDS': '0',
+            })
+
+            result = self.run_fixture(root, env, '--muse')
+
+            self.assertNotEqual(result.returncode, 0)
+            self.assertEqual(count_file.read_text().strip(), '2')
+            self.assertIn('did not report the required status', result.stderr)
 
     def test_muse_current_planning_commit_is_reused(self):
         with self.fixture() as (root, env, git):
