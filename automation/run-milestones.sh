@@ -318,7 +318,6 @@ for ((i=start_milestone; i<=end_milestone; i++)); do
     python3 automation/context.py check "$milestone"
     run_agent "$implement_prompt_template" "$milestone" "MILESTONE_AUTOMATION_STATUS: COMPLETE"
     pull_changes "$milestone implemented"
-    python3 automation/context.py check "$milestone"
     python3 automation/context.py audit
 
     echo "Testing $milestone..."
