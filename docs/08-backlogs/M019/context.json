@@ -87,7 +87,7 @@
       "path": "backend/tools/LinguaDesk.Ai.Evaluation/Program.cs",
       "use": "reference",
       "reason": "Runner extended with profile selection, conformance and live access check",
-      "sha256": "1c2f9cf9c3074e0c106b3d61f75a0e62f09eba0c1110128960daddffbf0c4096"
+      "sha256": "4994348e289feff18340498d758fa4ff2087d7db547f4135c820ed03a0cb61dc"
     },
     {
       "path": "backend/src/LinguaDesk.Infrastructure.Ai/LinguaDesk.Infrastructure.Ai.csproj",
@@ -99,11 +99,11 @@
       "path": "scripts/ai.sh",
       "use": "reference",
       "reason": "Offline AI check and live-command surface extended by this slice",
-      "sha256": "9b63441411ce49a002d38f55e303fb42b9f1a65697b8dc50857d10f61ab86e21"
+      "sha256": "f46d6c091ede39309cdec72e846cda9ad426ff29c594e3608ab9d69a989410fb"
     }
   ],
   "source_map_sha256": "8caababde1d58491df753f79ff77cc0a37924d562613e143cf766c270b833cd9",
-  "baseline_commit": "7f8a68a42c1a283e60c4142906dea8387674e724",
+  "baseline_commit": "df50293e1db4b4df4d254747a8b52564f34ae280",
   "locked_files": {
     "docs/00-SDD-Planning-Workflow.md": "183ae93148ff594f9f1e021aa7543baa8878e9cc0bcfd69ebc696c28976e2945",
     "docs/00-workflow/execution.md": "f362a1384cefef24ba204e0723e3190857c8cca9bcd91908136932e19c5caf02",

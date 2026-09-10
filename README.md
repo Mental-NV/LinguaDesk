@@ -71,7 +71,7 @@ Browser-session calls must use HTTPS so the `__Host-` Secure cookies are accepte
 
 ## Independent AI development commands
 
-The M004 inner loop uses `Microsoft.Extensions.AI.Abstractions` `10.9.0` and does not reference the API, ASP.NET Core, EF/Identity, a provider SDK, or the full AI middleware package. Run setup once when the locked graph is absent locally, then use the focused commands from any directory:
+The M004 inner loop uses `Microsoft.Extensions.AI.Abstractions` `10.9.0` and does not reference the API, ASP.NET Core, EF/Identity, a provider SDK, or the full AI middleware package. M019 adds the multi-profile candidate registry, the OpenAI-compatible Chat Completions adapter, and the evaluation credential/live-access workflows on the same host-independent surface. Run setup once when the locked graph is absent locally, then use the focused commands from any directory:
 
 ```sh
 # Verify .NET 10.0.302 and restore only the three locked AI projects.
@@ -86,9 +86,16 @@ bash scripts/ai.sh inspect
 
 # Invoke the shared boundary once with a fixed scripted raw response.
 bash scripts/ai.sh probe
+
+# Run sanitized transport conformance for every registry profile offline.
+bash scripts/ai.sh conformance
+
+# Make at most one low-output fixed-synthetic budget-admitted live request
+# through the profile's actual endpoint/model/auth/settings/parser.
+bash scripts/ai.sh verify-access --profile DeepSeek-V4.1-Flash --max-dispatches 1 --max-spend-usd 0.05
 ```
 
-`check`, `inspect`, and `probe` clear common provider credential variables and point outbound HTTP proxies at an unreachable loopback address. They start no API/frontend process, open no database, and write no persistent evaluation report; `check` writes only generated build output and `artifacts/test-results/ai.trx`. The runner accepts only `inspect` or `probe`, exposes no live mode, and accepts no source, configuration, credential, or arbitrary text argument.
+`check`, `inspect`, `probe`, and `conformance` clear common provider credential variables and point outbound HTTP proxies at an unreachable loopback address. They start no API/frontend process, open no database, and write no persistent evaluation report; `check` writes only generated build output and `artifacts/test-results/ai.trx`. Only `verify-access` uses the network and the host credential: it reads the key exclusively from `LINGUADESK_AIEVALUATION__CREDENTIALS__<REF>__APIKEY` (for example `...__DEEPSEEK__APIKEY` for `CredentialRef` `deepseek`), makes at most one dispatch under the explicit finite budget, and prints a sanitized report naming only the reference, disposition, usage, and exposure — never the key. A missing or blank credential exits blocked (`3`) with zero dispatches and no scripted fallback. The runner accepts no source, configuration, credential, or arbitrary text argument.
 
 Inspection deliberately prints the checked-in synthetic source containing a quote, newline, and instruction-like phrase. `probe` labels its observation `raw_scripted_observation` and reports `live: false` and `validated: false`. Neither command classifies a product input, validates a response, transforms text, qualifies a model/provider, measures quality/cost/performance, or proves a release gate. Those behaviors remain later selected milestones.
 

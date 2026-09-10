@@ -1,7 +1,7 @@
 # M019 — Configurable candidate access backlog
 
-**Document:** #8 · **Version:** 1.0 · **Updated:** 2026-09-10
-**State:** Selected; package AC-001–006 pending execution
+**Document:** #8 · **Version:** 1.2 · **Updated:** 2026-09-11
+**State:** Done; AC-001–006 passed, including one bounded live DeepSeek access dispatch (see [tasks](tasks.md#completion-record))
 **Roadmap:** [M019 — Connect and verify configurable candidate access](../../07-roadmap.md#43-independently-testable-language-behavior)
 
 ## 1. Outcome and authoritative inputs
@@ -29,7 +29,7 @@ credential resolver, no live mode. M019 adds exactly that access slice.
 
 | Item ID | Outcome/title | Priority | Target milestone | Dependencies/blockers | State | Delivery package |
 | --- | --- | --- | --- | --- | --- | --- |
-| BI-019 | Connect and verify configurable candidate access | Next / AI-path enablement | M019 | M004, M005 done; owner-reported DeepSeek credential present in the evaluation environment variable | selected | [M019](spec.md) |
+| BI-019 | Connect and verify configurable candidate access | Next / AI-path enablement | M019 | M004, M005 done | done | [M019](spec.md) |
 
 ### BI-019 — Connect and verify configurable candidate access
 

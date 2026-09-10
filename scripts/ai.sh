@@ -13,7 +13,7 @@ expected_sdk="10.0.302"
 configuration="Release"
 
 usage() {
-    echo "Usage: bash scripts/ai.sh {setup|check|inspect|probe}" >&2
+    echo "Usage: bash scripts/ai.sh {setup|check|inspect|probe|conformance|verify-access --profile <id> --max-dispatches <n> --max-spend-usd <amount>}" >&2
 }
 
 require_command() {
@@ -42,6 +42,10 @@ run_offline() {
         -u GEMINI_API_KEY \
         -u MISTRAL_API_KEY \
         -u COHERE_API_KEY \
+        -u LINGUADESK_AIEVALUATION__CREDENTIALS__DEEPSEEK__APIKEY \
+        -u LINGUADESK_AIEVALUATION__CREDENTIALS__DEEPSEEK_SECONDARY__APIKEY \
+        -u LINGUADESK_AIEVALUATION__CREDENTIALS__OPENAI__APIKEY \
+        -u LINGUADESK_AIEVALUATION__CREDENTIALS__MUSE_SPARK__APIKEY \
         HTTP_PROXY=http://127.0.0.1:1 \
         HTTPS_PROXY=http://127.0.0.1:1 \
         ALL_PROXY=http://127.0.0.1:1 \
@@ -148,6 +152,7 @@ check() {
         exit 1
     fi
     run_offline dotnet "$runner_dll" probe >/dev/null
+    run_offline dotnet "$runner_dll" conformance
     cleanup_inspection_files
     trap - EXIT INT TERM HUP
 
@@ -164,16 +169,40 @@ run_runner() {
     run_offline dotnet "$runner_dll" "$mode"
 }
 
-if [ "$#" -ne 1 ]; then
+run_live() {
+    check_sdk
+    if [ ! -f "$runner_dll" ]; then
+        echo "The Release runner is absent. Run 'bash scripts/ai.sh check' after setup." >&2
+        exit 1
+    fi
+    dotnet "$runner_dll" "$@"
+}
+
+if [ "$#" -lt 1 ]; then
     usage
     exit 2
 fi
 
-case "$1" in
-    setup) setup ;;
-    check) check ;;
-    inspect) run_runner inspect ;;
-    probe) run_runner probe ;;
+mode=$1
+shift
+
+case "$mode" in
+    setup | check | inspect | probe | conformance)
+        if [ "$#" -ne 0 ]; then
+            usage
+            exit 2
+        fi
+        case "$mode" in
+            setup) setup ;;
+            check) check ;;
+            inspect) run_runner inspect ;;
+            probe) run_runner probe ;;
+            conformance) run_runner conformance ;;
+        esac
+        ;;
+    verify-access)
+        run_live verify-access "$@"
+        ;;
     *)
         usage
         exit 2

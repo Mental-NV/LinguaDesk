@@ -205,9 +205,9 @@ Read the complete contracts at [UX Section 12](../ux/acceptance.md#12-acceptance
 | LLM-AC-008 | V-007, V-008 |
 | LLM-AC-009 | V-007, V-005, V-014 |
 | LLM-AC-010 | V-006, V-007 |
-| LLM-AC-011 | V-008 |
+| LLM-AC-011 | V-008; M019 AC-002/003 passed the wire-settings/bound/cancel/error-mapping portion through fake-handler fixtures and AC-005 passed one bounded live access dispatch; quality/capability qualification remains pending |
 | LLM-AC-012 | V-015, V-005 |
-| LLM-AC-013 | V-007, V-006, V-013 |
+| LLM-AC-013 | V-007, V-006, V-013; M019 runner distinguishes fixture/conformance, live, and missing-credential-blocked outcomes on the production bundle and recorded known usage/cost for one access dispatch; live qualification and grader-cost evidence remain pending |
 | LLM-AC-014 | V-013, V-014 |
 | LLM-AC-015 | V-007, V-005, V-002, V-003, V-012 |
 
