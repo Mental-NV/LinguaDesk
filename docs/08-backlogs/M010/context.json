@@ -1,0 +1,296 @@
+{
+  "version": 1,
+  "scope": "M010",
+  "sources": [
+    {
+      "path": "docs/delivery/current.md",
+      "heading": "Selected milestone",
+      "use": "reference",
+      "reason": "Mutable current selection authority; verify M010 remains the planned scope before execution",
+      "sha256": "8d3e47ec225ce6e205e0bea08f8d4d8891aecd74cee3088137be6d4511368255"
+    },
+    {
+      "path": "docs/delivery/current.md",
+      "heading": "Completed milestones",
+      "use": "reference",
+      "reason": "Mutable dependency index confirming M009 completion",
+      "sha256": "e59dbb421fc3d832bfc7a725cc6b995b04a3ab3b39d016fd5af16772e85c991d"
+    },
+    {
+      "path": "docs/07-roadmap.md",
+      "ids": [
+        "M009",
+        "M010",
+        "M014"
+      ],
+      "use": "excerpt",
+      "reason": "Selected outcome, dependency and adjacent browser-recovery ownership boundary",
+      "sha256": "0f0a70675541ed6ab74f331084087e68bf66652274c97f826bc5089411ead2ee"
+    },
+    {
+      "path": "docs/08-backlogs/M009/backlog.md",
+      "use": "excerpt",
+      "reason": "Concise completed prerequisite outcome and explicit M010 stamp-invalidation handoff",
+      "sha256": "6176a362a49974865569d744859acd5e3ed729233be66905b33103afbb1934d0"
+    },
+    {
+      "path": "docs/08-backlogs/M009/tasks.md",
+      "heading": "Completion record",
+      "use": "reference",
+      "reason": "Open only to audit detailed Bearer [REDACTED] stamp/precedence evidence",
+      "sha256": "f7dbdddc6f10e9f1f667bca56577877bc600d10e86aa0c912cd18ef9d09ca700"
+    },
+    {
+      "path": "docs/01-PRD.md",
+      "heading": "3. Scope and boundaries",
+      "use": "excerpt",
+      "reason": "Confirmed MVP local recovery scope and explicit exclusions",
+      "sha256": "098f612ccda59a19faaa1c0d2c7cce57c59e3892a9dff448772aae36369a919e"
+    },
+    {
+      "path": "docs/01-PRD.md",
+      "ids": [
+        "FR-002",
+        "NFR-004",
+        "P-005",
+        "P-006"
+      ],
+      "use": "excerpt",
+      "reason": "Selected recovery requirement, privacy constraint and proposed-only safeguards/compatibility",
+      "sha256": "e83ed3e4401eb9ca7c1df0489fdcbc1a49d390898468e4b151de65d915f5e2fe"
+    },
+    {
+      "path": "docs/product/open-questions.md",
+      "ids": [
+        "Q-004",
+        "Q-006"
+      ],
+      "use": "excerpt",
+      "reason": "Applicable lifecycle and exact auth-contract dispositions",
+      "sha256": "f325c39a045f4834a8794a287e932f454dc15a45c53399e0a6e10590dd7fa35c"
+    },
+    {
+      "path": "docs/03-architecture.md",
+      "heading": "5.1 Identity",
+      "use": "excerpt",
+      "reason": "Canonical Identity, stamp and persistent-key boundaries",
+      "sha256": "16321de4d0c157cc1cc641392b9e0cdd53e96fabbe51a3f137e57a7cdd019f52"
+    },
+    {
+      "path": "docs/03-architecture.md",
+      "heading": "5.2 Configuration and diagnostics",
+      "use": "excerpt",
+      "reason": "Secret-safe configuration/logging and contract-generation runtime constraints",
+      "sha256": "ac4b0a745d06bdcb8ee562089e87f645bc604c1e25c992aed046aaabcb8e25de"
+    },
+    {
+      "path": "docs/03-architecture.md",
+      "heading": "6.2 Privacy and retention (Q-004)",
+      "use": "excerpt",
+      "reason": "Token/text privacy boundary and exact scope of unresolved lifecycle questions",
+      "sha256": "2f1cef5894770a228c1caa3a887884f38eb9f906a8a968d5238672957aed060b"
+    },
+    {
+      "path": "docs/03-architecture.md",
+      "heading": "8.3 API behavioral design and generated contract",
+      "use": "excerpt",
+      "reason": "Required C# metadata, generation, review and client-type ordering",
+      "sha256": "14eeacbef7471e3cdb6651582e4537db4ec7a30b5525f015c4a08b7d4bfb8660"
+    },
+    {
+      "path": "docs/api/accounts.md",
+      "heading": "3.3 Verification and recovery",
+      "use": "excerpt",
+      "reason": "Non-enumeration, no-auto-sign-in and generic reset-failure rules",
+      "sha256": "5bca521c4911290b0d4d1418b1ecdd0f281ac65393047083695aaf87b52988b9"
+    },
+    {
+      "path": "docs/api/accounts.md",
+      "heading": "3.4 M006 registration contract",
+      "use": "excerpt",
+      "reason": "Exact email/password and strict account request/error conventions reused by recovery",
+      "sha256": "e1ff62a094c0de0b79716409c3b8346728e0cf2183a4fa38b61608a536abdd4b"
+    },
+    {
+      "path": "docs/api/accounts.md",
+      "heading": "3.5 M007 confirmation and resend contract",
+      "use": "excerpt",
+      "reason": "Sibling delivery/cooldown/code pattern mirrored by the reset slice",
+      "sha256": "eacdd5fb260b796ce7679684923286d64c75d16a25f1d8dd163dbec24e658127"
+    },
+    {
+      "path": "docs/05-api-design.md",
+      "ids": [
+        "API-AC-003",
+        "API-AC-012",
+        "API-AC-014"
+      ],
+      "use": "excerpt",
+      "reason": "Selected reset/invalidation, non-enumeration and generated-contract scenario portions",
+      "sha256": "6cff4c65e090e15d6f2ed0097516597c5166e07c5dd819819781640750efb5d3"
+    },
+    {
+      "path": "docs/06-verification-plan.md",
+      "ids": [
+        "V-004",
+        "V-009",
+        "V-015"
+      ],
+      "use": "excerpt",
+      "reason": "Selected real authentication, generated-contract and privacy check groups",
+      "sha256": "eb343cfcbbc493b4aca0f42ede96f1ba90152a602b00fa97f1d3cd1e37446821"
+    },
+    {
+      "path": "docs/06-verification-plan.md",
+      "heading": "7.1 When to run",
+      "use": "excerpt",
+      "reason": "Required focused, aggregate, contract and published-smoke stages",
+      "sha256": "a4cd1182b2e9c1033cc69af76620424905ec1dcce4499499d9d8c466b7f33b08"
+    },
+    {
+      "path": "docs/06-verification-plan.md",
+      "heading": "7.3 Evidence records and failure handling",
+      "use": "excerpt",
+      "reason": "Evidence fields and truthful pending/blocked/failed handling",
+      "sha256": "baf4f98e4fe09bee51a9a9a4ed94fafccc4e5eb3369aeb08134c124c0fe5575a"
+    },
+    {
+      "path": "docs/verification/backend.md",
+      "heading": "3.1 Database, HTTP and published-host harness",
+      "use": "excerpt",
+      "reason": "Real handlers, reset tokens, file SQLite, loopback HTTPS and deterministic isolation requirements",
+      "sha256": "c493bc0519d9271615893303f036c333d6c38d279a75c1b2863778d944c4e794"
+    },
+    {
+      "path": "docs/verification/coverage.md",
+      "ids": [
+        "FR-002"
+      ],
+      "use": "excerpt",
+      "reason": "Current prior evidence and V-group allocation for the selected recovery portion",
+      "sha256": "83ee3055e8ad65aea3971d5138d9ee9124bc7669baffa51dd75eb052d7a6c0b5"
+    },
+    {
+      "path": "backend/src/LinguaDesk.Api/Program.cs",
+      "use": "reference",
+      "reason": "Current middleware and endpoint/fallback ordering",
+      "sha256": "3a2109247202283a85b3bdcd8df6865f07db7a7ee42a0640c7444ce44d561413"
+    },
+    {
+      "path": "backend/src/LinguaDesk.Api/Features/Identity/IdentityRegistrationExtensions.cs",
+      "use": "reference",
+      "reason": "Current Identity services and token-provider registration to extend",
+      "sha256": "03e366e5dddc1c4eba105c1e708c4c89ff56f8189d567853e2dddc75ddbc037e"
+    },
+    {
+      "path": "backend/src/LinguaDesk.Api/Features/Identity/Registration/IAccountConfirmationSender.cs",
+      "use": "reference",
+      "reason": "Delivery-seam pattern mirrored by the reset sender",
+      "sha256": "2a05404d082484708138a0738b88424da556bfdb61917e31521838910fb8a1d1"
+    },
+    {
+      "path": "backend/src/LinguaDesk.Api/Features/Identity/Verification/VerificationContract.cs",
+      "use": "reference",
+      "reason": "Sibling confirmation DTO/Problem Details metadata conventions to reuse",
+      "sha256": "ced68d1dc9e7f0b444527e0d322b364e0d4f1caf99e5cf2668ced588ee76b302"
+    },
+    {
+      "path": "backend/src/LinguaDesk.Api/Features/Identity/Verification/VerificationEndpoints.cs",
+      "use": "reference",
+      "reason": "Sibling strict JSON/media/query/method/no-store account boundary to reuse or safely refactor",
+      "sha256": "65a4d6607098f0dfa60d5beab81baa629d818208deac3a1ada929b2850e42ef5"
+    },
+    {
+      "path": "backend/src/LinguaDesk.Api/Features/Identity/Verification/AccountConfirmationCoordinator.cs",
+      "use": "reference",
+      "reason": "Sibling delivery/cooldown coordination pattern to mirror",
+      "sha256": "ee9c7431969021c6a14c38e933f0c5b16c3aab48036d0fd91da782401d9a5bed"
+    },
+    {
+      "path": "backend/src/LinguaDesk.Api/Features/Identity/VerifiedAccountAuthorization.cs",
+      "use": "reference",
+      "reason": "Current fresh verification-state policy that recovery must leave intact",
+      "sha256": "2b3309a1b2428dc02087c08a88013c20c630da5927b594fffce2544a4a7d0bcb"
+    },
+    {
+      "path": "backend/src/LinguaDesk.Api/Features/Capabilities/OpenApiRegistration.cs",
+      "use": "reference",
+      "reason": "Current generated document transforms and account response/security headers",
+      "sha256": "926663343b9ece86d8c726357ef668bec5a8cd504f7e61c9d344f0292acc307a"
+    },
+    {
+      "path": "backend/src/LinguaDesk.Api/Infrastructure/Security/SecurityRegistrationExtensions.cs",
+      "use": "reference",
+      "reason": "Existing persistent Data Protection application/key configuration and generation boundary",
+      "sha256": "d86270811d34f4f980a7621d34af5b6baa00f35a982c3edd067bf9fa0c060872"
+    },
+    {
+      "path": "backend/src/LinguaDesk.Api/Infrastructure/Persistence/PersistenceRegistrationExtensions.cs",
+      "use": "reference",
+      "reason": "Current IdentityCore/store/password configuration and contract-generation branch",
+      "sha256": "31a34ae643821720c203910ac796e77383afeddb9fc242f6ccb770f586ccf9f5"
+    },
+    {
+      "path": "backend/tests/LinguaDesk.Api.Tests/AccountVerificationTests.cs",
+      "use": "reference",
+      "reason": "Current real Identity/confirmation/file-SQLite HTTP harness and M007 regression surface",
+      "sha256": "c1a3a570409a76b74984f22e18613a4621b9e914913fb1d5e186656ad2976cbf"
+    },
+    {
+      "path": "docs/05-openapi.yaml",
+      "use": "reference",
+      "reason": "Current generated public contract baseline whose selected path set will change",
+      "sha256": "15b5bd07ccf576e134a3b6f718abd81b3d0002ed9922a1235f7325283babf960"
+    },
+    {
+      "path": "frontend/src/api/generated/linguadesk-api.d.ts",
+      "use": "reference",
+      "reason": "Current generated client declaration baseline regenerated from the reviewed contract",
+      "sha256": "96df1d5a8e961a2e030b0677a1d97a00cb1b043d87f8127bfa3b2fb90893e7e9"
+    },
+    {
+      "path": "backend/Directory.Packages.props",
+      "use": "reference",
+      "reason": "Pinned ASP.NET Core Identity and verification dependencies",
+      "sha256": "32a19f187185e0978c01bfb89be4949e791db2a6b793b5dd4d6b9fcaa4edc57c"
+    },
+    {
+      "path": "global.json",
+      "use": "reference",
+      "reason": "Pinned .NET SDK required by execution commands",
+      "sha256": "0588e32d44bdf884e0305ded21820b13a59b1518efd39976c34d909eff3b1044"
+    },
+    {
+      "path": "frontend/package.json",
+      "use": "reference",
+      "reason": "Pinned Node/npm and generated-client verification scripts",
+      "sha256": "6679b8d86b24c87bded9242d2d5a0caed0fc70d1c30ecedffc2382e381fb1b89"
+    },
+    {
+      "path": "scripts/backend.sh",
+      "use": "reference",
+      "reason": "Aggregate backend, focused-suite guard and published host verification command",
+      "sha256": "264fb3f9b9ec6a5a447e070aeb4a8ef61ff52aa8a0f8cfe76d2ef17131e6e8da"
+    },
+    {
+      "path": "scripts/contract.sh",
+      "use": "reference",
+      "reason": "Canonical OpenAPI/TypeScript generation and drift procedure",
+      "sha256": "d514721c6a6beca458a884f9af172cda279fbaf36529dc1e1709e76dfb4471b9"
+    },
+    {
+      "path": "scripts/frontend.sh",
+      "use": "reference",
+      "reason": "Frontend type/build and published Chromium regression commands",
+      "sha256": "f5977a5161c09985fc5cdc6eee4b9ddd5614b589d4b49e6fed8add6530b12f15"
+    }
+  ],
+  "source_map_sha256": "eb23ba4c42ab1503acb6f9bd380852e1eb5c4be48099466c1de4fca030997d7d",
+  "baseline_commit": "a4302313aa30e25d5933d51763734463385264f3",
+  "locked_files": {
+    "docs/00-SDD-Planning-Workflow.md": "183ae93148ff594f9f1e021aa7543baa8878e9cc0bcfd69ebc696c28976e2945",
+    "docs/00-workflow/execution.md": "f362a1384cefef24ba204e0723e3190857c8cca9bcd91908136932e19c5caf02",
+    "docs/08-backlogs/M010/spec.md": "0ef4f8c09c02ad76457bd77a458fd7366e0e9312b9cf3c516c0d327f1ceae0c4",
+    "docs/08-backlogs/M010/plan.md": "36a41eb539b4ad444c243ecf2231cf7818541615f22bf44d848c20408d01d01c"
+  }
+}
