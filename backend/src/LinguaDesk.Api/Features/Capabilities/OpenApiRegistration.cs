@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using System.Reflection;
+using LinguaDesk.Api.Features.Identity.Bearer;
 using LinguaDesk.Api.Features.Identity.Registration;
 using LinguaDesk.Api.Features.Identity.Verification;
 using LinguaDesk.Api.Features.Identity.Session;
@@ -24,9 +25,9 @@ public static class OpenApiRegistration
                 document.Info = new()
                 {
                     Title = "LinguaDesk API",
-                    Version = "0.1.0-m008",
+                    Version = "0.1.0-m009",
                     Description =
-                        "Pre-release M008 contract containing implemented public capabilities, local-account registration/verification, and browser cookie-session operations. " +
+                        "Pre-release M009 contract containing implemented public capabilities, local-account registration/verification, browser cookie-session, and independent-client bearer operations. " +
                         "No compatibility or deprecation guarantee is implied.",
                 };
                 document.Components ??= new OpenApiComponents();
@@ -51,6 +52,12 @@ public static class OpenApiRegistration
                     In = ParameterLocation.Cookie,
                     Name = SessionAuthentication.AntiforgeryCookieName,
                     Description = "Secure, HttpOnly, SameSite=Strict host-scoped cookie paired with X-LinguaDesk-Antiforgery.",
+                };
+                document.Components.SecuritySchemes["bearerAuth"] = new OpenApiSecurityScheme
+                {
+                    Type = SecuritySchemeType.Http,
+                    Scheme = "bearer",
+                    Description = "Opaque ASP.NET Core Identity bearer access token presented as `Authorization: Bearer ...`. Tokens are never set as cookies or persisted by browser JavaScript.",
                 };
                 return Task.CompletedTask;
             });
@@ -104,6 +111,50 @@ public static class OpenApiRegistration
                         schema.MinLength = 15;
                         schema.MaxLength = 128;
                         schema.WriteOnly = true;
+                    }
+
+                    if (property.DeclaringType == typeof(BearerSignInRequest)
+                        && string.Equals(property.Name, nameof(BearerSignInRequest.Email), StringComparison.Ordinal))
+                    {
+                        schema.Format = "email";
+                        schema.MaxLength = 254;
+                    }
+
+                    if (property.DeclaringType == typeof(BearerSignInRequest)
+                        && string.Equals(property.Name, nameof(BearerSignInRequest.Password), StringComparison.Ordinal))
+                    {
+                        schema.Format = "password";
+                        schema.MinLength = 15;
+                        schema.MaxLength = 128;
+                        schema.WriteOnly = true;
+                    }
+
+                    if (property.DeclaringType == typeof(BearerRefreshRequest))
+                    {
+                        schema.MinLength = 1;
+                        schema.WriteOnly = true;
+                    }
+
+                    if (property.DeclaringType == typeof(BearerTokenPairResponse))
+                    {
+                        if (string.Equals(property.Name, nameof(BearerTokenPairResponse.ExpiresIn), StringComparison.Ordinal))
+                        {
+                            schema.Type = JsonSchemaType.Integer;
+                            schema.Pattern = null;
+                        }
+
+                        if ((string.Equals(property.Name, nameof(BearerTokenPairResponse.AccessToken), StringComparison.Ordinal)
+                                || string.Equals(property.Name, nameof(BearerTokenPairResponse.RefreshToken), StringComparison.Ordinal))
+                            && schema.Type is null)
+                        {
+                            schema.Type = JsonSchemaType.String;
+                        }
+
+                        if (string.Equals(property.Name, nameof(BearerTokenPairResponse.AccessToken), StringComparison.Ordinal)
+                            || string.Equals(property.Name, nameof(BearerTokenPairResponse.RefreshToken), StringComparison.Ordinal))
+                        {
+                            schema.WriteOnly = true;
+                        }
                     }
 
                     if (property.DeclaringType == typeof(ConfirmEmailRequest)
@@ -171,7 +222,8 @@ public static class OpenApiRegistration
                 }
 
                 if (endpointName is "getAccountAntiforgeryToken" or "signInLocalAccount"
-                    or "getLocalAccountSession" or "signOutLocalAccount")
+                    or "getLocalAccountSession" or "signOutLocalAccount"
+                    or "signInBearerClient" or "refreshBearerClient" or "getCurrentAccount")
                 {
                     if (operation.Responses is not null)
                     {
@@ -222,6 +274,20 @@ public static class OpenApiRegistration
                     {
                         operation.Security =
                         [
+                            new OpenApiSecurityRequirement
+                            {
+                                [new OpenApiSecuritySchemeReference("sessionCookie", context.Document)] = [],
+                            },
+                        ];
+                    }
+                    else if (endpointName == "getCurrentAccount")
+                    {
+                        operation.Security =
+                        [
+                            new OpenApiSecurityRequirement
+                            {
+                                [new OpenApiSecuritySchemeReference("bearerAuth", context.Document)] = [],
+                            },
                             new OpenApiSecurityRequirement
                             {
                                 [new OpenApiSecuritySchemeReference("sessionCookie", context.Document)] = [],

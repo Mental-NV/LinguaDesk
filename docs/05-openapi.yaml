@@ -2,8 +2,8 @@
 openapi: 3.1.1
 info:
   title: LinguaDesk API
-  description: Pre-release M008 contract containing implemented public capabilities, local-account registration/verification, and browser cookie-session operations. No compatibility or deprecation guarantee is implied.
-  version: 0.1.0-m008
+  description: Pre-release M009 contract containing implemented public capabilities, local-account registration/verification, browser cookie-session, and independent-client bearer operations. No compatibility or deprecation guarantee is implied.
+  version: 0.1.0-m009
 paths:
   /api/capabilities:
     get:
@@ -472,6 +472,237 @@ paths:
       security:
         - antiforgeryHeader: []
           antiforgeryCookie: []
+  /api/accounts/bearer-sign-in:
+    post:
+      tags:
+        - BearerEndpoints
+      summary: Sign in an independent API client
+      description: Anonymous. Accepts exactly email and password JSON. Returns only the opaque 15-minute access / 7-day refresh pair with expiresIn 900 and tokenType Bearer; tokens are never set as cookies.
+      operationId: signInBearerClient
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BearerSignInRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+          headers:
+            Cache-Control:
+              description: Always `no-store` for account-session responses.
+              required: true
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BearerTokenPairResponse"
+        "400":
+          description: Bad Request
+          headers:
+            Cache-Control:
+              description: Always `no-store` for account-session responses.
+              required: true
+              schema:
+                type: string
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/SessionProblemDetails"
+        "401":
+          description: Unauthorized
+          headers:
+            Cache-Control:
+              description: Always `no-store` for account-session responses.
+              required: true
+              schema:
+                type: string
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/SessionProblemDetails"
+        "405":
+          description: Method Not Allowed
+          headers:
+            Cache-Control:
+              description: Always `no-store` for account-session responses.
+              required: true
+              schema:
+                type: string
+        "415":
+          description: Unsupported Media Type
+          headers:
+            Cache-Control:
+              description: Always `no-store` for account-session responses.
+              required: true
+              schema:
+                type: string
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/SessionProblemDetails"
+        "503":
+          description: Service Unavailable
+          headers:
+            Cache-Control:
+              description: Always `no-store` for account-session responses.
+              required: true
+              schema:
+                type: string
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/SessionProblemDetails"
+  /api/accounts/bearer-refresh:
+    post:
+      tags:
+        - BearerEndpoints
+      summary: Refresh a held bearer pair
+      description: Anonymous. Accepts exactly the currently held refreshToken and accessToken pair. Returns a replacement pair with fresh expiries; never replays language work.
+      operationId: refreshBearerClient
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BearerRefreshRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+          headers:
+            Cache-Control:
+              description: Always `no-store` for account-session responses.
+              required: true
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BearerTokenPairResponse"
+        "400":
+          description: Bad Request
+          headers:
+            Cache-Control:
+              description: Always `no-store` for account-session responses.
+              required: true
+              schema:
+                type: string
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/SessionProblemDetails"
+        "401":
+          description: Unauthorized
+          headers:
+            Cache-Control:
+              description: Always `no-store` for account-session responses.
+              required: true
+              schema:
+                type: string
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/SessionProblemDetails"
+        "405":
+          description: Method Not Allowed
+          headers:
+            Cache-Control:
+              description: Always `no-store` for account-session responses.
+              required: true
+              schema:
+                type: string
+        "415":
+          description: Unsupported Media Type
+          headers:
+            Cache-Control:
+              description: Always `no-store` for account-session responses.
+              required: true
+              schema:
+                type: string
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/SessionProblemDetails"
+        "503":
+          description: Service Unavailable
+          headers:
+            Cache-Control:
+              description: Always `no-store` for account-session responses.
+              required: true
+              schema:
+                type: string
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/SessionProblemDetails"
+  /api/accounts/me:
+    get:
+      tags:
+        - BearerEndpoints
+      summary: Read the current account
+      description: Accepts either a valid Authorization Bearer credential or a valid session cookie. Reports which mode authenticated the call; bearer header wins with no cookie fallback.
+      operationId: getCurrentAccount
+      responses:
+        "200":
+          description: OK
+          headers:
+            Cache-Control:
+              description: Always `no-store` for account-session responses.
+              required: true
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CurrentAccountResponse"
+        "400":
+          description: Bad Request
+          headers:
+            Cache-Control:
+              description: Always `no-store` for account-session responses.
+              required: true
+              schema:
+                type: string
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/SessionProblemDetails"
+        "401":
+          description: Unauthorized
+          headers:
+            Cache-Control:
+              description: Always `no-store` for account-session responses.
+              required: true
+              schema:
+                type: string
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/SessionProblemDetails"
+        "405":
+          description: Method Not Allowed
+          headers:
+            Cache-Control:
+              description: Always `no-store` for account-session responses.
+              required: true
+              schema:
+                type: string
+        "503":
+          description: Service Unavailable
+          headers:
+            Cache-Control:
+              description: Always `no-store` for account-session responses.
+              required: true
+              schema:
+                type: string
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/SessionProblemDetails"
+      security:
+        - bearerAuth: []
+        - sessionCookie: []
 components:
   schemas:
     AccountSessionResponse:
@@ -503,6 +734,73 @@ components:
         headerName:
           type: string
           description: Always `X-LinguaDesk-Antiforgery`.
+    AuthMode:
+      enum:
+        - bearer
+        - cookie
+      type: string
+      description: Credential mode that authenticated this call.
+    BearerRefreshRequest:
+      required:
+        - refreshToken
+        - accessToken
+      type: object
+      properties:
+        refreshToken:
+          minLength: 1
+          type: string
+          description: Write-only currently held opaque refresh token. Both held pair members are required.
+          writeOnly: true
+        accessToken:
+          minLength: 1
+          type: string
+          description: Write-only currently held opaque access token. Both held pair members are required.
+          writeOnly: true
+    BearerSignInRequest:
+      required:
+        - email
+        - password
+      type: object
+      properties:
+        email:
+          maxLength: 254
+          type: string
+          description: Local account email address. Maximum 254 Unicode scalar values; surrounding whitespace is invalid.
+          format: email
+        password:
+          maxLength: 128
+          minLength: 15
+          type: string
+          description: Write-only password containing 15 to 128 well-formed Unicode scalar values.
+          format: password
+          writeOnly: true
+    BearerTokenPairResponse:
+      required:
+        - accessToken
+        - refreshToken
+        - expiresIn
+        - tokenType
+        - verificationStatus
+      type: object
+      properties:
+        accessToken:
+          type: string
+          description: "Opaque protected access token. Present it as `Authorization: Bearer ...`; it is never set as a cookie."
+          writeOnly: true
+        refreshToken:
+          type: string
+          description: Opaque protected refresh token used only with POST /api/accounts/bearer-refresh.
+          writeOnly: true
+        expiresIn:
+          type: integer
+          description: Access-token lifetime in seconds; always 900.
+          format: int64
+        tokenType:
+          type: string
+          description: Always `Bearer`.
+        verificationStatus:
+          description: Current server-side account verification state.
+          $ref: "#/components/schemas/SessionVerificationStatus"
     CapabilitiesResponse:
       required:
         - serverTimeUtc
@@ -632,6 +930,22 @@ components:
         - unicodeScalar
       type: string
       description: Unit counted in exact decoded source text.
+    CurrentAccountResponse:
+      required:
+        - email
+        - verificationStatus
+        - authMode
+      type: object
+      properties:
+        email:
+          type: string
+          description: Local account email address.
+        verificationStatus:
+          description: Current server-side account verification state.
+          $ref: "#/components/schemas/SessionVerificationStatus"
+        authMode:
+          description: Credential mode that authenticated this call.
+          $ref: "#/components/schemas/AuthMode"
     EmptyOrWhitespacePolicy:
       enum:
         - reject
@@ -1052,8 +1366,13 @@ components:
       description: Secure, HttpOnly, SameSite=Strict host-scoped cookie paired with X-LinguaDesk-Antiforgery.
       name: __Host-LinguaDesk.Antiforgery
       in: cookie
+    bearerAuth:
+      type: http
+      description: "Opaque ASP.NET Core Identity bearer access token presented as `Authorization: Bearer ...`. Tokens are never set as cookies or persisted by browser JavaScript."
+      scheme: bearer
 tags:
   - name: CapabilitiesEndpoints
   - name: RegistrationEndpoints
   - name: VerificationEndpoints
   - name: SessionEndpoints
+  - name: BearerEndpoints

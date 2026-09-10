@@ -125,6 +125,7 @@ check() {
     validate_class_count "$api_report" "LinguaDesk.Api.Tests.AccountRegistrationTests" 10 "account registration"
     validate_class_count "$api_report" "LinguaDesk.Api.Tests.AccountVerificationTests" 11 "account verification"
     validate_class_count "$api_report" "LinguaDesk.Api.Tests.AccountSessionTests" 11 "account session"
+    validate_class_count "$api_report" "LinguaDesk.Api.Tests.AccountBearerTests" 11 "account bearer"
     validate_class_count "$api_report" "LinguaDesk.Api.Tests.AccountReadinessTests" 9 "account readiness"
     validate_class_count "$api_report" "LinguaDesk.Api.Tests.StorageMigrationTests" 7 "storage migration"
     validate_report "$core_report" "Core input policy" "$expected_minimum_core_tests"

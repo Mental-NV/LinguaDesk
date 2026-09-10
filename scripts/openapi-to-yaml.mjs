@@ -42,7 +42,7 @@ function assertPropertyDescriptions(document) {
 function validateContract(document) {
   expect(/^3\.1(?:\.|$)/u.test(document.openapi), 'document must use OpenAPI 3.1')
   expect(document.info?.title === 'LinguaDesk API', 'unexpected API title')
-  expect(document.info?.version === '0.1.0-m008', 'unexpected artifact version')
+  expect(document.info?.version === '0.1.0-m009', 'unexpected artifact version')
   expect(typeof document.info?.description === 'string', 'artifact description is required')
 
   sameValues(
@@ -56,6 +56,9 @@ function validateContract(document) {
       '/api/accounts/sign-in',
       '/api/accounts/session',
       '/api/accounts/sign-out',
+      '/api/accounts/bearer-sign-in',
+      '/api/accounts/bearer-refresh',
+      '/api/accounts/me',
     ],
     'document paths',
   )
@@ -239,6 +242,9 @@ function validateContract(document) {
     { path: '/api/accounts/sign-in', method: 'post', id: 'signInLocalAccount', responses: ['200', '400', '401', '405', '415', '503'] },
     { path: '/api/accounts/session', method: 'get', id: 'getLocalAccountSession', responses: ['200', '400', '401', '405', '503'] },
     { path: '/api/accounts/sign-out', method: 'post', id: 'signOutLocalAccount', responses: ['204', '400', '405'] },
+    { path: '/api/accounts/bearer-sign-in', method: 'post', id: 'signInBearerClient', responses: ['200', '400', '401', '405', '415', '503'] },
+    { path: '/api/accounts/bearer-refresh', method: 'post', id: 'refreshBearerClient', responses: ['200', '400', '401', '405', '415', '503'] },
+    { path: '/api/accounts/me', method: 'get', id: 'getCurrentAccount', responses: ['200', '400', '401', '405', '503'] },
   ]
   for (const item of sessionOperations) {
     const path = document.paths[item.path]
@@ -266,7 +272,32 @@ function validateContract(document) {
   expect(document.paths['/api/accounts/sign-out'].post.security?.[0]?.antiforgeryHeader !== undefined, 'sign-out antiforgery security is missing')
   expect(document.paths['/api/accounts/sign-out'].post.security?.[0]?.antiforgeryCookie !== undefined, 'sign-out antiforgery cookie security is missing')
   expect(document.paths['/api/accounts/antiforgery'].get.security === undefined, 'bootstrap must remain anonymous')
+  expect(document.paths['/api/accounts/bearer-sign-in'].post.security === undefined, 'bearer sign-in must remain anonymous')
+  expect(document.paths['/api/accounts/bearer-refresh'].post.security === undefined, 'bearer refresh must remain anonymous')
+  expect(document.components.securitySchemes.bearerAuth.type === 'http', 'bearer scheme is missing')
+  expect(document.components.securitySchemes.bearerAuth.scheme === 'bearer', 'bearer scheme must be bearer')
+  expect(document.paths['/api/accounts/me'].get.security?.length === 2, 'current account must accept bearer or cookie')
+  expect(document.paths['/api/accounts/me'].get.security?.[0]?.bearerAuth !== undefined, 'current account bearer security is missing')
+  expect(document.paths['/api/accounts/me'].get.security?.[1]?.sessionCookie !== undefined, 'current account cookie security is missing')
   expect(document.paths['/api/accounts/sign-in'].post.requestBody?.content?.['application/json']?.schema?.$ref === '#/components/schemas/SignInRequest', 'sign-in request schema is missing')
+  expect(document.paths['/api/accounts/bearer-sign-in'].post.requestBody?.content?.['application/json']?.schema?.$ref === '#/components/schemas/BearerSignInRequest', 'bearer sign-in request schema is missing')
+  expect(document.paths['/api/accounts/bearer-refresh'].post.requestBody?.content?.['application/json']?.schema?.$ref === '#/components/schemas/BearerRefreshRequest', 'bearer refresh request schema is missing')
+  expect(document.paths['/api/accounts/me'].get.responses['200'].content?.['application/json']?.schema?.$ref === '#/components/schemas/CurrentAccountResponse', 'current account response schema is missing')
+  const bearerSignInRequest = document.components.schemas.BearerSignInRequest
+  sameValues(bearerSignInRequest.required, ['email', 'password'], 'bearer sign-in required fields')
+  expect(bearerSignInRequest.properties.email.format === 'email' && bearerSignInRequest.properties.email.maxLength === 254, 'bearer sign-in email constraints are missing')
+  expect(bearerSignInRequest.properties.password.format === 'password' && bearerSignInRequest.properties.password.minLength === 15 && bearerSignInRequest.properties.password.maxLength === 128 && bearerSignInRequest.properties.password.writeOnly === true, 'bearer sign-in password constraints are missing')
+  const bearerRefreshRequest = document.components.schemas.BearerRefreshRequest
+  sameValues(bearerRefreshRequest.required, ['refreshToken', 'accessToken'], 'bearer refresh required fields')
+  expect(bearerRefreshRequest.properties.refreshToken.writeOnly === true && bearerRefreshRequest.properties.accessToken.writeOnly === true, 'bearer refresh tokens must be write-only')
+  const bearerPair = document.components.schemas.BearerTokenPairResponse
+  sameValues(bearerPair.required, ['accessToken', 'refreshToken', 'expiresIn', 'tokenType', 'verificationStatus'], 'bearer pair required fields')
+  expect(bearerPair.properties.verificationStatus.$ref === '#/components/schemas/SessionVerificationStatus', 'bearer pair verification status schema is missing')
+  expect(bearerPair.properties.expiresIn.type === 'integer', 'bearer pair expiry must be integer-only')
+  expect(bearerPair.properties.accessToken.writeOnly === true && bearerPair.properties.refreshToken.writeOnly === true, 'bearer pair tokens must be write-only')
+  const currentAccount = document.components.schemas.CurrentAccountResponse
+  sameValues(currentAccount.required, ['email', 'verificationStatus', 'authMode'], 'current account required fields')
+  sameValues(document.components.schemas.AuthMode.enum, ['bearer', 'cookie'], 'auth mode values')
   const signInRequest = document.components.schemas.SignInRequest
   sameValues(signInRequest.required, ['email', 'password'], 'sign-in required fields')
   expect(signInRequest.properties.email.format === 'email' && signInRequest.properties.email.maxLength === 254, 'sign-in email constraints are missing')

@@ -164,6 +164,66 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/accounts/bearer-sign-in": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Sign in an independent API client
+         * @description Anonymous. Accepts exactly email and password JSON. Returns only the opaque 15-minute access / 7-day refresh pair with expiresIn 900 and tokenType Bearer; tokens are never set as cookies.
+         */
+        post: operations["signInBearerClient"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/accounts/bearer-refresh": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Refresh a held bearer pair
+         * @description Anonymous. Accepts exactly the currently held refreshToken and accessToken pair. Returns a replacement pair with fresh expiries; never replays language work.
+         */
+        post: operations["refreshBearerClient"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/accounts/me": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Read the current account
+         * @description Accepts either a valid Authorization Bearer credential or a valid session cookie. Reports which mode authenticated the call; bearer header wins with no cookie fallback.
+         */
+        get: operations["getCurrentAccount"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -184,6 +244,44 @@ export interface components {
             requestToken: string;
             /** @description Always `X-LinguaDesk-Antiforgery`. */
             headerName: string;
+        };
+        /**
+         * @description Credential mode that authenticated this call.
+         * @enum {string}
+         */
+        AuthMode: "bearer" | "cookie";
+        BearerRefreshRequest: {
+            /** @description Write-only currently held opaque refresh token. Both held pair members are required. */
+            refreshToken: string;
+            /** @description Write-only currently held opaque access token. Both held pair members are required. */
+            accessToken: string;
+        };
+        BearerSignInRequest: {
+            /**
+             * Format: email
+             * @description Local account email address. Maximum 254 Unicode scalar values; surrounding whitespace is invalid.
+             */
+            email: string;
+            /**
+             * Format: password
+             * @description Write-only password containing 15 to 128 well-formed Unicode scalar values.
+             */
+            password: string;
+        };
+        BearerTokenPairResponse: {
+            /** @description Opaque protected access token. Present it as `Authorization: Bearer ...`; it is never set as a cookie. */
+            accessToken: string;
+            /** @description Opaque protected refresh token used only with POST /api/accounts/bearer-refresh. */
+            refreshToken: string;
+            /**
+             * Format: int64
+             * @description Access-token lifetime in seconds; always 900.
+             */
+            expiresIn: number;
+            /** @description Always `Bearer`. */
+            tokenType: string;
+            /** @description Current server-side account verification state. */
+            verificationStatus: components["schemas"]["SessionVerificationStatus"];
         };
         CapabilitiesResponse: {
             /**
@@ -252,6 +350,14 @@ export interface components {
          * @enum {string}
          */
         CountingUnit: "unicodeScalar";
+        CurrentAccountResponse: {
+            /** @description Local account email address. */
+            email: string;
+            /** @description Current server-side account verification state. */
+            verificationStatus: components["schemas"]["SessionVerificationStatus"];
+            /** @description Credential mode that authenticated this call. */
+            authMode: components["schemas"]["AuthMode"];
+        };
         /**
          * @description Disposition of empty or fixed-set whitespace-only source.
          * @enum {string}
@@ -963,6 +1069,228 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+        };
+    };
+    signInBearerClient: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BearerSignInRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    /** @description Always `no-store` for account-session responses. */
+                    "Cache-Control": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BearerTokenPairResponse"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    /** @description Always `no-store` for account-session responses. */
+                    "Cache-Control": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["SessionProblemDetails"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    /** @description Always `no-store` for account-session responses. */
+                    "Cache-Control": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["SessionProblemDetails"];
+                };
+            };
+            /** @description Method Not Allowed */
+            405: {
+                headers: {
+                    /** @description Always `no-store` for account-session responses. */
+                    "Cache-Control": string;
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unsupported Media Type */
+            415: {
+                headers: {
+                    /** @description Always `no-store` for account-session responses. */
+                    "Cache-Control": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["SessionProblemDetails"];
+                };
+            };
+            /** @description Service Unavailable */
+            503: {
+                headers: {
+                    /** @description Always `no-store` for account-session responses. */
+                    "Cache-Control": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["SessionProblemDetails"];
+                };
+            };
+        };
+    };
+    refreshBearerClient: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BearerRefreshRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    /** @description Always `no-store` for account-session responses. */
+                    "Cache-Control": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BearerTokenPairResponse"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    /** @description Always `no-store` for account-session responses. */
+                    "Cache-Control": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["SessionProblemDetails"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    /** @description Always `no-store` for account-session responses. */
+                    "Cache-Control": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["SessionProblemDetails"];
+                };
+            };
+            /** @description Method Not Allowed */
+            405: {
+                headers: {
+                    /** @description Always `no-store` for account-session responses. */
+                    "Cache-Control": string;
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unsupported Media Type */
+            415: {
+                headers: {
+                    /** @description Always `no-store` for account-session responses. */
+                    "Cache-Control": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["SessionProblemDetails"];
+                };
+            };
+            /** @description Service Unavailable */
+            503: {
+                headers: {
+                    /** @description Always `no-store` for account-session responses. */
+                    "Cache-Control": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["SessionProblemDetails"];
+                };
+            };
+        };
+    };
+    getCurrentAccount: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    /** @description Always `no-store` for account-session responses. */
+                    "Cache-Control": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CurrentAccountResponse"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    /** @description Always `no-store` for account-session responses. */
+                    "Cache-Control": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["SessionProblemDetails"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    /** @description Always `no-store` for account-session responses. */
+                    "Cache-Control": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["SessionProblemDetails"];
+                };
+            };
+            /** @description Method Not Allowed */
+            405: {
+                headers: {
+                    /** @description Always `no-store` for account-session responses. */
+                    "Cache-Control": string;
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Service Unavailable */
+            503: {
+                headers: {
+                    /** @description Always `no-store` for account-session responses. */
+                    "Cache-Control": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["SessionProblemDetails"];
+                };
             };
         };
     };

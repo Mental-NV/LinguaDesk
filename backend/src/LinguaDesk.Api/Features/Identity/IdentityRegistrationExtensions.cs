@@ -1,7 +1,9 @@
 using LinguaDesk.Api.Features.Identity.Registration;
 using LinguaDesk.Api.Features.Identity.Verification;
+using LinguaDesk.Api.Features.Identity.Bearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.BearerToken;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using LinguaDesk.Api.Features.Identity.Session;
 
@@ -22,11 +24,15 @@ public static class IdentityRegistrationExtensions
                 options.ForwardDefaultSelector = context =>
                     context.Request.Headers.Authorization.Any(static value =>
                         value?.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase) == true)
-                        ? SessionAuthentication.UnsupportedBearerScheme
+                        ? IdentityConstants.BearerScheme
                         : IdentityConstants.ApplicationScheme;
             })
-            .AddScheme<AuthenticationSchemeOptions, UnsupportedBearerAuthenticationHandler>(
-                SessionAuthentication.UnsupportedBearerScheme, null)
+            .AddBearerToken(IdentityConstants.BearerScheme, options =>
+            {
+                options.BearerTokenExpiration = BearerAuthentication.AccessLifetime;
+                options.RefreshTokenExpiration = BearerAuthentication.RefreshLifetime;
+                options.EventsType = typeof(BearerStampValidationEvents);
+            })
             .AddCookie(IdentityConstants.ApplicationScheme, options =>
             {
                 options.Cookie.Name = SessionAuthentication.SessionCookieName;
@@ -40,6 +46,8 @@ public static class IdentityRegistrationExtensions
             });
         services.AddOptions<CookieAuthenticationOptions>(IdentityConstants.ApplicationScheme)
             .Configure<TimeProvider>((options, timeProvider) => options.TimeProvider = timeProvider);
+        services.AddOptions<BearerTokenOptions>(IdentityConstants.BearerScheme)
+            .Configure<TimeProvider>((options, timeProvider) => options.TimeProvider = timeProvider);
         services.AddAntiforgery(options =>
         {
             options.Cookie.Name = SessionAuthentication.AntiforgeryCookieName;
@@ -50,6 +58,7 @@ public static class IdentityRegistrationExtensions
             options.HeaderName = SessionAuthentication.AntiforgeryHeaderName;
         });
         services.AddScoped<CurrentAccountCookieEvents>();
+        services.AddScoped<BearerStampValidationEvents>();
         services.AddScoped<RegistrationCoordinator>();
         services.AddScoped<AccountConfirmationCoordinator>();
         services.AddScoped<AccountVerificationDeliveryCoordinator>();
