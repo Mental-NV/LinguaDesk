@@ -207,6 +207,14 @@ run_agent() {
     rm -f "$output_file"
 }
 
+pull_changes() {
+    local pending_commit=$1
+    echo "Pulling upstream changes before commit..."
+    if ! git -C "$repository_root" pull --rebase --autostash; then
+        fail "Could not integrate upstream changes before commit '$pending_commit'. Resolve the Git state before resuming."
+    fi
+}
+
 commit_changes() {
     local message=$1
 
@@ -300,6 +308,7 @@ for ((i=start_milestone; i<=end_milestone; i++)); do
     else
         echo "Planning $milestone..."
         run_agent "$plan_prompt_template" "$milestone" "MILESTONE_AUTOMATION_STATUS: READY"
+        pull_changes "$milestone planned"
         python3 automation/context.py check "$milestone"
         python3 automation/context.py audit
         commit_changes "$milestone planned"
@@ -308,6 +317,8 @@ for ((i=start_milestone; i<=end_milestone; i++)); do
     echo "Implementing $milestone..."
     python3 automation/context.py check "$milestone"
     run_agent "$implement_prompt_template" "$milestone" "MILESTONE_AUTOMATION_STATUS: COMPLETE"
+    pull_changes "$milestone implemented"
+    python3 automation/context.py check "$milestone"
     python3 automation/context.py audit
 
     echo "Testing $milestone..."

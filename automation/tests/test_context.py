@@ -270,8 +270,9 @@ class RunnerTests(unittest.TestCase):
     def fixture(self):
         # Real runner + fake coding CLI in an isolated repository. No paid calls
         # or user-repository commits/application effects occur.
-        with tempfile.TemporaryDirectory() as temp:
+        with tempfile.TemporaryDirectory() as temp, tempfile.TemporaryDirectory() as remote_temp:
             root = Path(temp).resolve()
+            remote = Path(remote_temp).resolve() / 'origin.git'
             (root / 'automation').mkdir()
             for name in (
                 'context.py', 'run-milestones.sh', 'muse_stream.py',
@@ -283,10 +284,22 @@ class RunnerTests(unittest.TestCase):
             (root / 'README.md').write_text('# Test\n')
             (root / 'backend').mkdir()
             (root / 'backend/LinguaDesk.slnx').write_text('test')
+            (root / 'scripts').mkdir()
+            for name in ('backend.sh', 'contract.sh', 'ai.sh', 'frontend.sh'):
+                file = root / 'scripts' / name
+                file.write_text('#!/bin/sh\nexit 0\n')
+                file.chmod(0o755)
             (root / 'fake-bin').mkdir()
             bodies = {
                 'dotnet': 'exit 0',
-                'codex': 'echo MILESTONE_AUTOMATION_STATUS: READY',
+                'codex': (
+                    'if [ "${CODEX_FIXTURE_MODE:-}" = "complete" ]; then\n'
+                    '  echo implementation >> README.md\n'
+                    '  echo MILESTONE_AUTOMATION_STATUS: COMPLETE\n'
+                    'else\n'
+                    '  echo MILESTONE_AUTOMATION_STATUS: READY\n'
+                    'fi'
+                ),
                 'muse': (
                     'count=1\n'
                     'if [ -n "${MUSE_FIXTURE_COUNT_FILE:-}" ]; then\n'
@@ -327,6 +340,14 @@ class RunnerTests(unittest.TestCase):
             git('config', 'user.name', 'Fixture')
             git('add', '.')
             git('commit', '-m', 'fixture')
+            git('branch', '-M', 'main')
+            subprocess.check_call(
+                ['git', 'init', '--bare', str(remote)],
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+            )
+            git('remote', 'add', 'origin', str(remote))
+            git('push', '--set-upstream', 'origin', 'main')
             yield root, env, git
 
     def run_fixture(self, root, env, *extra):
@@ -459,6 +480,33 @@ class RunnerTests(unittest.TestCase):
             # Fake implementation reports READY, not COMPLETE, so no commit follows.
             self.assertNotEqual(result.returncode, 0)
             self.assertEqual(before, git('rev-parse', 'HEAD'))
+
+    def test_upstream_changes_are_pulled_before_commit(self):
+        with self.fixture() as (root, env, git):
+            self.prepare_plan(root, git)
+            remote = git('remote', 'get-url', 'origin').strip()
+            with tempfile.TemporaryDirectory() as peer_temp:
+                peer = Path(peer_temp).resolve()
+                subprocess.check_call(
+                    ['git', 'clone', '--branch', 'main', remote, str(peer)],
+                    stdout=subprocess.DEVNULL,
+                    stderr=subprocess.DEVNULL,
+                )
+                subprocess.check_call(['git', '-C', str(peer), 'config', 'user.email', 'peer@example.invalid'])
+                subprocess.check_call(['git', '-C', str(peer), 'config', 'user.name', 'Peer'])
+                (peer / 'REMOTE.md').write_text('upstream change\n')
+                subprocess.check_call(['git', '-C', str(peer), 'add', 'REMOTE.md'])
+                subprocess.check_call(['git', '-C', str(peer), 'commit', '-m', 'Upstream change'], stdout=subprocess.DEVNULL)
+                subprocess.check_call(['git', '-C', str(peer), 'push', 'origin', 'main'], stdout=subprocess.DEVNULL)
+
+            env['CODEX_FIXTURE_MODE'] = 'complete'
+            result = self.run_fixture(root, env)
+
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertIn('Pulling upstream changes before commit...', result.stdout)
+            self.assertEqual((root / 'REMOTE.md').read_text(), 'upstream change\n')
+            self.assertIn('implementation', (root / 'README.md').read_text())
+            self.assertEqual(git('log', '-1', '--format=%s').strip(), 'M015 implemented')
 
 
 if __name__ == '__main__':
