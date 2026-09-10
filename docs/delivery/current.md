@@ -8,9 +8,9 @@ Mutable #7 status owner. Read for selection/dependency checks and closeout; do n
 
 | ID | State | Dependency/readiness | Package |
 | --- | --- | --- | --- |
-| — | None | No implementation milestone is currently selected. | — |
+| M008 | Selected | M007 is done; the reviewed package has no blocking question or human gate. | [Package](../08-backlogs/M008/backlog.md) |
 
-M015 remains the next recommended independent-track candidate under the roadmap priority policy; it is not selected and this status creates no implementation request.
+M008 was selected by the milestone-planning request. M015 remains the next recommended independent-track candidate under the roadmap priority policy; it is not selected.
 
 ## Completed milestones
 

@@ -1,0 +1,337 @@
+{
+  "version": 1,
+  "scope": "M008",
+  "sources": [
+    {
+      "path": "docs/07-roadmap.md",
+      "ids": [
+        "M008",
+        "M009",
+        "M010",
+        "M012",
+        "M013"
+      ],
+      "use": "excerpt",
+      "reason": "Selected outcome, dependency and adjacent milestone ownership boundaries",
+      "sha256": "a33f974a837936da05e6baf041f68b367ec32305a430833108d9392fb9131987"
+    },
+    {
+      "path": "docs/delivery/current.md",
+      "heading": "Selected milestone",
+      "use": "reference",
+      "reason": "Mutable current selection authority; verify M008 remains selected before execution",
+      "sha256": "f3231beb069c28e642b61ba6684c4077ad0de59aee94da21ef737574d6a2dc67"
+    },
+    {
+      "path": "docs/delivery/current.md",
+      "heading": "Completed milestones",
+      "use": "reference",
+      "reason": "Mutable dependency index confirming M007 completion",
+      "sha256": "a22ab060129cf11b215e7d6bef6348d89bc6f04bfbeee2824e008e3184d86509"
+    },
+    {
+      "path": "docs/08-backlogs/M007/backlog.md",
+      "use": "excerpt",
+      "reason": "Concise completed prerequisite outcome and explicit M008 handoff",
+      "sha256": "e02ba6ab9c0f57b1be4318701d4f987b9b148382fec192429ac0f52788071cb6"
+    },
+    {
+      "path": "docs/08-backlogs/M007/tasks.md",
+      "heading": "Completion record",
+      "use": "reference",
+      "reason": "Open only to audit detailed Identity, database, key, verification and regression evidence",
+      "sha256": "bfa1f6873510efa2e969b7c2e240ed6a130b6532171515a360a83c78bc697bbc"
+    },
+    {
+      "path": "docs/01-PRD.md",
+      "heading": "3. Scope and boundaries",
+      "use": "excerpt",
+      "reason": "Confirmed MVP local sign-in and explicit exclusions",
+      "sha256": "098f612ccda59a19faaa1c0d2c7cce57c59e3892a9dff448772aae36369a919e"
+    },
+    {
+      "path": "docs/01-PRD.md",
+      "ids": [
+        "FR-001",
+        "FR-002",
+        "NFR-004",
+        "NFR-008",
+        "P-005",
+        "P-006",
+        "RG-005"
+      ],
+      "use": "excerpt",
+      "reason": "Selected access requirements, privacy constraint, proposed-only safeguards/compatibility and incomplete release gate",
+      "sha256": "478e2b8aaa6674e41fb24efc11737c2ea1e8f618788d078a045e3168339dd1ba"
+    },
+    {
+      "path": "docs/product/open-questions.md",
+      "ids": [
+        "Q-004",
+        "Q-006",
+        "Q-008",
+        "Q-010"
+      ],
+      "use": "excerpt",
+      "reason": "Applicable lifecycle, exact auth-contract and proposal dispositions",
+      "sha256": "b0d76b86d21c8272ae5fa2d11057e242210f87a794a5205ef5b79b78bb865c54"
+    },
+    {
+      "path": "docs/02-ux-specification.md",
+      "heading": "3.1 Routes and account access",
+      "use": "reference",
+      "reason": "Later browser consumers and verified/unverified routing that the session API must support",
+      "sha256": "3c7ca3b93736cb688c2cd16f1a19902c9149ba495c73a7e14770f12f63aeb836"
+    },
+    {
+      "path": "docs/02-ux-specification.md",
+      "heading": "3.4 Workspace and session boundary",
+      "use": "reference",
+      "reason": "Later M013 teardown/sign-out contract; prevents server success from being mistaken for browser privacy evidence",
+      "sha256": "788b2ac5ad8557fbbb49460718b47f99b63ebf193237fb2929bb9bc4b08cd316"
+    },
+    {
+      "path": "docs/ux/acceptance.md",
+      "ids": [
+        "UX-AC-013",
+        "UX-AC-014",
+        "UX-AC-015",
+        "UX-AC-016"
+      ],
+      "use": "reference",
+      "reason": "On-demand M013 login/invalid/expiry/sign-out scenarios that bound, but are not selected by, this API slice",
+      "sha256": "7b274a1abb2523b31dcb4b6c9a2627fd011019f7cba1d8e21aa516c619606b0b"
+    },
+    {
+      "path": "docs/03-architecture.md",
+      "heading": "5.1 Identity",
+      "use": "excerpt",
+      "reason": "Canonical Identity, cookie, antiforgery, stamp and persistent-key boundaries",
+      "sha256": "255500a20e3c329dc23b4a03ae097a7444a2b8b348f183eb9f98d808ed1f960a"
+    },
+    {
+      "path": "docs/03-architecture.md",
+      "heading": "5.2 Configuration and diagnostics",
+      "use": "excerpt",
+      "reason": "Secret-safe configuration/logging and contract-generation runtime constraints",
+      "sha256": "ac4b0a745d06bdcb8ee562089e87f645bc604c1e25c992aed046aaabcb8e25de"
+    },
+    {
+      "path": "docs/03-architecture.md",
+      "heading": "6.2 Privacy and retention (Q-004)",
+      "use": "excerpt",
+      "reason": "Session/text privacy boundary and exact scope of unresolved lifecycle questions",
+      "sha256": "2f1cef5894770a228c1caa3a887884f38eb9f906a8a968d5238672957aed060b"
+    },
+    {
+      "path": "docs/03-architecture.md",
+      "heading": "8.3 API behavioral design and generated contract",
+      "use": "excerpt",
+      "reason": "Required C# metadata, generation, review and client-type ordering",
+      "sha256": "14eeacbef7471e3cdb6651582e4537db4ec7a30b5525f015c4a08b7d4bfb8660"
+    },
+    {
+      "path": "docs/api/accounts.md",
+      "heading": "3.1 Cookie and bearer access",
+      "use": "excerpt",
+      "reason": "Canonical cookie, antiforgery and credential-precedence behavior",
+      "sha256": "e31c884dbbf28b4fcd488b7914468e79857ee468e6303528ec1b787155bdcae6"
+    },
+    {
+      "path": "docs/api/accounts.md",
+      "heading": "3.2 Expiry, refresh, and revocation",
+      "use": "excerpt",
+      "reason": "Cookie lifetime, immediate stamp validation and bounded sign-out semantics",
+      "sha256": "8d55860e39a42689e7dca1b52b3be4508b282b74d84cd41041a9ce7100704950"
+    },
+    {
+      "path": "docs/api/accounts.md",
+      "heading": "3.3 Verification and recovery",
+      "use": "excerpt",
+      "reason": "Unverified sign-in/status, valid-password disclosure and machine-readable failure rules",
+      "sha256": "5bca521c4911290b0d4d1418b1ecdd0f281ac65393047083695aaf87b52988b9"
+    },
+    {
+      "path": "docs/api/accounts.md",
+      "heading": "3.4 M006 registration contract",
+      "use": "excerpt",
+      "reason": "Exact email/password and strict account request/error conventions reused by sign-in",
+      "sha256": "e1ff62a094c0de0b79716409c3b8346728e0cf2183a4fa38b61608a536abdd4b"
+    },
+    {
+      "path": "docs/05-api-design.md",
+      "ids": [
+        "API-AC-002",
+        "API-AC-003",
+        "API-AC-012",
+        "API-AC-014"
+      ],
+      "use": "excerpt",
+      "reason": "Selected cookie/antiforgery/invalidation, non-enumeration and generated-contract scenario portions",
+      "sha256": "586fccd0aeaceb18e5e6a5d59e435dd9a5016ea13759635b836fddfb95fe799d"
+    },
+    {
+      "path": "docs/06-verification-plan.md",
+      "ids": [
+        "V-004",
+        "V-009",
+        "V-015"
+      ],
+      "use": "excerpt",
+      "reason": "Selected real authentication, generated-contract and privacy check groups",
+      "sha256": "eb343cfcbbc493b4aca0f42ede96f1ba90152a602b00fa97f1d3cd1e37446821"
+    },
+    {
+      "path": "docs/06-verification-plan.md",
+      "heading": "7.1 When to run",
+      "use": "excerpt",
+      "reason": "Required focused, aggregate, contract and published-smoke stages",
+      "sha256": "a4cd1182b2e9c1033cc69af76620424905ec1dcce4499499d9d8c466b7f33b08"
+    },
+    {
+      "path": "docs/06-verification-plan.md",
+      "heading": "7.3 Evidence records and failure handling",
+      "use": "excerpt",
+      "reason": "Evidence fields and truthful pending/blocked/failed handling",
+      "sha256": "baf4f98e4fe09bee51a9a9a4ed94fafccc4e5eb3369aeb08134c124c0fe5575a"
+    },
+    {
+      "path": "docs/verification/backend.md",
+      "heading": "3.1 Database, HTTP and published-host harness",
+      "use": "excerpt",
+      "reason": "Real handlers, antiforgery, file SQLite, loopback HTTPS and deterministic isolation requirements",
+      "sha256": "c493bc0519d9271615893303f036c333d6c38d279a75c1b2863778d944c4e794"
+    },
+    {
+      "path": "docs/verification/coverage.md",
+      "ids": [
+        "FR-001",
+        "FR-002",
+        "API-AC-002",
+        "API-AC-003",
+        "API-AC-012",
+        "API-AC-014"
+      ],
+      "use": "excerpt",
+      "reason": "Current prior evidence and V-group allocation for selected scenario portions",
+      "sha256": "c638cfd83f946b7aef03dfddd60029ee2628d2a0095957efab6117c808418b6e"
+    },
+    {
+      "path": "docs/verification/readiness.md",
+      "heading": "9. Readiness and remaining dependencies",
+      "use": "reference",
+      "reason": "On-demand cross-check that unrelated launch dependencies do not become M008 completion claims",
+      "sha256": "73a8b0c91d813cbf40f675b50c08b7895f2964eae66b0f802893e6811ba8f70d"
+    },
+    {
+      "path": "backend/src/LinguaDesk.Api/Program.cs",
+      "use": "reference",
+      "reason": "Current middleware and endpoint/fallback ordering",
+      "sha256": "382d9419752db5659de4da8179e98583702c6e4fe2521df6a3e26da84a88aa76"
+    },
+    {
+      "path": "backend/src/LinguaDesk.Api/Features/Identity/IdentityRegistrationExtensions.cs",
+      "use": "reference",
+      "reason": "Current Identity services and authorization registration to extend",
+      "sha256": "571c82491b1c1a27e8bb88a6c520163c151685735039dab0b30d5c5b9b75b55e"
+    },
+    {
+      "path": "backend/src/LinguaDesk.Api/Infrastructure/Persistence/PersistenceRegistrationExtensions.cs",
+      "use": "reference",
+      "reason": "Current IdentityCore/store/password configuration and contract-generation branch",
+      "sha256": "ef65cdd3352fb75db9fd5b9a36e03270bd5a2240616cbc8608e91c3191622cfd"
+    },
+    {
+      "path": "backend/src/LinguaDesk.Api/Features/Identity/VerifiedAccountAuthorization.cs",
+      "use": "reference",
+      "reason": "Current fresh verification-state policy that cookie principals must continue to satisfy",
+      "sha256": "2b3309a1b2428dc02087c08a88013c20c630da5927b594fffce2544a4a7d0bcb"
+    },
+    {
+      "path": "backend/src/LinguaDesk.Api/Features/Identity/Registration/RegistrationContract.cs",
+      "use": "reference",
+      "reason": "Current email/password and Problem Details metadata conventions",
+      "sha256": "49e482959f586d35d20154470820ca25a1fedf74b0176725a06091c0004ccce6"
+    },
+    {
+      "path": "backend/src/LinguaDesk.Api/Features/Identity/Registration/RegistrationEndpoints.cs",
+      "use": "reference",
+      "reason": "Strict JSON/media/query/method/no-store account boundary to reuse or safely refactor",
+      "sha256": "6f802341a7bb9a8d215940c31c34628ddbf91df4ad54b596edb94e98877b0b4f"
+    },
+    {
+      "path": "backend/src/LinguaDesk.Api/Features/Capabilities/OpenApiRegistration.cs",
+      "use": "reference",
+      "reason": "Current generated document transforms and account response headers",
+      "sha256": "b54607c2a63bccaaf3dbac1a11573ec9a8ef9beb7172015daf04bfa081416d50"
+    },
+    {
+      "path": "backend/src/LinguaDesk.Api/Infrastructure/Security/SecurityRegistrationExtensions.cs",
+      "use": "reference",
+      "reason": "Existing persistent Data Protection application/key configuration and generation boundary",
+      "sha256": "84d1c331035e2e44c50cd456e460fa238df406c383a06f7017e723cdecd64af9"
+    },
+    {
+      "path": "backend/tests/LinguaDesk.Api.Tests/AccountVerificationTests.cs",
+      "use": "reference",
+      "reason": "Current real Identity/file-SQLite/key/fake-time account harness and M007 regression surface",
+      "sha256": "c1a3a570409a76b74984f22e18613a4621b9e914913fb1d5e186656ad2976cbf"
+    },
+    {
+      "path": "docs/05-openapi.yaml",
+      "use": "reference",
+      "reason": "Current generated public contract baseline whose selected path set and security metadata will change",
+      "sha256": "f6734e262cbd213122dad296ba3c251676cfa02722ecaef87a58966d9cf9e001"
+    },
+    {
+      "path": "frontend/src/api/generated/linguadesk-api.d.ts",
+      "use": "reference",
+      "reason": "Current generated client declaration baseline regenerated from the reviewed contract",
+      "sha256": "032a8625ba9914f7f522c1824e55c3b674e8eeb5585418aab95fca2223a9a9e5"
+    },
+    {
+      "path": "backend/Directory.Packages.props",
+      "use": "reference",
+      "reason": "Pinned ASP.NET Core Identity and verification dependencies",
+      "sha256": "32a19f187185e0978c01bfb89be4949e791db2a6b793b5dd4d6b9fcaa4edc57c"
+    },
+    {
+      "path": "global.json",
+      "use": "reference",
+      "reason": "Pinned .NET SDK required by execution commands",
+      "sha256": "0588e32d44bdf884e0305ded21820b13a59b1518efd39976c34d909eff3b1044"
+    },
+    {
+      "path": "frontend/package.json",
+      "use": "reference",
+      "reason": "Pinned Node/npm and generated-client verification scripts",
+      "sha256": "6679b8d86b24c87bded9242d2d5a0caed0fc70d1c30ecedffc2382e381fb1b89"
+    },
+    {
+      "path": "scripts/backend.sh",
+      "use": "reference",
+      "reason": "Aggregate backend, focused-suite guard and published host verification command",
+      "sha256": "0842754f13ed7001700a1f732437034ca45c859976c59e3e9290874221da607d"
+    },
+    {
+      "path": "scripts/contract.sh",
+      "use": "reference",
+      "reason": "Canonical OpenAPI/TypeScript generation and drift procedure",
+      "sha256": "d514721c6a6beca458a884f9af172cda279fbaf36529dc1e1709e76dfb4471b9"
+    },
+    {
+      "path": "scripts/frontend.sh",
+      "use": "reference",
+      "reason": "Frontend type/build and published Chromium regression commands",
+      "sha256": "f5977a5161c09985fc5cdc6eee4b9ddd5614b589d4b49e6fed8add6530b12f15"
+    }
+  ],
+  "source_map_sha256": "b1b784c5250806b5947b5b92ddb540fa2a8236f3012b73b176762b713a895288",
+  "baseline_commit": "bd3ebe70ebd95ce168e3751250c58a1694ad29fd",
+  "locked_files": {
+    "docs/00-SDD-Planning-Workflow.md": "183ae93148ff594f9f1e021aa7543baa8878e9cc0bcfd69ebc696c28976e2945",
+    "docs/00-workflow/execution.md": "f362a1384cefef24ba204e0723e3190857c8cca9bcd91908136932e19c5caf02",
+    "docs/08-backlogs/M008/spec.md": "cf205e19ee4da97209cacd7c599b5241de9d3c337dd3caebdd63e4e8a8354179",
+    "docs/08-backlogs/M008/plan.md": "759509bb0ab7856443c10d2396d945cc04340fec1f89d5cc168ab5ff3be87bf3"
+  }
+}
