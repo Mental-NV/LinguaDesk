@@ -2,13 +2,13 @@
 
 Mutable #7 status owner. Read for selection/dependency checks and closeout; do not include in the stable execution prefix.
 
-**Most recently completed milestone: [M010 — Recover API account access](../08-backlogs/M010/backlog.md).** State: **Done**. [Package 010](../08-backlogs/M010/spec.md) AC-001–007 passed real Identity password recovery, non-enumerating acknowledgments, invalid/expired/replayed-token handling, exact password policy, security-stamp invalidation, generated-contract regressions and published smokes. Its [completion record](../08-backlogs/M010/tasks.md#completion-record) owns the exact evidence. Browser account UX/privacy evidence (M013/M014) and live email (M034) remain pending.
+**Most recently completed milestone: [M011 — Register in the web app](../08-backlogs/M011/backlog.md).** State: **Done**. [Package 011](../08-backlogs/M011/spec.md) AC-001–007 passed single-request web registration through the generated client shape, no-request local validation with linked errors and first-invalid focus, server-rejection password clearing with one-request retry, generic network retry with stale-completion discard, keyboard/caret/geometry behavior, storage/history/URL sentinels and unchanged generated-contract plus aggregate regressions and published smokes. Its [completion record](../08-backlogs/M011/tasks.md#completion-record) owns the exact evidence. Verification/resend/continuation (M012), sign-in browser UX (M013), recovery forms (M014) and live email (M034) remain pending.
 
 ## Selected milestone
 
 | ID | State | Dependency/readiness | Package |
 | --- | --- | --- | --- |
-| — | No milestone selected | M010 completed; follow roadmap selection workflow | — |
+| — | No milestone selected | M011 completed; follow roadmap selection workflow | — |
 
 M015 remains the next recommended independent-track candidate under the roadmap priority policy; it is not selected.
 
@@ -26,5 +26,6 @@ M015 remains the next recommended independent-track candidate under the roadmap 
 | M008 | Done | [Backlog](../08-backlogs/M008/backlog.md), [spec](../08-backlogs/M008/spec.md), [tasks/evidence](../08-backlogs/M008/tasks.md#completion-record) |
 | M009 | Done | [Backlog](../08-backlogs/M009/backlog.md), [spec](../08-backlogs/M009/spec.md), [tasks/evidence](../08-backlogs/M009/tasks.md#completion-record) |
 | M010 | Done | [Backlog](../08-backlogs/M010/backlog.md), [spec](../08-backlogs/M010/spec.md), [tasks/evidence](../08-backlogs/M010/tasks.md#completion-record) |
+| M011 | Done | [Backlog](../08-backlogs/M011/backlog.md), [spec](../08-backlogs/M011/spec.md), [tasks/evidence](../08-backlogs/M011/tasks.md#completion-record) |
 
-All roadmap milestones other than completed M001–M010 are Candidate with no selected package and evidence pending. M015 is recommended, not selected. Full product and release evidence remains pending in #6 coverage.
+All roadmap milestones other than completed M001–M011 are Candidate with no selected package and evidence pending. M015 is recommended, not selected. Full product and release evidence remains pending in #6 coverage.

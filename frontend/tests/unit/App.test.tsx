@@ -15,7 +15,6 @@ describe('signed-out shell routes', () => {
   it.each([
     ['/', 'Sign in', 'Sign-in is not available in this build.'],
     ['/login', 'Sign in', 'Sign-in is not available in this build.'],
-    ['/register', 'Create account', 'Registration is not available in this build.'],
     ['/translate', 'Sign in', 'Sign-in is not available in this build.'],
     ['/rewrite', 'Sign in', 'Sign-in is not available in this build.'],
     ['/unknown-page', 'Page not found', 'The page you requested does not exist.'],
@@ -30,6 +29,26 @@ describe('signed-out shell routes', () => {
     expect(screen.queryByRole('form')).not.toBeInTheDocument()
     expect(screen.queryByRole('textbox')).not.toBeInTheDocument()
     expect(screen.queryByRole('button')).not.toBeInTheDocument()
+  })
+
+  it('renders /register with the registration form and no protected workspace', async () => {
+    renderRoute('/register')
+
+    const destinationHeading = await screen.findByRole('heading', { level: 1, name: 'Create account' })
+    expect(destinationHeading).toHaveFocus()
+    expect(screen.getByRole('form')).toBeVisible()
+    expect(screen.getByLabelText('Email')).toBeVisible()
+    expect(screen.getByLabelText('Password')).toBeVisible()
+    expect(screen.getByLabelText('Confirm password')).toBeVisible()
+    expect(screen.getByRole('button', { name: 'Create account' })).toBeVisible()
+    expect(screen.getByRole('link', { name: 'Sign in' })).toHaveAttribute('href', '/login')
+  })
+
+  it('redirects /verify-email to /register without an in-memory registration', async () => {
+    renderRoute('/verify-email')
+
+    expect(await screen.findByRole('heading', { level: 1, name: 'Create account' })).toBeInTheDocument()
+    expect(screen.getByRole('form')).toBeVisible()
   })
 
   it('uses native links for shell navigation', async () => {

@@ -1,5 +1,7 @@
-import { useEffect, useRef, type ReactNode } from 'react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { Link, Navigate, Route, Routes, useLocation } from 'react-router-dom'
+import { RegisterPage } from '../auth/RegisterPage'
+import { VerifyEmailEntryPage } from '../auth/VerifyEmailEntryPage'
 
 type PageProps = {
   children: ReactNode
@@ -33,11 +35,10 @@ function LoginPage() {
   )
 }
 
-function RegisterPage() {
+function VerifyEmailPage({ email }: { email: string | null }) {
   return (
-    <Page heading="Create account">
-      <p>Registration is not available in this build.</p>
-      <Link className="primary-link" to="/login">Go to sign in</Link>
+    <Page heading="Verify your email">
+      <VerifyEmailEntryPage email={email} />
     </Page>
   )
 }
@@ -52,6 +53,8 @@ function NotFoundPage() {
 }
 
 export function App() {
+  const [pendingVerificationEmail, setPendingVerificationEmail] = useState<string | null>(null)
+
   return (
     <div className="app-shell">
       <a className="skip-link" href="#main-content">Skip to main content</a>
@@ -67,7 +70,15 @@ export function App() {
       <Routes>
         <Route path="/" element={<Navigate to="/login" replace />} />
         <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
+        <Route
+          path="/register"
+          element={
+            <Page heading="Create account">
+              <RegisterPage onRegistered={setPendingVerificationEmail} />
+            </Page>
+          }
+        />
+        <Route path="/verify-email" element={<VerifyEmailPage email={pendingVerificationEmail} />} />
         <Route path="/translate" element={<Navigate to="/login" replace />} />
         <Route path="/rewrite" element={<Navigate to="/login" replace />} />
         <Route path="*" element={<NotFoundPage />} />

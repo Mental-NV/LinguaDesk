@@ -7,14 +7,14 @@
       "heading": "Selected milestone",
       "use": "reference",
       "reason": "Mutable current selection authority; verify M011 remains the planned scope before execution",
-      "sha256": "63a42e8070d62461d4f5ba4653773c9fd31071f70386dfd7af0153d9621ebc25"
+      "sha256": "4b89b222ec4e4b1d4f1326712e753ee51f0f550eff507d616538b02d6179cb39"
     },
     {
       "path": "docs/delivery/current.md",
       "heading": "Completed milestones",
       "use": "reference",
       "reason": "Mutable dependency index confirming M002 and M006 completion",
-      "sha256": "ed74890fe8df32b8227f9e3eb108a8508f4ebc8edd232a46ae3d965a069269de"
+      "sha256": "138f2261bbf0626f3d1cee3ce280091c47d40076f6c34c01e6608bab7c7a6f3f"
     },
     {
       "path": "docs/07-roadmap.md",
@@ -154,7 +154,7 @@
       "heading": "8.2 Local acceptance allocation",
       "use": "excerpt",
       "reason": "V-group allocation for the selected UX scenarios",
-      "sha256": "38e04cd5e53e12555c30f959c1f9ddbcad5c977999a050befe19d61c23afffa3"
+      "sha256": "688ed34c5706735be3ae35b84fc23265b5b5e5b418a966cb11075283caaba330"
     },
     {
       "path": "docs/verification/readiness.md",
@@ -167,7 +167,7 @@
       "path": "frontend/src/shell/App.tsx",
       "use": "reference",
       "reason": "Current placeholder routes, heading-focus and shell conventions to extend",
-      "sha256": "f89b6352cda9b99e7c0d84b3a10edb442f992289542ee16d254774afccc8b90a"
+      "sha256": "a5a7892e0b9f86e0f27441454c498a13f1ed92ffdd4bf0b4e2818ddd6bab1bf5"
     },
     {
       "path": "frontend/src/api/generated/linguadesk-api.d.ts",
@@ -185,7 +185,7 @@
       "path": "frontend/tests/unit/App.test.tsx",
       "use": "reference",
       "reason": "Current placeholder assertions whose /register cases change under M011",
-      "sha256": "8f30adb1a24ff25ca2b2d4cebe6fbafdad83a793939ec0a679ca753440d2bbe4"
+      "sha256": "701eadae301b80befbf6736c90fc338086592c34080656d4fdc72966a25aa0a2"
     },
     {
       "path": "frontend/tests/e2e/published-shell.spec.ts",
@@ -219,7 +219,7 @@
     }
   ],
   "source_map_sha256": "3f41b24160dc06d6d5afc539506424fd4c1c4da86b6440be64f473a4051d7432",
-  "baseline_commit": "7499a7d6d6d3428cf200ba139fa3e0b06e698269",
+  "baseline_commit": "aa04356c7114b5dba773f896f8497a018608f9ea",
   "locked_files": {
     "docs/00-SDD-Planning-Workflow.md": "183ae93148ff594f9f1e021aa7543baa8878e9cc0bcfd69ebc696c28976e2945",
     "docs/00-workflow/execution.md": "f362a1384cefef24ba204e0723e3190857c8cca9bcd91908136932e19c5caf02",
