@@ -84,6 +84,46 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/accounts/forgot-password": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Request a local-account password reset
+         * @description Returns one fixed acknowledgment for every syntactically valid email and requests delivery only for an existing local account outside its cooldown.
+         */
+        post: operations["requestLocalAccountPasswordReset"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/accounts/reset-password": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Complete a local-account password reset
+         * @description Sets a new policy-compliant password from delivered opaque material without issuing authentication credentials or redirecting.
+         */
+        post: operations["resetLocalAccountPassword"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/accounts/antiforgery": {
         parameters: {
             query?: never;
@@ -363,6 +403,27 @@ export interface components {
          * @enum {string}
          */
         EmptyOrWhitespacePolicy: "reject";
+        ForgotPasswordAccepted: {
+            /** @description Always `passwordResetRequested` for a syntactically valid request. */
+            status: components["schemas"]["ForgotPasswordStatus"];
+            /**
+             * Format: int32
+             * @description Fixed reset-delivery interval in seconds; it does not disclose account or cooldown state.
+             */
+            retryAfterSeconds: number;
+        };
+        ForgotPasswordRequest: {
+            /**
+             * Format: email
+             * @description Local account email address. Maximum 254 Unicode scalar values; surrounding whitespace is invalid.
+             */
+            email: string;
+        };
+        /**
+         * @description Always `passwordResetRequested` for a syntactically valid request.
+         * @enum {string}
+         */
+        ForgotPasswordStatus: "passwordResetRequested";
         /**
          * @description Disposition of isolated UTF-16 surrogates or malformed decoded Unicode.
          * @enum {string}
@@ -414,6 +475,27 @@ export interface components {
          * @enum {string}
          */
         OversizeHandling: "rejectWhole";
+        RecoveryProblemDetails: {
+            /** @description RFC 9457 problem type reference. */
+            type?: null | string;
+            /** @description Short, stable problem summary. */
+            title: string;
+            /**
+             * Format: int32
+             * @description HTTP status code for this occurrence.
+             */
+            status: number;
+            /** @description Safe explanation that never echoes submitted account, token or password values. */
+            detail: string;
+            /** @description LinguaDesk error category: `invalidRequest`, `invalidOrExpiredPasswordReset`, or `availability`. */
+            category: string;
+            /** @description Opaque request correlation identifier. */
+            correlationId: string;
+            /** @description Field messages keyed only by `email` or `newPassword`; present for field validation failures. */
+            errors?: null | {
+                [key: string]: string[];
+            };
+        };
         RegistrationAccepted: {
             /** @description Always `verificationRequired` for an accepted new or existing normalized email. */
             status: components["schemas"]["RegistrationStatus"];
@@ -477,6 +559,26 @@ export interface components {
          * @enum {string}
          */
         ResendVerificationStatus: "verificationRequested";
+        ResetPasswordAccepted: {
+            /** @description Always `passwordReset` after a successful password reset. */
+            status: components["schemas"]["ResetPasswordStatus"];
+        };
+        ResetPasswordRequest: {
+            /** @description Opaque local-account identifier delivered with the reset code. Maximum 450 characters. */
+            userId: string;
+            /** @description Unpadded base64url encoding of the delivered password-reset token. Maximum 4096 characters. */
+            code: string;
+            /**
+             * Format: password
+             * @description Write-only replacement password containing 15 to 128 well-formed Unicode scalar values.
+             */
+            newPassword: string;
+        };
+        /**
+         * @description Always `passwordReset` after a successful password reset.
+         * @enum {string}
+         */
+        ResetPasswordStatus: "passwordReset";
         /** @description Exclusive rewriting modes, whole-input limit, and overall deadline. */
         RewritingCapability: {
             /**
@@ -837,6 +939,142 @@ export interface operations {
                 };
                 content: {
                     "application/problem+json": components["schemas"]["VerificationProblemDetails"];
+                };
+            };
+        };
+    };
+    requestLocalAccountPasswordReset: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ForgotPasswordRequest"];
+            };
+        };
+        responses: {
+            /** @description Accepted */
+            202: {
+                headers: {
+                    /** @description Always `no-store` for local-account mutation responses. */
+                    "Cache-Control": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ForgotPasswordAccepted"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    /** @description Always `no-store` for local-account mutation responses. */
+                    "Cache-Control": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["RecoveryProblemDetails"];
+                };
+            };
+            /** @description Method Not Allowed */
+            405: {
+                headers: {
+                    /** @description Always `no-store` for local-account mutation responses. */
+                    "Cache-Control": string;
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unsupported Media Type */
+            415: {
+                headers: {
+                    /** @description Always `no-store` for local-account mutation responses. */
+                    "Cache-Control": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["RecoveryProblemDetails"];
+                };
+            };
+            /** @description Service Unavailable */
+            503: {
+                headers: {
+                    /** @description Always `no-store` for local-account mutation responses. */
+                    "Cache-Control": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["RecoveryProblemDetails"];
+                };
+            };
+        };
+    };
+    resetLocalAccountPassword: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ResetPasswordRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    /** @description Always `no-store` for local-account mutation responses. */
+                    "Cache-Control": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResetPasswordAccepted"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    /** @description Always `no-store` for local-account mutation responses. */
+                    "Cache-Control": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["RecoveryProblemDetails"];
+                };
+            };
+            /** @description Method Not Allowed */
+            405: {
+                headers: {
+                    /** @description Always `no-store` for local-account mutation responses. */
+                    "Cache-Control": string;
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unsupported Media Type */
+            415: {
+                headers: {
+                    /** @description Always `no-store` for local-account mutation responses. */
+                    "Cache-Control": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["RecoveryProblemDetails"];
+                };
+            };
+            /** @description Service Unavailable */
+            503: {
+                headers: {
+                    /** @description Always `no-store` for local-account mutation responses. */
+                    "Cache-Control": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["RecoveryProblemDetails"];
                 };
             };
         };

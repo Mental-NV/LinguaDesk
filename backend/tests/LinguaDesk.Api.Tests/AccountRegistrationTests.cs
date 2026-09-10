@@ -5,6 +5,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Text.Json;
 using LinguaDesk.Api.Features.Identity;
+using LinguaDesk.Api.Features.Identity.Recovery;
 using LinguaDesk.Api.Features.Identity.Registration;
 using LinguaDesk.Api.Features.Identity.Verification;
 using LinguaDesk.Api.Infrastructure.Persistence;
@@ -406,7 +407,9 @@ internal sealed class AccountWebApplicationFactory(
     string environment = "Testing",
     IReadOnlyDictionary<string, string?>? configurationOverrides = null,
     TimeProvider? timeProvider = null,
-    TimeSpan? emailConfirmationTokenLifespan = null) : WebApplicationFactory<Program>
+    TimeSpan? emailConfirmationTokenLifespan = null,
+    IAccountPasswordResetSender? resetSender = null,
+    TimeSpan? passwordResetTokenLifespan = null) : WebApplicationFactory<Program>
 {
     private readonly string webRoot = Directory.CreateTempSubdirectory("linguadesk-account-webroot-").FullName;
 
@@ -444,6 +447,17 @@ internal sealed class AccountWebApplicationFactory(
             {
                 services.Configure<LinguaDeskEmailConfirmationTokenProviderOptions>(options =>
                     options.TokenLifespan = emailConfirmationTokenLifespan.Value);
+            }
+            if (resetSender is not null)
+            {
+                services.RemoveAll<IAccountPasswordResetSender>();
+                services.AddSingleton(resetSender);
+                services.AddSingleton<IAccountPasswordResetSender>(resetSender);
+            }
+            if (passwordResetTokenLifespan is not null)
+            {
+                services.Configure<DataProtectionTokenProviderOptions>(options =>
+                    options.TokenLifespan = passwordResetTokenLifespan.Value);
             }
         });
     }

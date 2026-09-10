@@ -42,7 +42,7 @@ function assertPropertyDescriptions(document) {
 function validateContract(document) {
   expect(/^3\.1(?:\.|$)/u.test(document.openapi), 'document must use OpenAPI 3.1')
   expect(document.info?.title === 'LinguaDesk API', 'unexpected API title')
-  expect(document.info?.version === '0.1.0-m009', 'unexpected artifact version')
+  expect(document.info?.version === '0.1.0-m010', 'unexpected artifact version')
   expect(typeof document.info?.description === 'string', 'artifact description is required')
 
   sameValues(
@@ -52,6 +52,8 @@ function validateContract(document) {
       '/api/accounts/register',
       '/api/accounts/confirm-email',
       '/api/accounts/resend-verification',
+      '/api/accounts/forgot-password',
+      '/api/accounts/reset-password',
       '/api/accounts/antiforgery',
       '/api/accounts/sign-in',
       '/api/accounts/session',
@@ -235,6 +237,100 @@ function validateContract(document) {
     Object.keys(verificationProblem.properties),
     ['type', 'title', 'status', 'detail', 'category', 'correlationId', 'errors'],
     'verification Problem Details fields',
+  )
+
+  const recoveryOperations = [
+    {
+      path: '/api/accounts/forgot-password',
+      operationId: 'requestLocalAccountPasswordReset',
+      requestSchema: 'ForgotPasswordRequest',
+      successStatus: '202',
+      successSchema: 'ForgotPasswordAccepted',
+    },
+    {
+      path: '/api/accounts/reset-password',
+      operationId: 'resetLocalAccountPassword',
+      requestSchema: 'ResetPasswordRequest',
+      successStatus: '200',
+      successSchema: 'ResetPasswordAccepted',
+    },
+  ]
+  for (const item of recoveryOperations) {
+    const path = document.paths[item.path]
+    sameValues(Object.keys(path), ['post'], `${item.operationId} operations`)
+    const selectedOperation = path.post
+    expect(selectedOperation.operationId === item.operationId, `unexpected ${item.operationId} operation ID`)
+    expect(selectedOperation.security === undefined, `${item.operationId} must not declare authentication`)
+    expect(
+      typeof selectedOperation.summary === 'string' && typeof selectedOperation.description === 'string',
+      `${item.operationId} descriptions are required`,
+    )
+    sameValues(
+      Object.keys(selectedOperation.responses ?? {}),
+      [item.successStatus, '400', '405', '415', '503'],
+      `${item.operationId} responses`,
+    )
+    expect(selectedOperation.requestBody?.required === true, `${item.operationId} request body must be required`)
+    expect(
+      selectedOperation.requestBody.content?.['application/json']?.schema?.$ref ===
+        `#/components/schemas/${item.requestSchema}`,
+      `${item.operationId} JSON request schema is missing`,
+    )
+    for (const status of [item.successStatus, '400', '405', '415', '503']) {
+      const selectedResponse = selectedOperation.responses[status]
+      expect(selectedResponse.headers?.['Cache-Control']?.required === true, `${item.operationId} ${status} must require Cache-Control`)
+      expect(selectedResponse.headers['Cache-Control'].schema?.type === 'string', `${item.operationId} ${status} Cache-Control must be a string`)
+    }
+    expect(
+      selectedOperation.responses[item.successStatus].content?.['application/json']?.schema?.$ref ===
+        `#/components/schemas/${item.successSchema}`,
+      `${item.operationId} success schema is missing`,
+    )
+    for (const status of ['400', '415', '503']) {
+      expect(
+        selectedOperation.responses[status].content?.['application/problem+json']?.schema?.$ref ===
+          '#/components/schemas/RecoveryProblemDetails',
+        `${item.operationId} ${status} Problem Details schema is missing`,
+      )
+    }
+  }
+
+  const forgotRequest = document.components.schemas.ForgotPasswordRequest
+  sameValues(forgotRequest.required, ['email'], 'forgot request required fields')
+  sameValues(Object.keys(forgotRequest.properties), ['email'], 'forgot request fields')
+  expect(forgotRequest.properties.email.format === 'email', 'forgot email format is missing')
+  expect(forgotRequest.properties.email.maxLength === 254, 'forgot email maximum is missing')
+  const forgotAccepted = document.components.schemas.ForgotPasswordAccepted
+  sameValues(forgotAccepted.required, ['status', 'retryAfterSeconds'], 'forgot acknowledgment required fields')
+  expect(forgotAccepted.properties.retryAfterSeconds.type === 'integer', 'forgot retry interval must be integer-only')
+  sameValues(document.components.schemas.ForgotPasswordStatus.enum, ['passwordResetRequested'], 'forgot status values')
+
+  const resetRequest = document.components.schemas.ResetPasswordRequest
+  sameValues(resetRequest.required, ['userId', 'code', 'newPassword'], 'reset request required fields')
+  sameValues(Object.keys(resetRequest.properties), ['userId', 'code', 'newPassword'], 'reset request fields')
+  expect(resetRequest.properties.userId.minLength === 1, 'reset user ID minimum is missing')
+  expect(resetRequest.properties.userId.maxLength === 450, 'reset user ID maximum is missing')
+  expect(resetRequest.properties.code.minLength === 1, 'reset code minimum is missing')
+  expect(resetRequest.properties.code.maxLength === 4096, 'reset code maximum is missing')
+  expect(resetRequest.properties.code.writeOnly === true, 'reset code must be write-only')
+  expect(resetRequest.properties.newPassword.format === 'password', 'reset password format is missing')
+  expect(resetRequest.properties.newPassword.minLength === 15, 'reset password minimum is missing')
+  expect(resetRequest.properties.newPassword.maxLength === 128, 'reset password maximum is missing')
+  expect(resetRequest.properties.newPassword.writeOnly === true, 'reset password must be write-only')
+  const resetAccepted = document.components.schemas.ResetPasswordAccepted
+  sameValues(resetAccepted.required, ['status'], 'reset acknowledgment required fields')
+  sameValues(document.components.schemas.ResetPasswordStatus.enum, ['passwordReset'], 'reset status values')
+
+  const recoveryProblem = document.components.schemas.RecoveryProblemDetails
+  sameValues(
+    recoveryProblem.required,
+    ['title', 'status', 'detail', 'category', 'correlationId'],
+    'recovery Problem Details required fields',
+  )
+  sameValues(
+    Object.keys(recoveryProblem.properties),
+    ['type', 'title', 'status', 'detail', 'category', 'correlationId', 'errors'],
+    'recovery Problem Details fields',
   )
 
   const sessionOperations = [

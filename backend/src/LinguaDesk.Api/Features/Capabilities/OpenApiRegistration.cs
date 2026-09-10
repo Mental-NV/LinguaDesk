@@ -3,6 +3,7 @@ using System.Reflection;
 using LinguaDesk.Api.Features.Identity.Bearer;
 using LinguaDesk.Api.Features.Identity.Registration;
 using LinguaDesk.Api.Features.Identity.Verification;
+using LinguaDesk.Api.Features.Identity.Recovery;
 using LinguaDesk.Api.Features.Identity.Session;
 using Microsoft.AspNetCore.OpenApi;
 using Microsoft.OpenApi;
@@ -25,9 +26,9 @@ public static class OpenApiRegistration
                 document.Info = new()
                 {
                     Title = "LinguaDesk API",
-                    Version = "0.1.0-m009",
+                    Version = "0.1.0-m010",
                     Description =
-                        "Pre-release M009 contract containing implemented public capabilities, local-account registration/verification, browser cookie-session, and independent-client bearer operations. " +
+                        "Pre-release M010 contract containing implemented public capabilities, local-account registration/verification/password-recovery, browser cookie-session, and independent-client bearer operations. " +
                         "No compatibility or deprecation guarantee is implied.",
                 };
                 document.Components ??= new OpenApiComponents();
@@ -178,6 +179,37 @@ public static class OpenApiRegistration
                         schema.Format = "email";
                         schema.MaxLength = 254;
                     }
+
+                    if (property.DeclaringType == typeof(ForgotPasswordRequest)
+                        && string.Equals(property.Name, nameof(ForgotPasswordRequest.Email), StringComparison.Ordinal))
+                    {
+                        schema.Format = "email";
+                        schema.MaxLength = 254;
+                    }
+
+                    if (property.DeclaringType == typeof(ResetPasswordRequest)
+                        && string.Equals(property.Name, nameof(ResetPasswordRequest.UserId), StringComparison.Ordinal))
+                    {
+                        schema.MinLength = 1;
+                        schema.MaxLength = 450;
+                    }
+
+                    if (property.DeclaringType == typeof(ResetPasswordRequest)
+                        && string.Equals(property.Name, nameof(ResetPasswordRequest.Code), StringComparison.Ordinal))
+                    {
+                        schema.MinLength = 1;
+                        schema.MaxLength = 4096;
+                        schema.WriteOnly = true;
+                    }
+
+                    if (property.DeclaringType == typeof(ResetPasswordRequest)
+                        && string.Equals(property.Name, nameof(ResetPasswordRequest.NewPassword), StringComparison.Ordinal))
+                    {
+                        schema.Format = "password";
+                        schema.MinLength = 15;
+                        schema.MaxLength = 128;
+                        schema.WriteOnly = true;
+                    }
                 }
 
                 return Task.CompletedTask;
@@ -206,7 +238,9 @@ public static class OpenApiRegistration
 
                 if ((string.Equals(endpointName, "registerLocalAccount", StringComparison.Ordinal)
                         || string.Equals(endpointName, "confirmLocalAccountEmail", StringComparison.Ordinal)
-                        || string.Equals(endpointName, "resendLocalAccountVerification", StringComparison.Ordinal))
+                        || string.Equals(endpointName, "resendLocalAccountVerification", StringComparison.Ordinal)
+                        || string.Equals(endpointName, "requestLocalAccountPasswordReset", StringComparison.Ordinal)
+                        || string.Equals(endpointName, "resetLocalAccountPassword", StringComparison.Ordinal))
                     && operation.Responses is not null)
                 {
                     foreach (var registrationResponse in operation.Responses.Values.OfType<OpenApiResponse>())

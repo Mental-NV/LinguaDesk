@@ -2,8 +2,8 @@
 openapi: 3.1.1
 info:
   title: LinguaDesk API
-  description: Pre-release M009 contract containing implemented public capabilities, local-account registration/verification, browser cookie-session, and independent-client bearer operations. No compatibility or deprecation guarantee is implied.
-  version: 0.1.0-m009
+  description: Pre-release M010 contract containing implemented public capabilities, local-account registration/verification/password-recovery, browser cookie-session, and independent-client bearer operations. No compatibility or deprecation guarantee is implied.
+  version: 0.1.0-m010
 paths:
   /api/capabilities:
     get:
@@ -227,6 +227,146 @@ paths:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/VerificationProblemDetails"
+  /api/accounts/forgot-password:
+    post:
+      tags:
+        - RecoveryEndpoints
+      summary: Request a local-account password reset
+      description: Returns one fixed acknowledgment for every syntactically valid email and requests delivery only for an existing local account outside its cooldown.
+      operationId: requestLocalAccountPasswordReset
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ForgotPasswordRequest"
+        required: true
+      responses:
+        "202":
+          description: Accepted
+          headers:
+            Cache-Control:
+              description: Always `no-store` for local-account mutation responses.
+              required: true
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ForgotPasswordAccepted"
+        "400":
+          description: Bad Request
+          headers:
+            Cache-Control:
+              description: Always `no-store` for local-account mutation responses.
+              required: true
+              schema:
+                type: string
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/RecoveryProblemDetails"
+        "405":
+          description: Method Not Allowed
+          headers:
+            Cache-Control:
+              description: Always `no-store` for local-account mutation responses.
+              required: true
+              schema:
+                type: string
+        "415":
+          description: Unsupported Media Type
+          headers:
+            Cache-Control:
+              description: Always `no-store` for local-account mutation responses.
+              required: true
+              schema:
+                type: string
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/RecoveryProblemDetails"
+        "503":
+          description: Service Unavailable
+          headers:
+            Cache-Control:
+              description: Always `no-store` for local-account mutation responses.
+              required: true
+              schema:
+                type: string
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/RecoveryProblemDetails"
+  /api/accounts/reset-password:
+    post:
+      tags:
+        - RecoveryEndpoints
+      summary: Complete a local-account password reset
+      description: Sets a new policy-compliant password from delivered opaque material without issuing authentication credentials or redirecting.
+      operationId: resetLocalAccountPassword
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ResetPasswordRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+          headers:
+            Cache-Control:
+              description: Always `no-store` for local-account mutation responses.
+              required: true
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResetPasswordAccepted"
+        "400":
+          description: Bad Request
+          headers:
+            Cache-Control:
+              description: Always `no-store` for local-account mutation responses.
+              required: true
+              schema:
+                type: string
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/RecoveryProblemDetails"
+        "405":
+          description: Method Not Allowed
+          headers:
+            Cache-Control:
+              description: Always `no-store` for local-account mutation responses.
+              required: true
+              schema:
+                type: string
+        "415":
+          description: Unsupported Media Type
+          headers:
+            Cache-Control:
+              description: Always `no-store` for local-account mutation responses.
+              required: true
+              schema:
+                type: string
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/RecoveryProblemDetails"
+        "503":
+          description: Service Unavailable
+          headers:
+            Cache-Control:
+              description: Always `no-store` for local-account mutation responses.
+              required: true
+              schema:
+                type: string
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/RecoveryProblemDetails"
   /api/accounts/antiforgery:
     get:
       tags:
@@ -951,6 +1091,34 @@ components:
         - reject
       type: string
       description: Disposition of empty or fixed-set whitespace-only source.
+    ForgotPasswordAccepted:
+      required:
+        - status
+        - retryAfterSeconds
+      type: object
+      properties:
+        status:
+          description: Always `passwordResetRequested` for a syntactically valid request.
+          $ref: "#/components/schemas/ForgotPasswordStatus"
+        retryAfterSeconds:
+          type: integer
+          description: Fixed reset-delivery interval in seconds; it does not disclose account or cooldown state.
+          format: int32
+    ForgotPasswordRequest:
+      required:
+        - email
+      type: object
+      properties:
+        email:
+          maxLength: 254
+          type: string
+          description: Local account email address. Maximum 254 Unicode scalar values; surrounding whitespace is invalid.
+          format: email
+    ForgotPasswordStatus:
+      enum:
+        - passwordResetRequested
+      type: string
+      description: Always `passwordResetRequested` for a syntactically valid request.
     InvalidUnicodePolicy:
       enum:
         - reject
@@ -1015,6 +1183,45 @@ components:
         - rejectWhole
       type: string
       description: Whole-input behavior when the source exceeds the maximum.
+    RecoveryProblemDetails:
+      required:
+        - title
+        - status
+        - detail
+        - category
+        - correlationId
+      type: object
+      properties:
+        type:
+          type:
+            - "null"
+            - string
+          description: RFC 9457 problem type reference.
+        title:
+          type: string
+          description: Short, stable problem summary.
+        status:
+          type: integer
+          description: HTTP status code for this occurrence.
+          format: int32
+        detail:
+          type: string
+          description: Safe explanation that never echoes submitted account, token or password values.
+        category:
+          type: string
+          description: "LinguaDesk error category: `invalidRequest`, `invalidOrExpiredPasswordReset`, or `availability`."
+        correlationId:
+          type: string
+          description: Opaque request correlation identifier.
+        errors:
+          type:
+            - "null"
+            - object
+          additionalProperties:
+            type: array
+            items:
+              type: string
+          description: Field messages keyed only by `email` or `newPassword`; present for field validation failures.
     RegistrationAccepted:
       required:
         - status
@@ -1113,6 +1320,44 @@ components:
         - verificationRequested
       type: string
       description: Always `verificationRequested` for a syntactically valid request.
+    ResetPasswordAccepted:
+      required:
+        - status
+      type: object
+      properties:
+        status:
+          description: Always `passwordReset` after a successful password reset.
+          $ref: "#/components/schemas/ResetPasswordStatus"
+    ResetPasswordRequest:
+      required:
+        - userId
+        - code
+        - newPassword
+      type: object
+      properties:
+        userId:
+          maxLength: 450
+          minLength: 1
+          type: string
+          description: Opaque local-account identifier delivered with the reset code. Maximum 450 characters.
+        code:
+          maxLength: 4096
+          minLength: 1
+          type: string
+          description: Unpadded base64url encoding of the delivered password-reset token. Maximum 4096 characters.
+          writeOnly: true
+        newPassword:
+          maxLength: 128
+          minLength: 15
+          type: string
+          description: Write-only replacement password containing 15 to 128 well-formed Unicode scalar values.
+          format: password
+          writeOnly: true
+    ResetPasswordStatus:
+      enum:
+        - passwordReset
+      type: string
+      description: Always `passwordReset` after a successful password reset.
     RewritingCapability:
       required:
         - maximumSourceCharacters
@@ -1374,5 +1619,6 @@ tags:
   - name: CapabilitiesEndpoints
   - name: RegistrationEndpoints
   - name: VerificationEndpoints
+  - name: RecoveryEndpoints
   - name: SessionEndpoints
   - name: BearerEndpoints

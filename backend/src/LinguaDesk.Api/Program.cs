@@ -6,6 +6,7 @@ using LinguaDesk.Api.Features.Identity;
 using LinguaDesk.Api.Features.Identity.Registration;
 using LinguaDesk.Api.Features.Identity.Bearer;
 using LinguaDesk.Api.Features.Identity.Session;
+using LinguaDesk.Api.Features.Identity.Recovery;
 using LinguaDesk.Api.Features.Identity.Verification;
 using LinguaDesk.Api.Infrastructure.Persistence;
 using LinguaDesk.Api.Infrastructure.Readiness;
@@ -78,6 +79,7 @@ app.MapHealthChecks(
 app.MapCapabilities();
 app.MapRegistration();
 app.MapAccountVerification();
+app.MapAccountRecovery();
 app.MapAccountSession();
 app.MapAccountBearer();
 

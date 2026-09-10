@@ -1,5 +1,6 @@
 using LinguaDesk.Api.Features.Identity.Registration;
 using LinguaDesk.Api.Features.Identity.Verification;
+using LinguaDesk.Api.Features.Identity.Recovery;
 using LinguaDesk.Api.Features.Identity.Bearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authentication;
@@ -62,8 +63,10 @@ public static class IdentityRegistrationExtensions
         services.AddScoped<RegistrationCoordinator>();
         services.AddScoped<AccountConfirmationCoordinator>();
         services.AddScoped<AccountVerificationDeliveryCoordinator>();
+        services.AddScoped<AccountPasswordResetCoordinator>();
         services.AddSingleton<RegistrationGate>();
         services.AddSingleton<IAccountConfirmationSender, UnavailableAccountConfirmationSender>();
+        services.AddSingleton<IAccountPasswordResetSender, UnavailableAccountPasswordResetSender>();
         services.AddTransient<LinguaDeskEmailConfirmationTokenProvider<IdentityUser>>();
         services.Configure<LinguaDeskEmailConfirmationTokenProviderOptions>(options =>
         {
@@ -75,6 +78,10 @@ public static class IdentityRegistrationExtensions
             options.Tokens.ProviderMap[LinguaDeskEmailConfirmationTokenPolicy.ProviderName] =
                 new TokenProviderDescriptor(typeof(LinguaDeskEmailConfirmationTokenProvider<IdentityUser>));
             options.Tokens.EmailConfirmationTokenProvider = LinguaDeskEmailConfirmationTokenPolicy.ProviderName;
+        });
+        services.Configure<DataProtectionTokenProviderOptions>(options =>
+        {
+            options.TokenLifespan = AccountPasswordResetPolicy.TokenLifespan;
         });
         services.AddVerifiedAccountAuthorization();
         return services;
