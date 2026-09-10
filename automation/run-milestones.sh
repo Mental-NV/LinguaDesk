@@ -20,10 +20,10 @@ muse_retry_delay_seconds=${MUSE_RUNNER_RETRY_DELAY_SECONDS:-5}
 runner="codex"
 
 usage() {
-    echo "Usage: $0 [-codex|-claude|--muse] [START_MILESTONE [END_MILESTONE]]" >&2
-    echo "Example: $0 3 10" >&2
-    echo "Example: $0 -claude 3 10" >&2
-    echo "Example: $0 --muse 3 10" >&2
+    echo "Usage: $0 [-codex|-claude|--muse] \"MILESTONE_OR_RANGE[, MILESTONE_OR_RANGE...]\"" >&2
+    echo "Example: $0 \"19, 15-18, 20, 21, 22-26\"" >&2
+    echo "Example: $0 -claude \"19, 15-18, 20\"" >&2
+    echo "Example: $0 --muse \"19, 15-18, 20\"" >&2
     echo "Runners: -codex (default, model '$codex_model') | -claude (ori claude, model '$claude_model') | --muse (muse exec, model '$muse_model')" >&2
 }
 
@@ -38,17 +38,40 @@ require_command() {
     fi
 }
 
-validate_number() {
+parse_milestones() {
     local value=$1
-    local name=$2
+    local item
+    local range_start
+    local range_end
+    local i
+    local -a requested_items
 
-    case "$value" in
-        ""|*[!0-9]*) fail "$name must be a positive integer." ;;
-    esac
-
-    if [ "$value" -eq 0 ]; then
-        fail "$name must be greater than zero."
+    if [[ ! "$value" =~ ^[[:space:]]*[0-9]+([[:space:]]*-[[:space:]]*[0-9]+)?[[:space:]]*(,[[:space:]]*[0-9]+([[:space:]]*-[[:space:]]*[0-9]+)?[[:space:]]*)*$ ]]; then
+        fail "Milestones must be numbers or inclusive number ranges separated by commas."
     fi
+
+    IFS=',' read -r -a requested_items <<< "$value"
+    for item in "${requested_items[@]}"; do
+        item=$(printf '%s' "$item" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+        if [[ "$item" =~ ^([0-9]+)[[:space:]]*-[[:space:]]*([0-9]+)$ ]]; then
+            range_start=$((10#${BASH_REMATCH[1]}))
+            range_end=$((10#${BASH_REMATCH[2]}))
+        else
+            range_start=$((10#$item))
+            range_end=$range_start
+        fi
+
+        if [ "$range_start" -eq 0 ] || [ "$range_end" -eq 0 ]; then
+            fail "Milestone numbers must be greater than zero."
+        fi
+        if [ "$range_start" -gt "$range_end" ]; then
+            fail "Milestone range '$item' must be in ascending order."
+        fi
+
+        for ((i=range_start; i<=range_end; i++)); do
+            milestones+=("$(printf "M%03d" "$i")")
+        done
+    done
 }
 
 ensure_clean_repository() {
@@ -236,23 +259,13 @@ while [ "$#" -gt 0 ]; do
     esac
 done
 
-if [ "$#" -gt 2 ]; then
+if [ "$#" -ne 1 ]; then
     usage
     exit 2
 fi
 
-start_milestone=${1:-1}
-end_milestone=${2:-999}
-
-validate_number "$start_milestone" "START_MILESTONE"
-validate_number "$end_milestone" "END_MILESTONE"
-
-start_milestone=$((10#$start_milestone))
-end_milestone=$((10#$end_milestone))
-
-if [ "$start_milestone" -gt "$end_milestone" ]; then
-    fail "START_MILESTONE must not be greater than END_MILESTONE."
-fi
+milestones=()
+parse_milestones "$1"
 
 if [ "$runner" = "claude" ]; then
     require_command ori
@@ -283,9 +296,7 @@ cd "$repository_root"
 ensure_clean_repository
 python3 automation/context.py audit
 
-for ((i=start_milestone; i<=end_milestone; i++)); do
-    milestone=$(printf "M%03d" "$i")
-
+for milestone in "${milestones[@]}"; do
     echo
     echo "========================================"
     echo "Processing $milestone"

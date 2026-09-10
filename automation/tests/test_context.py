@@ -405,7 +405,20 @@ class RunnerTests(unittest.TestCase):
             yield root, env, git
 
     def run_fixture(self, root, env, *extra):
-        return subprocess.run(['bash', str(root / 'automation/run-milestones.sh'), *extra, '15', '15'], env=env, text=True, capture_output=True)
+        return subprocess.run(
+            ['bash', str(root / 'automation/run-milestones.sh'), *extra, '15'],
+            env=env,
+            text=True,
+            capture_output=True,
+        )
+
+    def run_fixture_args(self, root, env, *args):
+        return subprocess.run(
+            ['bash', str(root / 'automation/run-milestones.sh'), *args],
+            env=env,
+            text=True,
+            capture_output=True,
+        )
 
     def prepare_plan(self, root, git):
         for name in context.RULES:
@@ -432,6 +445,44 @@ class RunnerTests(unittest.TestCase):
             self.assertIn('MILESTONE_AUTOMATION_STATUS: READY', result.stdout, result.stderr)
             self.assertNotIn('Implementing M015', result.stdout)
             self.assertEqual(before, git('rev-parse', 'HEAD'))
+
+    def test_numbers_and_ranges_are_processed_in_supplied_order(self):
+        with self.fixture() as (root, env, git):
+            milestone_ids = ('M019', 'M015', 'M016', 'M017', 'M018', 'M020')
+            (root / 'docs/07-roadmap.md').write_text(
+                ''.join(f'| {milestone_id} | Test |\n' for milestone_id in milestone_ids)
+            )
+            git('add', '.')
+            git('commit', '-m', 'Add roadmap milestones')
+            for milestone_id in milestone_ids:
+                subprocess.check_call(
+                    ['git', '-C', str(root), 'commit', '--allow-empty', '-m', f'{milestone_id} implemented'],
+                    stdout=subprocess.DEVNULL,
+                )
+
+            result = self.run_fixture_args(
+                root,
+                env,
+                '19, 15-18, 20',
+            )
+
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            positions = [result.stdout.index(f'Processing {milestone_id}') for milestone_id in milestone_ids]
+            self.assertEqual(positions, sorted(positions))
+
+    def test_prefixed_ids_are_rejected(self):
+        with self.fixture() as (root, env, _git):
+            result = self.run_fixture_args(root, env, 'M019, 15-18')
+
+            self.assertEqual(result.returncode, 1)
+            self.assertIn('must be numbers or inclusive number ranges', result.stderr)
+
+    def test_two_argument_range_is_rejected(self):
+        with self.fixture() as (root, env, _git):
+            result = self.run_fixture_args(root, env, '15', '20')
+
+            self.assertEqual(result.returncode, 2)
+            self.assertIn('MILESTONE_OR_RANGE', result.stderr)
 
     def test_current_planning_commit_is_reused(self):
         with self.fixture() as (root, env, git):
