@@ -241,7 +241,10 @@ class RunnerTests(unittest.TestCase):
             self.assertIn('muse working...', result.stdout)
             self.assertNotIn('Implementing M015', result.stdout)
             self.assertEqual(before, git('rev-parse', 'HEAD'))
-            for flag in ('exec', '--model', '--reasoning-effort', '--workspace', '--trust-workspace', '--disable-approval'):
+            for flag in (
+                'exec', '--model', '--reasoning-effort', '--workspace',
+                '--trust-workspace', '--disable-approval', '--disable-sandbox',
+            ):
                 self.assertIn(flag, result.stdout)
 
     def test_muse_current_planning_commit_is_reused(self):

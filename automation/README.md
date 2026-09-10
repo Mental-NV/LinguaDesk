@@ -1,25 +1,16 @@
 # Milestone automation
 
-`automation/run-milestones.sh` plans, implements, verifies and commits milestones sequentially with noninteractive agent runs. Start only from a clean repository with the automation changes committed and the selected runner's CLI authenticated. Python 3.9+, Git and the documented application toolchains are required.
+`automation/run-milestones.sh` plans, implements, verifies and commits roadmap
+milestones in numeric order. Run it from a clean repository with Git, Python
+3.9+, the project toolchains and the selected authenticated agent CLI available.
+
+## Usage
 
 ```sh
-./automation/run-milestones.sh 15 20            # codex runner (default)
-./automation/run-milestones.sh -claude 15 20   # claude runner via ori
-./automation/run-milestones.sh --muse 15 20    # muse runner via muse exec
+./automation/run-milestones.sh 15 20           # Codex (default)
+./automation/run-milestones.sh --claude 15 20  # Claude
+./automation/run-milestones.sh --muse 15 20    # Muse
 ```
 
-Switches are `-codex` (default), `-claude` and `--muse` (`--codex`/`--claude`/`-muse` also accepted). The codex runner needs the Codex CLI on PATH; the claude runner needs the `ori` and `claude` CLIs and invokes `ori claude --model <claude_model> --effort <claude_effort> -p --dangerously-skip-permissions`; the muse runner needs the `muse` CLI and invokes `muse exec --model <muse_model> --reasoning-effort <muse_reasoning_effort> --workspace <repo> --trust-workspace --disable-approval`. Runner models/effort are configured via `codex_model`, `codex_reasoning_effort`, `claude_model`, `claude_effort`, `muse_model` and `muse_reasoning_effort` at the top of the script. Agent output streams live via `tee`; only the status-line check reads back the captured copy.
-
-Bounds are inclusive numeric IDs (defaults 1–999). The runner follows numeric order within those bounds; it does not compute the roadmap's recommended dependency order. Consult [current delivery status](../docs/delivery/current.md) and choose eligible bounds. It stops at an undefined milestone, readiness blocker, missing final status, failed context/link check, failed regression or Git error. Existing implementation commits are skipped, including legacy M001/M002 wording.
-
-Each unfinished milestone gets a planning run and `<ID> planned` commit, an implementation run, regression checks and `<ID> implemented` commit. An existing planning commit is reusable only when its selected context lock is current. Missing/stale manifests trigger planning again; READY without a valid manifest cannot proceed to implementation or a planning commit. Source hashes check freshness, not semantic readiness. Planning/implementation prompts use the [bounded context workflow](context-guide.md), with all package artifacts under `docs/08-backlogs/<ID>/`.
-
-The implementation run owns every selected package check and evidence gate. The runner additionally executes backend check/smoke, contract drift, AI check/probe and frontend check/smoke. It does not establish live-provider, email, manual accessibility or release evidence through these deterministic checks. If a run stops with changes, inspect and commit, restore or stash them deliberately before resuming; the clean-tree guard prevents absorbing unrelated work.
-
-Documentation/tooling checks that do not invoke an agent runner, application services or commits:
-
-```sh
-python3 automation/context.py audit
-python3 -m unittest discover -s automation/tests
-bash -n automation/run-milestones.sh
-```
+The start and end milestone numbers are inclusive. Both are optional; they
+default to `1` and `999`. Use the same number twice to run one milestone.

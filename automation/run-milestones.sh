@@ -105,9 +105,11 @@ run_claude_harness() {
 
 # Muse differs from the codex CLI: it has no `exec --cd/--approve-for-me`
 # flags. The working directory comes from a subshell cd, workspace tooling
-# is rooted with --workspace, and unattended runs use --trust-workspace plus
-# --disable-approval (sandbox stays on). The prompt stays a positional
-# argument like codex so run_agent needs no per-runner templating.
+# is rooted with --workspace. Unattended runs trust the repository and disable
+# both approval prompts and the sandbox: milestone verification needs registry
+# access and loopback sockets, and a headless run cannot approve an escalation.
+# The prompt stays a positional argument like codex so run_agent needs no
+# per-runner templating.
 run_muse_harness() {
     (
         cd "$repository_root" || exit 1
@@ -117,6 +119,7 @@ run_muse_harness() {
             --workspace "$repository_root" \
             --trust-workspace \
             --disable-approval \
+            --disable-sandbox \
             "$1"
     )
 }
