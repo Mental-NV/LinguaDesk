@@ -1,0 +1,114 @@
+{
+  "version": 1,
+  "scope": "M014",
+  "sources": [
+    {
+      "path": "docs/07-roadmap.md",
+      "ids": [
+        "M014"
+      ],
+      "use": "excerpt",
+      "reason": "Selected milestone outcome, prerequisites and verification allocation",
+      "sha256": "22555c1f17e5a6b62180ee8aad9702699960a2617c607772ab52f4b379ae14b7"
+    },
+    {
+      "path": "docs/01-PRD.md",
+      "ids": [
+        "FR-002"
+      ],
+      "use": "excerpt",
+      "reason": "Selected recovery requirement: self-service reset",
+      "sha256": "c5e2051e4bdf1ccedf2982f2e727c05b7c16534aff20a741b33e20c2f6fc25ac"
+    },
+    {
+      "path": "docs/02-ux-specification.md",
+      "heading": "9. Local-account and availability flows",
+      "use": "excerpt",
+      "reason": "Canonical forgot/reset form, message and focus behavior",
+      "sha256": "e04b0fae9d96f500a8df34adb10beee3bb38491385e1c6a54956fa1311586809"
+    },
+    {
+      "path": "docs/ux/acceptance.md",
+      "ids": [
+        "UX-AC-017",
+        "UX-AC-018",
+        "UX-AC-019",
+        "UX-AC-020",
+        "UX-AC-101",
+        "UX-AC-102",
+        "UX-AC-103"
+      ],
+      "use": "excerpt",
+      "reason": "Selected recovery and shared-form acceptance rows",
+      "sha256": "96cb303f551f5a538911081ed1c4fc8b4daa01658aefceae21c3a9fcc8844fa2"
+    },
+    {
+      "path": "docs/ux/processing.md",
+      "ids": [
+        "UX-MSG-031",
+        "UX-MSG-033",
+        "UX-MSG-036",
+        "UX-MSG-038",
+        "UX-MSG-039",
+        "UX-MSG-040",
+        "UX-MSG-042",
+        "UX-MSG-044"
+      ],
+      "use": "excerpt",
+      "reason": "Exact normative copy for recovery success, failure and field errors",
+      "sha256": "d5649bd7dc24666a18a3a26cf40b31af68f85b3e53935a6c7aa687468dc7dd65"
+    },
+    {
+      "path": "docs/06-verification-plan.md",
+      "heading": "2.2 Stable check groups",
+      "use": "excerpt",
+      "reason": "V-003/V-009/V-010/V-012/V-015 assertion ownership for this slice",
+      "sha256": "95bf3bf55aa828bb457ff50d877178be6fb2fe7c3532fb21bae72cdfc7e49902"
+    },
+    {
+      "path": "docs/verification/frontend.md",
+      "heading": "4.1 Shared UI fixtures",
+      "use": "excerpt",
+      "reason": "Deterministic UI harness rules, fixtures and password/token conventions",
+      "sha256": "7b6236fc51c7069628cb2e80b7df5d4f8642279f5a710d0486a1ca2077f0e272"
+    },
+    {
+      "path": "docs/08-backlogs/M010/spec.md",
+      "use": "reference",
+      "reason": "Completed reset API contract adopted unchanged; open only for regression questions",
+      "sha256": "0ef4f8c09c02ad76457bd77a458fd7366e0e9312b9cf3c516c0d327f1ceae0c4"
+    },
+    {
+      "path": "docs/08-backlogs/M013/spec.md",
+      "use": "reference",
+      "reason": "Completed sign-in form conventions and staged placeholder replaced by this slice",
+      "sha256": "554c82800bf43006a447f163862ff2c06123b77692951ed154e57cc5295a8daa"
+    },
+    {
+      "path": "frontend/src/api/accounts.ts",
+      "use": "reference",
+      "reason": "Wrapper pattern extended with the two recovery operations",
+      "sha256": "78064f20cce5a6591262be0380ea5547feb707fa7c9531a0c1975db957eded77"
+    },
+    {
+      "path": "frontend/src/shell/App.tsx",
+      "use": "reference",
+      "reason": "Staged forgot-password route replaced; reset-password route added",
+      "sha256": "ee7a32b7c7469a3698456dc7dbe6c6d12cd7164510fe730e8a539df155d5fb07"
+    },
+    {
+      "path": "frontend/src/auth/VerifyEmailEntryPage.tsx",
+      "use": "reference",
+      "reason": "Link-material classification and stripping pattern reused for reset links",
+      "sha256": "3c873b211b939bfb6ff46935ab4abeb2663a885aa7dc09338a0e080e6da44270"
+    }
+  ],
+  "source_map_sha256": "d73c68a9b32902d67c8a43419c1374e56cd7433621a34a4d19faf4e983382dbd",
+  "baseline_commit": "0f77c28d47650070a1898bd810d1edf4523718f9",
+  "locked_files": {
+    "docs/00-SDD-Planning-Workflow.md": "183ae93148ff594f9f1e021aa7543baa8878e9cc0bcfd69ebc696c28976e2945",
+    "docs/00-workflow/execution.md": "f362a1384cefef24ba204e0723e3190857c8cca9bcd91908136932e19c5caf02",
+    "docs/08-backlogs/M014/spec.md": "be9ab7dce27a86a7336f42427a56f7457d3376114c4c72f9c98a076e2640c456",
+    "docs/08-backlogs/M014/plan.md": "d47b1a80f476399b7b90d76da77c472b3ffd836dff22eaa0b5c1a87139ed4f9a"
+  }
+}
