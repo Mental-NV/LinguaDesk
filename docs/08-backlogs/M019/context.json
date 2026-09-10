@@ -1,0 +1,113 @@
+{
+  "version": 1,
+  "scope": "M019",
+  "sources": [
+    {
+      "path": "docs/07-roadmap.md",
+      "ids": [
+        "M019"
+      ],
+      "use": "excerpt",
+      "reason": "Selected milestone outcome, prerequisites and verification allocation",
+      "sha256": "3a142c58bfdf76390c0da39538559984192c7fa980b9b7893153a103ec18e6a4"
+    },
+    {
+      "path": "docs/04-llm-specification.md",
+      "heading": "5. Provider configuration and capability evidence",
+      "use": "excerpt",
+      "reason": "Canonical registry, credential, adapter and bound behavior for this slice",
+      "sha256": "942d6ccc2e479ff970bc49e100d1ebea2d4ec7c1884fbaf4d1f96130351b29aa"
+    },
+    {
+      "path": "docs/04-llm-specification.md",
+      "heading": "8. Privacy and owner diagnostics",
+      "use": "excerpt",
+      "reason": "Secret handling and diagnostic limits for credentials and reports",
+      "sha256": "e0b358fa0bf8cc8d895415f818a234086a6462741042a3260004cd6beaeb5f26"
+    },
+    {
+      "path": "docs/product/open-questions.md",
+      "ids": [
+        "Q-001",
+        "Q-007"
+      ],
+      "use": "excerpt",
+      "reason": "Question dispositions bounding this access-evidence increment",
+      "sha256": "4dc61556971d58ac8c0af094159d9c67a2d977507c54b242b54f5d076a912874"
+    },
+    {
+      "path": "docs/product/deferred-scope.md",
+      "ids": [
+        "DF-004"
+      ],
+      "use": "excerpt",
+      "reason": "Deferred routing scope excluded from this slice",
+      "sha256": "4b6bab37be0e7b27167f92f0a03f34c461f888797134770f0a542f462d62a18f"
+    },
+    {
+      "path": "docs/06-verification-plan.md",
+      "heading": "2.2 Stable check groups",
+      "use": "excerpt",
+      "reason": "V-008 assertion ownership for adapter and live capability evidence",
+      "sha256": "95bf3bf55aa828bb457ff50d877178be6fb2fe7c3532fb21bae72cdfc7e49902"
+    },
+    {
+      "path": "docs/verification/backend.md",
+      "heading": "3.3 Independent AI workflows",
+      "use": "excerpt",
+      "reason": "Host-independent build, conformance and live-run workflow rules",
+      "sha256": "93dfae45cbdb8562309e250ab771ac5787ffb79f8517a148ca90702123b936b8"
+    },
+    {
+      "path": "docs/research/deepseek-2026-09-08.md",
+      "heading": "5.3 DeepSeek documentation checked on 2026-09-11",
+      "use": "reference",
+      "reason": "Provider snapshot backing the first adapter; open on wire drift only",
+      "sha256": "f3a5ae1403742f1c62b749a3d95d2cf2d1ba459e6254a9bb74f87676db1e6e47"
+    },
+    {
+      "path": "docs/decisions/ADR-012.md",
+      "use": "reference",
+      "reason": "Shared AI boundary and evaluation-ownership decision; open if the slice changes it",
+      "sha256": "3f60892d42cd948b27a4870d4a53248b36b0f4ec6dea7c9da2a059f1c37a0ffd"
+    },
+    {
+      "path": "docs/08-backlogs/M004/spec.md",
+      "use": "reference",
+      "reason": "Completed AI inner-loop dependency; open only for regression questions",
+      "sha256": "f44774a5418c16ab57f1f3b8ae12104a48fd5e2a77d68369bef8f7d9841254bc"
+    },
+    {
+      "path": "docs/08-backlogs/M005/spec.md",
+      "use": "reference",
+      "reason": "Completed shared input/contract dependency; open only for regression questions",
+      "sha256": "da5938537df39deb4fe4fe82c918010440deb39165ff3d2c684a79db0d76c12d"
+    },
+    {
+      "path": "backend/tools/LinguaDesk.Ai.Evaluation/Program.cs",
+      "use": "reference",
+      "reason": "Runner extended with profile selection, conformance and live access check",
+      "sha256": "1c2f9cf9c3074e0c106b3d61f75a0e62f09eba0c1110128960daddffbf0c4096"
+    },
+    {
+      "path": "backend/src/LinguaDesk.Infrastructure.Ai/LinguaDesk.Infrastructure.Ai.csproj",
+      "use": "reference",
+      "reason": "AI library dependency pin guarded by the ai.sh lock-graph check",
+      "sha256": "6263dbfb961b7820b0c8e3675c413f6987ec727a47421482eea6a43869c9f28a"
+    },
+    {
+      "path": "scripts/ai.sh",
+      "use": "reference",
+      "reason": "Offline AI check and live-command surface extended by this slice",
+      "sha256": "9b63441411ce49a002d38f55e303fb42b9f1a65697b8dc50857d10f61ab86e21"
+    }
+  ],
+  "source_map_sha256": "8caababde1d58491df753f79ff77cc0a37924d562613e143cf766c270b833cd9",
+  "baseline_commit": "7f8a68a42c1a283e60c4142906dea8387674e724",
+  "locked_files": {
+    "docs/00-SDD-Planning-Workflow.md": "183ae93148ff594f9f1e021aa7543baa8878e9cc0bcfd69ebc696c28976e2945",
+    "docs/00-workflow/execution.md": "f362a1384cefef24ba204e0723e3190857c8cca9bcd91908136932e19c5caf02",
+    "docs/08-backlogs/M019/spec.md": "670f54f4461664919a34caaac7157799f8995393b7255f06d093a0ec64b803be",
+    "docs/08-backlogs/M019/plan.md": "b33a35a1fc691b8a137548788f1253628ee956cf47b807ddd0e8f84eda22ab28"
+  }
+}
