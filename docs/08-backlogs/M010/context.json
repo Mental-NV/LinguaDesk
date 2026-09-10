@@ -7,14 +7,14 @@
       "heading": "Selected milestone",
       "use": "reference",
       "reason": "Mutable current selection authority; verify M010 remains the planned scope before execution",
-      "sha256": "d66823ee59ae8de9a77c7cd0b397ba59c0f7d95f2cd1bdcb534be3e3aa70ee00"
+      "sha256": "63a42e8070d62461d4f5ba4653773c9fd31071f70386dfd7af0153d9621ebc25"
     },
     {
       "path": "docs/delivery/current.md",
       "heading": "Completed milestones",
       "use": "reference",
       "reason": "Mutable dependency index confirming M009 completion",
-      "sha256": "e59dbb421fc3d832bfc7a725cc6b995b04a3ab3b39d016fd5af16772e85c991d"
+      "sha256": "ed74890fe8df32b8227f9e3eb108a8508f4ebc8edd232a46ae3d965a069269de"
     },
     {
       "path": "docs/07-roadmap.md",
@@ -168,7 +168,7 @@
       ],
       "use": "excerpt",
       "reason": "Current prior evidence and V-group allocation for the selected recovery portion",
-      "sha256": "86820ad409934ee475ae3d29d01234cd5921e3ae26661afe8e8c75252a4e9b33"
+      "sha256": "49239d9e74215f7d669e2b0acfe126568693c0ee71cc1249c38c5aad7b7ecddd"
     },
     {
       "path": "backend/src/LinguaDesk.Api/Program.cs",
@@ -286,7 +286,7 @@
     }
   ],
   "source_map_sha256": "eb23ba4c42ab1503acb6f9bd380852e1eb5c4be48099466c1de4fca030997d7d",
-  "baseline_commit": "0f204e9bbb315f2ef682607d7d83fc8a67965be3",
+  "baseline_commit": "f099cfa4a5586b0e28ed48e998f52c00615190d9",
   "locked_files": {
     "docs/00-SDD-Planning-Workflow.md": "183ae93148ff594f9f1e021aa7543baa8878e9cc0bcfd69ebc696c28976e2945",
     "docs/00-workflow/execution.md": "f362a1384cefef24ba204e0723e3190857c8cca9bcd91908136932e19c5caf02",
