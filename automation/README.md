@@ -5,9 +5,10 @@
 ```sh
 ./automation/run-milestones.sh 15 20            # codex runner (default)
 ./automation/run-milestones.sh -claude 15 20   # claude runner via ori
+./automation/run-milestones.sh --muse 15 20    # muse runner via muse exec
 ```
 
-Switches are `-codex` (default) and `-claude`. The codex runner needs the Codex CLI on PATH; the claude runner needs the `ori` and `claude` CLIs and invokes `ori claude --model <claude_model> --effort <claude_effort> -p --dangerously-skip-permissions`. Runner models/effort are configured via `codex_model`, `codex_reasoning_effort`, `claude_model` and `claude_effort` at the top of the script.
+Switches are `-codex` (default), `-claude` and `--muse` (`--codex`/`--claude`/`-muse` also accepted). The codex runner needs the Codex CLI on PATH; the claude runner needs the `ori` and `claude` CLIs and invokes `ori claude --model <claude_model> --effort <claude_effort> -p --dangerously-skip-permissions`; the muse runner needs the `muse` CLI and invokes `muse exec --model <muse_model> --reasoning-effort <muse_reasoning_effort> --workspace <repo> --trust-workspace --disable-approval`. Runner models/effort are configured via `codex_model`, `codex_reasoning_effort`, `claude_model`, `claude_effort`, `muse_model` and `muse_reasoning_effort` at the top of the script. Agent output streams live via `tee`; only the status-line check reads back the captured copy.
 
 Bounds are inclusive numeric IDs (defaults 1–999). The runner follows numeric order within those bounds; it does not compute the roadmap's recommended dependency order. Consult [current delivery status](../docs/delivery/current.md) and choose eligible bounds. It stops at an undefined milestone, readiness blocker, missing final status, failed context/link check, failed regression or Git error. Existing implementation commits are skipped, including legacy M001/M002 wording.
 

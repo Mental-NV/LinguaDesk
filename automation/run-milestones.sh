@@ -12,13 +12,16 @@ codex_model="gpt-5.6-sol"
 codex_reasoning_effort="medium"
 claude_model="meta/muse-spark-1.3-contributor"
 claude_effort="high"
+muse_model="meta/muse-spark-1.3-contributor"
+muse_reasoning_effort="high"
 runner="codex"
 
 usage() {
-    echo "Usage: $0 [-codex|-claude] [START_MILESTONE [END_MILESTONE]]" >&2
+    echo "Usage: $0 [-codex|-claude|--muse] [START_MILESTONE [END_MILESTONE]]" >&2
     echo "Example: $0 3 10" >&2
     echo "Example: $0 -claude 3 10" >&2
-    echo "Runners: -codex (default, model '$codex_model') | -claude (ori claude, model '$claude_model')" >&2
+    echo "Example: $0 --muse 3 10" >&2
+    echo "Runners: -codex (default, model '$codex_model') | -claude (ori claude, model '$claude_model') | --muse (muse exec, model '$muse_model')" >&2
 }
 
 fail() {
@@ -100,30 +103,54 @@ run_claude_harness() {
     )
 }
 
+# Muse differs from the codex CLI: it has no `exec --cd/--approve-for-me`
+# flags. The working directory comes from a subshell cd, workspace tooling
+# is rooted with --workspace, and unattended runs use --trust-workspace plus
+# --disable-approval (sandbox stays on). The prompt stays a positional
+# argument like codex so run_agent needs no per-runner templating.
+run_muse_harness() {
+    (
+        cd "$repository_root" || exit 1
+        muse exec \
+            --model "$muse_model" \
+            --reasoning-effort "$muse_reasoning_effort" \
+            --workspace "$repository_root" \
+            --trust-workspace \
+            --disable-approval \
+            "$1"
+    )
+}
+
 run_agent() {
     local template=$1
     local milestone=$2
     local expected_status=$3
     local prompt
-    local output
+    local output_file
     local agent_status=0
     prompt=$(sed "s/{{MILESTONE}}/$milestone/g" "$template")
+    output_file=$(mktemp)
 
+    # Stream live through tee so intermediate results are visible while the
+    # run is in progress; the file copy is only for the status-line check.
     if [ "$runner" = "claude" ]; then
-        output=$(run_claude_harness "$prompt") || agent_status=$?
+        run_claude_harness "$prompt" 2>&1 | tee "$output_file" || agent_status=$?
+    elif [ "$runner" = "muse" ]; then
+        run_muse_harness "$prompt" 2>&1 | tee "$output_file" || agent_status=$?
     else
-        output=$(run_codex_harness "$prompt") || agent_status=$?
+        run_codex_harness "$prompt" 2>&1 | tee "$output_file" || agent_status=$?
     fi
 
-    printf '%s\n' "$output"
-
     if [ "$agent_status" -ne 0 ]; then
+        rm -f "$output_file"
         return "$agent_status"
     fi
 
-    if ! grep -Fxq "$expected_status" <<<"$output"; then
+    if ! grep -Fxq "$expected_status" "$output_file"; then
+        rm -f "$output_file"
         fail "Agent ($runner) did not report the required status '$expected_status'. Inspect the working tree before resuming."
     fi
+    rm -f "$output_file"
 }
 
 commit_changes() {
@@ -141,6 +168,7 @@ while [ "$#" -gt 0 ]; do
     case "$1" in
         -codex|--codex) runner="codex"; shift ;;
         -claude|--claude) runner="claude"; shift ;;
+        -muse|--muse) runner="muse"; shift ;;
         -*) usage; exit 2 ;;
         *) break ;;
     esac
@@ -167,6 +195,8 @@ fi
 if [ "$runner" = "claude" ]; then
     require_command ori
     require_command claude
+elif [ "$runner" = "muse" ]; then
+    require_command muse
 else
     require_command codex
 fi

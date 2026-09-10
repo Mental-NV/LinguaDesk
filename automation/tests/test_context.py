@@ -159,7 +159,12 @@ class RunnerTests(unittest.TestCase):
             (root / 'backend').mkdir()
             (root / 'backend/LinguaDesk.slnx').write_text('test')
             (root / 'fake-bin').mkdir()
-            for name, body in {'dotnet': 'exit 0', 'codex': 'echo MILESTONE_AUTOMATION_STATUS: READY'}.items():
+            bodies = {
+                'dotnet': 'exit 0',
+                'codex': 'echo MILESTONE_AUTOMATION_STATUS: READY',
+                'muse': 'echo \"muse-harness-args: $*\"\necho muse working...\necho MILESTONE_AUTOMATION_STATUS: READY',
+            }
+            for name, body in bodies.items():
                 file = root / 'fake-bin' / name
                 file.write_text('#!/bin/sh\n' + body + '\n')
                 file.chmod(0o755)
@@ -173,8 +178,8 @@ class RunnerTests(unittest.TestCase):
             git('commit', '-m', 'fixture')
             yield root, env, git
 
-    def run_fixture(self, root, env):
-        return subprocess.run(['bash', str(root / 'automation/run-milestones.sh'), '15', '15'], env=env, text=True, capture_output=True)
+    def run_fixture(self, root, env, *extra):
+        return subprocess.run(['bash', str(root / 'automation/run-milestones.sh'), *extra, '15', '15'], env=env, text=True, capture_output=True)
 
     def prepare_plan(self, root, git):
         for name in context.RULES:
@@ -224,6 +229,30 @@ class RunnerTests(unittest.TestCase):
             result = self.run_fixture(root, env)
             self.assertIn('Planning M015', result.stdout, result.stderr)
             self.assertNotIn('Implementing M015', result.stdout)
+            self.assertNotEqual(result.returncode, 0)
+            self.assertEqual(before, git('rev-parse', 'HEAD'))
+
+    def test_muse_ready_without_lock_cannot_commit_or_implement(self):
+        with self.fixture() as (root, env, git):
+            before = git('rev-parse', 'HEAD')
+            result = self.run_fixture(root, env, '--muse')
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn('MILESTONE_AUTOMATION_STATUS: READY', result.stdout, result.stderr)
+            self.assertIn('muse working...', result.stdout)
+            self.assertNotIn('Implementing M015', result.stdout)
+            self.assertEqual(before, git('rev-parse', 'HEAD'))
+            for flag in ('exec', '--model', '--reasoning-effort', '--workspace', '--trust-workspace', '--disable-approval'):
+                self.assertIn(flag, result.stdout)
+
+    def test_muse_current_planning_commit_is_reused(self):
+        with self.fixture() as (root, env, git):
+            self.prepare_plan(root, git)
+            before = git('rev-parse', 'HEAD')
+            result = self.run_fixture(root, env, '-muse')
+            self.assertIn('Reusing it.', result.stdout, result.stderr)
+            self.assertIn('Implementing M015', result.stdout)
+            self.assertNotIn('Planning M015', result.stdout)
+            # Fake implementation reports READY, not COMPLETE, so no commit follows.
             self.assertNotEqual(result.returncode, 0)
             self.assertEqual(before, git('rev-parse', 'HEAD'))
 
