@@ -8,6 +8,7 @@ roadmap="$repository_root/docs/07-roadmap.md"
 solution="$repository_root/backend/LinguaDesk.slnx"
 plan_prompt_template="$script_directory/plan.prompt.md"
 implement_prompt_template="$script_directory/implement.prompt.md"
+muse_stream_renderer="$script_directory/muse_stream.py"
 codex_model="gpt-5.6-sol"
 codex_reasoning_effort="medium"
 claude_model="meta/muse-spark-1.3-contributor"
@@ -108,19 +109,20 @@ run_claude_harness() {
 # is rooted with --workspace. Unattended runs trust the repository and disable
 # both approval prompts and the sandbox: milestone verification needs registry
 # access and loopback sockets, and a headless run cannot approve an escalation.
-# The prompt stays a positional argument like codex so run_agent needs no
-# per-runner templating.
+# JSONL mode exposes incremental output events; the unbuffered renderer turns
+# them back into a plain live transcript for tee and the final status check.
 run_muse_harness() {
     (
         cd "$repository_root" || exit 1
         muse exec \
+            --json \
             --model "$muse_model" \
             --reasoning-effort "$muse_reasoning_effort" \
             --workspace "$repository_root" \
             --trust-workspace \
             --disable-approval \
             --disable-sandbox \
-            "$1"
+            "$1" | python3 -u "$muse_stream_renderer"
     )
 }
 
@@ -213,6 +215,7 @@ require_command python3
 [ -f "$solution" ] || fail "Solution not found: $solution"
 [ -f "$plan_prompt_template" ] || fail "Plan prompt not found: $plan_prompt_template"
 [ -f "$implement_prompt_template" ] || fail "Implementation prompt not found: $implement_prompt_template"
+[ -f "$muse_stream_renderer" ] || fail "Muse stream renderer not found: $muse_stream_renderer"
 
 actual_root=$(git -C "$repository_root" rev-parse --show-toplevel)
 if [ "$actual_root" != "$repository_root" ]; then

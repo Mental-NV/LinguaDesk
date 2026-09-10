@@ -16,6 +16,65 @@ spec = importlib.util.spec_from_file_location('context', MODULE)
 context = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(context)
 
+MUSE_STREAM_MODULE = MODULE.parent / 'muse_stream.py'
+muse_stream_spec = importlib.util.spec_from_file_location(
+    'muse_stream', MUSE_STREAM_MODULE,
+)
+muse_stream = importlib.util.module_from_spec(muse_stream_spec)
+muse_stream_spec.loader.exec_module(muse_stream)
+
+
+class FlushingBuffer(io.StringIO):
+    def __init__(self):
+        super().__init__()
+        self.flushes = 0
+
+    def flush(self):
+        self.flushes += 1
+        super().flush()
+
+
+class MuseStreamTests(unittest.TestCase):
+    def test_deltas_stream_as_plain_text_without_terminal_duplication(self):
+        events = [
+            'muse: workspace trusted\n',
+            json.dumps({
+                'payload_type': 'run.output.delta',
+                'payload': {'text': 'working...'},
+            }) + '\n',
+            json.dumps({
+                'payload_type': 'run.output.delta',
+                'payload': {'text': '\nMILESTONE_AUTOMATION_STATUS: READY'},
+            }) + '\n',
+            json.dumps({
+                'payload_type': 'run.terminal.completed',
+                'payload': {
+                    'text': 'working...\nMILESTONE_AUTOMATION_STATUS: READY',
+                },
+            }) + '\n',
+        ]
+        output = FlushingBuffer()
+
+        muse_stream.render(events, output)
+
+        self.assertEqual(
+            output.getvalue(),
+            'muse: workspace trusted\nworking...\n'
+            'MILESTONE_AUTOMATION_STATUS: READY\n',
+        )
+        self.assertGreaterEqual(output.flushes, 4)
+
+    def test_terminal_text_is_used_when_no_deltas_are_available(self):
+        event = json.dumps({
+            'payload_type': 'run.terminal.completed',
+            'payload': {'text': 'final only'},
+        }) + '\n'
+        output = FlushingBuffer()
+
+        muse_stream.render([event], output)
+
+        self.assertEqual(output.getvalue(), 'final only\n')
+
 
 class ContextTests(unittest.TestCase):
     def setUp(self):
@@ -151,7 +210,10 @@ class RunnerTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp).resolve()
             (root / 'automation').mkdir()
-            for name in ('context.py', 'run-milestones.sh', 'plan.prompt.md', 'implement.prompt.md'):
+            for name in (
+                'context.py', 'run-milestones.sh', 'muse_stream.py',
+                'plan.prompt.md', 'implement.prompt.md',
+            ):
                 shutil.copyfile(MODULE.parent / name, root / 'automation' / name)
             (root / 'docs/08-backlogs').mkdir(parents=True)
             (root / 'docs/07-roadmap.md').write_text('| M015 | Test |\n')
@@ -162,7 +224,10 @@ class RunnerTests(unittest.TestCase):
             bodies = {
                 'dotnet': 'exit 0',
                 'codex': 'echo MILESTONE_AUTOMATION_STATUS: READY',
-                'muse': 'echo \"muse-harness-args: $*\"\necho muse working...\necho MILESTONE_AUTOMATION_STATUS: READY',
+                'muse': (
+                    'echo \"muse-harness-args: $*\" >&2\n'
+                    "echo '{\"payload_type\":\"run.output.delta\",\"payload\":{\"text\":\"muse working...\\nMILESTONE_AUTOMATION_STATUS: READY\"}}'"
+                ),
             }
             for name, body in bodies.items():
                 file = root / 'fake-bin' / name
@@ -243,7 +308,8 @@ class RunnerTests(unittest.TestCase):
             self.assertEqual(before, git('rev-parse', 'HEAD'))
             for flag in (
                 'exec', '--model', '--reasoning-effort', '--workspace',
-                '--trust-workspace', '--disable-approval', '--disable-sandbox',
+                '--json', '--trust-workspace', '--disable-approval',
+                '--disable-sandbox',
             ):
                 self.assertIn(flag, result.stdout)
 
