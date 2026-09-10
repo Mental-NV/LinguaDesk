@@ -1,0 +1,265 @@
+{
+  "version": 1,
+  "scope": "M013",
+  "sources": [
+    {
+      "path": "docs/07-roadmap.md",
+      "ids": [
+        "M008",
+        "M012",
+        "M013",
+        "M014"
+      ],
+      "use": "excerpt",
+      "reason": "Selected outcome, dependencies and adjacent recovery ownership boundary",
+      "sha256": "ef31787fffede9afec1779f71ca0f62fbac04a82c042b19d48f37a8b5e905f7d"
+    },
+    {
+      "path": "docs/delivery/current.md",
+      "heading": "Completed milestones",
+      "use": "reference",
+      "reason": "Mutable dependency index confirming M008 and M012 completion",
+      "sha256": "5368367aa71b5620752a2ba81f67ccb863276ec92b581dc725dfafe7835258ad"
+    },
+    {
+      "path": "docs/08-backlogs/M008/backlog.md",
+      "use": "reference",
+      "reason": "Completed browser-session API prerequisite outcome",
+      "sha256": "5a00985381da3e3334cb0d8b42d55cbf944cc477ed0582136a75200659377ec6"
+    },
+    {
+      "path": "docs/08-backlogs/M008/spec.md",
+      "use": "reference",
+      "reason": "Exact antiforgery/sign-in/session/sign-out shapes, cookies and error categories adopted unchanged",
+      "sha256": "cf205e19ee4da97209cacd7c599b5241de9d3c337dd3caebdd63e4e8a8354179"
+    },
+    {
+      "path": "docs/08-backlogs/M012/backlog.md",
+      "use": "reference",
+      "reason": "Completed web-verification prerequisite: /verify-email page and in-memory email handoff",
+      "sha256": "33619f1282783c6a249ab7e0362baf9a92274370a7d5ded16c9281bd0a59572e"
+    },
+    {
+      "path": "docs/08-backlogs/M012/spec.md",
+      "use": "reference",
+      "reason": "Continuation variants, guarded shell entries and stale-completion conventions extended by M013",
+      "sha256": "1b9d8d649857ec92d6b0c925ea3de592a4be0b13720184e2807e5a27d782d70f"
+    },
+    {
+      "path": "docs/01-PRD.md",
+      "ids": [
+        "FR-001",
+        "FR-038"
+      ],
+      "use": "excerpt",
+      "reason": "Selected local sign-in requirement and in-memory workspace boundary",
+      "sha256": "2f7bd3d0dd10dbd4a1ee4486517917c9725398ee84df14e96f75d0071b5f8bbd"
+    },
+    {
+      "path": "docs/product/open-questions.md",
+      "ids": [
+        "Q-004",
+        "Q-006"
+      ],
+      "use": "excerpt",
+      "reason": "Applicable lifecycle non-claim and exact auth-contract dispositions",
+      "sha256": "f325c39a045f4834a8794a287e932f454dc15a45c53399e0a6e10590dd7fa35c"
+    },
+    {
+      "path": "docs/02-ux-specification.md",
+      "heading": "3.1 Routes and account access",
+      "use": "excerpt",
+      "reason": "Route table for /login, safe destination memory and signed-in redirects",
+      "sha256": "3c7ca3b93736cb688c2cd16f1a19902c9149ba495c73a7e14770f12f63aeb836"
+    },
+    {
+      "path": "docs/02-ux-specification.md",
+      "heading": "3.4 Workspace and session boundary",
+      "use": "excerpt",
+      "reason": "Sign-out/expiry teardown, failure text and late-callback rejection rules",
+      "sha256": "788b2ac5ad8557fbbb49460718b47f99b63ebf193237fb2929bb9bc4b08cd316"
+    },
+    {
+      "path": "docs/02-ux-specification.md",
+      "heading": "9. Local-account and availability flows",
+      "use": "excerpt",
+      "reason": "Canonical login form, validation, failure and stale-completion behavior",
+      "sha256": "e04b0fae9d96f500a8df34adb10beee3bb38491385e1c6a54956fa1311586809"
+    },
+    {
+      "path": "docs/ux/processing.md",
+      "heading": "6.3 Exact message IDs and disposition",
+      "use": "excerpt",
+      "reason": "Normative MSG-028/MSG-037 copy and generic failure text",
+      "sha256": "2dc4106342973b68395dd28ee84f7fb38614a0c308d401c747218c13f671632b"
+    },
+    {
+      "path": "docs/ux/acceptance.md",
+      "heading": "12.2–12.9 Scenario disposition and current acceptance",
+      "use": "excerpt",
+      "reason": "Selected UX-AC-013/014/015/016/101/102/103 contracts and deferred/retired boundaries",
+      "sha256": "5f4515441ce70253344cc653186a5c7feaabe67c2fe2d3b077a0652f1d023ada"
+    },
+    {
+      "path": "docs/api/accounts.md",
+      "heading": "3.6 M008 browser-session contract",
+      "use": "excerpt",
+      "reason": "Shared antiforgery/sign-in/session/sign-out semantics adopted by the web slice",
+      "sha256": "f07b2bdd83b55d542f902c96739dc63829c062712c12962b50d52cf2ca85951c"
+    },
+    {
+      "path": "docs/api/accounts.md",
+      "heading": "3.2 Expiry, refresh, and revocation",
+      "use": "excerpt",
+      "reason": "Ticket lifetime, stamp validation and caller-cookie clearing rules behind expiry/sign-out UX",
+      "sha256": "8d55860e39a42689e7dca1b52b3be4508b282b74d84cd41041a9ce7100704950"
+    },
+    {
+      "path": "docs/03-architecture.md",
+      "heading": "8.1 Explicit actions and plain-text state",
+      "use": "excerpt",
+      "reason": "Explicit-submission, duplicate-guard, stale-completion and in-memory-state rules for the slice",
+      "sha256": "ef247e37bdebbf9a2deccce39794e4818d5ba83f381b577fed0a6ef92018e2f5"
+    },
+    {
+      "path": "docs/03-architecture.md",
+      "heading": "8.3 API behavioral design and generated contract",
+      "use": "excerpt",
+      "reason": "Required generated-contract review before client adoption",
+      "sha256": "14eeacbef7471e3cdb6651582e4537db4ec7a30b5525f015c4a08b7d4bfb8660"
+    },
+    {
+      "path": "docs/06-verification-plan.md",
+      "ids": [
+        "V-002",
+        "V-003",
+        "V-010",
+        "V-015"
+      ],
+      "use": "excerpt",
+      "reason": "Selected stale-guard, component, browser-contract and privacy check groups",
+      "sha256": "8d184a52566bb32439ff9957780e1d779a1dd2ae008e17b36acdeae25018a4af"
+    },
+    {
+      "path": "docs/06-verification-plan.md",
+      "heading": "7.1 When to run",
+      "use": "excerpt",
+      "reason": "Required focused, aggregate, contract and published-smoke stages",
+      "sha256": "a4cd1182b2e9c1033cc69af76620424905ec1dcce4499499d9d8c466b7f33b08"
+    },
+    {
+      "path": "docs/06-verification-plan.md",
+      "heading": "7.3 Evidence records and failure handling",
+      "use": "excerpt",
+      "reason": "Evidence fields and truthful pending/blocked/failed handling",
+      "sha256": "baf4f98e4fe09bee51a9a9a4ed94fafccc4e5eb3369aeb08134c124c0fe5575a"
+    },
+    {
+      "path": "docs/verification/frontend.md",
+      "heading": "4.1 Shared UI fixtures",
+      "use": "excerpt",
+      "reason": "Canonical fixtures, request-count and fake-boundary conventions",
+      "sha256": "7b6236fc51c7069628cb2e80b7df5d4f8642279f5a710d0486a1ca2077f0e272"
+    },
+    {
+      "path": "docs/verification/frontend.md",
+      "heading": "4.2 Browser lanes",
+      "use": "excerpt",
+      "reason": "Chromium smoke scope and release-only branded-browser/device evidence boundary",
+      "sha256": "24b0e19b0b330638ecd0d87f0f6f952014faaa60ac4f8e4d404e560029693e04"
+    },
+    {
+      "path": "docs/verification/coverage.md",
+      "heading": "8.2 Local acceptance allocation",
+      "use": "excerpt",
+      "reason": "V-group allocation for the selected UX scenarios",
+      "sha256": "0999657002c0fb16f7d4cef68e234e22134a37fadc8790a27a66f95649e793d7"
+    },
+    {
+      "path": "frontend/src/shell/App.tsx",
+      "use": "reference",
+      "reason": "Current placeholder routes, heading-focus and shell conventions to extend",
+      "sha256": "1d276054e0ba666074955b7f18d8b4148aede2b53aff01b8923c4829b96fa565"
+    },
+    {
+      "path": "frontend/src/auth/RegisterPage.tsx",
+      "use": "reference",
+      "reason": "Form, validation-focus and in-memory handoff conventions mirrored by the login page",
+      "sha256": "2602d1d3c80cd2ba72e60abe9d94a3c67cacb47377610195b68200bcf4c3b9c0"
+    },
+    {
+      "path": "frontend/src/auth/VerifyEmailEntryPage.tsx",
+      "use": "reference",
+      "reason": "Continuation variants and single-read session style kept consistent",
+      "sha256": "4c272084cd2c47b82f7292d80af623ae611654f3db6e00dbc64087f14e388938"
+    },
+    {
+      "path": "frontend/src/api/accounts.ts",
+      "use": "reference",
+      "reason": "Typed wrapper and result-mapping style extended with antiforgery/sign-in/sign-out calls",
+      "sha256": "021031fee5eb7c0994ecdc19b5f313476a51e86c599259a7919ff362a84f725d"
+    },
+    {
+      "path": "frontend/src/api/generated/linguadesk-api.d.ts",
+      "use": "reference",
+      "reason": "Generated session-operation shapes adopted without API change",
+      "sha256": "2f13e433b8839496558b6e060ed25c812cc29527bfc4c9e0c0bb801997dc8805"
+    },
+    {
+      "path": "frontend/tests/unit/App.test.tsx",
+      "use": "reference",
+      "reason": "Current guard assertions extended with sign-in routing cases",
+      "sha256": "8ce3389eb0c985cbb1eceea2b9b55099ad284eea93275c4633aea2654b86afea"
+    },
+    {
+      "path": "frontend/tests/unit/register.test.tsx",
+      "use": "reference",
+      "reason": "Focused-suite conventions mirrored by the new login suite",
+      "sha256": "9ab1e39438783d7283e416314183ae5ce9a1b915270b8f813887c10acf3d73af"
+    },
+    {
+      "path": "frontend/tests/e2e/verification.spec.ts",
+      "use": "reference",
+      "reason": "Current published-smoke surface extended by the sign-in trip",
+      "sha256": "e3e96729ac52393e0c4cbd07c4a9e205351304b4a53f129282191498db3030ed"
+    },
+    {
+      "path": "frontend/playwright.config.ts",
+      "use": "reference",
+      "reason": "Owned-host Chromium lane configuration for the browser trip",
+      "sha256": "f93422d719599d582be3ae302128f4be2964b65d8e787d00babdfe4780367768"
+    },
+    {
+      "path": "frontend/package.json",
+      "use": "reference",
+      "reason": "Pinned Node/npm and frontend verification scripts",
+      "sha256": "6679b8d86b24c87bded9242d2d5a0caed0fc70d1c30ecedffc2382e381fb1b89"
+    },
+    {
+      "path": "scripts/frontend.sh",
+      "use": "reference",
+      "reason": "Frontend type/build and published Chromium verification command",
+      "sha256": "f5977a5161c09985fc5cdc6eee4b9ddd5614b589d4b49e6fed8add6530b12f15"
+    },
+    {
+      "path": "scripts/contract.sh",
+      "use": "reference",
+      "reason": "Canonical OpenAPI/TypeScript drift procedure proving no API change",
+      "sha256": "d514721c6a6beca458a884f9af172cda279fbaf36529dc1e1709e76dfb4471b9"
+    },
+    {
+      "path": "scripts/backend.sh",
+      "use": "reference",
+      "reason": "Aggregate backend regression command for AC-008",
+      "sha256": "d7ca3bed9aa2fbdd0a279d9d369725e922c80f2d34c31bf086b59ce0d0241d77"
+    }
+  ],
+  "source_map_sha256": "4f18a3fd895852719c614035768ffa43381d88d63806b582c9345c8f5c28f614",
+  "baseline_commit": "84127e9a652871bf19e8b4cfc9a2ace083cbd99b",
+  "locked_files": {
+    "docs/00-SDD-Planning-Workflow.md": "183ae93148ff594f9f1e021aa7543baa8878e9cc0bcfd69ebc696c28976e2945",
+    "docs/00-workflow/execution.md": "f362a1384cefef24ba204e0723e3190857c8cca9bcd91908136932e19c5caf02",
+    "docs/08-backlogs/M013/spec.md": "554c82800bf43006a447f163862ff2c06123b77692951ed154e57cc5295a8daa",
+    "docs/08-backlogs/M013/plan.md": "1ba20db0cf5dcb5c067737d62039fdf568dd5f23f2df850ecdcc5c814143133a"
+  }
+}
