@@ -24,7 +24,7 @@ public sealed class OperationRecoveryTests
         var owned = fixture ?? await OperationFixture.CreateAsync();
         var user = await owned.CreateAccountAsync(email, confirmed: true);
         var access = await owned.SignInAsync(email);
-        var operationId = Guid.CreateVersion7().ToString("D");
+        var operationId = OperationIdentity.CreateForTime(owned.Time.GetUtcNow()).ToString("D");
         var body = target is null
             ? JsonSerializer.Serialize(new { operationId, family, source })
             : JsonSerializer.Serialize(new { operationId, family, source, target });
@@ -410,7 +410,7 @@ public sealed class OperationRecoveryTests
         var user = await fixture.CreateAccountAsync("unknown-status@example.test", confirmed: true);
         var access = await fixture.SignInAsync("unknown-status@example.test");
 
-        using (var unknown = await fixture.GetAsync($"/api/operations/{Guid.CreateVersion7():D}", access))
+        using (var unknown = await fixture.GetAsync($"/api/operations/{OperationIdentity.CreateForTime(fixture.Time.GetUtcNow()):D}", access))
         {
             var body = await unknown.Content.ReadAsStringAsync();
             Assert.AreEqual(HttpStatusCode.NotFound, unknown.StatusCode, body);
@@ -456,7 +456,7 @@ public sealed class OperationRecoveryTests
         await using var fixture = await OperationFixture.CreateAsync(MonetaryConfig(100000));
         var user = await fixture.CreateAccountAsync("exposure-interrupt@example.test", confirmed: true);
         var access = await fixture.SignInAsync("exposure-interrupt@example.test");
-        var operationId = Guid.CreateVersion7().ToString("D");
+        var operationId = OperationIdentity.CreateForTime(fixture.Time.GetUtcNow()).ToString("D");
         using (var admitted = await fixture.PostRawAsync(
             "/api/operations",
             JsonSerializer.Serialize(new { operationId, family = "translation", source = "Exposure probe text", target = "ru" }),
@@ -465,7 +465,7 @@ public sealed class OperationRecoveryTests
             Assert.AreEqual(HttpStatusCode.Accepted, admitted.StatusCode);
         }
 
-        var attemptId = Guid.CreateVersion7().ToString("D");
+        var attemptId = OperationIdentity.CreateForTime(fixture.Time.GetUtcNow()).ToString("D");
         MonetaryAdmissionResult reservation;
         using (var scope = fixture.Factory.Services.CreateScope())
         {
@@ -688,7 +688,7 @@ public sealed class OperationRecoveryTests
         var user = await fixture.CreateAccountAsync("interrupt-sentinel@example.test", confirmed: true);
         var access = await fixture.SignInAsync("interrupt-sentinel@example.test");
         var sourceSentinel = "interrupt-sentinel-source-" + Guid.NewGuid().ToString("N");
-        var operationId = Guid.CreateVersion7().ToString("D");
+        var operationId = OperationIdentity.CreateForTime(fixture.Time.GetUtcNow()).ToString("D");
         using (var admitted = await fixture.PostRawAsync(
             "/api/operations",
             JsonSerializer.Serialize(new { operationId, family = "translation", source = sourceSentinel, target = "ru" }),

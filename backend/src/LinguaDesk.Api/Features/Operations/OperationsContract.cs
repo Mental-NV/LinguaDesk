@@ -80,6 +80,37 @@ public sealed record OperationStatusResponse(
     [property: Description("Fresh current-day user usage snapshot.")]
     UsageSnapshot Usage);
 
+/// <summary>Synchronous translation success: complete validated translated text with its committed charge and a fresh current-day usage snapshot. Text-bearing responses always use `Cache-Control: no-store`.</summary>
+public sealed record TranslationSuccessResponse(
+    [property: Description("Operation identity echoed from the submission.")]
+    Guid OperationId,
+    [property: Description("Language operation family.")]
+    OperationFamily Family,
+    [property: Description("Observed operation state: `pending`, `succeeded`, `failed` or `interrupted`.")]
+    OperationStatus Status,
+    [property: Description("Complete validated translated text. Never logged, traced or persisted.")]
+    string TranslatedText,
+    [property: Description("Committed Unicode scalar charge for the full submitted source.")]
+    int CharacterCount,
+    [property: Description("UTC day owning the charge (the stored admission day), in yyyy-MM-dd form.")]
+    string AdmissionDay,
+    [property: Description("Server-controlled overall deadline for the operation.")]
+    DateTimeOffset DeadlineUtc,
+    [property: Description("Current server time in UTC.")]
+    DateTimeOffset ServerTimeUtc,
+    [property: Description("Fresh current-day user usage snapshot.")]
+    UsageSnapshot Usage);
+
+/// <summary>Wire-fixed Problem Details category names for the translation execution path (API §8).</summary>
+public static class TranslationProblemCategories
+{
+    /// <summary>Classified provider/refusal/invalid-output exhaustion: 503 with zero character charge.</summary>
+    public const string ProcessingFailure = "processingFailure";
+
+    /// <summary>Server-established terminal deadline failure: 504 with zero character charge.</summary>
+    public const string DeadlineExceeded = "deadlineExceeded";
+}
+
 /// <summary>Categorical current-day availability computed from the same consistent read as the snapshot.</summary>
 [JsonConverter(typeof(JsonStringEnumConverter<UsageAvailability>))]
 public enum UsageAvailability

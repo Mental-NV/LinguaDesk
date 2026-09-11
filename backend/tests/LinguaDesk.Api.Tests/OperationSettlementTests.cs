@@ -19,7 +19,7 @@ public sealed class OperationSettlementTests
         var owned = fixture ?? await OperationFixture.CreateAsync();
         var user = await owned.CreateAccountAsync(email, confirmed: true);
         var access = await owned.SignInAsync(email);
-        var operationId = Guid.CreateVersion7().ToString("D");
+        var operationId = OperationIdentity.CreateForTime(owned.Time.GetUtcNow()).ToString("D");
         var body = target is null
             ? JsonSerializer.Serialize(new { operationId, family, source })
             : JsonSerializer.Serialize(new { operationId, family, source, target });
@@ -416,7 +416,7 @@ public sealed class OperationSettlementTests
             Assert.IsFalse(envelope.RootElement.GetProperty("outputAvailable").GetBoolean());
             Assert.IsTrue(envelope.RootElement.TryGetProperty("usage", out _));
 
-            using var unknown = await succeededFixture.GetAsync($"/api/operations/{Guid.CreateVersion7():D}", access);
+            using var unknown = await succeededFixture.GetAsync($"/api/operations/{OperationIdentity.CreateForTime(succeededFixture.Time.GetUtcNow()):D}", access);
             Assert.AreEqual(HttpStatusCode.NotFound, unknown.StatusCode);
 
             var revisionBefore = envelope.RootElement.GetProperty("usage").GetProperty("revision").GetInt64();

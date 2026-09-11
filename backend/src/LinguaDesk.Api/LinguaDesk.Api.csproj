@@ -19,5 +19,6 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="../LinguaDesk.Core/LinguaDesk.Core.csproj" />
+    <ProjectReference Include="../LinguaDesk.Infrastructure.Ai/LinguaDesk.Infrastructure.Ai.csproj" />
   </ItemGroup>
 </Project>

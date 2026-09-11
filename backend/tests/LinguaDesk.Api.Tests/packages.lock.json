@@ -548,6 +548,7 @@
         "type": "Project",
         "dependencies": {
           "LinguaDesk.Core": "[1.0.0, )",
+          "LinguaDesk.Infrastructure.Ai": "[1.0.0, )",
           "Microsoft.AspNetCore.Identity.EntityFrameworkCore": "[10.0.10, )",
           "Microsoft.AspNetCore.OpenApi": "[10.0.10, )",
           "Microsoft.EntityFrameworkCore.Sqlite": "[10.0.10, )",
@@ -557,6 +558,13 @@
       },
       "linguadesk.core": {
         "type": "Project"
+      },
+      "linguadesk.infrastructure.ai": {
+        "type": "Project",
+        "dependencies": {
+          "LinguaDesk.Core": "[1.0.0, )",
+          "Microsoft.Extensions.AI.Abstractions": "[10.9.0, )"
+        }
       },
       "Microsoft.AspNetCore.Identity.EntityFrameworkCore": {
         "type": "CentralTransitive",
@@ -591,6 +599,12 @@
           "SQLitePCLRaw.bundle_e_sqlite3": "2.1.11",
           "SQLitePCLRaw.core": "2.1.11"
         }
+      },
+      "Microsoft.Extensions.AI.Abstractions": {
+        "type": "CentralTransitive",
+        "requested": "[10.9.0, )",
+        "resolved": "10.9.0",
+        "contentHash": "//nASHMCJVxnYfE/WSzfaLOao6/q816kPpgB9rxU0gfSmAny1u3rfQT0D4xAmcIo4yQqJs7rAeBB+M/dIMdZYA=="
       },
       "Microsoft.OpenApi": {
         "type": "CentralTransitive",

@@ -7,7 +7,6 @@ repository_root=$(CDPATH= cd -- "$script_directory/.." && pwd)
 ai_project="$repository_root/backend/src/LinguaDesk.Infrastructure.Ai/LinguaDesk.Infrastructure.Ai.csproj"
 ai_test_project="$repository_root/backend/tests/LinguaDesk.Infrastructure.Ai.Tests/LinguaDesk.Infrastructure.Ai.Tests.csproj"
 runner_project="$repository_root/backend/tools/LinguaDesk.Ai.Evaluation/LinguaDesk.Ai.Evaluation.csproj"
-api_project="$repository_root/backend/src/LinguaDesk.Api/LinguaDesk.Api.csproj"
 runner_dll="$repository_root/backend/tools/LinguaDesk.Ai.Evaluation/bin/Release/net10.0/LinguaDesk.Ai.Evaluation.dll"
 expected_sdk="10.0.302"
 configuration="Release"
@@ -71,10 +70,8 @@ validate_graph() {
         echo "The serving AI library lock graph contains a forbidden host, storage, or full AI middleware dependency." >&2
         exit 1
     fi
-    if grep -q 'LinguaDesk.Infrastructure.Ai' "$api_project"; then
-        echo "The API must not reference the M004 AI library before a consuming slice is selected." >&2
-        exit 1
-    fi
+    # M026 selects API consumption of this library. Independence constrains
+    # the library's dependencies (above), not the hosts allowed to consume it.
     if [ "$(grep -c 'Microsoft.Extensions.AI.Abstractions' "$library_lock" || true)" -ne 1 ]; then
         echo "The serving AI library must resolve exactly the selected AI abstractions package." >&2
         exit 1

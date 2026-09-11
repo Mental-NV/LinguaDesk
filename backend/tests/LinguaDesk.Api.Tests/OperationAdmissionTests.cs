@@ -22,7 +22,7 @@ public sealed class OperationAdmissionTests
         await using var fixture = await OperationFixture.CreateAsync();
         var user = await fixture.CreateAccountAsync("same@example.test", confirmed: true);
         var access = await fixture.SignInAsync("same@example.test");
-        var operationId = Guid.CreateVersion7().ToString("D");
+        var operationId = OperationIdentity.CreateForTime(fixture.Time.GetUtcNow()).ToString("D");
         var body = JsonSerializer.Serialize(new
         {
             operationId,
@@ -105,7 +105,7 @@ public sealed class OperationAdmissionTests
         await using var fixture = await OperationFixture.CreateAsync();
         await fixture.CreateAccountAsync("conflict@example.test", confirmed: true);
         var access = await fixture.SignInAsync("conflict@example.test");
-        var operationId = Guid.CreateVersion7().ToString("D");
+        var operationId = OperationIdentity.CreateForTime(fixture.Time.GetUtcNow()).ToString("D");
         using var admitted = await fixture.PostRawAsync(
             "/api/operations",
             JsonSerializer.Serialize(new
@@ -156,7 +156,7 @@ public sealed class OperationAdmissionTests
             "/api/operations",
             JsonSerializer.Serialize(new
             {
-                operationId = Guid.CreateVersion7().ToString("D"),
+                operationId = OperationIdentity.CreateForTime(fixture.Time.GetUtcNow()).ToString("D"),
                 family = "rewriting",
                 source = "Rewrite probe text",
                 mode = "simple",
@@ -192,7 +192,7 @@ public sealed class OperationAdmissionTests
         await using var fixture = await OperationFixture.CreateAsync();
         await fixture.CreateAccountAsync("spelling@example.test", confirmed: true);
         var access = await fixture.SignInAsync("spelling@example.test");
-        var operationId = Guid.CreateVersion7().ToString("D");
+        var operationId = OperationIdentity.CreateForTime(fixture.Time.GetUtcNow()).ToString("D");
         using var first = await fixture.PostRawAsync(
             "/api/operations",
             JsonSerializer.Serialize(new
@@ -317,21 +317,21 @@ public sealed class OperationAdmissionTests
         var forty = new string('b', 40);
         using (await fixture.PostRawAsync(
             "/api/operations",
-            JsonSerializer.Serialize(new { operationId = Guid.CreateVersion7().ToString("D"), family = "translation", source = sixty, target = "ru" }),
+            JsonSerializer.Serialize(new { operationId = OperationIdentity.CreateForTime(fixture.Time.GetUtcNow()).ToString("D"), family = "translation", source = sixty, target = "ru" }),
             access))
         {
         }
 
         using (await fixture.PostRawAsync(
             "/api/operations",
-            JsonSerializer.Serialize(new { operationId = Guid.CreateVersion7().ToString("D"), family = "translation", source = forty, target = "ru" }),
+            JsonSerializer.Serialize(new { operationId = OperationIdentity.CreateForTime(fixture.Time.GetUtcNow()).ToString("D"), family = "translation", source = forty, target = "ru" }),
             access))
         {
         }
 
         using var denied = await fixture.PostRawAsync(
             "/api/operations",
-            JsonSerializer.Serialize(new { operationId = Guid.CreateVersion7().ToString("D"), family = "translation", source = "c", target = "ru" }),
+            JsonSerializer.Serialize(new { operationId = OperationIdentity.CreateForTime(fixture.Time.GetUtcNow()).ToString("D"), family = "translation", source = "c", target = "ru" }),
             access);
         var deniedBody = await denied.Content.ReadAsStringAsync();
         Assert.AreEqual((HttpStatusCode)429, denied.StatusCode, deniedBody);
@@ -361,21 +361,21 @@ public sealed class OperationAdmissionTests
 
         using (await global.PostRawAsync(
             "/api/operations",
-            JsonSerializer.Serialize(new { operationId = Guid.CreateVersion7().ToString("D"), family = "translation", source = sixty, target = "ru" }),
+            JsonSerializer.Serialize(new { operationId = OperationIdentity.CreateForTime(fixture.Time.GetUtcNow()).ToString("D"), family = "translation", source = sixty, target = "ru" }),
             tokens[0]))
         {
         }
 
         using (await global.PostRawAsync(
             "/api/operations",
-            JsonSerializer.Serialize(new { operationId = Guid.CreateVersion7().ToString("D"), family = "translation", source = forty, target = "ru" }),
+            JsonSerializer.Serialize(new { operationId = OperationIdentity.CreateForTime(fixture.Time.GetUtcNow()).ToString("D"), family = "translation", source = forty, target = "ru" }),
             tokens[1]))
         {
         }
 
         using var globalDenied = await global.PostRawAsync(
             "/api/operations",
-            JsonSerializer.Serialize(new { operationId = Guid.CreateVersion7().ToString("D"), family = "translation", source = "c", target = "ru" }),
+            JsonSerializer.Serialize(new { operationId = OperationIdentity.CreateForTime(fixture.Time.GetUtcNow()).ToString("D"), family = "translation", source = "c", target = "ru" }),
             tokens[2]);
         var globalBody = await globalDenied.Content.ReadAsStringAsync();
         Assert.AreEqual((HttpStatusCode)429, globalDenied.StatusCode, globalBody);
@@ -402,12 +402,12 @@ public sealed class OperationAdmissionTests
 
         var unprocessable = new (string Name, string Body, string Reason)[]
         {
-            ("empty", JsonSerializer.Serialize(new { operationId = Guid.CreateVersion7().ToString("D"), family = "translation", source = "   ", target = "ru" }), "emptySource"),
-            ("oversize", JsonSerializer.Serialize(new { operationId = Guid.CreateVersion7().ToString("D"), family = "translation", source = oversized, target = "ru" }), "oversizedSource"),
-            ("missingTarget", JsonSerializer.Serialize(new { operationId = Guid.CreateVersion7().ToString("D"), family = "translation", source = "Eligible text" }), "targetRequired"),
-            ("invalidTarget", JsonSerializer.Serialize(new { operationId = Guid.CreateVersion7().ToString("D"), family = "translation", source = "Eligible text", target = "xx" }), "invalidTarget"),
-            ("sameLanguage", JsonSerializer.Serialize(new { operationId = Guid.CreateVersion7().ToString("D"), family = "translation", source = "Eligible text", sourceSelection = "en", target = "en" }), "sameLanguage"),
-            ("invalidMode", JsonSerializer.Serialize(new { operationId = Guid.CreateVersion7().ToString("D"), family = "rewriting", source = "Eligible text", mode = "shouty" }), "invalidMode"),
+            ("empty", JsonSerializer.Serialize(new { operationId = OperationIdentity.CreateForTime(fixture.Time.GetUtcNow()).ToString("D"), family = "translation", source = "   ", target = "ru" }), "emptySource"),
+            ("oversize", JsonSerializer.Serialize(new { operationId = OperationIdentity.CreateForTime(fixture.Time.GetUtcNow()).ToString("D"), family = "translation", source = oversized, target = "ru" }), "oversizedSource"),
+            ("missingTarget", JsonSerializer.Serialize(new { operationId = OperationIdentity.CreateForTime(fixture.Time.GetUtcNow()).ToString("D"), family = "translation", source = "Eligible text" }), "targetRequired"),
+            ("invalidTarget", JsonSerializer.Serialize(new { operationId = OperationIdentity.CreateForTime(fixture.Time.GetUtcNow()).ToString("D"), family = "translation", source = "Eligible text", target = "xx" }), "invalidTarget"),
+            ("sameLanguage", JsonSerializer.Serialize(new { operationId = OperationIdentity.CreateForTime(fixture.Time.GetUtcNow()).ToString("D"), family = "translation", source = "Eligible text", sourceSelection = "en", target = "en" }), "sameLanguage"),
+            ("invalidMode", JsonSerializer.Serialize(new { operationId = OperationIdentity.CreateForTime(fixture.Time.GetUtcNow()).ToString("D"), family = "rewriting", source = "Eligible text", mode = "shouty" }), "invalidMode"),
         };
         foreach (var item in unprocessable)
         {
@@ -421,25 +421,25 @@ public sealed class OperationAdmissionTests
 
         using var unknownFamily = await fixture.PostRawAsync(
             "/api/operations",
-            JsonSerializer.Serialize(new { operationId = Guid.CreateVersion7().ToString("D"), family = "summarization", source = "Eligible text" }),
+            JsonSerializer.Serialize(new { operationId = OperationIdentity.CreateForTime(fixture.Time.GetUtcNow()).ToString("D"), family = "summarization", source = "Eligible text" }),
             access);
         Assert.AreEqual(HttpStatusCode.BadRequest, unknownFamily.StatusCode);
 
         using var duplicateField = await fixture.PostRawAsync(
             "/api/operations",
-            "{\"operationId\":\"" + Guid.CreateVersion7().ToString("D") + "\",\"family\":\"translation\",\"family\":\"translation\",\"source\":\"Eligible text\",\"target\":\"ru\"}",
+            "{\"operationId\":\"" + OperationIdentity.CreateForTime(fixture.Time.GetUtcNow()).ToString("D") + "\",\"family\":\"translation\",\"family\":\"translation\",\"source\":\"Eligible text\",\"target\":\"ru\"}",
             access);
         Assert.AreEqual(HttpStatusCode.BadRequest, duplicateField.StatusCode);
 
         using var unknownField = await fixture.PostRawAsync(
             "/api/operations",
-            JsonSerializer.Serialize(new { operationId = Guid.CreateVersion7().ToString("D"), family = "translation", source = "Eligible text", target = "ru", traceId = "x" }),
+            JsonSerializer.Serialize(new { operationId = OperationIdentity.CreateForTime(fixture.Time.GetUtcNow()).ToString("D"), family = "translation", source = "Eligible text", target = "ru", traceId = "x" }),
             access);
         Assert.AreEqual(HttpStatusCode.BadRequest, unknownField.StatusCode);
 
         using var query = await fixture.PostWithQueryAsync(
             "/api/operations?debug=true",
-            JsonSerializer.Serialize(new { operationId = Guid.CreateVersion7().ToString("D"), family = "translation", source = "Eligible text", target = "ru" }),
+            JsonSerializer.Serialize(new { operationId = OperationIdentity.CreateForTime(fixture.Time.GetUtcNow()).ToString("D"), family = "translation", source = "Eligible text", target = "ru" }),
             access);
         Assert.AreEqual(HttpStatusCode.BadRequest, query.StatusCode);
 
@@ -451,7 +451,7 @@ public sealed class OperationAdmissionTests
 
         using var anonymous = await fixture.PostRawAsync(
             "/api/operations",
-            JsonSerializer.Serialize(new { operationId = Guid.CreateVersion7().ToString("D"), family = "translation", source = "Eligible text", target = "ru" }),
+            JsonSerializer.Serialize(new { operationId = OperationIdentity.CreateForTime(fixture.Time.GetUtcNow()).ToString("D"), family = "translation", source = "Eligible text", target = "ru" }),
             accessToken: null);
         Assert.AreEqual(HttpStatusCode.Unauthorized, anonymous.StatusCode);
 
@@ -459,7 +459,7 @@ public sealed class OperationAdmissionTests
         var unverifiedAccess = await fixture.SignInAsync("unverified-ops@example.test");
         using var unverified = await fixture.PostRawAsync(
             "/api/operations",
-            JsonSerializer.Serialize(new { operationId = Guid.CreateVersion7().ToString("D"), family = "translation", source = "Eligible text", target = "ru" }),
+            JsonSerializer.Serialize(new { operationId = OperationIdentity.CreateForTime(fixture.Time.GetUtcNow()).ToString("D"), family = "translation", source = "Eligible text", target = "ru" }),
             unverifiedAccess);
         Assert.AreEqual(HttpStatusCode.Forbidden, unverified.StatusCode);
 
@@ -475,7 +475,7 @@ public sealed class OperationAdmissionTests
         await using var fixture = await OperationFixture.CreateAsync();
         await fixture.CreateAccountAsync("restart@example.test", confirmed: true);
         var access = await fixture.SignInAsync("restart@example.test");
-        var operationId = Guid.CreateVersion7().ToString("D");
+        var operationId = OperationIdentity.CreateForTime(fixture.Time.GetUtcNow()).ToString("D");
         var operationBody = JsonSerializer.Serialize(new
         {
             operationId,
@@ -519,7 +519,7 @@ public sealed class OperationAdmissionTests
         var access = await fixture.SignInAsync("sentinel@example.test");
         var sourceSentinel = "sentinel-source-" + Guid.NewGuid().ToString("N");
         var secretSentinel = "sentinel-secret-" + Guid.NewGuid().ToString("N");
-        var operationId = Guid.CreateVersion7().ToString("D");
+        var operationId = OperationIdentity.CreateForTime(fixture.Time.GetUtcNow()).ToString("D");
         using var admitted = await fixture.PostRawAsync(
             "/api/operations",
             JsonSerializer.Serialize(new { operationId, family = "translation", source = sourceSentinel, target = "ru" }),
@@ -568,7 +568,7 @@ public sealed class OperationAdmissionTests
         await fixture.CreateAccountAsync("other@example.test", confirmed: true);
         var ownerAccess = await fixture.SignInAsync("owner@example.test");
         var otherAccess = await fixture.SignInAsync("other@example.test");
-        var operationId = Guid.CreateVersion7().ToString("D");
+        var operationId = OperationIdentity.CreateForTime(fixture.Time.GetUtcNow()).ToString("D");
         using (await fixture.PostRawAsync(
             "/api/operations",
             JsonSerializer.Serialize(new { operationId, family = "translation", source = "Scoped text", target = "ru" }),
@@ -581,7 +581,7 @@ public sealed class OperationAdmissionTests
         using var foreignProblem = JsonDocument.Parse(await foreign.Content.ReadAsStringAsync());
         Assert.AreEqual("unknownOperation", foreignProblem.RootElement.GetProperty("category").GetString());
 
-        using var unknown = await fixture.GetAsync($"/api/operations/{Guid.CreateVersion7():D}", ownerAccess);
+        using var unknown = await fixture.GetAsync($"/api/operations/{OperationIdentity.CreateForTime(fixture.Time.GetUtcNow()):D}", ownerAccess);
         Assert.AreEqual(HttpStatusCode.NotFound, unknown.StatusCode);
 
         using var malformed = await fixture.GetAsync("/api/operations/not-a-guid", ownerAccess);
@@ -614,7 +614,7 @@ public sealed class OperationAdmissionTests
         await fixture.CreateAccountAsync("second-owner@example.test", confirmed: true);
         var firstAccess = await fixture.SignInAsync("first-owner@example.test");
         var secondAccess = await fixture.SignInAsync("second-owner@example.test");
-        var operationId = Guid.CreateVersion7().ToString("D");
+        var operationId = OperationIdentity.CreateForTime(fixture.Time.GetUtcNow()).ToString("D");
         var body = JsonSerializer.Serialize(new { operationId, family = "translation", source = "Shared identity text", target = "ru" });
 
         using var first = await fixture.PostRawAsync("/api/operations", body, firstAccess);
@@ -665,19 +665,22 @@ internal sealed class OperationFixture : IAsyncDisposable
 
     public HttpClient Client { get; }
 
-    public static async Task<OperationFixture> CreateAsync(IReadOnlyDictionary<string, string?>? overrides = null)
+    public static async Task<OperationFixture> CreateAsync(
+        IReadOnlyDictionary<string, string?>? overrides = null,
+        Action<IServiceCollection>? configureServices = null)
     {
         var database = StorageTestDatabase.Create();
         await database.MigrateAsync();
         var keysPath = Directory.CreateDirectory(Path.Combine(database.RootPath, "keys")).FullName;
-        return Attach(database, keysPath, overrides);
+        return Attach(database, keysPath, overrides, configureServices: configureServices);
     }
 
     public static OperationFixture Attach(
         StorageTestDatabase database,
         string keysPath,
         IReadOnlyDictionary<string, string?>? overrides = null,
-        DateTimeOffset? initialTime = null)
+        DateTimeOffset? initialTime = null,
+        Action<IServiceCollection>? configureServices = null)
     {
         var time = new AdjustableTimeProvider(new DateTimeOffset(2026, 9, 11, 8, 30, 0, TimeSpan.Zero));
         if (initialTime.HasValue)
@@ -690,7 +693,8 @@ internal sealed class OperationFixture : IAsyncDisposable
             keysPath,
             new CapturingConfirmationSender(),
             timeProvider: time,
-            configurationOverrides: overrides);
+            configurationOverrides: overrides,
+            configureServices: configureServices);
         var client = factory.CreateClient(new() { BaseAddress = new Uri("https://localhost"), HandleCookies = false, AllowAutoRedirect = false });
         return new OperationFixture(database, keysPath, time, factory, client);
     }

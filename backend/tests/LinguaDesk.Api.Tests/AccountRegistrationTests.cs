@@ -409,7 +409,8 @@ internal sealed class AccountWebApplicationFactory(
     TimeProvider? timeProvider = null,
     TimeSpan? emailConfirmationTokenLifespan = null,
     IAccountPasswordResetSender? resetSender = null,
-    TimeSpan? passwordResetTokenLifespan = null) : WebApplicationFactory<Program>
+    TimeSpan? passwordResetTokenLifespan = null,
+    Action<IServiceCollection>? configureServices = null) : WebApplicationFactory<Program>
 {
     private readonly string webRoot = Directory.CreateTempSubdirectory("linguadesk-account-webroot-").FullName;
 
@@ -459,6 +460,7 @@ internal sealed class AccountWebApplicationFactory(
                 services.Configure<DataProtectionTokenProviderOptions>(options =>
                     options.TokenLifespan = passwordResetTokenLifespan.Value);
             }
+            configureServices?.Invoke(services);
         });
     }
 

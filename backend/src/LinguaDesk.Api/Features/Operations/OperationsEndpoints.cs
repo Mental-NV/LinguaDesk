@@ -20,8 +20,11 @@ public static class OperationsEndpoints
             .WithDescription(
                 "Validates, fingerprint-matches and atomically reserves exactly one logical operation per verified " +
                 "account identity against both daily character allowances. Identical identities observe the pending " +
-                "reservation or the settled success/failure/interrupted metadata; changed payloads conflict. No provider dispatch occurs.")
+                "reservation or the settled success/failure/interrupted metadata; changed payloads conflict. " +
+                "Translation submissions execute synchronously through the configured provider behind the stored deadline " +
+                "and return complete text or a classified failure; rewriting submissions remain pending reservations until M027.")
             .Accepts<SubmitOperationRequest>("application/json")
+            .Produces<TranslationSuccessResponse>(StatusCodes.Status201Created, "application/json")
             .Produces<OperationPendingResponse>(StatusCodes.Status202Accepted, "application/json")
             .Produces<OperationStatusResponse>(StatusCodes.Status200OK, "application/json")
             .Produces<OperationProblemDetails>(StatusCodes.Status400BadRequest, "application/problem+json")
@@ -34,6 +37,7 @@ public static class OperationsEndpoints
             .Produces<OperationProblemDetails>(StatusCodes.Status422UnprocessableEntity, "application/problem+json")
             .Produces<OperationProblemDetails>(StatusCodes.Status429TooManyRequests, "application/problem+json")
             .Produces<OperationProblemDetails>(StatusCodes.Status503ServiceUnavailable, "application/problem+json")
+            .Produces<OperationProblemDetails>(StatusCodes.Status504GatewayTimeout, "application/problem+json")
             .RequireAuthorization(VerifiedAccountAuthorization.PolicyName);
         endpoints.MapPost("/api/operations", static (HttpContext context) =>
             {
@@ -131,6 +135,7 @@ public static class OperationsEndpoints
     private static async Task<IResult> SubmitAsync(
         HttpContext context,
         OperationAdmissionService admissions,
+        TranslationOperationCoordinator translator,
         IOptions<MonetaryAdmissionOptions> monetaryOptions,
         TimeProvider timeProvider,
         CancellationToken cancellationToken)
@@ -263,6 +268,22 @@ public static class OperationsEndpoints
                 "Operation submission is temporarily unavailable.",
                 correlationId,
                 "availability");
+        }
+
+        if (outcome.Outcome == AdmissionOutcome.Admitted
+            && string.Equals(parsed.Family, OperationAdmissionService.FamilyTranslation, StringComparison.Ordinal))
+        {
+            var execution = await translator.ExecuteAdmittedAsync(
+                accountId,
+                parsed.Source,
+                parsed.SourceSelection,
+                parsed.Target,
+                identity.OperationId,
+                outcome.Submission!,
+                outcome.Usage,
+                outcome.ServerTime,
+                cancellationToken);
+            return MapTranslationExecution(execution, correlationId);
         }
 
         return outcome.Outcome switch
@@ -476,6 +497,56 @@ public static class OperationsEndpoints
                 "availability");
         }
     }
+
+    internal static IResult MapTranslationExecution(
+        TranslationExecutionResult execution,
+        string correlationId) =>
+        execution.Outcome switch
+        {
+            TranslationExecutionOutcome.Succeeded => Results.Json(
+                ToSuccess(execution),
+                statusCode: StatusCodes.Status201Created),
+            TranslationExecutionOutcome.ProviderUnavailable => Results.Json(
+                ToPending(execution.Submission!, execution.Usage, execution.ServerTime),
+                statusCode: StatusCodes.Status202Accepted),
+            TranslationExecutionOutcome.InputEligibilityRejected => Problem(
+                StatusCodes.Status422UnprocessableEntity,
+                "Input not eligible",
+                "The translation provider classified the source as not eligible for transformation; no character charge was made.",
+                correlationId,
+                "inputEligibility",
+                reason: execution.EligibilityReason,
+                characterCount: execution.Submission?.ScalarCount),
+            TranslationExecutionOutcome.MonetarySuspended => Problem(
+                MonetaryAdmissionProblem.SuspensionStatus,
+                MonetaryAdmissionProblem.Describe(MonetaryAdmissionOutcome.DeniedOverCap).Title,
+                MonetaryAdmissionProblem.Describe(MonetaryAdmissionOutcome.DeniedOverCap).Detail,
+                correlationId,
+                MonetaryAdmissionProblem.SuspensionCategory),
+            TranslationExecutionOutcome.DeadlineExceeded or TranslationExecutionOutcome.Cancelled => Problem(
+                StatusCodes.Status504GatewayTimeout,
+                "Translation deadline exceeded",
+                "The translation did not complete within the server-established deadline; no character charge was made.",
+                correlationId,
+                TranslationProblemCategories.DeadlineExceeded),
+            _ => Problem(
+                StatusCodes.Status503ServiceUnavailable,
+                "Translation unavailable",
+                "The translation could not be completed; no character charge was made.",
+                correlationId,
+                TranslationProblemCategories.ProcessingFailure),
+        };
+
+    internal static TranslationSuccessResponse ToSuccess(TranslationExecutionResult execution) => new(
+        Guid.Parse(execution.Submission!.OperationId),
+        ToFamily(execution.Submission),
+        OperationStatus.Succeeded,
+        execution.TranslatedText!,
+        execution.Submission.ScalarCount,
+        execution.Submission.AdmissionDay,
+        execution.Submission.DeadlineUtc,
+        execution.ServerTime,
+        ToUsage(execution.Usage));
 
     internal static IResult ToDuplicate(
         OperationSubmission submission,

@@ -30,7 +30,7 @@ paths:
       tags:
         - OperationsEndpoints
       summary: Submit one logical language operation
-      description: Validates, fingerprint-matches and atomically reserves exactly one logical operation per verified account identity against both daily character allowances. Identical identities observe the pending reservation or the settled success/failure/interrupted metadata; changed payloads conflict. No provider dispatch occurs.
+      description: Validates, fingerprint-matches and atomically reserves exactly one logical operation per verified account identity against both daily character allowances. Identical identities observe the pending reservation or the settled success/failure/interrupted metadata; changed payloads conflict. Translation submissions execute synchronously through the configured provider behind the stored deadline and return complete text or a classified failure; rewriting submissions remain pending reservations until M027.
       operationId: submitLanguageOperation
       requestBody:
         content:
@@ -51,6 +51,18 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/OperationStatusResponse"
+        "201":
+          description: Created
+          headers:
+            Cache-Control:
+              description: Always `no-store` for language-operation admission responses.
+              required: true
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TranslationSuccessResponse"
         "202":
           description: Accepted
           headers:
@@ -169,6 +181,18 @@ paths:
                 $ref: "#/components/schemas/OperationProblemDetails"
         "503":
           description: Service Unavailable
+          headers:
+            Cache-Control:
+              description: Always `no-store` for language-operation admission responses.
+              required: true
+              schema:
+                type: string
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/OperationProblemDetails"
+        "504":
+          description: Gateway Timeout
           headers:
             Cache-Control:
               description: Always `no-store` for language-operation admission responses.
@@ -1648,7 +1672,7 @@ components:
         - failed
         - interrupted
       type: string
-      description: "Observed reservation state: `pending`."
+      description: "Observed operation state: `pending`, `succeeded`, `failed` or `interrupted`."
     OperationStatusResponse:
       required:
         - operationId
@@ -2105,6 +2129,50 @@ components:
         target:
           description: Translation target language.
           $ref: "#/components/schemas/LanguageId"
+    TranslationSuccessResponse:
+      required:
+        - operationId
+        - family
+        - status
+        - translatedText
+        - characterCount
+        - admissionDay
+        - deadlineUtc
+        - serverTimeUtc
+        - usage
+      type: object
+      properties:
+        operationId:
+          type: string
+          description: Operation identity echoed from the submission.
+          format: uuid
+        family:
+          description: Language operation family.
+          $ref: "#/components/schemas/OperationFamily"
+        status:
+          description: "Observed operation state: `pending`, `succeeded`, `failed` or `interrupted`."
+          $ref: "#/components/schemas/OperationStatus"
+        translatedText:
+          type: string
+          description: Complete validated translated text. Never logged, traced or persisted.
+        characterCount:
+          type: integer
+          description: Committed Unicode scalar charge for the full submitted source.
+          format: int32
+        admissionDay:
+          type: string
+          description: UTC day owning the charge (the stored admission day), in yyyy-MM-dd form.
+        deadlineUtc:
+          type: string
+          description: Server-controlled overall deadline for the operation.
+          format: date-time
+        serverTimeUtc:
+          type: string
+          description: Current server time in UTC.
+          format: date-time
+        usage:
+          description: Fresh current-day user usage snapshot.
+          $ref: "#/components/schemas/UsageSnapshot"
     UsageAvailability:
       enum:
         - available

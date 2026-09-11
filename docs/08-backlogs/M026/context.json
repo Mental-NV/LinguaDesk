@@ -15,7 +15,7 @@
       "path": "docs/delivery/current.md",
       "use": "reference",
       "reason": "Dependency state (M009/M016/M018/M022-M025 Done) and selected-scope status at planning time",
-      "sha256": "cec88ecc33daae759ba227eadff7b7313ccc2eb85a4d48bfc57ee973fd76fe6f"
+      "sha256": "8af7d9b11b5eb0bc0ad7764d3bd0bf800cfa27cc69d0218f1b5f21c37d62fc54"
     },
     {
       "path": "docs/01-PRD.md",
@@ -205,7 +205,7 @@
       "heading": "8.2 Local acceptance allocation",
       "use": "reference",
       "reason": "Canonical scenario-to-check allocation the translation portion composes with",
-      "sha256": "75571941168f178fc80a7cdb779ab0f2bd61227d3d27923cdbb697b1dd634d28"
+      "sha256": "8cf3713cc9ada96fc65ea104baf222bda8927d3c6f7c94a0f0bfa55ee6891bc8"
     },
     {
       "path": "docs/08-backlogs/M009/backlog.md",
@@ -253,13 +253,13 @@
       "path": "backend/src/LinguaDesk.Api/Features/Operations/OperationsContract.cs",
       "use": "reference",
       "reason": "Current submit/status DTOs the translation contract extends",
-      "sha256": "d3a9544bf18a7d27c3e35adfc1cf887689e1e55478b0e3731661553e0ef2bb0b"
+      "sha256": "d617a0559d857c0b0a42380555fb24c07dfb6e4b3f915baad80266e41ad0289f"
     },
     {
       "path": "backend/src/LinguaDesk.Api/Features/Operations/OperationsEndpoints.cs",
       "use": "reference",
       "reason": "Current submit/status routes receiving the translation execution path",
-      "sha256": "56ae058036812fab7119208c1225d96f93f8db3f4e2986198cf5c7f256613013"
+      "sha256": "7b57859ef9ce00c981c248eb083eb026d6420ae1833d425093d6170357678f4d"
     },
     {
       "path": "backend/src/LinguaDesk.Api/Features/Operations/OperationAdmissionService.cs",
@@ -323,7 +323,7 @@
     }
   ],
   "source_map_sha256": "169877ae56216683cd2d988561ec0d633d708ef07c0e753f5420cf744d1a29f8",
-  "baseline_commit": "d456c65bc3c058aaaace1334c1ed46953588a3e9",
+  "baseline_commit": "d5f56864226941b4a4b58cf5a6cd8c70aaf0635d",
   "locked_files": {
     "docs/00-SDD-Planning-Workflow.md": "5ccca040d0f0d50fac47632643306e7224a8d2e5460df0958e7e7c333146db89",
     "docs/00-workflow/execution.md": "f362a1384cefef24ba204e0723e3190857c8cca9bcd91908136932e19c5caf02",

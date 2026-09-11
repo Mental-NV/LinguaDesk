@@ -13,6 +13,8 @@ public static class OperationsRegistrationExtensions
         services.AddOptions<MonetaryAdmissionOptions>().BindConfiguration(MonetaryAdmissionOptions.SectionName);
         services.AddSingleton<IValidateOptions<MonetaryAdmissionOptions>, MonetaryAdmissionOptionsValidator>();
         services.AddScoped<OperationAdmissionService>();
+        services.AddScoped<ITranslationClientProvider, UnavailableTranslationClientProvider>();
+        services.AddScoped<TranslationOperationCoordinator>();
         services.AddScoped<OperationSettlementService>();
         services.AddScoped<OperationRecoveryService>();
         services.AddHostedService<OperationRecoveryHostedService>();

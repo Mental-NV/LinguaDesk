@@ -91,7 +91,7 @@ function validateContract(document) {
   )
   sameValues(
     Object.keys(submitOperation.responses ?? {}),
-    ['200', '202', '400', '401', '403', '405', '409', '410', '415', '422', '429', '503'],
+    ['200', '201', '202', '400', '401', '403', '405', '409', '410', '415', '422', '429', '503', '504'],
     'submitLanguageOperation responses',
   )
   expect(submitOperation.requestBody?.required === true, 'submitLanguageOperation request body must be required')
@@ -102,7 +102,7 @@ function validateContract(document) {
   expect(submitOperation.security?.length === 2, 'submitLanguageOperation must accept Bearer or cookie')
   expect(submitOperation.security?.[0]?.bearerAuth !== undefined, 'submitLanguageOperation Bearer auth is missing')
   expect(submitOperation.security?.[1]?.sessionCookie !== undefined, 'submitLanguageOperation cookie security is missing')
-  for (const status of ['200', '202', '400', '401', '403', '405', '409', '410', '415', '422', '429', '503']) {
+  for (const status of ['200', '201', '202', '400', '401', '403', '405', '409', '410', '415', '422', '429', '503', '504']) {
     const selectedResponse = submitOperation.responses[status]
     expect(selectedResponse.headers?.['Cache-Control']?.required === true, `submitLanguageOperation ${status} must require Cache-Control`)
     expect(selectedResponse.headers['Cache-Control'].schema?.type === 'string', `submitLanguageOperation ${status} Cache-Control must be a string`)
@@ -112,10 +112,14 @@ function validateContract(document) {
     'submitLanguageOperation success schema is missing',
   )
   expect(
+    submitOperation.responses['201'].content?.['application/json']?.schema?.$ref === '#/components/schemas/TranslationSuccessResponse',
+    'submitLanguageOperation translation success schema is missing',
+  )
+  expect(
     submitOperation.responses['200'].content?.['application/json']?.schema?.$ref === '#/components/schemas/OperationStatusResponse',
     'submitLanguageOperation settled duplicate schema is missing',
   )
-  for (const status of ['400', '401', '403', '409', '410', '415', '422', '429', '503']) {
+  for (const status of ['400', '401', '403', '409', '410', '415', '422', '429', '503', '504']) {
     expect(
       submitOperation.responses[status].content?.['application/problem+json']?.schema?.$ref === '#/components/schemas/OperationProblemDetails',
       `submitLanguageOperation ${status} Problem Details schema is missing`,
@@ -221,6 +225,18 @@ function validateContract(document) {
   )
   expect(statusResponse.properties.characterCount.type === 'integer', 'status character count must be integer-only')
   expect(statusResponse.properties.outputAvailable.type === 'boolean', 'status output availability must be boolean-only')
+  const translationSuccess = document.components.schemas.TranslationSuccessResponse
+  sameValues(
+    translationSuccess.required,
+    ['operationId', 'family', 'status', 'translatedText', 'characterCount', 'admissionDay', 'deadlineUtc', 'serverTimeUtc', 'usage'],
+    'translation success required fields',
+  )
+  sameValues(
+    Object.keys(translationSuccess.properties),
+    ['operationId', 'family', 'status', 'translatedText', 'characterCount', 'admissionDay', 'deadlineUtc', 'serverTimeUtc', 'usage'],
+    'translation success fields',
+  )
+  expect(translationSuccess.properties.characterCount.type === 'integer', 'translation success character count must be integer-only')
   const usageSnapshot = document.components.schemas.UsageSnapshot
   sameValues(
     usageSnapshot.required,
