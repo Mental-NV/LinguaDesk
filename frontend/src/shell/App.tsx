@@ -6,6 +6,7 @@ import {
   signOutLocalAccount,
 } from '../api/accounts'
 import { ForgotPasswordPage } from '../auth/ForgotPasswordPage'
+import { RewritePage } from '../rewrite/RewritePage'
 import { TranslatePage } from '../translate/TranslatePage'
 import { LoginPage, type SignInCompletionStatus } from '../auth/LoginPage'
 import { RegisterPage } from '../auth/RegisterPage'
@@ -68,26 +69,6 @@ function VerifyEmailPage({
         allowUnverifiedEntry={allowUnverifiedEntry}
         protectedContinuationPath={continuationPath}
       />
-    </Page>
-  )
-}
-
-function SignedInPlaceholder({
-  feature,
-  onSignOut,
-}: {
-  feature: 'translate' | 'rewrite'
-  onSignOut: () => void
-}) {
-  const heading = feature === 'translate' ? 'Translation' : 'Rewriting'
-  return (
-    <Page heading={heading}>
-      <p>The {heading.toLowerCase()} workspace arrives in a later update.</p>
-      <div className="form-actions">
-        <button type="button" className="secondary-button" onClick={onSignOut}>
-          Sign out
-        </button>
-      </div>
     </Page>
   )
 }
@@ -307,7 +288,11 @@ export function App() {
           </Page>
         )
       }
-      return <SignedInPlaceholder feature={feature} onSignOut={handleSignOut} />
+      return (
+        <Page heading="Rewriting">
+          <RewritePage onSignOut={handleSignOut} />
+        </Page>
+      )
     }
     if (auth === 'unverified' || pendingVerificationEmail !== null) {
       return (

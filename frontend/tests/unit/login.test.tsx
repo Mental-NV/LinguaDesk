@@ -79,6 +79,42 @@ function unverifiedSessionResponse(): Response {
   })
 }
 
+function rewritingCapabilitiesResponse(): Response {
+  return jsonResponse(200, {
+    serverTimeUtc: '2026-09-11T08:30:00Z',
+    languages: [
+      { id: 'en', name: 'English' },
+      { id: 'ru', name: 'Russian' },
+      { id: 'ro', name: 'Romanian' },
+      { id: 'zh', name: 'Chinese' },
+    ],
+    sourceSelection: { default: 'auto', values: ['auto', 'en', 'ru', 'ro', 'zh'] },
+    rewriting: {
+      maximumSourceCharacters: 2000,
+      oversizeHandling: 'rejectWhole',
+      overallDeadlineSeconds: 30,
+      defaultMode: 'correctionOnly',
+      modes: [
+        { id: 'correctionOnly', name: 'Correction only', kind: 'correction' },
+        { id: 'friendly', name: 'Friendly', kind: 'tone' },
+      ],
+    },
+  })
+}
+
+function rewritingUsageResponse(): Response {
+  return jsonResponse(200, {
+    day: '2026-09-11',
+    resetAtUtc: '2026-09-12T00:00:00Z',
+    consumedCharacters: 7500,
+    reservedCharacters: 0,
+    allowanceCharacters: 20000,
+    availableCharacters: 12500,
+    revision: 3,
+    availability: 'available',
+  })
+}
+
 interface RecordedCall {
   url: string
   init?: RequestInit
@@ -264,6 +300,8 @@ describe('verified sign-in (AC-001)', () => {
       if (url === '/api/accounts/session') return unverifiedSessionResponse()
       if (url === '/api/accounts/antiforgery') return antiforgeryResponse()
       if (url === '/api/accounts/sign-in') return verifiedSignInResponse()
+      if (url === '/api/capabilities') return rewritingCapabilitiesResponse()
+      if (url === '/api/usage') return rewritingUsageResponse()
       throw new Error(`unexpected request to ${url}`)
     })
     renderAppWithProbe('/rewrite')
@@ -276,9 +314,9 @@ describe('verified sign-in (AC-001)', () => {
 
     const destinationHeading = await screen.findByRole('heading', { level: 1, name: 'Rewriting' })
     expect(destinationHeading).toHaveFocus()
-    expect(
-      await screen.findByText('The rewriting workspace arrives in a later update.'),
-    ).toBeVisible()
+    expect(await screen.findByLabelText('Writing language')).toBeVisible()
+    expect(screen.getByLabelText('Writing mode')).toHaveValue('correctionOnly')
+    expect(screen.getByRole('button', { name: 'Rewrite' })).toBeVisible()
   })
 
   it('disables fields during flight and ignores duplicate click and Enter', async () => {

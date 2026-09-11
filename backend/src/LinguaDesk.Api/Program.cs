@@ -39,6 +39,7 @@ builder.Services.AddLinguaDeskPersistence(
 builder.Services.AddLinguaDeskAccounts();
 builder.Services.AddLinguaDeskOperations();
 builder.Services.AddSmokeDeterministicTranslationProvider(builder.Environment);
+builder.Services.AddSmokeDeterministicRewritingProvider(builder.Environment);
 builder.Services.AddLinguaDeskSecurity(builder.Configuration, isContractGeneration);
 builder.Services.AddLinguaDeskReadiness(builder.Environment, isContractGeneration);
 
