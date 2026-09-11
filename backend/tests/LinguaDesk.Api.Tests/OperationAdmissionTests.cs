@@ -676,9 +676,15 @@ internal sealed class OperationFixture : IAsyncDisposable
     public static OperationFixture Attach(
         StorageTestDatabase database,
         string keysPath,
-        IReadOnlyDictionary<string, string?>? overrides = null)
+        IReadOnlyDictionary<string, string?>? overrides = null,
+        DateTimeOffset? initialTime = null)
     {
         var time = new AdjustableTimeProvider(new DateTimeOffset(2026, 9, 11, 8, 30, 0, TimeSpan.Zero));
+        if (initialTime.HasValue)
+        {
+            time.Advance(initialTime.Value - time.GetUtcNow());
+        }
+
         var factory = new AccountWebApplicationFactory(
             database.DatabasePath,
             keysPath,
@@ -695,8 +701,7 @@ internal sealed class OperationFixture : IAsyncDisposable
         Client.Dispose();
         await Factory.DisposeAsync();
         detached = true;
-        var restarted = Attach(Database, KeysPath);
-        restarted.Time.Advance(current - restarted.Time.GetUtcNow());
+        var restarted = Attach(Database, KeysPath, initialTime: current);
         return restarted;
     }
 

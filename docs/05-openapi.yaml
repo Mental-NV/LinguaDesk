@@ -30,7 +30,7 @@ paths:
       tags:
         - OperationsEndpoints
       summary: Submit one logical language operation
-      description: Validates, fingerprint-matches and atomically reserves exactly one logical operation per verified account identity against both daily character allowances. Identical identities observe the pending reservation or the settled success/failure metadata; changed payloads conflict. No provider dispatch occurs.
+      description: Validates, fingerprint-matches and atomically reserves exactly one logical operation per verified account identity against both daily character allowances. Identical identities observe the pending reservation or the settled success/failure/interrupted metadata; changed payloads conflict. No provider dispatch occurs.
       operationId: submitLanguageOperation
       requestBody:
         content:
@@ -187,7 +187,7 @@ paths:
       tags:
         - OperationsEndpoints
       summary: Read one submitted operation
-      description: Returns the pending reservation or settled success/failure metadata for an account-owned operation identity with a fresh current-day usage snapshot. Status reads never dispatch work.
+      description: Returns the pending reservation or settled success/failure/interrupted metadata for an account-owned operation identity with a fresh current-day usage snapshot. Status reads never dispatch work.
       operationId: getLanguageOperationStatus
       parameters:
         - name: operationId
@@ -1567,6 +1567,7 @@ components:
         - pending
         - succeeded
         - failed
+        - interrupted
       type: string
       description: "Observed reservation state: `pending`."
     OperationStatusResponse:
@@ -1590,11 +1591,11 @@ components:
           description: Language operation family.
           $ref: "#/components/schemas/OperationFamily"
         status:
-          description: "Observed operation state: `pending`, `succeeded` or `failed`."
+          description: "Observed operation state: `pending`, `succeeded`, `failed` or `interrupted`."
           $ref: "#/components/schemas/OperationStatus"
         characterCount:
           type: integer
-          description: Reserved count while pending, committed charge when succeeded, zero when failed.
+          description: Reserved count while pending, committed charge when succeeded, zero when failed or interrupted.
           format: int32
         admissionDay:
           type: string

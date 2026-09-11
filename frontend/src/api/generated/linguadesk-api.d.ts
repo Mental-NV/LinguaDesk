@@ -35,7 +35,7 @@ export interface paths {
         put?: never;
         /**
          * Submit one logical language operation
-         * @description Validates, fingerprint-matches and atomically reserves exactly one logical operation per verified account identity against both daily character allowances. Identical identities observe the pending reservation or the settled success/failure metadata; changed payloads conflict. No provider dispatch occurs.
+         * @description Validates, fingerprint-matches and atomically reserves exactly one logical operation per verified account identity against both daily character allowances. Identical identities observe the pending reservation or the settled success/failure/interrupted metadata; changed payloads conflict. No provider dispatch occurs.
          */
         post: operations["submitLanguageOperation"];
         delete?: never;
@@ -53,7 +53,7 @@ export interface paths {
         };
         /**
          * Read one submitted operation
-         * @description Returns the pending reservation or settled success/failure metadata for an account-owned operation identity with a fresh current-day usage snapshot. Status reads never dispatch work.
+         * @description Returns the pending reservation or settled success/failure/interrupted metadata for an account-owned operation identity with a fresh current-day usage snapshot. Status reads never dispatch work.
          */
         get: operations["getLanguageOperationStatus"];
         put?: never;
@@ -592,7 +592,7 @@ export interface components {
          * @description Observed reservation state: `pending`.
          * @enum {string}
          */
-        OperationStatus: "pending" | "succeeded" | "failed";
+        OperationStatus: "pending" | "succeeded" | "failed" | "interrupted";
         OperationStatusResponse: {
             /**
              * Format: uuid
@@ -601,11 +601,11 @@ export interface components {
             operationId: string;
             /** @description Language operation family. */
             family: components["schemas"]["OperationFamily"];
-            /** @description Observed operation state: `pending`, `succeeded` or `failed`. */
+            /** @description Observed operation state: `pending`, `succeeded`, `failed` or `interrupted`. */
             status: components["schemas"]["OperationStatus"];
             /**
              * Format: int32
-             * @description Reserved count while pending, committed charge when succeeded, zero when failed.
+             * @description Reserved count while pending, committed charge when succeeded, zero when failed or interrupted.
              */
             characterCount: number;
             /** @description UTC day owning the reservation or charge, in yyyy-MM-dd form. */

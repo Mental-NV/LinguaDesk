@@ -554,7 +554,7 @@ function validateContract(document) {
     NormalizationPolicy: ['none'],
     OperationFamily: ['translation', 'rewriting'],
     OperationIdentityFormat: ['uuidV7'],
-    OperationStatus: ['pending', 'succeeded', 'failed'],
+    OperationStatus: ['pending', 'succeeded', 'failed', 'interrupted'],
     OversizeHandling: ['rejectWhole'],
     RewritingModeId: [
       'correctionOnly',

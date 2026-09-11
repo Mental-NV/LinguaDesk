@@ -12,7 +12,7 @@
       "path": "docs/delivery/current.md",
       "reason": "Dependency state (M022/M023 Done) and selected-scope status at planning time",
       "use": "reference",
-      "sha256": "35953c4d33c5eb1f1e6c184f7de6ff4ff7087bc9475708ba680c659257bfc6f2"
+      "sha256": "b725d729c0202b3fb95eac1d3d69f8368f014a9c433286c52d49d405e1402188"
     },
     {
       "ids": [
@@ -154,7 +154,7 @@
       "path": "docs/verification/coverage.md",
       "reason": "Canonical V-005/V-009/V-014/V-015/V-016 allocation for the selected recovery scenarios",
       "use": "reference",
-      "sha256": "37d5808f7b46982e9235df578f029e6593fb79315807b7ccb6c82e5ca4e811eb"
+      "sha256": "cc8c1a5220f7b0191a80c2e3a709273428370a6685e7f6a14edaf1c151367b1b"
     },
     {
       "path": "docs/08-backlogs/M022/backlog.md",
@@ -172,7 +172,7 @@
       "path": "backend/src/LinguaDesk.Api/Features/Operations/OperationEntities.cs",
       "reason": "Current submission/ledger entities the interrupted state composes with",
       "use": "reference",
-      "sha256": "f58def6bb3125cd2ee1c415ce700c387cdf54d1dc2976e50c5598acca31db83d"
+      "sha256": "72f527cc0c6b85560bba1e9af7a691f9b95a2e7a68de59139ec43ae362bda2c1"
     },
     {
       "path": "backend/src/LinguaDesk.Api/Features/Operations/OperationSettlementService.cs",
@@ -184,13 +184,13 @@
       "path": "backend/src/LinguaDesk.Api/Features/Operations/OperationsEndpoints.cs",
       "reason": "Current submission/status routes the interrupted mapping builds on",
       "use": "reference",
-      "sha256": "eb4535a31269a2bae33bec603683ce46ac7752d3ca26e26a8c9bed1ac70279e0"
+      "sha256": "a3a8499433b1912c84a47a6fd83cf5583dad05478853606ea9193db29b614900"
     },
     {
       "path": "backend/src/LinguaDesk.Api/Features/Operations/OperationsContract.cs",
       "reason": "Current DTOs constraining the interrupted status-shape mapping",
       "use": "reference",
-      "sha256": "b153ee3e14d3b52c549405478c254f4bdc0218742bfbb14bc9d4a943f7243161"
+      "sha256": "706366d9e7e4da1e394ca82c3866f5e8eeccc326da99db3f48998c2a3f3dfd30"
     },
     {
       "path": "backend/src/LinguaDesk.Api/Infrastructure/Persistence/LinguaDeskDbContext.cs",
@@ -213,7 +213,7 @@
   ],
   "version": 1,
   "source_map_sha256": "5d2b6774082b5618fcaa81540fe35b256dd22dc5678a54c1b37e06589828d0fb",
-  "baseline_commit": "82c79fd4530bddf1465faa0115cfc21d4874b863",
+  "baseline_commit": "6e86a1c0bfc3f1a5d80068a3b8046de374dc4cdd",
   "locked_files": {
     "docs/00-SDD-Planning-Workflow.md": "183ae93148ff594f9f1e021aa7543baa8878e9cc0bcfd69ebc696c28976e2945",
     "docs/00-workflow/execution.md": "f362a1384cefef24ba204e0723e3190857c8cca9bcd91908136932e19c5caf02",

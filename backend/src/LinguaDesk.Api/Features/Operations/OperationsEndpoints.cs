@@ -19,7 +19,7 @@ public static class OperationsEndpoints
             .WithDescription(
                 "Validates, fingerprint-matches and atomically reserves exactly one logical operation per verified " +
                 "account identity against both daily character allowances. Identical identities observe the pending " +
-                "reservation or the settled success/failure metadata; changed payloads conflict. No provider dispatch occurs.")
+                "reservation or the settled success/failure/interrupted metadata; changed payloads conflict. No provider dispatch occurs.")
             .Accepts<SubmitOperationRequest>("application/json")
             .Produces<OperationPendingResponse>(StatusCodes.Status202Accepted, "application/json")
             .Produces<OperationStatusResponse>(StatusCodes.Status200OK, "application/json")
@@ -71,7 +71,7 @@ public static class OperationsEndpoints
             .WithGroupName("linguadesk")
             .WithSummary("Read one submitted operation")
             .WithDescription(
-                "Returns the pending reservation or settled success/failure metadata for an account-owned operation " +
+                "Returns the pending reservation or settled success/failure/interrupted metadata for an account-owned operation " +
                 "identity with a fresh current-day usage snapshot. Status reads never dispatch work.")
             .Produces<OperationStatusResponse>(StatusCodes.Status200OK, "application/json")
             .Produces<OperationProblemDetails>(StatusCodes.Status400BadRequest, "application/problem+json")
@@ -396,7 +396,10 @@ public static class OperationsEndpoints
             Guid.Parse(submission.OperationId),
             ToFamily(submission),
             ToOperationStatus(submission),
-            string.Equals(submission.State, OperationStates.Failed, StringComparison.Ordinal) ? 0 : submission.ScalarCount,
+            string.Equals(submission.State, OperationStates.Succeeded, StringComparison.Ordinal)
+                || string.Equals(submission.State, OperationStates.Pending, StringComparison.Ordinal)
+                ? submission.ScalarCount
+                : 0,
             submission.AdmissionDay,
             submission.DeadlineUtc,
             false,
@@ -410,8 +413,13 @@ public static class OperationsEndpoints
             return OperationStatus.Succeeded;
         }
 
-        return string.Equals(submission.State, OperationStates.Failed, StringComparison.Ordinal)
-            ? OperationStatus.Failed
+        if (string.Equals(submission.State, OperationStates.Failed, StringComparison.Ordinal))
+        {
+            return OperationStatus.Failed;
+        }
+
+        return string.Equals(submission.State, OperationStates.Interrupted, StringComparison.Ordinal)
+            ? OperationStatus.Interrupted
             : OperationStatus.Pending;
     }
 

@@ -14,6 +14,8 @@ public static class OperationsRegistrationExtensions
         services.AddSingleton<IValidateOptions<MonetaryAdmissionOptions>, MonetaryAdmissionOptionsValidator>();
         services.AddScoped<OperationAdmissionService>();
         services.AddScoped<OperationSettlementService>();
+        services.AddScoped<OperationRecoveryService>();
+        services.AddHostedService<OperationRecoveryHostedService>();
         services.AddScoped<MonetaryAdmissionService>();
         services.AddSingleton<OperationFingerprintKeyProvider>(serviceProvider =>
             new OperationFingerprintKeyProvider(

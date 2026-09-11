@@ -21,6 +21,8 @@ public enum OperationStatus
     Succeeded,
     [JsonStringEnumMemberName("failed")]
     Failed,
+    [JsonStringEnumMemberName("interrupted")]
+    Interrupted,
 }
 
 /// <summary>Client operation submission admitted as exactly one reserved logical operation.</summary>
@@ -57,15 +59,15 @@ public sealed record OperationPendingResponse(
     [property: Description("Fresh current-day user usage snapshot.")]
     UsageSnapshot Usage);
 
-/// <summary>Terminal operation metadata: pending reservation, settled success charge with output unavailable, or settled failure with zero charge, plus a fresh current-day usage snapshot. Reads never dispatch work.</summary>
+/// <summary>Terminal operation metadata: pending reservation, settled success charge with output unavailable, settled failure with zero charge, or recovered interruption with zero charge, plus a fresh current-day usage snapshot. Reads never dispatch work.</summary>
 public sealed record OperationStatusResponse(
     [property: Description("Operation identity echoed from the submission.")]
     Guid OperationId,
     [property: Description("Language operation family.")]
     OperationFamily Family,
-    [property: Description("Observed operation state: `pending`, `succeeded` or `failed`.")]
+    [property: Description("Observed operation state: `pending`, `succeeded`, `failed` or `interrupted`.")]
     OperationStatus Status,
-    [property: Description("Reserved count while pending, committed charge when succeeded, zero when failed.")]
+    [property: Description("Reserved count while pending, committed charge when succeeded, zero when failed or interrupted.")]
     int CharacterCount,
     [property: Description("UTC day owning the reservation or charge, in yyyy-MM-dd form.")]
     string AdmissionDay,
