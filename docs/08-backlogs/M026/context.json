@@ -1,0 +1,333 @@
+{
+  "version": 1,
+  "scope": "M026",
+  "sources": [
+    {
+      "path": "docs/07-roadmap.md",
+      "ids": [
+        "M026"
+      ],
+      "use": "excerpt",
+      "reason": "Selected outcome, exit criterion, prerequisites and M028 successor boundary this API slice must not claim",
+      "sha256": "d5a4f2da9b595806534b1e5968c263ec8216830224ee55db9b7ce424ea9c13bf"
+    },
+    {
+      "path": "docs/delivery/current.md",
+      "use": "reference",
+      "reason": "Dependency state (M009/M016/M018/M022-M025 Done) and selected-scope status at planning time",
+      "sha256": "cec88ecc33daae759ba227eadff7b7313ccc2eb85a4d48bfc57ee973fd76fe6f"
+    },
+    {
+      "path": "docs/01-PRD.md",
+      "ids": [
+        "FR-003",
+        "FR-009",
+        "FR-011",
+        "FR-024",
+        "FR-035",
+        "FR-036",
+        "FR-037"
+      ],
+      "use": "excerpt",
+      "reason": "Selected translation/API product requirements for this slice",
+      "sha256": "fc54e7da8d1a4867c8794d99e7e93de367b9a3d789535c20af6d22dff278ed0a"
+    },
+    {
+      "path": "docs/01-PRD.md",
+      "ids": [
+        "FR-004",
+        "FR-008",
+        "NFR-002",
+        "NFR-004",
+        "NFR-006"
+      ],
+      "use": "reference",
+      "reason": "Eligibility, fidelity, deadline, privacy and cost context this slice composes with",
+      "sha256": "ba1bfa8dc728da0bd559d4012980c54b1f298b493b5b7f9e8e111f09c94b36bb"
+    },
+    {
+      "path": "docs/product/open-questions.md",
+      "ids": [
+        "Q-003",
+        "Q-006"
+      ],
+      "use": "excerpt",
+      "reason": "Shared counting/recovery/auth semantics implemented; wire names fixed in this slice",
+      "sha256": "d8d95ce5c9d54c7331447de126991b55eb72e92989638921b309887ac69a145f"
+    },
+    {
+      "path": "docs/product/open-questions.md",
+      "ids": [
+        "Q-001",
+        "Q-004"
+      ],
+      "use": "reference",
+      "reason": "Cap/billing verification stays open pre-launch; retention/deletion makes no new claim",
+      "sha256": "51f77e060dc3bb0d6c9776720560003db1062c493a5b0acc74ff87a7ade2f6dd"
+    },
+    {
+      "path": "docs/03-architecture.md",
+      "heading": "7. Operations, Accounting, and Crash Recovery",
+      "use": "excerpt",
+      "reason": "Durable reservation, settle-once, fencing, deadline and ceiling rules the coordinator follows",
+      "sha256": "837822ff4578a01739f116e011470174c4d8ad5866ecb7b300563efd0d347309"
+    },
+    {
+      "path": "docs/03-architecture.md",
+      "heading": "8.3 API behavioral design and generated contract",
+      "use": "reference",
+      "reason": "Generated-contract review and drift rules for the translation delta",
+      "sha256": "14eeacbef7471e3cdb6651582e4537db4ec7a30b5525f015c4a08b7d4bfb8660"
+    },
+    {
+      "path": "docs/api/operations.md",
+      "heading": "4. Complete input and canonical counting",
+      "use": "excerpt",
+      "reason": "Scalar counting, validation and translation settings enforced before admission",
+      "sha256": "8e99adeb5008c61f79f18581d3663a4b5f0bf6017fa43ab3f02ed4a28c39e019"
+    },
+    {
+      "path": "docs/api/operations.md",
+      "heading": "5. Submission identity, duplicates, and replay",
+      "use": "excerpt",
+      "reason": "Identity validity, fingerprint matching and identity-state table for this slice",
+      "sha256": "88e971aec84fd3279067befac9f7952ae26fcd0ac97df04054a0ea998872d474"
+    },
+    {
+      "path": "docs/api/operations.md",
+      "heading": "6. Completion, cancellation, and lost-response recovery",
+      "use": "excerpt",
+      "reason": "Outcome finality, deadline/cancellation and metadata-only recovery semantics",
+      "sha256": "55358dd5c8b33bb25be35719b0a512ef7abf46497da2ea801d69b8ac4f882c5d"
+    },
+    {
+      "path": "docs/api/operations.md",
+      "heading": "7. Allowances, UTC boundaries, and usage ordering",
+      "use": "reference",
+      "reason": "Admission-day settlement, cost-month attribution and snapshot ordering reused from M022-M025",
+      "sha256": "5fbefd22bcd98b680b4ebcf2f614ed8d853a23468de73f45b7043915514d79dc"
+    },
+    {
+      "path": "docs/api/operations.md",
+      "heading": "8. Error semantics and client recovery",
+      "use": "excerpt",
+      "reason": "Wire categories and recovery mapping for validation, eligibility, allowance, budget, processing and deadline failures",
+      "sha256": "787b03e3f41e00492446ebe0f4b677a6c229562212f13a604897ae0197fecd8a"
+    },
+    {
+      "path": "docs/04-llm-specification.md",
+      "heading": "3. Input eligibility and operation behavior",
+      "use": "excerpt",
+      "reason": "Eligibility-before-transformation and translation fidelity rules via the M016 pipeline",
+      "sha256": "437a82f2d0967d372f2aec1e661e50fc5442ccf0fd7d868d2f21188c8779c32c"
+    },
+    {
+      "path": "docs/04-llm-specification.md",
+      "heading": "6. Routing, attempts, and time bounds",
+      "use": "excerpt",
+      "reason": "Explicit traversal, dispatch bounds and deadline policy via the M018 chain",
+      "sha256": "baa98d196e4549008323072028dbe1ad47138ac267479e8d8ad125263b5a4cfd"
+    },
+    {
+      "path": "docs/04-llm-specification.md",
+      "heading": "7. Error classification and recovery",
+      "use": "excerpt",
+      "reason": "Internal dispositions mapped to the public translation categories",
+      "sha256": "ffb52e572de013d56dd45a0ba703fc8ed586c2eb905a31626f3d4fdf78fe06c8"
+    },
+    {
+      "path": "docs/04-llm-specification.md",
+      "heading": "10. Local acceptance scenarios and handoffs",
+      "use": "reference",
+      "reason": "LLM-AC translation-portion boundaries composed with, not re-proven here",
+      "sha256": "2a61831246c3c9219255aa7f7b0fed38df27b698cd1436164570604a8c2358dc"
+    },
+    {
+      "path": "docs/05-api-design.md",
+      "ids": [
+        "API-AC-013"
+      ],
+      "use": "excerpt",
+      "reason": "Independent-client translation scenario this slice delivers (translation portion)",
+      "sha256": "04fc1382bf655211c81b3c7d68468336e65f4574bfa4d7c6ab0ac15d1287d3fa"
+    },
+    {
+      "path": "docs/05-api-design.md",
+      "ids": [
+        "API-AC-004",
+        "API-AC-006",
+        "API-AC-007",
+        "API-AC-008",
+        "API-AC-014"
+      ],
+      "use": "reference",
+      "reason": "Duplicate/recovery and contract-drift composition boundaries reused from prior evidence",
+      "sha256": "d3ff0f3f6c4ea0214da32627141224c26db1e20179877f0f08b0990cb0d36426"
+    },
+    {
+      "path": "docs/06-verification-plan.md",
+      "ids": [
+        "V-005",
+        "V-007",
+        "V-009"
+      ],
+      "use": "excerpt",
+      "reason": "Accounting, independent-AI and authenticated-consumer check groups for this slice",
+      "sha256": "c5200eee1aa6d5ee926d5dd14ff03a146cadbeb8bb2a8510abddee4986b77415"
+    },
+    {
+      "path": "docs/06-verification-plan.md",
+      "ids": [
+        "V-001",
+        "V-008",
+        "V-015"
+      ],
+      "use": "reference",
+      "reason": "Count-fixture boundary, adapter-behavior and privacy context for the translation path",
+      "sha256": "bc295f41e95af61cc1d6840cfc079d3f085a55f2d63b7878b78d3e86e9ea0d8d"
+    },
+    {
+      "path": "docs/verification/backend.md",
+      "heading": "3.1 Database, HTTP and published-host harness",
+      "use": "excerpt",
+      "reason": "File-backed SQLite isolation, migration and fake-adapter harness rules for the HTTP suite",
+      "sha256": "c493bc0519d9271615893303f036c333d6c38d279a75c1b2863778d944c4e794"
+    },
+    {
+      "path": "docs/verification/backend.md",
+      "heading": "3.2 High-risk accounting and privacy cases",
+      "use": "reference",
+      "reason": "Concurrent/crash/restart accounting cases and dispatch-free read requirements",
+      "sha256": "486ce55d64b8286164aeb4aeb4a28c861553bf003f81174554c1fb6705d25272"
+    },
+    {
+      "path": "docs/verification/coverage.md",
+      "heading": "8.2 Local acceptance allocation",
+      "use": "reference",
+      "reason": "Canonical scenario-to-check allocation the translation portion composes with",
+      "sha256": "75571941168f178fc80a7cdb779ab0f2bd61227d3d27923cdbb697b1dd634d28"
+    },
+    {
+      "path": "docs/08-backlogs/M009/backlog.md",
+      "use": "reference",
+      "reason": "Dependency evidence: Bearer lifecycle, precedence and verified gate precedent",
+      "sha256": "6176a362a49974865569d744859acd5e3ed729233be66905b33103afbb1934d0"
+    },
+    {
+      "path": "docs/08-backlogs/M016/backlog.md",
+      "use": "reference",
+      "reason": "Dependency evidence: translation pipeline and envelope validation precedent",
+      "sha256": "c9a85914ca9fb808c5a0506a5a91503b6e0c28f86671f8eb6d2aaf1ecb8c7139"
+    },
+    {
+      "path": "docs/08-backlogs/M018/backlog.md",
+      "use": "reference",
+      "reason": "Dependency evidence: chain traversal, deadline and cost-admission precedent",
+      "sha256": "103c5b0c75e99ffecb5f541f5ad1e7a8d6562930d9f77b73d1ce5bd34529b00c"
+    },
+    {
+      "path": "docs/08-backlogs/M022/backlog.md",
+      "use": "reference",
+      "reason": "Dependency evidence: settle-once and admission-day settlement precedent",
+      "sha256": "4bdc59296e30975321cf55afed590ef6f78a46806b6639c05e2629d3cfd0561d"
+    },
+    {
+      "path": "docs/08-backlogs/M023/backlog.md",
+      "use": "reference",
+      "reason": "Dependency evidence: cost-month attribution and carryover precedent",
+      "sha256": "d31ef9fd711b687c2b4ecfd02bca18bf3ba1eb97f2e5f8c5f9e883bec97334b1"
+    },
+    {
+      "path": "docs/08-backlogs/M024/backlog.md",
+      "use": "reference",
+      "reason": "Dependency evidence: interrupted fencing and dispatch-free status precedent",
+      "sha256": "3d4f22a3a5142d9a60a5a80da26fa29c6cba35642d847730550e1afca7adbcb4"
+    },
+    {
+      "path": "docs/08-backlogs/M025/backlog.md",
+      "use": "reference",
+      "reason": "Dependency evidence: authoritative snapshot and availability-signal precedent",
+      "sha256": "d67461b50136850d46d56c24c5aef3e7777c7f78ef66c9b6ce5a8a527794d673"
+    },
+    {
+      "path": "backend/src/LinguaDesk.Api/Features/Operations/OperationsContract.cs",
+      "use": "reference",
+      "reason": "Current submit/status DTOs the translation contract extends",
+      "sha256": "d3a9544bf18a7d27c3e35adfc1cf887689e1e55478b0e3731661553e0ef2bb0b"
+    },
+    {
+      "path": "backend/src/LinguaDesk.Api/Features/Operations/OperationsEndpoints.cs",
+      "use": "reference",
+      "reason": "Current submit/status routes receiving the translation execution path",
+      "sha256": "56ae058036812fab7119208c1225d96f93f8db3f4e2986198cf5c7f256613013"
+    },
+    {
+      "path": "backend/src/LinguaDesk.Api/Features/Operations/OperationAdmissionService.cs",
+      "use": "reference",
+      "reason": "Current admission entry point the coordinator reuses",
+      "sha256": "7a91aebf4e5857199830eefcd52e9bd949c037c959716348889fa92d3f9fd03e"
+    },
+    {
+      "path": "backend/src/LinguaDesk.Api/Features/Operations/OperationSettlementService.cs",
+      "use": "reference",
+      "reason": "Current settle-once service the translation outcome commits through",
+      "sha256": "d46587d0609d18980fd0357869f6468b495df5f55100e1fd7869ae31766eb4cb"
+    },
+    {
+      "path": "backend/src/LinguaDesk.Api/Features/Operations/OperationRecoveryService.cs",
+      "use": "reference",
+      "reason": "Current fencing/recovery service the translation path preserves",
+      "sha256": "6eea8c2476f355152b2f5faa6d0439e23fd10426019d3fa419c7a0a5a96b63b6"
+    },
+    {
+      "path": "backend/src/LinguaDesk.Api/Features/Operations/MonetaryAdmissionService.cs",
+      "use": "reference",
+      "reason": "Current per-attempt ceiling inputs the translation attempts reuse",
+      "sha256": "6c1cc728febe1d43fa7d47eed3d819de59ff0696907d131e16cfbd4a48d8fa9c"
+    },
+    {
+      "path": "backend/src/LinguaDesk.Infrastructure.Ai/TranslationPipeline.cs",
+      "use": "reference",
+      "reason": "Existing translation pipeline driven behind the operations coordinator",
+      "sha256": "7f4b904935a0bf21aff590886507e7b6391d79e25f57c99c8dd68a951cf9db0e"
+    },
+    {
+      "path": "backend/src/LinguaDesk.Infrastructure.Ai/ChainOrchestrator.cs",
+      "use": "reference",
+      "reason": "Existing explicit-traversal orchestrator reused for the translation chain",
+      "sha256": "a9b220a42aaaa5826cac2ef153c14ab29b91bd4641810e3b8806df914c128615"
+    },
+    {
+      "path": "backend/src/LinguaDesk.Core/ScalarInputPolicy.cs",
+      "use": "reference",
+      "reason": "Current canonical counting/validation policy the slice enforces",
+      "sha256": "f9060fc2611b571b74ae701341a1166bebf637ae55453c22aacb5c4997ccdec0"
+    },
+    {
+      "path": "backend/src/LinguaDesk.Core/ProductCatalog.cs",
+      "use": "reference",
+      "reason": "Current language/target/mode catalog the translation validation reuses",
+      "sha256": "60de0c7227b53a871cba618f194bb6190d27e4916e5cb79f7c7bfe1f219d376c"
+    },
+    {
+      "path": "scripts/backend.sh",
+      "use": "reference",
+      "reason": "Backend aggregate and file-backed check command surface",
+      "sha256": "377c9652f76ace23925039451b1b545eb31c9b24fa7af6fe6c3ffb0d699699fa"
+    },
+    {
+      "path": "scripts/contract.sh",
+      "use": "reference",
+      "reason": "Deterministic contract generation and drift command surface",
+      "sha256": "d514721c6a6beca458a884f9af172cda279fbaf36529dc1e1709e76dfb4471b9"
+    }
+  ],
+  "source_map_sha256": "169877ae56216683cd2d988561ec0d633d708ef07c0e753f5420cf744d1a29f8",
+  "baseline_commit": "d456c65bc3c058aaaace1334c1ed46953588a3e9",
+  "locked_files": {
+    "docs/00-SDD-Planning-Workflow.md": "5ccca040d0f0d50fac47632643306e7224a8d2e5460df0958e7e7c333146db89",
+    "docs/00-workflow/execution.md": "f362a1384cefef24ba204e0723e3190857c8cca9bcd91908136932e19c5caf02",
+    "docs/08-backlogs/M026/spec.md": "883ab4c49c18219f9b2bb3426e0dcfc2712df2a2c03811d2f5cecdbecc65a5d7",
+    "docs/08-backlogs/M026/plan.md": "3d013da14d1ca28adfb1012acd530fbb18fb9a9e34bd03e418c27071ff06c5ae"
+  }
+}
