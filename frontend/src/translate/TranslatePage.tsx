@@ -1,5 +1,11 @@
 import { useCallback, useEffect, useId, useState } from 'react'
 import { analyzeInput } from '../api/inputPolicy'
+import {
+  StartNewWorkspaceButton,
+  WorkspaceLifetimeFooter,
+  WorkspaceSessionTeardown,
+  useTranslationSourceFocusRequest,
+} from '../shell/WorkspaceReset'
 import { useTranslateFeature } from '../shell/workspaceStores'
 import {
   MESSAGE_OFFLINE,
@@ -38,6 +44,8 @@ export function TranslatePage({ onSignOut }: TranslatePageProps) {
   const errorId = `${formId}-error`
 
   const [offline, setOffline] = useState(() => !window.navigator.onLine)
+
+  useTranslationSourceFocusRequest()
 
   useEffect(() => {
     const handleOnline = (): void => setOffline(false)
@@ -153,6 +161,8 @@ export function TranslatePage({ onSignOut }: TranslatePageProps) {
           id={sourceId}
           value={state.source}
           rows={6}
+          data-workspace-source="translation"
+          autoComplete="off"
           aria-describedby={inlineValidation === null ? undefined : validationId}
           aria-invalid={inlineValidation !== null}
           onChange={(event) => dispatch({ type: 'sourceChanged', source: event.target.value })}
@@ -176,6 +186,11 @@ export function TranslatePage({ onSignOut }: TranslatePageProps) {
         >
           {state.phase === 'submitting' ? 'Translating…' : 'Translate'}
         </button>
+        <StartNewWorkspaceButton
+          feature="translation"
+          fallbackReset={() => store.resetWorkspace()}
+          fallbackEmpty={state.source === '' && !state.hasResult && state.resultText === ''}
+        />
         <button type="button" className="secondary-button" onClick={onSignOut}>
           Sign out
         </button>
@@ -247,6 +262,7 @@ export function TranslatePage({ onSignOut }: TranslatePageProps) {
             id={resultId}
             value={state.resultText}
             rows={6}
+            autoComplete="off"
             onChange={(event) => dispatch({ type: 'resultEdited', value: event.target.value })}
           />
           <div className="form-actions">
@@ -271,6 +287,9 @@ export function TranslatePage({ onSignOut }: TranslatePageProps) {
           </p>
         )}
       </section>
+
+      <WorkspaceLifetimeFooter />
+      <WorkspaceSessionTeardown />
     </div>
   )
 }

@@ -68,6 +68,7 @@ export interface TranslateFeatureStore {
   readonly saveScroll: (scrollY: number) => void
   readonly readSavedScroll: () => number
   readonly abortFlights: () => void
+  readonly resetWorkspace: () => void
 }
 
 export interface RewriteFeatureStore {
@@ -81,6 +82,7 @@ export interface RewriteFeatureStore {
   readonly saveScroll: (scrollY: number) => void
   readonly readSavedScroll: () => number
   readonly abortFlights: () => void
+  readonly resetWorkspace: () => void
 }
 
 export function useTranslateFeatureInstance(): TranslateFeatureStore {
@@ -360,6 +362,16 @@ export function useTranslateFeatureInstance(): TranslateFeatureStore {
     dispatch({ type: 'submitAborted', revision })
   }, [])
 
+  const resetWorkspace = useCallback(() => {
+    // M032 safe reset: abort paid and read-only flights, drop saved scroll,
+    // then clear text/settings/result/errors/pending identity through the
+    // single clearing action. The reducer revision bump fences late responses.
+    flightRef.current?.abort()
+    readRef.current?.abort()
+    scrollRef.current = 0
+    dispatch({ type: 'workspaceCleared' })
+  }, [])
+
   return useMemo<TranslateFeatureStore>(
     () => ({
       state,
@@ -372,6 +384,7 @@ export function useTranslateFeatureInstance(): TranslateFeatureStore {
       saveScroll,
       readSavedScroll,
       abortFlights,
+      resetWorkspace,
     }),
     [
       state,
@@ -383,6 +396,7 @@ export function useTranslateFeatureInstance(): TranslateFeatureStore {
       saveScroll,
       readSavedScroll,
       abortFlights,
+      resetWorkspace,
     ],
   )
 }
@@ -662,6 +676,16 @@ export function useRewriteFeatureInstance(): RewriteFeatureStore {
     dispatch({ type: 'submitAborted', revision })
   }, [])
 
+  const resetWorkspace = useCallback(() => {
+    // M032 safe reset: abort paid and read-only flights, drop saved scroll,
+    // then clear text/settings/result/errors/pending identity through the
+    // single clearing action. The reducer revision bump fences late responses.
+    flightRef.current?.abort()
+    readRef.current?.abort()
+    scrollRef.current = 0
+    dispatch({ type: 'workspaceCleared' })
+  }, [])
+
   return useMemo<RewriteFeatureStore>(
     () => ({
       state,
@@ -674,6 +698,7 @@ export function useRewriteFeatureInstance(): RewriteFeatureStore {
       saveScroll,
       readSavedScroll,
       abortFlights,
+      resetWorkspace,
     }),
     [
       state,
@@ -685,6 +710,7 @@ export function useRewriteFeatureInstance(): RewriteFeatureStore {
       saveScroll,
       readSavedScroll,
       abortFlights,
+      resetWorkspace,
     ],
   )
 }
@@ -692,6 +718,7 @@ export function useRewriteFeatureInstance(): RewriteFeatureStore {
 export interface WorkspaceStores {
   readonly translate: TranslateFeatureStore
   readonly rewrite: RewriteFeatureStore
+  readonly resetAll: () => void
 }
 
 export const WorkspaceStoreContext = createContext<WorkspaceStores | null>(null)

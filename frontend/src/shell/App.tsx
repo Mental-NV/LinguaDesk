@@ -122,6 +122,10 @@ function Shell() {
 
   const mountedRef = useRef(true)
   const signOutFlightRef = useRef(0)
+  const storesRef = useRef(stores)
+  useEffect(() => {
+    storesRef.current = stores
+  }, [stores])
 
   useEffect(() => {
     mountedRef.current = true
@@ -146,6 +150,9 @@ function Shell() {
       } else if (result.kind === 'unverified') {
         setAuth('unverified')
       } else if (result.kind === 'signedOut') {
+        // Session expiry clears lifted text before the login form renders
+        // (MSG-037); late text callbacks are fenced by the clearing revision.
+        storesRef.current?.resetAll()
         setAuth('signedOut')
         setPendingVerificationEmail(null)
         setSafeReturn('/translate')
@@ -182,11 +189,11 @@ function Shell() {
     if (signOutFlightRef.current > 0) return
     const flight = signOutFlightRef.current + 1
     signOutFlightRef.current = flight
-    // Sign-out keeps the M013 teardown guarantee: pending feature flights
-    // are invalidated so late responses cannot restore cleared text.
-    // Plain navigation does not abort; see the lifted workspace store.
-    stores?.translate.abortFlights()
-    stores?.rewrite.abortFlights()
+    // Sign-out keeps the M013 teardown guarantee through the single M032
+    // reset-all path: lifted text clears immediately while pending feature
+    // flights are aborted, so late responses cannot restore cleared text.
+    // Plain navigation never resets; see the lifted workspace store.
+    stores?.resetAll()
     setSafeReturn('/translate')
     setPendingVerificationEmail(null)
     setExpiryNotice(false)

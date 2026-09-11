@@ -531,3 +531,114 @@ describe('recovery from unavailable or unknown outcomes', () => {
     expect(refreshed.usage?.consumedCharacters).toBe(7546)
   })
 })
+
+describe('translation workspace clearing (M032)', () => {
+  function settled(source = 'Hello.'): TranslationWorkspaceState {
+    const submitting = translationWorkspaceReducer(
+      {
+        ...loaded(source),
+        usage,
+        usageObservedAtMs: 1_000,
+        resultText: 'Bună.',
+        hasResult: true,
+        error: { text: MESSAGE_PROCESSING_FAILURE, canRetry: true, canCheckStatus: false },
+        notice: 'A notice.',
+      },
+      { type: 'submitRequested' },
+    )
+    return translationWorkspaceReducer(submitting, {
+      type: 'submitSucceeded',
+      revision: submitting.requestRevision,
+      translatedText: 'Bună.',
+      characterCount: 46,
+      usage,
+      observedAtMs: 1_000,
+    })
+  }
+
+  it('restores defaults while preserving the settled usage snapshot and capabilities', () => {
+    const cleared = translationWorkspaceReducer(settled(), { type: 'workspaceCleared' })
+    expect(cleared.source).toBe('')
+    expect(cleared.sourceSelection).toBe('auto')
+    expect(cleared.target).toBe('')
+    expect(cleared.resultText).toBe('')
+    expect(cleared.hasResult).toBe(false)
+    expect(cleared.resultOutdated).toBe(false)
+    expect(cleared.resultEdited).toBe(false)
+    expect(cleared.phase).toBe('idle')
+    expect(cleared.composing).toBe(false)
+    expect(cleared.error).toBeNull()
+    expect(cleared.notice).toBeNull()
+    expect(cleared.copyAlert).toBeNull()
+    expect(cleared.pendingOperationId).toBeNull()
+    expect(cleared.staleChargePending).toBeNull()
+    expect(cleared.appliedRevision).toBe(0)
+    expect(cleared.usage).toEqual(usage)
+    expect(cleared.usageObservedAtMs).toBe(1_000)
+    expect(cleared.capabilities).toEqual(capabilities)
+    expect(
+      describeReadiness(cleared, capabilities.maximumSourceCharacters).canSubmit,
+    ).toBe(false)
+  })
+
+  it('fences a late success so cleared text is never restored', () => {
+    const submitting = translationWorkspaceReducer(loaded('Hello.'), {
+      type: 'submitRequested',
+    })
+    const cleared = translationWorkspaceReducer(submitting, { type: 'workspaceCleared' })
+    expect(cleared.requestRevision).toBe(submitting.requestRevision + 1)
+
+    const late = translationWorkspaceReducer(cleared, {
+      type: 'submitSucceeded',
+      revision: submitting.requestRevision,
+      translatedText: 'Late text.',
+      characterCount: 46,
+      usage,
+      observedAtMs: 2_000,
+    })
+    expect(late.resultText).toBe('')
+    expect(late.hasResult).toBe(false)
+    expect(late.source).toBe('')
+    expect(late.phase).toBe('idle')
+  })
+
+  it('ignores late failures and status answers after clearing', () => {
+    const submitting = translationWorkspaceReducer(loaded('Hello.'), {
+      type: 'submitRequested',
+    })
+    const pending = translationWorkspaceReducer(submitting, {
+      type: 'submitUnknownOutcome',
+      revision: submitting.requestRevision,
+      operationId: '0193a5b2-2c1d-7a11-9a22-334455667788',
+    })
+    const cleared = translationWorkspaceReducer(pending, { type: 'workspaceCleared' })
+
+    const lateFailure = translationWorkspaceReducer(cleared, {
+      type: 'submitFailed',
+      revision: submitting.requestRevision,
+      error: { text: MESSAGE_PROCESSING_FAILURE, canRetry: true, canCheckStatus: false },
+    })
+    expect(lateFailure.error).toBeNull()
+
+    const lateStatus = translationWorkspaceReducer(cleared, {
+      type: 'statusResolved',
+      revision: submitting.requestRevision,
+      operationId: '0193a5b2-2c1d-7a11-9a22-334455667788',
+      resolution: { outcome: 'noRecord' },
+    })
+    expect(lateStatus.error).toBeNull()
+    expect(lateStatus.pendingOperationId).toBeNull()
+  })
+
+  it('still reconciles independently settled usage after clearing', () => {
+    const cleared = translationWorkspaceReducer(settled(), { type: 'workspaceCleared' })
+    const refreshed = translationWorkspaceReducer(cleared, {
+      type: 'usageUpdated',
+      usage: { ...usage, consumedCharacters: 7592 },
+      observedAtMs: 2_000,
+    })
+    expect(refreshed.usage?.consumedCharacters).toBe(7592)
+    expect(refreshed.source).toBe('')
+    expect(refreshed.hasResult).toBe(false)
+  })
+})

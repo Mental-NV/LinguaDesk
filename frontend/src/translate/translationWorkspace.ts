@@ -155,6 +155,7 @@ export type TranslationWorkspaceAction =
       readonly resolution: TranslationStatusResolution
     }
   | { readonly type: 'submitAborted'; readonly revision: number }
+  | { readonly type: 'workspaceCleared' }
   | { readonly type: 'resultEdited'; readonly value: string }
   | { readonly type: 'usageUpdated'; readonly usage: TranslationUsage; readonly observedAtMs: number }
   | { readonly type: 'usageRefreshFailed' }
@@ -524,6 +525,22 @@ export function translationWorkspaceReducer(
       // busy phase without touching text. Navigation never dispatches this.
       if (action.revision !== state.requestRevision) return state
       return { ...state, phase: 'idle' }
+    case 'workspaceCleared': {
+      // M032 safe reset: restore FR-038 defaults while preserving the settled
+      // usage snapshot and loaded capabilities. The revision bump invalidates
+      // every in-flight submit/status identity, so a late success can at most
+      // record its independently settled charge (stale branch) and never
+      // restores cleared text; late failures and status answers are ignored.
+      const fresh = createInitialWorkspace()
+      return {
+        ...fresh,
+        capabilities: state.capabilities,
+        capabilitiesFailed: state.capabilitiesFailed,
+        usage: state.usage,
+        usageObservedAtMs: state.usageObservedAtMs,
+        requestRevision: state.requestRevision + 1,
+      }
+    }
     case 'resultEdited':
       return { ...state, resultText: action.value, resultEdited: true, copyAlert: null }
     case 'usageUpdated':

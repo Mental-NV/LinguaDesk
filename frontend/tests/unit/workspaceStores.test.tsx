@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { act, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { MemoryRouter } from 'react-router-dom'
 import { RewritePage } from '../../src/rewrite/RewritePage'
 import { WorkspaceStoreProvider } from '../../src/shell/workspaces'
 import {
@@ -130,13 +131,36 @@ function captureStores() {
   }
   function capture(element: React.ReactElement) {
     return render(
-      <WorkspaceStoreProvider>
-        <Probe onStores={(stores) => { captured.current = stores }} />
-        {element}
-      </WorkspaceStoreProvider>,
+      <MemoryRouter>
+        <WorkspaceStoreProvider>
+          <Probe onStores={(stores) => { captured.current = stores }} />
+          {element}
+        </WorkspaceStoreProvider>
+      </MemoryRouter>,
     )
   }
   return { captured, capture }
+}
+
+// Pages own router navigation (M032 reset confirm), so component renders
+// provide a memory router alongside the lifted provider.
+function renderWorkspace(element: React.ReactElement) {
+  return render(
+    <MemoryRouter>
+      <WorkspaceStoreProvider>{element}</WorkspaceStoreProvider>
+    </MemoryRouter>,
+  )
+}
+
+function rerenderWorkspace(
+  view: ReturnType<typeof render>,
+  element: React.ReactElement,
+) {
+  view.rerender(
+    <MemoryRouter>
+      <WorkspaceStoreProvider>{element}</WorkspaceStoreProvider>
+    </MemoryRouter>,
+  )
 }
 
 describe('lifted workspace store', () => {
@@ -149,32 +173,20 @@ describe('lifted workspace store', () => {
     const { operations } = installFetch(() => {
       throw new Error('navigation must not submit')
     })
-    const view = render(
-      <WorkspaceStoreProvider>
-        <TranslatePage onSignOut={() => {}} />
-      </WorkspaceStoreProvider>,
-    )
+    const view = renderWorkspace(<TranslatePage onSignOut={() => {}} />)
     await screen.findByLabelText('Source language')
     await user.selectOptions(screen.getByLabelText('Source language'), 'en')
     await user.selectOptions(screen.getByLabelText('Target language'), 'ro')
     await user.type(screen.getByLabelText('Source text'), TOK_A)
     expect(operations).toHaveLength(0)
 
-    view.rerender(
-      <WorkspaceStoreProvider>
-        <RewritePage onSignOut={() => {}} />
-      </WorkspaceStoreProvider>,
-    )
+    rerenderWorkspace(view, <RewritePage onSignOut={() => {}} />)
     await screen.findByLabelText('Writing mode')
     expect(screen.getByLabelText('Source text')).toHaveValue('')
     await user.type(screen.getByLabelText('Source text'), W_OK)
     expect(operations).toHaveLength(0)
 
-    view.rerender(
-      <WorkspaceStoreProvider>
-        <TranslatePage onSignOut={() => {}} />
-      </WorkspaceStoreProvider>,
-    )
+    rerenderWorkspace(view, <TranslatePage onSignOut={() => {}} />)
     await screen.findByLabelText('Source language')
     expect(screen.getByLabelText('Source text')).toHaveValue(TOK_A)
     expect(operations).toHaveLength(0)
@@ -188,11 +200,7 @@ describe('lifted workspace store', () => {
       release = resolve
     })
     const { operations } = installFetch(() => gate)
-    const view = render(
-      <WorkspaceStoreProvider>
-        <TranslatePage onSignOut={() => {}} />
-      </WorkspaceStoreProvider>,
-    )
+    const view = renderWorkspace(<TranslatePage onSignOut={() => {}} />)
     await screen.findByText(/7,500 of 20,000 characters used/)
     await user.selectOptions(screen.getByLabelText('Source language'), 'en')
     await user.selectOptions(screen.getByLabelText('Target language'), 'ro')
@@ -200,11 +208,7 @@ describe('lifted workspace store', () => {
     await user.click(screen.getByRole('button', { name: 'Translate' }))
     await waitFor(() => expect(operations).toHaveLength(1))
 
-    view.rerender(
-      <WorkspaceStoreProvider>
-        <RewritePage onSignOut={() => {}} />
-      </WorkspaceStoreProvider>,
-    )
+    rerenderWorkspace(view, <RewritePage onSignOut={() => {}} />)
     await screen.findByLabelText('Writing mode')
     expect(screen.getByLabelText('Source text')).toHaveValue('')
     expect(screen.queryByLabelText('Result')).not.toBeInTheDocument()
@@ -216,11 +220,7 @@ describe('lifted workspace store', () => {
     expect(screen.queryByLabelText('Result')).not.toBeInTheDocument()
     expect(operations).toHaveLength(1)
 
-    view.rerender(
-      <WorkspaceStoreProvider>
-        <TranslatePage onSignOut={() => {}} />
-      </WorkspaceStoreProvider>,
-    )
+    rerenderWorkspace(view, <TranslatePage onSignOut={() => {}} />)
     expect(await screen.findByLabelText('Result')).toHaveValue(RO_FIXTURE)
     await screen.findByText(/7,546 of 20,000 characters used/)
     expect(operations).toHaveLength(1)
@@ -300,6 +300,132 @@ describe('lifted workspace store', () => {
     expect(screen.getByLabelText('Source text')).toHaveValue(TOK_A)
     await screen.findByText(/7,500 of 20,000 characters used/)
     expect(screen.getByRole('button', { name: 'Translate' })).toBeEnabled()
+    view.unmount()
+  })
+
+  it('resetAll clears both workspaces to defaults, preserves usage and drops scroll', () => {
+    const { captured, capture } = captureStores()
+    const view = capture(<></>)
+    const stores = captured.current
+    if (stores === null) throw new Error('workspace stores are required')
+
+    act(() => {
+      stores.translate.dispatch({ type: 'sourceChanged', source: TOK_A })
+      stores.translate.dispatch({
+        type: 'capabilitiesLoaded',
+        capabilities: {
+          maximumSourceCharacters: 5000,
+          sourceDefault: 'auto',
+          sourceValues: ['auto', 'en'],
+          languages: { en: 'English' },
+          targetValues: ['ro'],
+        },
+      })
+      stores.translate.dispatch({
+        type: 'usageUpdated',
+        usage: {
+          consumedCharacters: 7546,
+          allowanceCharacters: 20000,
+          availableCharacters: 12454,
+          resetAtUtc: '2026-09-12T00:00:00Z',
+          availability: 'available',
+          revision: 4,
+        },
+        observedAtMs: 1_000,
+      })
+      stores.rewrite.dispatch({ type: 'sourceChanged', source: W_OK })
+      stores.rewrite.dispatch({
+        type: 'capabilitiesLoaded',
+        capabilities: {
+          maximumSourceCharacters: 2000,
+          sourceDefault: 'auto',
+          sourceValues: ['auto', 'en'],
+          languages: { en: 'English' },
+          modeDefault: 'correctionOnly',
+          modeValues: ['correctionOnly', 'friendly'],
+          modeNames: { correctionOnly: 'Correction only', friendly: 'Friendly' },
+        },
+      })
+      stores.rewrite.dispatch({ type: 'modeChanged', value: 'friendly' })
+      stores.translate.saveScroll(90)
+      stores.rewrite.saveScroll(40)
+    })
+
+    act(() => {
+      captured.current?.resetAll()
+    })
+
+    const translate = captured.current?.translate.state
+    expect(translate?.source).toBe('')
+    expect(translate?.sourceSelection).toBe('auto')
+    expect(translate?.target).toBe('')
+    expect(translate?.hasResult).toBe(false)
+    expect(translate?.phase).toBe('idle')
+    expect(translate?.error).toBeNull()
+    expect(translate?.usage?.consumedCharacters).toBe(7546)
+
+    const rewrite = captured.current?.rewrite.state
+    expect(rewrite?.source).toBe('')
+    expect(rewrite?.mode).toBe('correctionOnly')
+    expect(rewrite?.hasResult).toBe(false)
+    expect(rewrite?.phase).toBe('idle')
+
+    expect(stores.translate.readSavedScroll()).toBe(0)
+    expect(stores.rewrite.readSavedScroll()).toBe(0)
+    view.unmount()
+  })
+
+  it('resetAll during a pending submit restores no late text and keeps usage', async () => {
+    const user = userEvent.setup()
+    let release!: (response: Response) => void
+    const gate = new Promise<Response>((resolve) => {
+      release = resolve
+    })
+    installFetch(() => gate)
+    const { captured, capture } = captureStores()
+    const view = capture(<TranslatePage onSignOut={() => {}} />)
+    await screen.findByText(/7,500 of 20,000 characters used/)
+    await user.selectOptions(screen.getByLabelText('Source language'), 'en')
+    await user.selectOptions(screen.getByLabelText('Target language'), 'ro')
+    await user.type(screen.getByLabelText('Source text'), TOK_A)
+    await user.click(screen.getByRole('button', { name: 'Translate' }))
+    const stores = captured.current
+    if (stores === null) throw new Error('workspace stores are required')
+    await waitFor(() => expect(captured.current?.translate.state.phase).toBe('submitting'))
+
+    act(() => {
+      stores.resetAll()
+    })
+    expect(captured.current?.translate.state.phase).toBe('idle')
+    expect(captured.current?.translate.state.source).toBe('')
+    expect(captured.current?.translate.state.target).toBe('')
+
+    release(new Response(JSON.stringify(translationSuccessBody()), { status: 201 }))
+    await new Promise((resolve) => setTimeout(resolve, 100))
+    expect(screen.queryByLabelText('Result')).not.toBeInTheDocument()
+    await screen.findByText(/7,500 of 20,000 characters used/)
+
+    // A response dispatched past the abort still cannot restore cleared text.
+    const revision = captured.current?.translate.state.requestRevision ?? 0
+    act(() => {
+      stores.translate.dispatch({
+        type: 'submitSucceeded',
+        revision: revision - 1,
+        translatedText: 'Late text.',
+        characterCount: 46,
+        usage: {
+          consumedCharacters: 7546,
+          allowanceCharacters: 20000,
+          availableCharacters: 12454,
+          resetAtUtc: '2026-09-12T00:00:00Z',
+          availability: 'available',
+          revision: 5,
+        },
+        observedAtMs: 2_000,
+      })
+    })
+    expect(captured.current?.translate.state.resultText).toBe('')
+    expect(captured.current?.translate.state.hasResult).toBe(false)
     view.unmount()
   })
 })

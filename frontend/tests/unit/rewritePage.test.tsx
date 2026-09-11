@@ -1,5 +1,6 @@
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { MemoryRouter } from 'react-router-dom'
 import { RewritePage } from '../../src/rewrite/RewritePage'
 
 const W_OK = 'The report is really ready. We sends it today.'
@@ -154,8 +155,16 @@ function jsonResponse(payload: unknown, status: number): Response {
   return new Response(JSON.stringify(payload), { status })
 }
 
+function renderPage() {
+  return render(
+    <MemoryRouter>
+      <RewritePage onSignOut={() => {}} />
+    </MemoryRouter>,
+  )
+}
+
 async function renderReadyWorkspace() {
-  render(<RewritePage onSignOut={() => {}} />)
+  renderPage()
   await screen.findByLabelText('Writing language')
   await screen.findByText(/7,546 of 20,000 characters used/)
 }
@@ -391,7 +400,7 @@ describe('rewrite workspace components', () => {
     for (const testCase of cases) {
       vi.unstubAllGlobals()
       const { operations } = installFetch(() => jsonResponse(testCase.body, testCase.status))
-      const { unmount } = render(<RewritePage onSignOut={() => {}} />)
+      const { unmount } = renderPage()
       await screen.findByLabelText('Writing language')
       await fillValidWorkspace(user)
       await user.click(screen.getByRole('button', { name: 'Rewrite' }))
@@ -452,7 +461,7 @@ describe('rewrite workspace components', () => {
       'fetch',
       vi.fn(async () => new Response('{}', { status: 500 })),
     )
-    render(<RewritePage onSignOut={() => {}} />)
+    renderPage()
     expect(await screen.findByText('Rewriting settings could not be loaded.')).toBeVisible()
     expect(screen.getByRole('button', { name: 'Try again' })).toBeVisible()
   })

@@ -119,29 +119,29 @@
       "path": "frontend/src/translate/translationWorkspace.ts",
       "use": "reference",
       "reason": "Current translation reducer semantics the clearing action must extend",
-      "sha256": "40f52c604ca70aeb52626ee312db380634b91fe4bbff3e4615809d0c2ee8fb14"
+      "sha256": "439d5b82a53ffac54d3ccb23e7413e37b7c1faa6e08ed3b94f438f92ddeb5ba5"
     },
     {
       "path": "frontend/src/rewrite/rewritingWorkspace.ts",
       "use": "reference",
       "reason": "Current rewriting reducer semantics the clearing action must extend",
-      "sha256": "068ad98959048a7afbea06162374e8845a079e15156f0cab90df17c1f2387b58"
+      "sha256": "db5d3ecdf6f0f5944d383aa7c8d8f2921d6d3ce221cf58b9f827141de25d8c77"
     },
     {
       "path": "frontend/src/shell/workspaceStores.ts",
       "use": "reference",
       "reason": "Current lifted-store transport ownership the reset-all path must extend",
-      "sha256": "2ab053c03bdc0d63d323b24e23ac4cebf005ed3ff5afd8033c784724ca665332"
+      "sha256": "94f51e89681b0573ff03d765a8a03374ac3446c06ee15e478d7d74e29319cdef"
     },
     {
       "path": "frontend/src/shell/App.tsx",
       "use": "reference",
       "reason": "Current sign-out/expiry shell the teardown wiring must extend",
-      "sha256": "74e9cd002e9e08dcbd854b784958d2fd8d5177e99f7af58ad02e1c70adfce88d"
+      "sha256": "7d24736736a4f54e987181149ec782521bcfe7960368fbc629638d80951cf157"
     }
   ],
   "source_map_sha256": "b279d3246e1ee0f0bff1d4348637119859270703c1355c4bd86147d9e92a75be",
-  "baseline_commit": "13c7c557c3501d70e820a2f5c9280ae6e39e1308",
+  "baseline_commit": "686d85ab7a0704058fe3b3dc539a9a07765dc6ed",
   "locked_files": {
     "docs/00-SDD-Planning-Workflow.md": "5ccca040d0f0d50fac47632643306e7224a8d2e5460df0958e7e7c333146db89",
     "docs/00-workflow/execution.md": "f362a1384cefef24ba204e0723e3190857c8cca9bcd91908136932e19c5caf02",

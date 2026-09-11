@@ -543,3 +543,107 @@ describe('recovery from unavailable or unknown outcomes', () => {
     expect(refreshed.usage?.consumedCharacters).toBe(7546)
   })
 })
+
+describe('rewriting workspace clearing (M032)', () => {
+  const operationId = '0193a5b2-2c1d-7a11-9a22-334455667788'
+
+  function settled(): RewritingWorkspaceState {
+    const submitting = rewritingWorkspaceReducer(
+      {
+        ...loaded(W_OK, 'friendly'),
+        usage,
+        usageObservedAtMs: 1_000,
+        resultText: W_RESULT,
+        hasResult: true,
+        error: { text: MESSAGE_PROCESSING_FAILURE, canRetry: true, canCheckStatus: false },
+        notice: 'A notice.',
+      },
+      { type: 'submitRequested' },
+    )
+    return rewritingWorkspaceReducer(submitting, {
+      type: 'submitSucceeded',
+      revision: submitting.requestRevision,
+      rewrittenText: W_RESULT,
+      characterCount: 46,
+      usage,
+      observedAtMs: 1_000,
+    })
+  }
+
+  it('restores Correction-only defaults while preserving usage and capabilities', () => {
+    const cleared = rewritingWorkspaceReducer(settled(), { type: 'workspaceCleared' })
+    expect(cleared.source).toBe('')
+    expect(cleared.sourceSelection).toBe('auto')
+    expect(cleared.mode).toBe('correctionOnly')
+    expect(cleared.resultText).toBe('')
+    expect(cleared.hasResult).toBe(false)
+    expect(cleared.phase).toBe('idle')
+    expect(cleared.composing).toBe(false)
+    expect(cleared.error).toBeNull()
+    expect(cleared.notice).toBeNull()
+    expect(cleared.pendingOperationId).toBeNull()
+    expect(cleared.appliedRevision).toBe(0)
+    expect(cleared.usage).toEqual(usage)
+    expect(cleared.usageObservedAtMs).toBe(1_000)
+    expect(cleared.capabilities).toEqual(capabilities)
+    expect(describeReadiness(cleared, capabilities.maximumSourceCharacters).canSubmit).toBe(
+      false,
+    )
+  })
+
+  it('fences a late success so cleared text is never restored', () => {
+    const submitting = rewritingWorkspaceReducer(loaded(W_OK), { type: 'submitRequested' })
+    const cleared = rewritingWorkspaceReducer(submitting, { type: 'workspaceCleared' })
+    expect(cleared.requestRevision).toBe(submitting.requestRevision + 1)
+
+    const late = rewritingWorkspaceReducer(cleared, {
+      type: 'submitSucceeded',
+      revision: submitting.requestRevision,
+      rewrittenText: 'Late text.',
+      characterCount: 46,
+      usage,
+      observedAtMs: 2_000,
+    })
+    expect(late.resultText).toBe('')
+    expect(late.hasResult).toBe(false)
+    expect(late.source).toBe('')
+  })
+
+  it('ignores late failures and status answers after clearing', () => {
+    const submitting = rewritingWorkspaceReducer(loaded(W_OK), { type: 'submitRequested' })
+    const pending = rewritingWorkspaceReducer(submitting, {
+      type: 'submitUnknownOutcome',
+      revision: submitting.requestRevision,
+      operationId,
+    })
+    const cleared = rewritingWorkspaceReducer(pending, { type: 'workspaceCleared' })
+
+    const lateFailure = rewritingWorkspaceReducer(cleared, {
+      type: 'submitFailed',
+      revision: submitting.requestRevision,
+      error: { text: MESSAGE_PROCESSING_FAILURE, canRetry: true, canCheckStatus: false },
+    })
+    expect(lateFailure.error).toBeNull()
+
+    const lateStatus = rewritingWorkspaceReducer(cleared, {
+      type: 'statusResolved',
+      revision: submitting.requestRevision,
+      operationId,
+      resolution: { outcome: 'noRecord' },
+    })
+    expect(lateStatus.error).toBeNull()
+    expect(lateStatus.pendingOperationId).toBeNull()
+  })
+
+  it('still reconciles independently settled usage after clearing', () => {
+    const cleared = rewritingWorkspaceReducer(settled(), { type: 'workspaceCleared' })
+    const refreshed = rewritingWorkspaceReducer(cleared, {
+      type: 'usageUpdated',
+      usage: { ...usage, consumedCharacters: 7592 },
+      observedAtMs: 2_000,
+    })
+    expect(refreshed.usage?.consumedCharacters).toBe(7592)
+    expect(refreshed.source).toBe('')
+    expect(refreshed.hasResult).toBe(false)
+  })
+})

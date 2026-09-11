@@ -1,5 +1,10 @@
 import { useCallback, useEffect, useId, useState } from 'react'
 import { analyzeInput } from '../api/inputPolicy'
+import {
+  StartNewWorkspaceButton,
+  WorkspaceLifetimeFooter,
+  WorkspaceSessionTeardown,
+} from '../shell/WorkspaceReset'
 import { useRewriteFeature } from '../shell/workspaceStores'
 import {
   MESSAGE_OFFLINE,
@@ -152,6 +157,8 @@ export function RewritePage({ onSignOut }: RewritePageProps) {
           id={sourceId}
           value={state.source}
           rows={6}
+          data-workspace-source="rewrite"
+          autoComplete="off"
           aria-describedby={inlineValidation === null ? undefined : validationId}
           aria-invalid={inlineValidation !== null}
           onChange={(event) => dispatch({ type: 'sourceChanged', source: event.target.value })}
@@ -175,6 +182,11 @@ export function RewritePage({ onSignOut }: RewritePageProps) {
         >
           {state.phase === 'submitting' ? 'Rewriting…' : 'Rewrite'}
         </button>
+        <StartNewWorkspaceButton
+          feature="rewrite"
+          fallbackReset={() => store.resetWorkspace()}
+          fallbackEmpty={state.source === '' && !state.hasResult && state.resultText === ''}
+        />
         <button type="button" className="secondary-button" onClick={onSignOut}>
           Sign out
         </button>
@@ -246,6 +258,7 @@ export function RewritePage({ onSignOut }: RewritePageProps) {
             id={resultId}
             value={state.resultText}
             rows={6}
+            autoComplete="off"
             onChange={(event) => dispatch({ type: 'resultEdited', value: event.target.value })}
           />
           <div className="form-actions">
@@ -270,6 +283,9 @@ export function RewritePage({ onSignOut }: RewritePageProps) {
           </p>
         )}
       </section>
+
+      <WorkspaceLifetimeFooter />
+      <WorkspaceSessionTeardown />
     </div>
   )
 }

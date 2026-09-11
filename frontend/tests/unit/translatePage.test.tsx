@@ -1,5 +1,6 @@
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { MemoryRouter } from 'react-router-dom'
 import { TranslatePage } from '../../src/translate/TranslatePage'
 
 const TOK_A = 'Hello, the meeting starts at 14:30. Please go.'
@@ -154,8 +155,16 @@ function jsonResponse(payload: unknown, status: number): Response {
   return new Response(JSON.stringify(payload), { status })
 }
 
+function renderPage() {
+  return render(
+    <MemoryRouter>
+      <TranslatePage onSignOut={() => {}} />
+    </MemoryRouter>,
+  )
+}
+
 async function renderReadyWorkspace() {
-  render(<TranslatePage onSignOut={() => {}} />)
+  renderPage()
   await screen.findByLabelText('Source language')
   await screen.findByText(/7,546 of 20,000 characters used/)
 }
@@ -381,7 +390,7 @@ describe('translate workspace components', () => {
     for (const testCase of cases) {
       vi.unstubAllGlobals()
       const { operations } = installFetch(() => jsonResponse(testCase.body, testCase.status))
-      const { unmount } = render(<TranslatePage onSignOut={() => {}} />)
+      const { unmount } = renderPage()
       await screen.findByLabelText('Source language')
       await fillValidWorkspace(user)
       await user.click(screen.getByRole('button', { name: 'Translate' }))
@@ -443,7 +452,7 @@ describe('translate workspace components', () => {
       'fetch',
       vi.fn(async () => new Response('{}', { status: 500 })),
     )
-    render(<TranslatePage onSignOut={() => {}} />)
+    renderPage()
     expect(await screen.findByText('Translation settings could not be loaded.')).toBeVisible()
     expect(screen.getByRole('button', { name: 'Try again' })).toBeVisible()
   })
