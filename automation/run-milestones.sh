@@ -8,6 +8,7 @@ roadmap="$repository_root/docs/07-roadmap.md"
 solution="$repository_root/backend/LinguaDesk.slnx"
 plan_prompt_template="$script_directory/plan.prompt.md"
 implement_prompt_template="$script_directory/implement.prompt.md"
+context_repair_prompt_template="$script_directory/context-repair.prompt.md"
 muse_stream_renderer="$script_directory/muse_stream.py"
 codex_model="gpt-5.6-sol"
 codex_reasoning_effort="medium"
@@ -18,6 +19,7 @@ muse_reasoning_effort="high"
 muse_max_attempts=${MUSE_RUNNER_MAX_ATTEMPTS:-3}
 muse_retry_delay_seconds=${MUSE_RUNNER_RETRY_DELAY_SECONDS:-5}
 runner="codex"
+context_repair_max_attempts=3
 
 usage() {
     echo "Usage: $0 [-codex|-claude|--muse] \"MILESTONE_OR_RANGE[, MILESTONE_OR_RANGE...]\"" >&2
@@ -249,6 +251,38 @@ commit_changes() {
     git -C "$repository_root" commit -m "$message"
 }
 
+validate_context() {
+    local milestone=$1
+    local validation_status=0
+
+    python3 automation/context.py check "$milestone" || validation_status=$?
+    python3 automation/context.py audit || validation_status=$?
+    return "$validation_status"
+}
+
+validate_context_with_repair() {
+    local milestone=$1
+    local attempt
+
+    if validate_context "$milestone"; then
+        return 0
+    fi
+
+    for ((attempt=1; attempt<=context_repair_max_attempts; attempt++)); do
+        echo "Context validation failed; asking the AI agent to repair $milestone (attempt $attempt/$context_repair_max_attempts)..."
+        run_agent \
+            "$context_repair_prompt_template" \
+            "$milestone" \
+            "MILESTONE_CONTEXT_REPAIR_STATUS: COMPLETE"
+        if validate_context "$milestone"; then
+            echo "$milestone context validation passed after repair attempt $attempt/$context_repair_max_attempts."
+            return 0
+        fi
+    done
+
+    fail "Context validation for $milestone still fails after $context_repair_max_attempts AI repair attempts. Inspect the working tree before resuming."
+}
+
 while [ "$#" -gt 0 ]; do
     case "$1" in
         -codex|--codex) runner="codex"; shift ;;
@@ -285,6 +319,7 @@ require_command python3
 [ -f "$solution" ] || fail "Solution not found: $solution"
 [ -f "$plan_prompt_template" ] || fail "Plan prompt not found: $plan_prompt_template"
 [ -f "$implement_prompt_template" ] || fail "Implementation prompt not found: $implement_prompt_template"
+[ -f "$context_repair_prompt_template" ] || fail "Context repair prompt not found: $context_repair_prompt_template"
 [ -f "$muse_stream_renderer" ] || fail "Muse stream renderer not found: $muse_stream_renderer"
 
 actual_root=$(git -C "$repository_root" rev-parse --show-toplevel)
@@ -320,8 +355,7 @@ for milestone in "${milestones[@]}"; do
         echo "Planning $milestone..."
         run_agent "$plan_prompt_template" "$milestone" "MILESTONE_AUTOMATION_STATUS: READY"
         pull_changes "$milestone planned"
-        python3 automation/context.py check "$milestone"
-        python3 automation/context.py audit
+        validate_context_with_repair "$milestone"
         commit_changes "$milestone planned"
     fi
 

@@ -331,6 +331,7 @@ class RunnerTests(unittest.TestCase):
             for name in (
                 'context.py', 'run-milestones.sh', 'muse_stream.py',
                 'plan.prompt.md', 'implement.prompt.md',
+                'context-repair.prompt.md',
             ):
                 shutil.copyfile(MODULE.parent / name, root / 'automation' / name)
             (root / 'docs/08-backlogs').mkdir(parents=True)
@@ -347,6 +348,25 @@ class RunnerTests(unittest.TestCase):
             bodies = {
                 'dotnet': 'exit 0',
                 'codex': (
+                    'if printf "%s" "$*" | grep -q "Repair the planning context"; then\n'
+                    '  count=1\n'
+                    '  if [ -n "${CONTEXT_REPAIR_FIXTURE_COUNT_FILE:-}" ]; then\n'
+                    '    if [ -f "$CONTEXT_REPAIR_FIXTURE_COUNT_FILE" ]; then count=$(( $(cat "$CONTEXT_REPAIR_FIXTURE_COUNT_FILE") + 1 )); fi\n'
+                    '    echo "$count" > "$CONTEXT_REPAIR_FIXTURE_COUNT_FILE"\n'
+                    '  fi\n'
+                    '  if [ "${CODEX_FIXTURE_MODE:-}" = "context-repair-success" ]; then\n'
+                    '    sed "s#../07-roadmap.md#../../07-roadmap.md#" docs/08-backlogs/M015/backlog.md > docs/08-backlogs/M015/backlog.md.tmp\n'
+                    '    mv docs/08-backlogs/M015/backlog.md.tmp docs/08-backlogs/M015/backlog.md\n'
+                    '  fi\n'
+                    '  echo MILESTONE_CONTEXT_REPAIR_STATUS: COMPLETE\n'
+                    '  exit 0\n'
+                    'fi\n'
+                    'if [ "${CODEX_FIXTURE_MODE:-}" = "context-repair-success" ] || [ "${CODEX_FIXTURE_MODE:-}" = "context-repair-noop" ]; then\n'
+                    '  if printf "%s" "$*" | grep -q "Plan one LinguaDesk milestone"; then\n'
+                    '    sed "s#../../07-roadmap.md#../07-roadmap.md#" docs/08-backlogs/M015/backlog.md > docs/08-backlogs/M015/backlog.md.tmp\n'
+                    '    mv docs/08-backlogs/M015/backlog.md.tmp docs/08-backlogs/M015/backlog.md\n'
+                    '  fi\n'
+                    'fi\n'
                     'if [ "${CODEX_FIXTURE_MODE:-}" = "complete" ]; then\n'
                     '  echo implementation >> README.md\n'
                     '  echo MILESTONE_AUTOMATION_STATUS: COMPLETE\n'
@@ -437,6 +457,27 @@ class RunnerTests(unittest.TestCase):
         git('add', '.')
         git('commit', '-m', 'M015 planned')
 
+    def prepare_broken_plan_candidate(self, root, git):
+        for name in context.RULES:
+            path = root / name
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text('# Rules\nStable rules.\n')
+        package = root / 'docs/08-backlogs/M015'
+        package.mkdir()
+        (package / 'backlog.md').write_text(
+            '# Package\n[Roadmap](../../07-roadmap.md#roadmap)\n'
+        )
+        for name in ('spec.md', 'plan.md', 'tasks.md'):
+            (package / name).write_text('# Package\nSelected fixture.\n')
+        (root / 'docs/07-roadmap.md').write_text('# Roadmap\n| M015 | Test |\n')
+        (root / 'docs/source.md').write_text('# Contract\nOriginal rule.\n')
+        (package / 'context.json').write_text(json.dumps({'version': 1, 'scope': 'M015', 'sources': [
+            {'path': 'docs/source.md', 'use': 'excerpt', 'reason': 'Fixture contract'}]}))
+        with patch.object(context, 'ROOT', root), contextlib.redirect_stdout(io.StringIO()):
+            context.lock('M015')
+        git('add', '.')
+        git('commit', '-m', 'Seed broken planning artifacts')
+
     def test_ready_without_lock_cannot_commit_or_implement(self):
         with self.fixture() as (root, env, git):
             before = git('rev-parse', 'HEAD')
@@ -509,6 +550,47 @@ class RunnerTests(unittest.TestCase):
             self.assertNotEqual(result.returncode, 0)
             self.assertEqual(before, git('rev-parse', 'HEAD'))
 
+    def test_failed_post_plan_validation_is_repaired_and_rechecked(self):
+        with self.fixture() as (root, env, git):
+            self.prepare_broken_plan_candidate(root, git)
+            count_file = root / 'context-repair-count'
+            env.update({
+                'CODEX_FIXTURE_MODE': 'context-repair-success',
+                'CONTEXT_REPAIR_FIXTURE_COUNT_FILE': str(count_file),
+            })
+
+            result = self.run_fixture(root, env)
+
+            self.assertNotEqual(result.returncode, 0)
+            self.assertEqual(count_file.read_text().strip(), '1')
+            self.assertIn('attempt 1/3', result.stdout)
+            self.assertIn('context validation passed after repair attempt 1/3', result.stdout)
+            self.assertIn('Implementing M015', result.stdout)
+            self.assertIn(
+                '../../07-roadmap.md#roadmap',
+                (root / 'docs/08-backlogs/M015/backlog.md').read_text(),
+            )
+            self.assertIn('M015 planned', git('log', '--format=%s'))
+
+    def test_failed_post_plan_validation_stops_after_three_repairs(self):
+        with self.fixture() as (root, env, git):
+            self.prepare_broken_plan_candidate(root, git)
+            before = git('rev-parse', 'HEAD')
+            count_file = root / 'context-repair-count'
+            env.update({
+                'CODEX_FIXTURE_MODE': 'context-repair-noop',
+                'CONTEXT_REPAIR_FIXTURE_COUNT_FILE': str(count_file),
+            })
+
+            result = self.run_fixture(root, env)
+
+            self.assertNotEqual(result.returncode, 0)
+            self.assertEqual(count_file.read_text().strip(), '3')
+            self.assertIn('attempt 3/3', result.stdout)
+            self.assertIn('still fails after 3 AI repair attempts', result.stderr)
+            self.assertNotIn('Implementing M015', result.stdout)
+            self.assertEqual(before, git('rev-parse', 'HEAD'))
+
     def test_muse_ready_without_lock_cannot_commit_or_implement(self):
         with self.fixture() as (root, env, git):
             env.pop('NO_COLOR', None)
@@ -542,7 +624,9 @@ class RunnerTests(unittest.TestCase):
             result = self.run_fixture(root, env, '--muse')
 
             self.assertNotEqual(result.returncode, 0)
-            self.assertEqual(count_file.read_text().strip(), '2')
+            # Two calls exercise the transient retry; three subsequent calls
+            # are the bounded context-repair attempts for the missing lock.
+            self.assertEqual(count_file.read_text().strip(), '5')
             self.assertIn('Transient provider failure; retrying attempt 2/3', result.stdout)
             self.assertIn('MILESTONE_AUTOMATION_STATUS: READY', result.stdout)
             self.assertEqual(before, git('rev-parse', 'HEAD'))

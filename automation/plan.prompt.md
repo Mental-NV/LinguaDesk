@@ -1,5 +1,8 @@
 Plan one LinguaDesk milestone under the authoritative SDD workflow.
 
+The milestone's owning package is `docs/08-backlogs/{{MILESTONE}}/`; use it as
+the primary location for milestone-specific context, scope, tasks and evidence.
+
 Read `docs/00-SDD-Planning-Workflow.md` and `docs/00-workflow/planning.md`. Follow their bounded reading procedure: inspect the selected roadmap row, current dependencies, relevant code and only applicable source sections/IDs. The document map is not a bulk-read checklist. Historical/completed packages are on-demand dependency evidence.
 
 Create or refine `docs/08-backlogs/{{MILESTONE}}/backlog.md`, `spec.md`, `plan.md`, `tasks.md` and `context.json`. Review selected acceptance, source completeness, dependencies, human gates and verification mapping. Lock and check the context manifest only after review. Work only on the selected milestone and indispensable prerequisites; no production code/tests or Git commit (the runner owns commits).

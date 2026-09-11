@@ -16,3 +16,9 @@ CLI available.
 Pass one quoted, comma-separated expression. Each item is either a milestone
 number or an inclusive ascending range. Ranges expand in place, so
 `"19, 15-18, 20"` processes `M019`, then `M015` through `M018`, then `M020`.
+
+After planning, the runner validates the milestone context lock and audits
+local documentation links and package layout. If either validation fails, the
+selected AI runner gets up to three context-repair attempts. Both validations
+are rerun after every repair; an unrepaired package is left uncommitted and
+implementation does not start.
