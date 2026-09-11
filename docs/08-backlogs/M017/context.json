@@ -1,0 +1,222 @@
+{
+  "version": 1,
+  "scope": "M017",
+  "sources": [
+    {
+      "path": "docs/07-roadmap.md",
+      "ids": [
+        "M017"
+      ],
+      "use": "excerpt",
+      "reason": "Selected milestone outcome, prerequisites and verification allocation",
+      "sha256": "072cc359e2e96287c7195ab4e9e9d1f00a0c04f2ba0c324da8d6cfbd2ce8e399"
+    },
+    {
+      "path": "docs/01-PRD.md",
+      "ids": [
+        "FR-012",
+        "FR-013",
+        "FR-014",
+        "FR-016"
+      ],
+      "use": "excerpt",
+      "reason": "Selected rewriting language, mandatory correction, exclusive mode catalog and explicit submission boundaries",
+      "sha256": "7cb6a866ce728d4393c49e36388df3b6d614c6e8591efcb77875df7a85cd292f"
+    },
+    {
+      "path": "docs/04-llm-specification.md",
+      "heading": "3.2 Transformation rules",
+      "use": "excerpt",
+      "reason": "Canonical rewriting behavior and per-mode prompt intents implemented by the pipeline",
+      "sha256": "0ce0d90536ecfae12a8a0fdf993a63816060e76c9b8abc4c12030266d8a92893"
+    },
+    {
+      "path": "docs/04-llm-specification.md",
+      "heading": "4.1 Versioned prompt bundle",
+      "use": "excerpt",
+      "reason": "rewriting.v1 prompt contract and serialization rules",
+      "sha256": "136ca8b298779dbc016ceec3b9bbf3e9ac620db28f7da553410b7b40d19dc740"
+    },
+    {
+      "path": "docs/04-llm-specification.md",
+      "heading": "4.2 Internal JSON response envelopes",
+      "use": "excerpt",
+      "reason": "Strict rewriting result/refused envelope contract implemented by the parser",
+      "sha256": "f3dc257dd3cfd7b96bdcc5310a64eebb62a4034ea3e71a2a8119aa602a615bee"
+    },
+    {
+      "path": "docs/04-llm-specification.md",
+      "heading": "4.3 Output validity and limits of runtime checks",
+      "use": "excerpt",
+      "reason": "Truncation/refusal/tool-output rejection and no-salvage rules for the rewriting stage",
+      "sha256": "11142b87b7327329bacc323e5a95c9fbc46f07c0fd970d9287899f6847cd28f9"
+    },
+    {
+      "path": "docs/04-llm-specification.md",
+      "heading": "5.2 Evaluation profiles and credentials",
+      "use": "excerpt",
+      "reason": "Credential-reference boundary and budget rules for the bounded live slice",
+      "sha256": "aed1d7d39463f41eb56a54d22092387444dcd6c64e0f8d0177837abeab19305d"
+    },
+    {
+      "path": "docs/04-llm-specification.md",
+      "heading": "5.4 Context and monetary bounds",
+      "use": "reference",
+      "reason": "Per-dispatch reservation bounds; open if admission behavior changes",
+      "sha256": "42ea488007ed372eeddf9ef3b9c152e7e80db4a1995349a3e72fd77424c6bc8b"
+    },
+    {
+      "path": "docs/04-llm-specification.md",
+      "heading": "7. Error classification and recovery",
+      "use": "excerpt",
+      "reason": "Refusal/invalid-output disposition with no fallback in this slice",
+      "sha256": "ffb52e572de013d56dd45a0ba703fc8ed586c2eb905a31626f3d4fdf78fe06c8"
+    },
+    {
+      "path": "docs/04-llm-specification.md",
+      "heading": "9.1 Host-independent capability",
+      "use": "excerpt",
+      "reason": "Every language/mode cell live-development evidence requirement and its non-qualification scope",
+      "sha256": "7011349294b0556076c7f4293400dd49f2b1730cccdf704e4e1b92c8842d579e"
+    },
+    {
+      "path": "docs/04-llm-specification.md",
+      "heading": "10. Local acceptance scenarios and handoffs",
+      "use": "excerpt",
+      "reason": "LLM-AC-005/006/007/008/013 allocation for the rewriting slice",
+      "sha256": "2a61831246c3c9219255aa7f7b0fed38df27b698cd1436164570604a8c2358dc"
+    },
+    {
+      "path": "docs/04-llm-specification.md",
+      "heading": "8. Privacy and owner diagnostics",
+      "use": "excerpt",
+      "reason": "Secret handling and diagnostic limits for the live slice and reports",
+      "sha256": "e0b358fa0bf8cc8d895415f818a234086a6462741042a3260004cd6beaeb5f26"
+    },
+    {
+      "path": "docs/06-verification-plan.md",
+      "heading": "2.2 Stable check groups",
+      "use": "excerpt",
+      "reason": "V-007/V-008 assertion ownership for this slice",
+      "sha256": "95bf3bf55aa828bb457ff50d877178be6fb2fe7c3532fb21bae72cdfc7e49902"
+    },
+    {
+      "path": "docs/verification/backend.md",
+      "heading": "3.3 Independent AI workflows",
+      "use": "excerpt",
+      "reason": "Host-independent build, offline and live-run workflow rules",
+      "sha256": "93dfae45cbdb8562309e250ab771ac5787ffb79f8517a148ca90702123b936b8"
+    },
+    {
+      "path": "docs/06-verification-plan.md",
+      "heading": "7.2 Evaluation report and data boundary",
+      "use": "excerpt",
+      "reason": "Sanitized live-slice report contents and synthetic-only data boundary",
+      "sha256": "78b45b543edb17f05571ea0bff7ad2322fd8c4d02f7aa8f4c314209c2c5ed008"
+    },
+    {
+      "path": "docs/product/open-questions.md",
+      "ids": [
+        "Q-001",
+        "Q-005",
+        "Q-007"
+      ],
+      "use": "excerpt",
+      "reason": "Question dispositions bounding this development-evidence increment",
+      "sha256": "27ba55e348830b7d21f16af84279e07a3c01073ec8188d1bc579f1b953474b2d"
+    },
+    {
+      "path": "docs/product/deferred-scope.md",
+      "ids": [
+        "DF-001",
+        "DF-002",
+        "DF-003",
+        "DF-004",
+        "DF-006"
+      ],
+      "use": "excerpt",
+      "reason": "Deferred alternatives/review/pause/fallback/prefix scope excluded from this slice",
+      "sha256": "c6ce3c0129edfeb3cb9d34a1d22e7916dddabe9ee7f5f27656e92d33c97a9a3e"
+    },
+    {
+      "path": "docs/08-backlogs/M015/spec.md",
+      "use": "reference",
+      "reason": "Completed eligibility dependency consumed unchanged by the rewriting pipeline",
+      "sha256": "7f77e19521eefb475c0313c73553218f4e4ed4d1b475dbb919c42ca88185624d"
+    },
+    {
+      "path": "docs/08-backlogs/M016/spec.md",
+      "use": "reference",
+      "reason": "Completed translation-slice pattern reused, not re-proven, by this slice",
+      "sha256": "216f61df13c22546c1da7ae37a4b6fa7505f1ed41fd1ef9e6b56e094814eb15a"
+    },
+    {
+      "path": "docs/08-backlogs/M004/spec.md",
+      "use": "reference",
+      "reason": "Completed AI inner-loop dependency; open only for regression questions",
+      "sha256": "f44774a5418c16ab57f1f3b8ae12104a48fd5e2a77d68369bef8f7d9841254bc"
+    },
+    {
+      "path": "docs/08-backlogs/M005/spec.md",
+      "use": "reference",
+      "reason": "Completed shared input/contract dependency; open only for regression questions",
+      "sha256": "da5938537df39deb4fe4fe82c918010440deb39165ff3d2c684a79db0d76c12d"
+    },
+    {
+      "path": "docs/08-backlogs/M019/spec.md",
+      "use": "reference",
+      "reason": "Completed adapter/credential/budget dependency consumed by the live slice",
+      "sha256": "670f54f4461664919a34caaac7157799f8995393b7255f06d093a0ec64b803be"
+    },
+    {
+      "path": "docs/decisions/ADR-012.md",
+      "use": "reference",
+      "reason": "Shared AI boundary decision; open if the slice changes it",
+      "sha256": "3f60892d42cd948b27a4870d4a53248b36b0f4ec6dea7c9da2a059f1c37a0ffd"
+    },
+    {
+      "path": "backend/src/LinguaDesk.Core/ProductCatalog.cs",
+      "use": "reference",
+      "reason": "9 rewriting modes, languages, Chinese scripts and rewriting limits consumed by AC-001/AC-002",
+      "sha256": "60de0c7227b53a871cba618f194bb6190d27e4916e5cb79f7c7bfe1f219d376c"
+    },
+    {
+      "path": "backend/src/LinguaDesk.Infrastructure.Ai/EligibilityPipeline.cs",
+      "use": "reference",
+      "reason": "Eligibility pipeline reused unchanged before transformation dispatch",
+      "sha256": "30b4047d0644ef90e14a1a959937130bb0993dae65718566dab9ab09f001fbf4"
+    },
+    {
+      "path": "backend/src/LinguaDesk.Infrastructure.Ai/CompleteResponseBoundary.cs",
+      "use": "reference",
+      "reason": "Complete-response boundary reused for the transformation dispatch",
+      "sha256": "6b1f1e4a2b0be8e1f9ded5c03ad6f2d99eac777cc29142eab10f0aefbb73c9d6"
+    },
+    {
+      "path": "backend/src/LinguaDesk.Infrastructure.Ai/EvaluationBudget.cs",
+      "use": "reference",
+      "reason": "Evaluation budget reused by the rewriting runner workflow",
+      "sha256": "cb3f56fa9be84cf4c5728a5fd77e8ffb32e6f1ee7029595a3dee658452d5a75c"
+    },
+    {
+      "path": "backend/tools/LinguaDesk.Ai.Evaluation/Program.cs",
+      "use": "reference",
+      "reason": "Runner extended with the budgeted evaluate-rewriting workflow",
+      "sha256": "09906caa3637e7c7d354214fd48da756e2ad17c5caf3780ea138914c22c33fdb"
+    },
+    {
+      "path": "scripts/ai.sh",
+      "use": "reference",
+      "reason": "Offline AI check and live-command surface extended by this slice",
+      "sha256": "98b356df9f65975a6ef00c6d4e05b75c47fa28e029403cc81a145e540a2465dc"
+    }
+  ],
+  "source_map_sha256": "ea2d20f8fb28e41f2bb70e2c57862fbc11cd9003ccdc133e2003760cf1bcfe33",
+  "baseline_commit": "f77df4323e541f952025d41d5821e4809a6f5bca",
+  "locked_files": {
+    "docs/00-SDD-Planning-Workflow.md": "183ae93148ff594f9f1e021aa7543baa8878e9cc0bcfd69ebc696c28976e2945",
+    "docs/00-workflow/execution.md": "f362a1384cefef24ba204e0723e3190857c8cca9bcd91908136932e19c5caf02",
+    "docs/08-backlogs/M017/spec.md": "176b08d5aa2509cf7659849e25428f1fc9b8dbb34d703eb4d3376e2a8fc13779",
+    "docs/08-backlogs/M017/plan.md": "95c333960d46e5ebcc63a8d8765b5a2ccad49ad3b977fdfc2154413e39ed4c19"
+  }
+}
