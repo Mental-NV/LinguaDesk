@@ -202,17 +202,17 @@
       "path": "backend/tools/LinguaDesk.Ai.Evaluation/Program.cs",
       "use": "reference",
       "reason": "Runner extended with the budgeted evaluate-rewriting workflow",
-      "sha256": "09906caa3637e7c7d354214fd48da756e2ad17c5caf3780ea138914c22c33fdb"
+      "sha256": "53955901108ab9e1f5ed68b10a3cefe14a64cfba3626f718852055c7c4b550ad"
     },
     {
       "path": "scripts/ai.sh",
       "use": "reference",
       "reason": "Offline AI check and live-command surface extended by this slice",
-      "sha256": "98b356df9f65975a6ef00c6d4e05b75c47fa28e029403cc81a145e540a2465dc"
+      "sha256": "2a5e9ce8d448ca7cff638d19b3c341252e2aadfaad3ee222100bdccdf0134667"
     }
   ],
   "source_map_sha256": "ea2d20f8fb28e41f2bb70e2c57862fbc11cd9003ccdc133e2003760cf1bcfe33",
-  "baseline_commit": "f77df4323e541f952025d41d5821e4809a6f5bca",
+  "baseline_commit": "c0aa4d2b0f03c40222b7fbafbc67aa6588a9a3ec",
   "locked_files": {
     "docs/00-SDD-Planning-Workflow.md": "183ae93148ff594f9f1e021aa7543baa8878e9cc0bcfd69ebc696c28976e2945",
     "docs/00-workflow/execution.md": "f362a1384cefef24ba204e0723e3190857c8cca9bcd91908136932e19c5caf02",

@@ -40,6 +40,7 @@ internal static class Program
             "verify-access" => await VerifyAccessAsync(args[1..]).ConfigureAwait(false),
             "evaluate-eligibility" => await EvaluateEligibility.RunAsync(args[1..]).ConfigureAwait(false),
             "evaluate-translation" => await EvaluateTranslation.RunAsync(args[1..]).ConfigureAwait(false),
+            "evaluate-rewriting" => await EvaluateRewriting.RunAsync(args[1..]).ConfigureAwait(false),
             _ => UnknownCommand(),
         };
     }
@@ -340,7 +341,8 @@ internal static class Program
             "Usage: dotnet LinguaDesk.Ai.Evaluation.dll {inspect|probe|conformance|" +
             "verify-access --profile <id> --max-dispatches <n> --max-spend-usd <amount>|" +
             "evaluate-eligibility [--offline|--live] --profile <id> --max-dispatches <n> --max-spend-usd <amount> [--output <path>]|" +
-            "evaluate-translation [--offline|--live] --profile <id> --max-dispatches <n> --max-spend-usd <amount> [--output <path>]}");
+            "evaluate-translation [--offline|--live] --profile <id> --max-dispatches <n> --max-spend-usd <amount> [--output <path>]|" +
+            "evaluate-rewriting [--offline|--live] --profile <id> --max-dispatches <n> --max-spend-usd <amount> [--output <path>]}");
 
     private sealed record VerifyAccessOptions(string Profile, int MaxDispatches, decimal MaxSpendUsd)
     {
