@@ -1,0 +1,218 @@
+{
+  "version": 1,
+  "scope": "M021",
+  "sources": [
+    {
+      "path": "docs/07-roadmap.md",
+      "ids": [
+        "M021",
+        "M022",
+        "M023",
+        "M024",
+        "M025"
+      ],
+      "use": "excerpt",
+      "reason": "Selected outcome, exit criterion, prerequisites and successor boundaries that M021 must not claim",
+      "sha256": "ac41c75d690c4509bb40c3c938d161974b290cf8feca0cccae00b115877e788e"
+    },
+    {
+      "path": "docs/delivery/current.md",
+      "use": "reference",
+      "reason": "Dependency states (M003/M005/M007 Done) and selected-scope status at planning time",
+      "sha256": "d2fd3ade63ee26212146e95808ea46803a9501aad7647942d314a498d7b91b52"
+    },
+    {
+      "path": "docs/01-PRD.md",
+      "ids": [
+        "FR-024",
+        "FR-026",
+        "FR-027",
+        "FR-035"
+      ],
+      "use": "excerpt",
+      "reason": "Selected character/admission/identity product requirements",
+      "sha256": "3457dc2995c13bb0974d866f8e3a28622678544b59be57c952606de4bfd41fec"
+    },
+    {
+      "path": "docs/01-PRD.md",
+      "heading": "5.4 Allowances and accounting",
+      "use": "excerpt",
+      "reason": "Confirmed 20,000/2,000,000 UTC-day allowance values enforced by admission",
+      "sha256": "41252818dcd434424fad29a85795d5d7609cfe4ceb5407e50ac33650aabb2499"
+    },
+    {
+      "path": "docs/01-PRD.md",
+      "ids": [
+        "NFR-003",
+        "NFR-004"
+      ],
+      "use": "excerpt",
+      "reason": "Applicable concurrency/no-double-charge and privacy constraints",
+      "sha256": "2764603485ffe0eb15c5a3f6e2482e4f748422eac5d1f2bce1792c686d5eb907"
+    },
+    {
+      "path": "docs/product/open-questions.md",
+      "ids": [
+        "Q-003",
+        "Q-004"
+      ],
+      "use": "reference",
+      "reason": "Applicable identity/matching/expiry and lifecycle dispositions bounding the slice",
+      "sha256": "ea5e2514b0dcc849ef3eccb1a00a66e06d55ce8e3a991bd529ab18a888bda556"
+    },
+    {
+      "path": "docs/03-architecture.md",
+      "heading": "7.1 Durable operation and reservation rules",
+      "use": "excerpt",
+      "reason": "Atomic admission, reservation and fencing rules implemented here",
+      "sha256": "9a89ea91d84aa1dab24a1eb3b9d627ce1cf4569ce8277164a04db6218e546e4e"
+    },
+    {
+      "path": "docs/03-architecture.md",
+      "heading": "7.2 Failure windows and limits of idempotency",
+      "use": "excerpt",
+      "reason": "Crash-window boundaries; settlement/recovery portions stay with M022/M024",
+      "sha256": "0841fbb2ddd59e3bd6ac40799bf3a98f6c0d361ffd7995c4188ef6d55f4e0fbf"
+    },
+    {
+      "path": "docs/03-architecture.md",
+      "heading": "6.1 SQLite and migrations",
+      "use": "excerpt",
+      "reason": "Single-writer, migration immutability and file-backed proof rules",
+      "sha256": "19ad999389b613a1cb01e2fd6bb44a96c43a0d801f7aa87d9309c24aa191adca"
+    },
+    {
+      "path": "docs/api/operations.md",
+      "heading": "5.1 Identity and bounded validity",
+      "use": "excerpt",
+      "reason": "UUIDv7 identity, 24h validity and skew rules for admission",
+      "sha256": "edaa8b0bf78e4d9c02ac317a66015ac6a93d285207e7ee5455f0594de620c305"
+    },
+    {
+      "path": "docs/api/operations.md",
+      "heading": "5.2 Payload matching and atomic admission",
+      "use": "excerpt",
+      "reason": "Fingerprint matching table and atomic claim semantics",
+      "sha256": "1c63bd9b0f870738f387a74b00a40127874ce64a4aa6d555910d9580d1b57bf2"
+    },
+    {
+      "path": "docs/api/operations.md",
+      "heading": "7.1 Daily character ledger",
+      "use": "excerpt",
+      "reason": "UTC-day admission, committed-plus-reserved test against both ledgers",
+      "sha256": "b9febef4eb0bc201b787dc27d717d1dc6960a212fb6f5a74ee219cb305451e89"
+    },
+    {
+      "path": "docs/api/operations.md",
+      "heading": "7.3 Usage snapshots",
+      "use": "excerpt",
+      "reason": "Minimal current-day snapshot and revision carried in M021 responses",
+      "sha256": "50c69dd281d9ba478796172cad1782c4c710b64832f3e4a49594e7be62621b11"
+    },
+    {
+      "path": "docs/api/operations.md",
+      "heading": "8. Error semantics and client recovery",
+      "use": "excerpt",
+      "reason": "Selected 400/401/403/409/410/422/429 categories and recovery guidance",
+      "sha256": "787b03e3f41e00492446ebe0f4b677a6c229562212f13a604897ae0197fecd8a"
+    },
+    {
+      "path": "docs/05-api-design.md",
+      "ids": [
+        "API-AC-004",
+        "API-AC-005"
+      ],
+      "use": "excerpt",
+      "reason": "Selected admission/matching scenarios; remaining API-AC portions stay pending",
+      "sha256": "d913611948ea7c11f59a0ed76082a18c475e707abd423c29b0b5515a3c3cc7b0"
+    },
+    {
+      "path": "docs/06-verification-plan.md",
+      "ids": [
+        "V-005"
+      ],
+      "use": "excerpt",
+      "reason": "Atomic idempotency, allowance and restart-reconciliation check group",
+      "sha256": "4162e1108e10248b965d4ce0df6f99b866a97586c23f15b546035ba8490d87cc"
+    },
+    {
+      "path": "docs/verification/backend.md",
+      "heading": "3.2 High-risk accounting and privacy cases",
+      "use": "excerpt",
+      "reason": "Concurrency, failure-injection, restart and zero-model-call read requirements",
+      "sha256": "486ce55d64b8286164aeb4aeb4a28c861553bf003f81174554c1fb6705d25272"
+    },
+    {
+      "path": "docs/verification/coverage.md",
+      "ids": [
+        "API-AC-004",
+        "API-AC-005"
+      ],
+      "use": "reference",
+      "reason": "Canonical V-group allocation for the selected scenario portions",
+      "sha256": "82dc0259e2a3229251c659bb5faad2f6fad33e34edb726b72821dee8f342e04f"
+    },
+    {
+      "path": "docs/08-backlogs/M003/backlog.md",
+      "use": "reference",
+      "reason": "Dependency evidence: file-backed store, migrations and single-writer handoff",
+      "sha256": "dcfd869d0b84543da337f569e3ffd7c6648a84e0db28d229897ada656afcdfe5"
+    },
+    {
+      "path": "docs/08-backlogs/M005/backlog.md",
+      "use": "reference",
+      "reason": "Dependency evidence: scalar counting, catalog limits, identity validity and contract baseline",
+      "sha256": "f49a22dfbad51d8e36088b1cac1f0323ca30ea8f36a8f6d549dc789fbab9e3a1"
+    },
+    {
+      "path": "docs/08-backlogs/M007/backlog.md",
+      "use": "reference",
+      "reason": "Dependency evidence: durable verified accounts and authorization policy",
+      "sha256": "e02ba6ab9c0f57b1be4318701d4f987b9b148382fec192429ac0f52788071cb6"
+    },
+    {
+      "path": "backend/src/LinguaDesk.Api/Infrastructure/Persistence/LinguaDeskDbContext.cs",
+      "use": "reference",
+      "reason": "Current Identity store boundary the operation/ledger migration extends",
+      "sha256": "9bf583a65b756c1aaaaf830cd46a9618b0a049b04bf90a3a3f020d1ca149b636"
+    },
+    {
+      "path": "backend/src/LinguaDesk.Core/ProductCatalog.cs",
+      "use": "reference",
+      "reason": "Current catalog limits and identity validity constants reused by admission",
+      "sha256": "60de0c7227b53a871cba618f194bb6190d27e4916e5cb79f7c7bfe1f219d376c"
+    },
+    {
+      "path": "backend/src/LinguaDesk.Core/ScalarInputPolicy.cs",
+      "use": "reference",
+      "reason": "Current unicode-scalar-v1 validation reused before admission",
+      "sha256": "f9060fc2611b571b74ae701341a1166bebf637ae55453c22aacb5c4997ccdec0"
+    },
+    {
+      "path": "docs/05-openapi.yaml",
+      "use": "reference",
+      "reason": "Current generated wire contract extended by the first operation slice",
+      "sha256": "22b93dd18adf85cb57a9d65b788fea1c05549ed0977b55ef612ae198c587120a"
+    },
+    {
+      "path": "scripts/backend.sh",
+      "use": "reference",
+      "reason": "Backend aggregate and file-backed check command surface",
+      "sha256": "377c9652f76ace23925039451b1b545eb31c9b24fa7af6fe6c3ffb0d699699fa"
+    },
+    {
+      "path": "scripts/contract.sh",
+      "use": "reference",
+      "reason": "Deterministic contract generation and drift command surface",
+      "sha256": "d514721c6a6beca458a884f9af172cda279fbaf36529dc1e1709e76dfb4471b9"
+    }
+  ],
+  "source_map_sha256": "c133d3bef3c34655eda33b2100c04d527637d7f75339c680a026bbb1ea2662fd",
+  "baseline_commit": "b38abb1ceb0e84ad5423ff7e039cca5712d49e80",
+  "locked_files": {
+    "docs/00-SDD-Planning-Workflow.md": "183ae93148ff594f9f1e021aa7543baa8878e9cc0bcfd69ebc696c28976e2945",
+    "docs/00-workflow/execution.md": "f362a1384cefef24ba204e0723e3190857c8cca9bcd91908136932e19c5caf02",
+    "docs/08-backlogs/M021/spec.md": "81e5bdaef5dd044bcbc228af415af744f64a77acf1460c17174c89d3b32fd128",
+    "docs/08-backlogs/M021/plan.md": "a82e49cd2a114d648e8d85f046432af5535dfdbbbf8ba79426419ff18dc81b79"
+  }
+}
