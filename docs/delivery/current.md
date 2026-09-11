@@ -2,7 +2,7 @@
 
 Mutable #7 status owner. Read for selection/dependency checks and closeout; do not include in the stable execution prefix.
 
-**Most recently completed milestone: [M021 — Reserve one logical operation](../08-backlogs/M021/backlog.md).** State: **Done**. [Package 021](../08-backlogs/M021/spec.md) AC-001–007 passed with deterministic policy + file-backed SQLite/HTTP evidence and zero provider dispatches: concurrent identical identity+payload claims admit one pending reservation, changed payloads conflict (409), equivalent JSON spellings match, expired identities are rejected (410) even after record cleanup, user/global UTC-day allowances (20,000/2,000,000) deny over-capacity (429) without overrun, pre-admission failures leave no record, reservations and the snapshot revision survive restart, and the reviewed additive OpenAPI/TypeScript delta carries the fixed identity wire names with metadata-only records. Its [completion record](../08-backlogs/M021/tasks.md#completion-record) owns the exact evidence. Rows stay `pending` until M022 settlement lands; this slice is not serving.
+**Most recently completed milestone: [M022 — Settle a result exactly once](../08-backlogs/M022/backlog.md).** State: **Done**. [Package 022](../08-backlogs/M022/spec.md) AC-001–008 passed with deterministic settlement + file-backed SQLite/HTTP evidence and zero provider dispatches: success commits exactly one full-source charge to the admission UTC day, failure releases the reservation with zero charge, duplicate same-outcome settlements are idempotent, late cross-outcome attempts are fenced, 8 parallel settlements commit once, cross-midnight success charges the original day, settled state/ledgers/revision survive restart, terminal reads report charge metadata with output unavailable, and the reviewed additive OpenAPI/TypeScript delta carries the `succeeded`/`failed` status envelope with metadata-only records. Its [completion record](../08-backlogs/M022/tasks.md#completion-record) owns the exact evidence. No monetary admission (M023), interrupted/unknown recovery (M024), or real dispatch (M026/M027) exists yet; this slice is not serving.
 
 ## Selected milestone
 
@@ -37,5 +37,6 @@ M019 completed the independent-track enabler for the explicit live provider path
 | M018 | Done | [Backlog](../08-backlogs/M018/backlog.md), [spec](../08-backlogs/M018/spec.md), [tasks/evidence](../08-backlogs/M018/tasks.md#completion-record) |
 | M020 | Done | [Backlog](../08-backlogs/M020/backlog.md), [spec](../08-backlogs/M020/spec.md), [tasks/evidence](../08-backlogs/M020/tasks.md#completion-record) |
 | M021 | Done | [Backlog](../08-backlogs/M021/backlog.md), [spec](../08-backlogs/M021/spec.md), [tasks/evidence](../08-backlogs/M021/tasks.md#completion-record) |
+| M022 | Done | [Backlog](../08-backlogs/M022/backlog.md), [spec](../08-backlogs/M022/spec.md), [tasks/evidence](../08-backlogs/M022/tasks.md#completion-record) |
 
-All roadmap milestones other than completed M001–M021 are Candidate with no selected package and evidence pending. Full product and release evidence remains pending in #6 coverage.
+All roadmap milestones other than completed M001–M022 are Candidate with no selected package and evidence pending. Full product and release evidence remains pending in #6 coverage.

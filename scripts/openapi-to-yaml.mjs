@@ -90,7 +90,7 @@ function validateContract(document) {
   )
   sameValues(
     Object.keys(submitOperation.responses ?? {}),
-    ['202', '400', '401', '403', '405', '409', '410', '415', '422', '429', '503'],
+    ['200', '202', '400', '401', '403', '405', '409', '410', '415', '422', '429', '503'],
     'submitLanguageOperation responses',
   )
   expect(submitOperation.requestBody?.required === true, 'submitLanguageOperation request body must be required')
@@ -101,7 +101,7 @@ function validateContract(document) {
   expect(submitOperation.security?.length === 2, 'submitLanguageOperation must accept Bearer or cookie')
   expect(submitOperation.security?.[0]?.bearerAuth !== undefined, 'submitLanguageOperation Bearer auth is missing')
   expect(submitOperation.security?.[1]?.sessionCookie !== undefined, 'submitLanguageOperation cookie security is missing')
-  for (const status of ['202', '400', '401', '403', '405', '409', '410', '415', '422', '429', '503']) {
+  for (const status of ['200', '202', '400', '401', '403', '405', '409', '410', '415', '422', '429', '503']) {
     const selectedResponse = submitOperation.responses[status]
     expect(selectedResponse.headers?.['Cache-Control']?.required === true, `submitLanguageOperation ${status} must require Cache-Control`)
     expect(selectedResponse.headers['Cache-Control'].schema?.type === 'string', `submitLanguageOperation ${status} Cache-Control must be a string`)
@@ -109,6 +109,10 @@ function validateContract(document) {
   expect(
     submitOperation.responses['202'].content?.['application/json']?.schema?.$ref === '#/components/schemas/OperationPendingResponse',
     'submitLanguageOperation success schema is missing',
+  )
+  expect(
+    submitOperation.responses['200'].content?.['application/json']?.schema?.$ref === '#/components/schemas/OperationStatusResponse',
+    'submitLanguageOperation settled duplicate schema is missing',
   )
   for (const status of ['400', '401', '403', '409', '410', '415', '422', '429', '503']) {
     expect(
@@ -139,7 +143,7 @@ function validateContract(document) {
     expect(selectedResponse.headers['Cache-Control'].schema?.type === 'string', `getLanguageOperationStatus ${status} Cache-Control must be a string`)
   }
   expect(
-    statusOperation.responses['200'].content?.['application/json']?.schema?.$ref === '#/components/schemas/OperationPendingResponse',
+    statusOperation.responses['200'].content?.['application/json']?.schema?.$ref === '#/components/schemas/OperationStatusResponse',
     'getLanguageOperationStatus success schema is missing',
   )
   for (const status of ['400', '401', '403', '404', '410', '503']) {
@@ -171,6 +175,19 @@ function validateContract(document) {
     'pending response fields',
   )
   expect(pendingResponse.properties.characterCount.type === 'integer', 'pending character count must be integer-only')
+  const statusResponse = document.components.schemas.OperationStatusResponse
+  sameValues(
+    statusResponse.required,
+    ['operationId', 'family', 'status', 'characterCount', 'admissionDay', 'deadlineUtc', 'outputAvailable', 'serverTimeUtc', 'usage'],
+    'status response required fields',
+  )
+  sameValues(
+    Object.keys(statusResponse.properties),
+    ['operationId', 'family', 'status', 'characterCount', 'admissionDay', 'deadlineUtc', 'outputAvailable', 'serverTimeUtc', 'usage'],
+    'status response fields',
+  )
+  expect(statusResponse.properties.characterCount.type === 'integer', 'status character count must be integer-only')
+  expect(statusResponse.properties.outputAvailable.type === 'boolean', 'status output availability must be boolean-only')
   const usageSnapshot = document.components.schemas.UsageSnapshot
   sameValues(
     usageSnapshot.required,
@@ -537,7 +554,7 @@ function validateContract(document) {
     NormalizationPolicy: ['none'],
     OperationFamily: ['translation', 'rewriting'],
     OperationIdentityFormat: ['uuidV7'],
-    OperationStatus: ['pending'],
+    OperationStatus: ['pending', 'succeeded', 'failed'],
     OversizeHandling: ['rejectWhole'],
     RewritingModeId: [
       'correctionOnly',

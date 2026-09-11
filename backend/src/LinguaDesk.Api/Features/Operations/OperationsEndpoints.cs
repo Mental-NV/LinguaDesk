@@ -19,9 +19,10 @@ public static class OperationsEndpoints
             .WithDescription(
                 "Validates, fingerprint-matches and atomically reserves exactly one logical operation per verified " +
                 "account identity against both daily character allowances. Identical identities observe the pending " +
-                "reservation; changed payloads conflict. No provider dispatch occurs.")
+                "reservation or the settled success/failure metadata; changed payloads conflict. No provider dispatch occurs.")
             .Accepts<SubmitOperationRequest>("application/json")
             .Produces<OperationPendingResponse>(StatusCodes.Status202Accepted, "application/json")
+            .Produces<OperationStatusResponse>(StatusCodes.Status200OK, "application/json")
             .Produces<OperationProblemDetails>(StatusCodes.Status400BadRequest, "application/problem+json")
             .Produces<OperationProblemDetails>(StatusCodes.Status401Unauthorized, "application/problem+json")
             .Produces<OperationProblemDetails>(StatusCodes.Status403Forbidden, "application/problem+json")
@@ -68,11 +69,11 @@ public static class OperationsEndpoints
         endpoints.MapGet("/api/operations/{operationId}", GetStatusAsync)
             .WithName("getLanguageOperationStatus")
             .WithGroupName("linguadesk")
-            .WithSummary("Read one submitted operation reservation")
+            .WithSummary("Read one submitted operation")
             .WithDescription(
-                "Returns the pending reservation metadata for an account-owned operation identity with a fresh " +
-                "current-day usage snapshot. Status reads never dispatch work.")
-            .Produces<OperationPendingResponse>(StatusCodes.Status200OK, "application/json")
+                "Returns the pending reservation or settled success/failure metadata for an account-owned operation " +
+                "identity with a fresh current-day usage snapshot. Status reads never dispatch work.")
+            .Produces<OperationStatusResponse>(StatusCodes.Status200OK, "application/json")
             .Produces<OperationProblemDetails>(StatusCodes.Status400BadRequest, "application/problem+json")
             .Produces<OperationProblemDetails>(StatusCodes.Status401Unauthorized, "application/problem+json")
             .Produces<OperationProblemDetails>(StatusCodes.Status403Forbidden, "application/problem+json")
@@ -224,9 +225,10 @@ public static class OperationsEndpoints
 
         return outcome.Outcome switch
         {
-            AdmissionOutcome.Admitted or AdmissionOutcome.DuplicateObserved => Results.Json(
+            AdmissionOutcome.Admitted => Results.Json(
                 ToPending(outcome.Submission!, outcome.Usage, outcome.ServerTime),
                 statusCode: StatusCodes.Status202Accepted),
+            AdmissionOutcome.DuplicateObserved => ToDuplicate(outcome.Submission!, outcome.Usage, outcome.ServerTime),
             AdmissionOutcome.IdentityConflict => Problem(
                 StatusCodes.Status409Conflict,
                 "Operation identity conflict",
@@ -347,7 +349,7 @@ public static class OperationsEndpoints
                     "unknownOperation");
             }
 
-            return Results.Json(ToPending(submission, usage, observedTime), statusCode: StatusCodes.Status200OK);
+            return ToTerminal(submission, usage, observedTime);
         }
         catch (Exception exception) when (exception is SqliteException or DbUpdateException)
         {
@@ -360,27 +362,72 @@ public static class OperationsEndpoints
         }
     }
 
+    internal static IResult ToDuplicate(
+        OperationSubmission submission,
+        UsageSnapshotData usage,
+        DateTimeOffset serverTime) =>
+        string.Equals(submission.State, OperationStates.Pending, StringComparison.Ordinal)
+            ? Results.Json(ToPending(submission, usage, serverTime), statusCode: StatusCodes.Status202Accepted)
+            : ToTerminal(submission, usage, serverTime);
+
+    internal static IResult ToTerminal(
+        OperationSubmission submission,
+        UsageSnapshotData usage,
+        DateTimeOffset serverTime) =>
+        Results.Json(ToStatus(submission, usage, serverTime), statusCode: StatusCodes.Status200OK);
+
     internal static OperationPendingResponse ToPending(
         OperationSubmission submission,
         UsageSnapshotData usage,
         DateTimeOffset serverTime) => new(
             Guid.Parse(submission.OperationId),
-            string.Equals(submission.Family, OperationAdmissionService.FamilyRewriting, StringComparison.Ordinal)
-                ? OperationFamily.Rewriting
-                : OperationFamily.Translation,
+            ToFamily(submission),
             OperationStatus.Pending,
             submission.ScalarCount,
             submission.AdmissionDay,
             submission.DeadlineUtc,
             serverTime,
-            new UsageSnapshot(
-                usage.Day,
-                usage.ResetAtUtc,
-                usage.ConsumedCharacters,
-                usage.ReservedCharacters,
-                usage.AllowanceCharacters,
-                usage.AvailableCharacters,
-                usage.Revision));
+            ToUsage(usage));
+
+    internal static OperationStatusResponse ToStatus(
+        OperationSubmission submission,
+        UsageSnapshotData usage,
+        DateTimeOffset serverTime) => new(
+            Guid.Parse(submission.OperationId),
+            ToFamily(submission),
+            ToOperationStatus(submission),
+            string.Equals(submission.State, OperationStates.Failed, StringComparison.Ordinal) ? 0 : submission.ScalarCount,
+            submission.AdmissionDay,
+            submission.DeadlineUtc,
+            false,
+            serverTime,
+            ToUsage(usage));
+
+    private static OperationStatus ToOperationStatus(OperationSubmission submission)
+    {
+        if (string.Equals(submission.State, OperationStates.Succeeded, StringComparison.Ordinal))
+        {
+            return OperationStatus.Succeeded;
+        }
+
+        return string.Equals(submission.State, OperationStates.Failed, StringComparison.Ordinal)
+            ? OperationStatus.Failed
+            : OperationStatus.Pending;
+    }
+
+    private static OperationFamily ToFamily(OperationSubmission submission) =>
+        string.Equals(submission.Family, OperationAdmissionService.FamilyRewriting, StringComparison.Ordinal)
+            ? OperationFamily.Rewriting
+            : OperationFamily.Translation;
+
+    private static UsageSnapshot ToUsage(UsageSnapshotData usage) => new(
+        usage.Day,
+        usage.ResetAtUtc,
+        usage.ConsumedCharacters,
+        usage.ReservedCharacters,
+        usage.AllowanceCharacters,
+        usage.AvailableCharacters,
+        usage.Revision);
 
     private static async Task<ParsedSubmission?> ParseSubmissionAsync(Stream body, CancellationToken cancellationToken)
     {

@@ -219,10 +219,10 @@ Read the complete contracts at [UX Section 12](../ux/acceptance.md#12-acceptance
 | API-AC-001 | V-001; M005 AC-004/005 passed for the fixture/local-boundary portion, HTTP submission boundary later |
 | API-AC-002 | V-004; M008 AC-001–005 passed the cookie/antiforgery/session-invalidation portion; M013 passed browser routing/teardown over the real HTTPS cookie boundary and M009 AC-001/003 passed the bearer precedence portion |
 | API-AC-003 | V-004; M007 AC-001–003 passed confirmation/current-state, M008 AC-002–004 passed cookie credential/verified-state portions; M013 passed web sign-in/session browser evidence and M009 AC-001/002/004 passed the bearer credential portion, reset portion later |
-| API-AC-004 | V-005; M021 AC-001/AC-004/AC-006 passed the admission portion (one reservation for concurrent identical claims, shared user/global ceilings with 429 categories and no overrun, restart-preserved reservation/revision) |
+| API-AC-004 | V-005; M021 AC-001/AC-004/AC-006 passed the admission portion (one reservation for concurrent identical claims, shared user/global ceilings with 429 categories and no overrun, restart-preserved reservation/revision); M022 AC-001/AC-003/AC-004 passed the settlement portion (one charge for settled success with idempotent duplicates, fenced late cross-outcome attempts with post-settlement 409, one consumed entry for 8 parallel settlements) |
 | API-AC-005 | V-001, V-005; M021 AC-002/AC-003/AC-005/AC-007 passed the admission/matching portion (changed-payload 409, equivalent-spelling match, 24h/5min-skew expiry and 410-after-cleanup, pre-admission rejection matrix, metadata-only records) |
-| API-AC-006 | V-005, V-009, V-015 |
-| API-AC-007 | V-005, V-016 |
+| API-AC-006 | V-005, V-009, V-015; M022 AC-007 passed the succeeded/failed terminal-read portion (original charge metadata with output unavailable, fresh usage, unknown stays 404 without asserting zero charge) |
+| API-AC-007 | V-005, V-016; M022 AC-002/AC-005/AC-006 passed the failure-window portion (failure releases with zero charge, cross-midnight success charges the admission day, restart-preserved settlement/revision with fenced late attempts and zero-dispatch reads) |
 | API-AC-008 | V-005, V-014 |
 | API-AC-009 | V-005, V-002, V-003 |
 | API-AC-010 | V-006 |

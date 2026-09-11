@@ -13,6 +13,7 @@ public sealed class StorageMigrationTests
     private const string InitialMigrationId = "20260908221711_InitialStorage";
     private const string LocalAccountsMigrationId = "20260909120834_LocalAccounts";
     private const string OperationAdmissionMigrationId = "20260911024223_OperationAdmission";
+    private const string OperationSettlementMigrationId = "20260911030052_OperationSettlement";
 
     [TestMethod]
     public async Task ModelMatchesSnapshotWithoutOpeningOrCreatingDatabase()
@@ -33,7 +34,7 @@ public sealed class StorageMigrationTests
         await using (var context = database.CreateContext())
         {
             var applied = await context.Database.GetAppliedMigrationsAsync();
-            CollectionAssert.AreEqual(new[] { InitialMigrationId, LocalAccountsMigrationId, OperationAdmissionMigrationId }, applied.ToArray());
+            CollectionAssert.AreEqual(new[] { InitialMigrationId, LocalAccountsMigrationId, OperationAdmissionMigrationId, OperationSettlementMigrationId }, applied.ToArray());
             Assert.AreEqual(
                 4L,
                 await ExecuteScalarAsync<long>(
@@ -54,7 +55,7 @@ public sealed class StorageMigrationTests
 
         await using var verification = database.CreateContext();
         var repeatedHistory = await verification.Database.GetAppliedMigrationsAsync();
-        CollectionAssert.AreEqual(new[] { InitialMigrationId, LocalAccountsMigrationId, OperationAdmissionMigrationId }, repeatedHistory.ToArray());
+        CollectionAssert.AreEqual(new[] { InitialMigrationId, LocalAccountsMigrationId, OperationAdmissionMigrationId, OperationSettlementMigrationId }, repeatedHistory.ToArray());
         Assert.AreEqual("preserved", await ExecuteScalarAsync<string>(verification, "SELECT value FROM test_fixture WHERE id = 1;"));
     }
 
@@ -75,7 +76,7 @@ public sealed class StorageMigrationTests
 
         await using var verification = database.CreateContext();
         CollectionAssert.AreEqual(
-            new[] { InitialMigrationId, LocalAccountsMigrationId, OperationAdmissionMigrationId },
+            new[] { InitialMigrationId, LocalAccountsMigrationId, OperationAdmissionMigrationId, OperationSettlementMigrationId },
             (await verification.Database.GetAppliedMigrationsAsync()).ToArray());
         Assert.AreEqual(
             "preserved",

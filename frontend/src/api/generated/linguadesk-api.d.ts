@@ -35,7 +35,7 @@ export interface paths {
         put?: never;
         /**
          * Submit one logical language operation
-         * @description Validates, fingerprint-matches and atomically reserves exactly one logical operation per verified account identity against both daily character allowances. Identical identities observe the pending reservation; changed payloads conflict. No provider dispatch occurs.
+         * @description Validates, fingerprint-matches and atomically reserves exactly one logical operation per verified account identity against both daily character allowances. Identical identities observe the pending reservation or the settled success/failure metadata; changed payloads conflict. No provider dispatch occurs.
          */
         post: operations["submitLanguageOperation"];
         delete?: never;
@@ -52,8 +52,8 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * Read one submitted operation reservation
-         * @description Returns the pending reservation metadata for an account-owned operation identity with a fresh current-day usage snapshot. Status reads never dispatch work.
+         * Read one submitted operation
+         * @description Returns the pending reservation or settled success/failure metadata for an account-owned operation identity with a fresh current-day usage snapshot. Status reads never dispatch work.
          */
         get: operations["getLanguageOperationStatus"];
         put?: never;
@@ -523,7 +523,7 @@ export interface components {
             operationId: string;
             /** @description Language operation family. */
             family: components["schemas"]["OperationFamily"];
-            /** @description Terminal state in this slice is always `pending`. */
+            /** @description Observed reservation state: `pending`. */
             status: components["schemas"]["OperationStatus"];
             /**
              * Format: int32
@@ -589,10 +589,42 @@ export interface components {
             };
         };
         /**
-         * @description Terminal state in this slice is always `pending`.
+         * @description Observed reservation state: `pending`.
          * @enum {string}
          */
-        OperationStatus: "pending";
+        OperationStatus: "pending" | "succeeded" | "failed";
+        OperationStatusResponse: {
+            /**
+             * Format: uuid
+             * @description Operation identity echoed from the submission.
+             */
+            operationId: string;
+            /** @description Language operation family. */
+            family: components["schemas"]["OperationFamily"];
+            /** @description Observed operation state: `pending`, `succeeded` or `failed`. */
+            status: components["schemas"]["OperationStatus"];
+            /**
+             * Format: int32
+             * @description Reserved count while pending, committed charge when succeeded, zero when failed.
+             */
+            characterCount: number;
+            /** @description UTC day owning the reservation or charge, in yyyy-MM-dd form. */
+            admissionDay: string;
+            /**
+             * Format: date-time
+             * @description Server-controlled overall deadline for the operation.
+             */
+            deadlineUtc: string;
+            /** @description Always false in this slice: status reads never carry result text. */
+            outputAvailable: boolean;
+            /**
+             * Format: date-time
+             * @description Current server time in UTC.
+             */
+            serverTimeUtc: string;
+            /** @description Fresh current-day user usage snapshot. */
+            usage: components["schemas"]["UsageSnapshot"];
+        };
         /**
          * @description Whole-input behavior when the source exceeds the maximum.
          * @enum {string}
@@ -936,6 +968,17 @@ export interface operations {
             };
         };
         responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    /** @description Always `no-store` for language-operation admission responses. */
+                    "Cache-Control": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OperationStatusResponse"];
+                };
+            };
             /** @description Accepted */
             202: {
                 headers: {
@@ -1076,7 +1119,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["OperationPendingResponse"];
+                    "application/json": components["schemas"]["OperationStatusResponse"];
                 };
             };
             /** @description Bad Request */

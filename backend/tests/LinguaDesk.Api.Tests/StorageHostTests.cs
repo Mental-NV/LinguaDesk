@@ -19,6 +19,7 @@ public sealed class StorageHostTests
         "20260908221711_InitialStorage",
         "20260909120834_LocalAccounts",
         "20260911024223_OperationAdmission",
+        "20260911030052_OperationSettlement",
     ];
 
     [TestMethod]

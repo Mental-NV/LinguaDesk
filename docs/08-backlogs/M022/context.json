@@ -19,7 +19,7 @@
       "path": "docs/delivery/current.md",
       "use": "reference",
       "reason": "Dependency state (M021 Done with pending-only rows) and selected-scope status at planning time",
-      "sha256": "a30c1e055de010fe621afb71fe86ad24ef89a4638c9b12e98606177b155fc4da"
+      "sha256": "85399727ea383cf0b65649a2825cb8f827696f0988a4005773f43bb0eb86bd02"
     },
     {
       "path": "docs/01-PRD.md",
@@ -144,7 +144,7 @@
       ],
       "use": "reference",
       "reason": "Canonical V-group allocation for the selected scenario portions",
-      "sha256": "c1fc3e134ab951aa563bd4780a4174b5459d8352b6566d3dde07fa5ac57f9d9f"
+      "sha256": "aa352fb31a4b905a12aa0492fce586ff14380e7c7b15439ea09cec7fa6f46fc0"
     },
     {
       "path": "docs/08-backlogs/M021/backlog.md",
@@ -156,31 +156,31 @@
       "path": "backend/src/LinguaDesk.Api/Features/Operations/OperationEntities.cs",
       "use": "reference",
       "reason": "Current pending-only submission/ledger entities the settlement migration extends",
-      "sha256": "3673adbbaf9db845ab514e44b14ef33c2b36fb27a2d76318bffabfa8b542005c"
+      "sha256": "f58def6bb3125cd2ee1c415ce700c387cdf54d1dc2976e50c5598acca31db83d"
     },
     {
       "path": "backend/src/LinguaDesk.Api/Features/Operations/OperationAdmissionService.cs",
       "use": "reference",
       "reason": "Current admission transaction the settlement service must compose with, not duplicate",
-      "sha256": "ef2327b56cf307393d7a11c91664f7714ae31bb4ce979b4619eb4d3fa894b799"
+      "sha256": "113c7e2df1d9d6c9f3ccd9ee10dc9a5a86d6150ad1faff51a1765a5b5f9a43c7"
     },
     {
       "path": "backend/src/LinguaDesk.Api/Features/Operations/OperationsEndpoints.cs",
       "use": "reference",
       "reason": "Current submission/status routes the extended terminal reads build on",
-      "sha256": "4d56ee7bd2e12b3154d2d99c4e2e80ad476ef96b86d775990d50a61d7b714db8"
+      "sha256": "eb4535a31269a2bae33bec603683ce46ac7752d3ca26e26a8c9bed1ac70279e0"
     },
     {
       "path": "backend/src/LinguaDesk.Api/Features/Operations/OperationsContract.cs",
       "use": "reference",
       "reason": "Current pending-only DTOs the extended status wire builds on",
-      "sha256": "8b837fc64ee97001e8ab90347b1cc6acdd323050d96c81433e64e94e1dc39173"
+      "sha256": "b153ee3e14d3b52c549405478c254f4bdc0218742bfbb14bc9d4a943f7243161"
     },
     {
       "path": "docs/05-openapi.yaml",
       "use": "reference",
       "reason": "Current generated wire contract extended by the settlement delta",
-      "sha256": "be4cda68f95eabc537ca5227459ff8f43cd921535aa209b8930a0692c035ad71"
+      "sha256": "096c1c8b2196f70f601e102857b5b32d170dffa9506586c3118d47d4e8cb5874"
     },
     {
       "path": "scripts/backend.sh",
@@ -196,7 +196,7 @@
     }
   ],
   "source_map_sha256": "5cd6872d91c2b65c37ecbac1b4e3ac94aaca6f76654493702388921c60b0dae3",
-  "baseline_commit": "bb2214c6896b925354ddb8988297caf0df5dcf7d",
+  "baseline_commit": "9256d46e996de7dfea8f41d1d4c5d129fcc6565d",
   "locked_files": {
     "docs/00-SDD-Planning-Workflow.md": "183ae93148ff594f9f1e021aa7543baa8878e9cc0bcfd69ebc696c28976e2945",
     "docs/00-workflow/execution.md": "f362a1384cefef24ba204e0723e3190857c8cca9bcd91908136932e19c5caf02",

@@ -343,32 +343,13 @@ public sealed partial class OperationAdmissionService(
         return revision;
     }
 
-    private async Task<UsageSnapshotData> SnapshotAsync(
+    private Task<UsageSnapshotData> SnapshotAsync(
         string accountId,
         string day,
         DateTimeOffset serverTime,
         int allowance,
-        CancellationToken cancellationToken)
-    {
-        var entry = await database.CharacterLedgerEntries
-            .AsNoTracking()
-            .SingleOrDefaultAsync(
-                item => item.Scope == CharacterLedgerScopes.User && item.AccountId == accountId && item.Day == day,
-                cancellationToken);
-        var revision = await database.LedgerRevisions
-            .AsNoTracking()
-            .SingleOrDefaultAsync(item => item.Id == LedgerRevision.SingletonId, cancellationToken);
-        var consumed = entry?.ConsumedCharacters ?? 0;
-        var reserved = entry?.ReservedCharacters ?? 0;
-        return new(
-            day,
-            NextMidnightUtc(serverTime),
-            consumed,
-            reserved,
-            allowance,
-            Math.Max(0, allowance - consumed - reserved),
-            revision?.Value ?? 0);
-    }
+        CancellationToken cancellationToken) =>
+        LedgerSnapshot.ReadAsync(database, accountId, day, serverTime, allowance, cancellationToken);
 
     private static bool IsUniqueViolation(DbUpdateException exception) =>
         exception.InnerException is SqliteException sqlite

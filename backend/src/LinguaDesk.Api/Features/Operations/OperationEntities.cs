@@ -21,11 +21,17 @@ public sealed class OperationSubmission
     public string State { get; set; } = OperationStates.Pending;
 
     public DateTimeOffset CreatedUtc { get; set; }
+
+    public DateTimeOffset? SettledUtc { get; set; }
 }
 
 public static class OperationStates
 {
     public const string Pending = "pending";
+
+    public const string Succeeded = "succeeded";
+
+    public const string Failed = "failed";
 }
 
 public sealed class CharacterLedgerEntry

@@ -17,6 +17,10 @@ public enum OperationStatus
 {
     [JsonStringEnumMemberName("pending")]
     Pending,
+    [JsonStringEnumMemberName("succeeded")]
+    Succeeded,
+    [JsonStringEnumMemberName("failed")]
+    Failed,
 }
 
 /// <summary>Client operation submission admitted as exactly one reserved logical operation.</summary>
@@ -40,7 +44,7 @@ public sealed record OperationPendingResponse(
     Guid OperationId,
     [property: Description("Language operation family.")]
     OperationFamily Family,
-    [property: Description("Terminal state in this slice is always `pending`.")]
+    [property: Description("Observed reservation state: `pending`.")]
     OperationStatus Status,
     [property: Description("Reserved Unicode scalar count charged on a later successful settlement.")]
     int CharacterCount,
@@ -48,6 +52,27 @@ public sealed record OperationPendingResponse(
     string AdmissionDay,
     [property: Description("Server-controlled overall deadline for the operation.")]
     DateTimeOffset DeadlineUtc,
+    [property: Description("Current server time in UTC.")]
+    DateTimeOffset ServerTimeUtc,
+    [property: Description("Fresh current-day user usage snapshot.")]
+    UsageSnapshot Usage);
+
+/// <summary>Terminal operation metadata: pending reservation, settled success charge with output unavailable, or settled failure with zero charge, plus a fresh current-day usage snapshot. Reads never dispatch work.</summary>
+public sealed record OperationStatusResponse(
+    [property: Description("Operation identity echoed from the submission.")]
+    Guid OperationId,
+    [property: Description("Language operation family.")]
+    OperationFamily Family,
+    [property: Description("Observed operation state: `pending`, `succeeded` or `failed`.")]
+    OperationStatus Status,
+    [property: Description("Reserved count while pending, committed charge when succeeded, zero when failed.")]
+    int CharacterCount,
+    [property: Description("UTC day owning the reservation or charge, in yyyy-MM-dd form.")]
+    string AdmissionDay,
+    [property: Description("Server-controlled overall deadline for the operation.")]
+    DateTimeOffset DeadlineUtc,
+    [property: Description("Always false in this slice: status reads never carry result text.")]
+    bool OutputAvailable,
     [property: Description("Current server time in UTC.")]
     DateTimeOffset ServerTimeUtc,
     [property: Description("Fresh current-day user usage snapshot.")]

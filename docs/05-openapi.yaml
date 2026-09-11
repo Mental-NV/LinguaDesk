@@ -30,7 +30,7 @@ paths:
       tags:
         - OperationsEndpoints
       summary: Submit one logical language operation
-      description: Validates, fingerprint-matches and atomically reserves exactly one logical operation per verified account identity against both daily character allowances. Identical identities observe the pending reservation; changed payloads conflict. No provider dispatch occurs.
+      description: Validates, fingerprint-matches and atomically reserves exactly one logical operation per verified account identity against both daily character allowances. Identical identities observe the pending reservation or the settled success/failure metadata; changed payloads conflict. No provider dispatch occurs.
       operationId: submitLanguageOperation
       requestBody:
         content:
@@ -39,6 +39,18 @@ paths:
               $ref: "#/components/schemas/SubmitOperationRequest"
         required: true
       responses:
+        "200":
+          description: OK
+          headers:
+            Cache-Control:
+              description: Always `no-store` for language-operation admission responses.
+              required: true
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OperationStatusResponse"
         "202":
           description: Accepted
           headers:
@@ -174,8 +186,8 @@ paths:
     get:
       tags:
         - OperationsEndpoints
-      summary: Read one submitted operation reservation
-      description: Returns the pending reservation metadata for an account-owned operation identity with a fresh current-day usage snapshot. Status reads never dispatch work.
+      summary: Read one submitted operation
+      description: Returns the pending reservation or settled success/failure metadata for an account-owned operation identity with a fresh current-day usage snapshot. Status reads never dispatch work.
       operationId: getLanguageOperationStatus
       parameters:
         - name: operationId
@@ -195,7 +207,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/OperationPendingResponse"
+                $ref: "#/components/schemas/OperationStatusResponse"
         "400":
           description: Bad Request
           headers:
@@ -1458,7 +1470,7 @@ components:
           description: Language operation family.
           $ref: "#/components/schemas/OperationFamily"
         status:
-          description: Terminal state in this slice is always `pending`.
+          description: "Observed reservation state: `pending`."
           $ref: "#/components/schemas/OperationStatus"
         characterCount:
           type: integer
@@ -1553,8 +1565,54 @@ components:
     OperationStatus:
       enum:
         - pending
+        - succeeded
+        - failed
       type: string
-      description: Terminal state in this slice is always `pending`.
+      description: "Observed reservation state: `pending`."
+    OperationStatusResponse:
+      required:
+        - operationId
+        - family
+        - status
+        - characterCount
+        - admissionDay
+        - deadlineUtc
+        - outputAvailable
+        - serverTimeUtc
+        - usage
+      type: object
+      properties:
+        operationId:
+          type: string
+          description: Operation identity echoed from the submission.
+          format: uuid
+        family:
+          description: Language operation family.
+          $ref: "#/components/schemas/OperationFamily"
+        status:
+          description: "Observed operation state: `pending`, `succeeded` or `failed`."
+          $ref: "#/components/schemas/OperationStatus"
+        characterCount:
+          type: integer
+          description: Reserved count while pending, committed charge when succeeded, zero when failed.
+          format: int32
+        admissionDay:
+          type: string
+          description: UTC day owning the reservation or charge, in yyyy-MM-dd form.
+        deadlineUtc:
+          type: string
+          description: Server-controlled overall deadline for the operation.
+          format: date-time
+        outputAvailable:
+          type: boolean
+          description: "Always false in this slice: status reads never carry result text."
+        serverTimeUtc:
+          type: string
+          description: Current server time in UTC.
+          format: date-time
+        usage:
+          description: Fresh current-day user usage snapshot.
+          $ref: "#/components/schemas/UsageSnapshot"
     OversizeHandling:
       enum:
         - rejectWhole

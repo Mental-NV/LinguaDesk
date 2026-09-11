@@ -11,6 +11,7 @@ public static class OperationsRegistrationExtensions
         services.AddOptions<OperationAdmissionOptions>().BindConfiguration(OperationAdmissionOptions.SectionName);
         services.AddSingleton<IValidateOptions<OperationAdmissionOptions>, OperationAdmissionOptionsValidator>();
         services.AddScoped<OperationAdmissionService>();
+        services.AddScoped<OperationSettlementService>();
         services.AddSingleton<OperationFingerprintKeyProvider>(serviceProvider =>
             new OperationFingerprintKeyProvider(
                 serviceProvider.GetRequiredService<IDataProtectionProvider>(),
