@@ -74,35 +74,47 @@ internal static class EvaluateEligibility
         }
 
         var promptProbe = EligibilityPrompt.Create(string.Empty, null);
-        var scripted = Cases.ToDictionary(
-            kase => kase.CaseId,
-            kase => kase.ScriptedResponse,
-            StringComparer.Ordinal);
 
         if (!selected.Live)
         {
-            return RunOfflineAsync(profile, promptProbe, scripted, selected);
+            return RunOfflineAsync(profile, promptProbe, selected);
         }
 
         return await RunLiveAsync(profile, promptProbe, selected).ConfigureAwait(false);
     }
 
-    private static int RunOfflineAsync(
+    internal static IReadOnlySet<string> FaultCaseIds { get; } =
+        new HashSet<string>(StringComparer.Ordinal);
+
+    internal static (IReadOnlyList<SectionRow> Rows, int Mismatches) RunOfflineSection(
         CandidateProfile profile,
-        PromptSnapshot promptProbe,
-        Dictionary<string, string?> scripted,
-        EvaluateEligibilityOptions selected)
+        PromptSnapshot promptProbe)
     {
-        var observations = new List<CaseObservation>();
+        var scripted = Cases.ToDictionary(
+            kase => kase.CaseId,
+            kase => kase.ScriptedResponse,
+            StringComparer.Ordinal);
+        var rows = new List<SectionRow>();
         foreach (var kase in Cases)
         {
             using var client = new ScriptedEligibilityClient(
                 scripted.TryGetValue(kase.CaseId, out var response) ? response : null);
             var outcome = EligibilityPipeline.EvaluateAsync(kase.ToInput(), client).GetAwaiter().GetResult();
-            observations.Add(Observe(kase, outcome, client.CallCount, Usage: null, ReservedUsd: 0m, ActualUsd: null));
+            var observation = Observe(kase, outcome, client.CallCount, Usage: null, ReservedUsd: 0m, ActualUsd: null);
+            rows.Add(new SectionRow(kase.CaseId, outcome.Decision.ToString(), observation));
         }
 
-        var mismatches = observations.Count(observation => !observation.MatchesReference);
+        var mismatches = rows.Count(row => !((CaseObservation)row.Observation).MatchesReference);
+        return (rows, mismatches);
+    }
+
+    private static int RunOfflineAsync(
+        CandidateProfile profile,
+        PromptSnapshot promptProbe,
+        EvaluateEligibilityOptions selected)
+    {
+        var (rows, mismatches) = RunOfflineSection(profile, promptProbe);
+        var observations = rows.Select(row => (CaseObservation)row.Observation).ToList();
         var report = new EligibilityEvaluationReport(
             "eligibility_evaluation_report",
             profile.CandidateId,
@@ -146,55 +158,8 @@ internal static class EvaluateEligibility
         using (credential)
         {
             var budget = new EvaluationBudget(selected.MaxDispatches, selected.MaxSpendUsd);
-            using var httpClient = new HttpClient
-            {
-                Timeout = TimeSpan.FromSeconds(profile.Bounds.AttemptTimeoutSeconds),
-            };
-            var adapter = new ChatCompletionsAdapter(profile, httpClient);
-            using var client = new AdapterChatClient(adapter, credential, budget);
-            var observations = new List<CaseObservation>();
-
-            foreach (var kase in Cases)
-            {
-                client.LastObservation = null;
-                EligibilityOutcome outcome;
-                try
-                {
-                    outcome = await EligibilityPipeline.EvaluateAsync(kase.ToInput(), client).ConfigureAwait(false);
-                }
-                catch (ChatCompletionsAdapterException exception) when (exception.Kind == AttemptFailureKind.BudgetDenied)
-                {
-                    observations.Add(Observe(
-                        kase,
-                        new EligibilityOutcome(
-                            EligibilityDecision.Failed,
-                            null,
-                            "budget-denied",
-                            client.CallCount,
-                            ChargesCharacters: false,
-                            null,
-                            promptProbe.PromptId,
-                            promptProbe.ResourceSha256),
-                        client.CallCount,
-                        Usage: null,
-                        budget.ReservedUsd,
-                        ActualUsd: null));
-                    break;
-                }
-
-                var observation = client.LastObservation;
-                observations.Add(Observe(
-                    kase,
-                    outcome,
-                    outcome.ClassificationDispatches,
-                    observation?.Usage,
-                    observation?.ReservedUsd ?? 0m,
-                    observation?.ActualUsd));
-            }
-
-            var failed = observations.Count(observation =>
-                string.Equals(observation.Decision, nameof(EligibilityDecision.Failed), StringComparison.Ordinal));
-            var mismatches = observations.Count(observation => !observation.MatchesReference);
+            var (rows, failed, mismatches) = await RunLiveSectionAsync(profile, promptProbe, budget, credential).ConfigureAwait(false);
+            var observations = rows.Select(row => (CaseObservation)row.Observation).ToList();
             var report = new EligibilityEvaluationReport(
                 "eligibility_evaluation_report",
                 profile.CandidateId,
@@ -220,6 +185,68 @@ internal static class EvaluateEligibility
 
             return WriteReport(report, selected, failed == 0 ? 0 : 1);
         }
+    }
+
+    internal static async Task<SectionOutcome> RunLiveSectionAsync(
+        CandidateProfile profile,
+        PromptSnapshot promptProbe,
+        EvaluationBudget budget,
+        TransportCredential credential)
+    {
+        using var httpClient = new HttpClient
+        {
+            Timeout = TimeSpan.FromSeconds(profile.Bounds.AttemptTimeoutSeconds),
+        };
+        var adapter = new ChatCompletionsAdapter(profile, httpClient);
+        using var client = new AdapterChatClient(adapter, credential, budget);
+        var rows = new List<SectionRow>();
+
+        foreach (var kase in Cases)
+        {
+            client.LastObservation = null;
+            EligibilityOutcome outcome;
+            try
+            {
+                outcome = await EligibilityPipeline.EvaluateAsync(kase.ToInput(), client).ConfigureAwait(false);
+            }
+            catch (ChatCompletionsAdapterException exception) when (exception.Kind == AttemptFailureKind.BudgetDenied)
+            {
+                var denied = Observe(
+                    kase,
+                    new EligibilityOutcome(
+                        EligibilityDecision.Failed,
+                        null,
+                        "budget-denied",
+                        client.CallCount,
+                        ChargesCharacters: false,
+                        null,
+                        promptProbe.PromptId,
+                        promptProbe.ResourceSha256),
+                    client.CallCount,
+                    Usage: null,
+                    budget.ReservedUsd,
+                    ActualUsd: null);
+                rows.Add(new SectionRow(kase.CaseId, nameof(EligibilityDecision.Failed), denied));
+                break;
+            }
+
+            var observation = client.LastObservation;
+            rows.Add(new SectionRow(
+                kase.CaseId,
+                outcome.Decision.ToString(),
+                Observe(
+                    kase,
+                    outcome,
+                    outcome.ClassificationDispatches,
+                    observation?.Usage,
+                    observation?.ReservedUsd ?? 0m,
+                    observation?.ActualUsd)));
+        }
+
+        var failed = rows.Count(row =>
+            string.Equals(row.Decision, nameof(EligibilityDecision.Failed), StringComparison.Ordinal));
+        var mismatches = rows.Count(row => !((CaseObservation)row.Observation).MatchesReference);
+        return new SectionOutcome(rows, failed, mismatches);
     }
 
     private static CaseObservation Observe(
@@ -419,7 +446,7 @@ internal static class EvaluateEligibility
         [property: JsonPropertyOrder(3)] decimal ReservedUsd,
         [property: JsonPropertyOrder(4)] decimal UnresolvedUsd);
 
-    private sealed record CaseObservation(
+    internal sealed record CaseObservation(
         [property: JsonPropertyOrder(0)] string CaseId,
         [property: JsonPropertyOrder(1)] string Operation,
         [property: JsonPropertyOrder(2)] string? SourceHint,

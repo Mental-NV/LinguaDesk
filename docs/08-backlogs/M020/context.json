@@ -15,7 +15,7 @@
       "path": "docs/delivery/current.md",
       "use": "reference",
       "reason": "Dependency states (M015-M019 Done) and selected-scope status at planning time",
-      "sha256": "d2fcbf1d6d9c36b0c72f6eaf739884d56918cd5dd361fffde308d422a2dfa825"
+      "sha256": "d2fd3ade63ee26212146e95808ea46803a9501aad7647942d314a498d7b91b52"
     },
     {
       "path": "docs/04-llm-specification.md",
@@ -86,17 +86,17 @@
       "path": "scripts/ai.sh",
       "use": "reference",
       "reason": "Existing evaluate-command surface and offline credential-stripping pattern to extend",
-      "sha256": "6f0d32d3fcb2d7161bb10d98f754a58310b348c8ec9140be816ba9552510866e"
+      "sha256": "b7c759d146ebbc4ee7bb05d89c6b51f7479da617a38ec1f2aff9a081bb499386"
     },
     {
       "path": "backend/tools/LinguaDesk.Ai.Evaluation/Program.cs",
       "use": "reference",
       "reason": "Runner command dispatch and per-workflow report-file precedent for the new command",
-      "sha256": "a0370599adbfcc0862c6dfd2daf9c69bd8f3db8af3b51a99d6181d52888944db"
+      "sha256": "aa4df8e64fed1dc1407bb138fb451c47904e5e15db5ac3bab36ae22fecf1fffd"
     }
   ],
   "source_map_sha256": "dff023bccdb23496187748bba9f02a2df66195b5e53d1e19f1ac214f63adb215",
-  "baseline_commit": "8e099b0bbfd2bdc5050eb5b9b1a0bfe0e401e57f",
+  "baseline_commit": "84b15f8612fa1095a55481829dccea39e53b34d1",
   "locked_files": {
     "docs/00-SDD-Planning-Workflow.md": "183ae93148ff594f9f1e021aa7543baa8878e9cc0bcfd69ebc696c28976e2945",
     "docs/00-workflow/execution.md": "f362a1384cefef24ba204e0723e3190857c8cca9bcd91908136932e19c5caf02",

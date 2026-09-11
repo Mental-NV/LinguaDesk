@@ -98,13 +98,15 @@ internal static class EvaluateChainBounds
         return await RunLiveAsync(profile, policy, selected).ConfigureAwait(false);
     }
 
-    private static int RunOfflineAsync(
+    internal static IReadOnlySet<string> FaultCaseIds { get; } =
+        new HashSet<string>(StringComparer.Ordinal);
+
+    internal static (IReadOnlyList<SectionRow> Rows, int Mismatches) RunOfflineSection(
         CandidateProfile profile,
         ChainPolicy policy,
-        EvaluateChainBoundsOptions selected)
+        EvaluationBudget budget)
     {
-        var budget = new EvaluationBudget(selected.MaxDispatches, selected.MaxSpendUsd);
-        var observations = new List<ChainBoundsCaseObservation>();
+        var rows = new List<SectionRow>();
 
         foreach (var kase in Cases)
         {
@@ -118,10 +120,22 @@ internal static class EvaluateChainBounds
                     chain, kase.ToTranslationInput(), _ => client, policy, budget).GetAwaiter().GetResult()
                 : ChainOrchestrator.ExecuteRewritingAsync(
                     chain, kase.ToRewritingInput(), _ => client, policy, budget).GetAwaiter().GetResult();
-            observations.Add(Observe(kase, outcome, null));
+            var observation = Observe(kase, outcome, null);
+            rows.Add(new SectionRow(kase.CaseId, outcome.Decision.ToString(), observation));
         }
 
-        var mismatches = observations.Count(observation => !observation.MatchesReference);
+        var mismatches = rows.Count(row => !((ChainBoundsCaseObservation)row.Observation).MatchesReference);
+        return (rows, mismatches);
+    }
+
+    private static int RunOfflineAsync(
+        CandidateProfile profile,
+        ChainPolicy policy,
+        EvaluateChainBoundsOptions selected)
+    {
+        var budget = new EvaluationBudget(selected.MaxDispatches, selected.MaxSpendUsd);
+        var (rows, mismatches) = RunOfflineSection(profile, policy, budget);
+        var observations = rows.Select(row => (ChainBoundsCaseObservation)row.Observation).ToList();
         var report = new ChainBoundsReport(
             "chain_bounds_report",
             profile.CandidateId,
@@ -169,36 +183,8 @@ internal static class EvaluateChainBounds
         using (credential)
         {
             var budget = new EvaluationBudget(selected.MaxDispatches, selected.MaxSpendUsd);
-            using var httpClient = new HttpClient
-            {
-                Timeout = TimeSpan.FromSeconds(profile.Bounds.AttemptTimeoutSeconds),
-            };
-            var adapter = new ChatCompletionsAdapter(profile, httpClient);
-            var observations = new List<ChainBoundsCaseObservation>();
-
-            foreach (var kase in Cases)
-            {
-                var chain = kase.Family == ChainFamily.Translation
-                    ? FamilyChain.Create(ChainFamily.Translation, CandidateRegistry.Default, profile.CandidateId)
-                    : FamilyChain.Create(ChainFamily.Rewriting, CandidateRegistry.Default, profile.CandidateId);
-                var attempts = new List<AttemptObservation>();
-                using var client = new ChainLiveClient(adapter, credential, attempts);
-                var outcome = kase.Family == ChainFamily.Translation
-                    ? await ChainOrchestrator.ExecuteTranslationAsync(
-                        chain, kase.ToTranslationInput(), _ => client, policy, budget).ConfigureAwait(false)
-                    : await ChainOrchestrator.ExecuteRewritingAsync(
-                        chain, kase.ToRewritingInput(), _ => client, policy, budget).ConfigureAwait(false);
-
-                observations.Add(Observe(kase, outcome, attempts));
-                if (outcome.Decision == ChainDecision.BudgetDenied)
-                {
-                    break;
-                }
-            }
-
-            var failed = observations.Count(observation =>
-                !string.Equals(observation.Decision, nameof(ChainDecision.Succeeded), StringComparison.Ordinal));
-            var mismatches = observations.Count(observation => !observation.MatchesReference);
+            var (rows, failed, mismatches) = await RunLiveSectionAsync(profile, policy, budget, credential).ConfigureAwait(false);
+            var observations = rows.Select(row => (ChainBoundsCaseObservation)row.Observation).ToList();
             var report = new ChainBoundsReport(
                 "chain_bounds_report",
                 profile.CandidateId,
@@ -222,6 +208,45 @@ internal static class EvaluateChainBounds
 
             return WriteReport(report, selected, failed == 0 ? 0 : 1);
         }
+    }
+
+    internal static async Task<SectionOutcome> RunLiveSectionAsync(
+        CandidateProfile profile,
+        ChainPolicy policy,
+        EvaluationBudget budget,
+        TransportCredential credential)
+    {
+        using var httpClient = new HttpClient
+        {
+            Timeout = TimeSpan.FromSeconds(profile.Bounds.AttemptTimeoutSeconds),
+        };
+        var adapter = new ChatCompletionsAdapter(profile, httpClient);
+        var rows = new List<SectionRow>();
+
+        foreach (var kase in Cases)
+        {
+            var chain = kase.Family == ChainFamily.Translation
+                ? FamilyChain.Create(ChainFamily.Translation, CandidateRegistry.Default, profile.CandidateId)
+                : FamilyChain.Create(ChainFamily.Rewriting, CandidateRegistry.Default, profile.CandidateId);
+            var attempts = new List<AttemptObservation>();
+            using var client = new ChainLiveClient(adapter, credential, attempts);
+            var outcome = kase.Family == ChainFamily.Translation
+                ? await ChainOrchestrator.ExecuteTranslationAsync(
+                    chain, kase.ToTranslationInput(), _ => client, policy, budget).ConfigureAwait(false)
+                : await ChainOrchestrator.ExecuteRewritingAsync(
+                    chain, kase.ToRewritingInput(), _ => client, policy, budget).ConfigureAwait(false);
+
+            rows.Add(new SectionRow(kase.CaseId, outcome.Decision.ToString(), Observe(kase, outcome, attempts)));
+            if (outcome.Decision == ChainDecision.BudgetDenied)
+            {
+                break;
+            }
+        }
+
+        var failed = rows.Count(row =>
+            !string.Equals(row.Decision, nameof(ChainDecision.Succeeded), StringComparison.Ordinal));
+        var mismatches = rows.Count(row => !((ChainBoundsCaseObservation)row.Observation).MatchesReference);
+        return new SectionOutcome(rows, failed, mismatches);
     }
 
     private static ChainBoundsCaseObservation Observe(
@@ -504,7 +529,7 @@ internal static class EvaluateChainBounds
         [property: JsonPropertyOrder(3)] decimal ReservedUsd,
         [property: JsonPropertyOrder(4)] decimal UnresolvedUsd);
 
-    private sealed record ChainAttemptObservation(
+    internal sealed record ChainAttemptObservation(
         [property: JsonPropertyOrder(0)] string CandidateId,
         [property: JsonPropertyOrder(1)] string CredentialRef,
         [property: JsonPropertyOrder(2)] string Stage,
@@ -514,7 +539,7 @@ internal static class EvaluateChainBounds
         [property: JsonPropertyOrder(6)] decimal? ActualUsd,
         [property: JsonPropertyOrder(7)] long ElapsedMs);
 
-    private sealed record ChainBoundsCaseObservation(
+    internal sealed record ChainBoundsCaseObservation(
         [property: JsonPropertyOrder(0)] string CaseId,
         [property: JsonPropertyOrder(1)] string Family,
         [property: JsonPropertyOrder(2)] string DirectionOrCell,

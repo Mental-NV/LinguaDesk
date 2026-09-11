@@ -1,4 +1,4 @@
-import { useEffect, useId, useRef, useState } from 'react'
+import { useEffect, useId, useLayoutEffect, useRef, useState } from 'react'
 import { Link, Navigate, useSearchParams } from 'react-router-dom'
 import {
   confirmLocalAccountEmail,
@@ -109,7 +109,7 @@ export function VerifyEmailEntryPage({
     resendPhase === 'retry' ||
     (statusPhase !== 'idle' && statusPhase !== 'checking')
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const signature = `${String(verified)}|${confirmPhase}|${resendPhase}|${statusPhase}`
     if (signature === lastAnnouncedRef.current) return
     lastAnnouncedRef.current = signature

@@ -122,22 +122,38 @@ internal static class EvaluateTranslation
         return await RunLiveAsync(profile, eligibilityProbe, translationProbe, selected).ConfigureAwait(false);
     }
 
+    internal static IReadOnlySet<string> FaultCaseIds { get; } = Cases
+        .Where(kase => kase.OfflineOnly)
+        .Select(kase => kase.CaseId)
+        .ToHashSet(StringComparer.Ordinal);
+
+    internal static (IReadOnlyList<SectionRow> Rows, int Mismatches) RunOfflineSection(
+        CandidateProfile profile,
+        PromptSnapshot eligibilityProbe,
+        PromptSnapshot translationProbe)
+    {
+        var rows = new List<SectionRow>();
+        foreach (var kase in Cases)
+        {
+            using var client = new ScriptedTranslationRunnerClient(
+                kase.ScriptedClassification, kase.ScriptedTransformation);
+            var outcome = TranslationPipeline.TranslateAsync(kase.ToInput(), client).GetAwaiter().GetResult();
+            var observation = Observe(kase, outcome, Usage: null, ReservedUsd: 0m, ActualUsd: null);
+            rows.Add(new SectionRow(kase.CaseId, outcome.Decision.ToString(), observation));
+        }
+
+        var mismatches = rows.Count(row => !((CaseObservation)row.Observation).MatchesReference);
+        return (rows, mismatches);
+    }
+
     private static int RunOfflineAsync(
         CandidateProfile profile,
         PromptSnapshot eligibilityProbe,
         PromptSnapshot translationProbe,
         EvaluateTranslationOptions selected)
     {
-        var observations = new List<CaseObservation>();
-        foreach (var kase in Cases)
-        {
-            using var client = new ScriptedTranslationRunnerClient(
-                kase.ScriptedClassification, kase.ScriptedTransformation);
-            var outcome = TranslationPipeline.TranslateAsync(kase.ToInput(), client).GetAwaiter().GetResult();
-            observations.Add(Observe(kase, outcome, Usage: null, ReservedUsd: 0m, ActualUsd: null));
-        }
-
-        var mismatches = observations.Count(observation => !observation.MatchesReference);
+        var (rows, mismatches) = RunOfflineSection(profile, eligibilityProbe, translationProbe);
+        var observations = rows.Select(row => (CaseObservation)row.Observation).ToList();
         var report = new TranslationEvaluationReport(
             "translation_evaluation_report",
             profile.CandidateId,
@@ -186,64 +202,8 @@ internal static class EvaluateTranslation
         using (credential)
         {
             var budget = new EvaluationBudget(selected.MaxDispatches, selected.MaxSpendUsd);
-            using var httpClient = new HttpClient
-            {
-                Timeout = TimeSpan.FromSeconds(profile.Bounds.AttemptTimeoutSeconds),
-            };
-            var adapter = new ChatCompletionsAdapter(profile, httpClient);
-            using var client = new AdapterChatClient(adapter, credential, budget);
-            var observations = new List<CaseObservation>();
-
-            foreach (var kase in Cases)
-            {
-                if (kase.OfflineOnly)
-                {
-                    observations.Add(SkippedObservation(kase));
-                    continue;
-                }
-
-                client.Attempts.Clear();
-                TranslationOutcome outcome;
-                try
-                {
-                    outcome = await TranslationPipeline.TranslateAsync(kase.ToInput(), client).ConfigureAwait(false);
-                }
-                catch (ChatCompletionsAdapterException exception) when (exception.Kind == AttemptFailureKind.BudgetDenied)
-                {
-                    observations.Add(Observe(
-                        kase,
-                        new TranslationOutcome(
-                            TranslationDecision.Failed,
-                            null,
-                            kase.Target,
-                            null,
-                            "budget-denied",
-                            client.CallCount,
-                            0,
-                            client.CallCount,
-                            ChargesCharacters: false,
-                            null,
-                            eligibilityProbe.PromptId,
-                            eligibilityProbe.ResourceSha256,
-                            translationProbe.PromptId,
-                            translationProbe.ResourceSha256),
-                        Usage: null,
-                        budget.ReservedUsd,
-                        ActualUsd: null));
-                    break;
-                }
-
-                observations.Add(Observe(
-                    kase,
-                    outcome,
-                    CombineUsage(client.Attempts),
-                    client.Attempts.Sum(attempt => attempt.ReservedUsd),
-                    CombineActual(client.Attempts)));
-            }
-
-            var failed = observations.Count(observation =>
-                string.Equals(observation.Decision, nameof(TranslationDecision.Failed), StringComparison.Ordinal));
-            var mismatches = observations.Count(observation => !observation.MatchesReference);
+            var (rows, failed, mismatches) = await RunLiveSectionAsync(profile, eligibilityProbe, translationProbe, budget, credential).ConfigureAwait(false);
+            var observations = rows.Select(row => (CaseObservation)row.Observation).ToList();
             var report = new TranslationEvaluationReport(
                 "translation_evaluation_report",
                 profile.CandidateId,
@@ -310,6 +270,78 @@ internal static class EvaluateTranslation
         }
 
         return any ? total : null;
+    }
+
+    internal static async Task<SectionOutcome> RunLiveSectionAsync(
+        CandidateProfile profile,
+        PromptSnapshot eligibilityProbe,
+        PromptSnapshot translationProbe,
+        EvaluationBudget budget,
+        TransportCredential credential)
+    {
+        using var httpClient = new HttpClient
+        {
+            Timeout = TimeSpan.FromSeconds(profile.Bounds.AttemptTimeoutSeconds),
+        };
+        var adapter = new ChatCompletionsAdapter(profile, httpClient);
+        using var client = new AdapterChatClient(adapter, credential, budget);
+        var rows = new List<SectionRow>();
+
+        foreach (var kase in Cases)
+        {
+            if (kase.OfflineOnly)
+            {
+                rows.Add(new SectionRow(kase.CaseId, "Skipped", SkippedObservation(kase)));
+                continue;
+            }
+
+            client.Attempts.Clear();
+            TranslationOutcome outcome;
+            try
+            {
+                outcome = await TranslationPipeline.TranslateAsync(kase.ToInput(), client).ConfigureAwait(false);
+            }
+            catch (ChatCompletionsAdapterException exception) when (exception.Kind == AttemptFailureKind.BudgetDenied)
+            {
+                var denied = Observe(
+                    kase,
+                    new TranslationOutcome(
+                        TranslationDecision.Failed,
+                        null,
+                        kase.Target,
+                        null,
+                        "budget-denied",
+                        client.CallCount,
+                        0,
+                        client.CallCount,
+                        ChargesCharacters: false,
+                        null,
+                        eligibilityProbe.PromptId,
+                        eligibilityProbe.ResourceSha256,
+                        translationProbe.PromptId,
+                        translationProbe.ResourceSha256),
+                    Usage: null,
+                    budget.ReservedUsd,
+                    ActualUsd: null);
+                rows.Add(new SectionRow(kase.CaseId, nameof(TranslationDecision.Failed), denied));
+                break;
+            }
+
+            rows.Add(new SectionRow(
+                kase.CaseId,
+                outcome.Decision.ToString(),
+                Observe(
+                    kase,
+                    outcome,
+                    CombineUsage(client.Attempts),
+                    client.Attempts.Sum(attempt => attempt.ReservedUsd),
+                    CombineActual(client.Attempts))));
+        }
+
+        var failed = rows.Count(row =>
+            string.Equals(row.Decision, nameof(TranslationDecision.Failed), StringComparison.Ordinal));
+        var mismatches = rows.Count(row => !((CaseObservation)row.Observation).MatchesReference);
+        return new SectionOutcome(rows, failed, mismatches);
     }
 
     private static CaseObservation SkippedObservation(EvalCase kase) =>
@@ -538,7 +570,7 @@ internal static class EvaluateTranslation
         [property: JsonPropertyOrder(3)] decimal ReservedUsd,
         [property: JsonPropertyOrder(4)] decimal UnresolvedUsd);
 
-    private sealed record CaseObservation(
+    internal sealed record CaseObservation(
         [property: JsonPropertyOrder(0)] string CaseId,
         [property: JsonPropertyOrder(1)] string Direction,
         [property: JsonPropertyOrder(2)] string? SourceHint,

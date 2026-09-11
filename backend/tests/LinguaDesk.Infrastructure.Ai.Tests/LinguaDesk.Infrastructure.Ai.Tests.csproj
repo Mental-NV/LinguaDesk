@@ -12,4 +12,7 @@
   <ItemGroup>
     <ProjectReference Include="../../src/LinguaDesk.Infrastructure.Ai/LinguaDesk.Infrastructure.Ai.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="../../tools/LinguaDesk.Ai.Evaluation/LinguaDesk.Ai.Evaluation.csproj" />
+  </ItemGroup>
 </Project>

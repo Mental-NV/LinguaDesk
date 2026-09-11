@@ -42,6 +42,7 @@ internal static class Program
             "evaluate-translation" => await EvaluateTranslation.RunAsync(args[1..]).ConfigureAwait(false),
             "evaluate-rewriting" => await EvaluateRewriting.RunAsync(args[1..]).ConfigureAwait(false),
             "evaluate-chain-bounds" => await EvaluateChainBounds.RunAsync(args[1..]).ConfigureAwait(false),
+            "evaluate-report" => await EvaluateReport.RunAsync(args[1..]).ConfigureAwait(false),
             _ => UnknownCommand(),
         };
     }
@@ -344,7 +345,8 @@ internal static class Program
             "evaluate-eligibility [--offline|--live] --profile <id> --max-dispatches <n> --max-spend-usd <amount> [--output <path>]|" +
             "evaluate-translation [--offline|--live] --profile <id> --max-dispatches <n> --max-spend-usd <amount> [--output <path>]|" +
             "evaluate-rewriting [--offline|--live] --profile <id> --max-dispatches <n> --max-spend-usd <amount> [--output <path>]|" +
-            "evaluate-chain-bounds [--offline|--live] --profile <id> --max-dispatches <n> --max-spend-usd <amount> [--deadline-ms <n>] [--output <path>]}");
+            "evaluate-chain-bounds [--offline|--live] --profile <id> --max-dispatches <n> --max-spend-usd <amount> [--deadline-ms <n>] [--output <path>]|" +
+            "evaluate-report [--offline|--live] --profile <id> --max-dispatches <n> --max-spend-usd <amount> [--deadline-ms <n>] [--output <path>]}");
 
     private sealed record VerifyAccessOptions(string Profile, int MaxDispatches, decimal MaxSpendUsd)
     {
