@@ -100,9 +100,18 @@ bash scripts/ai.sh verify-access --profile DeepSeek-V4.1-Flash --max-dispatches 
 # metadata-only report under artifacts/eligibility/.
 bash scripts/ai.sh evaluate-eligibility --profile DeepSeek-V4.1-Flash --max-dispatches 12 --max-spend-usd 0.50
 bash scripts/ai.sh evaluate-eligibility --live --profile DeepSeek-V4.1-Flash --max-dispatches 12 --max-spend-usd 0.50
+
+# Run the allowlisted synthetic translation slice offline (scripted
+# classification/transformation pairs, no credential, no network) or live
+# (--live) through the selected profile under the explicit finite budget.
+# The slice covers every Translation direction; the refusal/malformed edge
+# cases are offline-only scripted proofs and are skipped live. Both write a
+# sanitized metadata-only report under artifacts/translation/.
+bash scripts/ai.sh evaluate-translation --profile DeepSeek-V4.1-Flash --max-dispatches 34 --max-spend-usd 0.50
+bash scripts/ai.sh evaluate-translation --live --profile DeepSeek-V4.1-Flash --max-dispatches 34 --max-spend-usd 0.50
 ```
 
-`check`, `inspect`, `probe`, and `conformance` clear common provider credential variables and point outbound HTTP proxies at an unreachable loopback address. They start no API/frontend process, open no database, and write no persistent evaluation report; `check` writes only generated build output and `artifacts/test-results/ai.trx`. The default offline `evaluate-eligibility` runs the same way: scripted classifications for the allowlisted synthetic slice, no credential read, no network, plus a metadata-only report under `artifacts/eligibility/`. Only `verify-access` and `evaluate-eligibility --live` use the network and the host credential: each reads the key exclusively from `LINGUADESK_AIEVALUATION__CREDENTIALS__<REF>__APIKEY` (for example `...__DEEPSEEK__APIKEY` for `CredentialRef` `deepseek`), stays within the explicit finite dispatch and spend budget, and prints a sanitized report naming only the reference, disposition, usage, and exposure — never the key. A missing or blank credential exits blocked (`3`) with zero dispatches and no scripted fallback. The runner accepts no source, configuration, credential, or arbitrary text argument.
+`check`, `inspect`, `probe`, and `conformance` clear common provider credential variables and point outbound HTTP proxies at an unreachable loopback address. They start no API/frontend process, open no database, and write no persistent evaluation report; `check` writes only generated build output and `artifacts/test-results/ai.trx`. The default offline `evaluate-eligibility` and `evaluate-translation` runs work the same way: scripted responses for the allowlisted synthetic slice, no credential read, no network, plus a metadata-only report under `artifacts/eligibility/` or `artifacts/translation/`. Only `verify-access` and the `--live` evaluation runs use the network and the host credential: each reads the key exclusively from `LINGUADESK_AIEVALUATION__CREDENTIALS__<REF>__APIKEY` (for example `...__DEEPSEEK__APIKEY` for `CredentialRef` `deepseek`), stays within the explicit finite dispatch and spend budget, and prints a sanitized report naming only the reference, disposition, usage, and exposure — never the key. A missing or blank credential exits blocked (`3`) with zero dispatches and no scripted fallback. The runner accepts no source, configuration, credential, or arbitrary text argument.
 
 Inspection deliberately prints the checked-in synthetic source containing a quote, newline, and instruction-like phrase. `probe` labels its observation `raw_scripted_observation` and reports `live: false` and `validated: false`. Neither command classifies a product input, validates a response, transforms text, qualifies a model/provider, measures quality/cost/performance, or proves a release gate. Those behaviors remain later selected milestones.
 

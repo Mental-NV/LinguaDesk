@@ -2,7 +2,7 @@
 
 Mutable #7 status owner. Read for selection/dependency checks and closeout; do not include in the stable execution prefix.
 
-**Most recently completed milestone: [M015 — Validate language eligibility](../08-backlogs/M015/backlog.md).** State: **Done**. [Package 015](../08-backlogs/M015/spec.md) AC-001–006 passed the strict eligibility envelope parser, operation-aware zero-dispatch gates, terminal classification mapping with resolved-language reuse, and a bounded reviewed live development slice (12/12 reference matches, 10 live dispatches, known usage, no unresolved spend). Its [completion record](../08-backlogs/M015/tasks.md#completion-record) owns the exact evidence. This is development evidence only; transformation, fallback, corpus qualification and production serving remain pending.
+**Most recently completed milestone: [M016 — Translate complete text through the AI boundary](../08-backlogs/M016/backlog.md).** State: **Done**. [Package 016](../08-backlogs/M016/spec.md) AC-001–005 passed the strict translation result-envelope parser, the `translation.v1` prompt/pipeline with M015 eligibility reuse and one transformation dispatch, deterministic refusal/invalid-output rejection with no retry, and a bounded reviewed live development slice (all 12 Translation directions succeeded, 25 live dispatches, known usage, no unresolved spend). Its [completion record](../08-backlogs/M016/tasks.md#completion-record) owns the exact evidence. This is development evidence only; rewriting modes, fallback/deadline traversal, corpus qualification and production serving remain pending.
 
 ## Selected milestone
 
@@ -32,5 +32,6 @@ M019 completed the independent-track enabler for the explicit live provider path
 | M014 | Done | [Backlog](../08-backlogs/M014/backlog.md), [spec](../08-backlogs/M014/spec.md), [tasks/evidence](../08-backlogs/M014/tasks.md#completion-record) |
 | M019 | Done | [Backlog](../08-backlogs/M019/backlog.md), [spec](../08-backlogs/M019/spec.md), [tasks/evidence](../08-backlogs/M019/tasks.md#completion-record) |
 | M015 | Done | [Backlog](../08-backlogs/M015/backlog.md), [spec](../08-backlogs/M015/spec.md), [tasks/evidence](../08-backlogs/M015/tasks.md#completion-record) |
+| M016 | Done | [Backlog](../08-backlogs/M016/backlog.md), [spec](../08-backlogs/M016/spec.md), [tasks/evidence](../08-backlogs/M016/tasks.md#completion-record) |
 
-All roadmap milestones other than completed M001–M015 and M019 are Candidate with no selected package and evidence pending. Full product and release evidence remains pending in #6 coverage.
+All roadmap milestones other than completed M001–M016 and M019 are Candidate with no selected package and evidence pending. Full product and release evidence remains pending in #6 coverage.
