@@ -13,7 +13,7 @@
       "path": "docs/delivery/current.md",
       "use": "reference",
       "reason": "Dependency state (M022/M023/M024 Done) and selected-scope status at planning time",
-      "sha256": "b725d729c0202b3fb95eac1d3d69f8368f014a9c433286c52d49d405e1402188"
+      "sha256": "729ee4a1c96c38fe43eacb26096b6a29d5306a7b14280234dc24afb99a84df17"
     },
     {
       "path": "docs/01-PRD.md",
@@ -161,7 +161,7 @@
       ],
       "use": "reference",
       "reason": "Canonical V-005/V-002/V-003 allocation for the selected usage scenarios",
-      "sha256": "224a5405cc395663623589a1e2da217830da0885f65ab5ac9029307ab20bec2d"
+      "sha256": "7d0add868a33b316555187b39e7a26d6544b216b4d95fd605be11ccb8ac04c2d"
     },
     {
       "path": "docs/08-backlogs/M022/backlog.md",
@@ -185,19 +185,19 @@
       "path": "backend/src/LinguaDesk.Api/Features/Operations/OperationsContract.cs",
       "use": "reference",
       "reason": "Current UsageSnapshot/status DTOs the availability delta extends",
-      "sha256": "706366d9e7e4da1e394ca82c3866f5e8eeccc326da99db3f48998c2a3f3dfd30"
+      "sha256": "d3a9544bf18a7d27c3e35adfc1cf887689e1e55478b0e3731661553e0ef2bb0b"
     },
     {
       "path": "backend/src/LinguaDesk.Api/Features/Operations/OperationsEndpoints.cs",
       "use": "reference",
       "reason": "Current submit/status routes the usage read and snapshot wiring build on",
-      "sha256": "a3a8499433b1912c84a47a6fd83cf5583dad05478853606ea9193db29b614900"
+      "sha256": "56ae058036812fab7119208c1225d96f93f8db3f4e2986198cf5c7f256613013"
     },
     {
       "path": "backend/src/LinguaDesk.Api/Features/Operations/LedgerSnapshot.cs",
       "use": "reference",
       "reason": "Current current-day snapshot reader the consistent availability read extends",
-      "sha256": "56dd5a99420395cdf032f4fc79193114b3f3a8b8d431f19b557161c82654a95b"
+      "sha256": "e5b3899055e619e385b355d1e977cfd29054b2c6d95f768e538e0d5b783bf073"
     },
     {
       "path": "backend/src/LinguaDesk.Api/Features/Operations/OperationEntities.cs",
@@ -209,7 +209,7 @@
       "path": "backend/src/LinguaDesk.Api/Features/Operations/OperationAdmissionService.cs",
       "use": "reference",
       "reason": "Current admission/status paths receiving the shared snapshot reader",
-      "sha256": "113c7e2df1d9d6c9f3ccd9ee10dc9a5a86d6150ad1faff51a1765a5b5f9a43c7"
+      "sha256": "7a91aebf4e5857199830eefcd52e9bd949c037c959716348889fa92d3f9fd03e"
     },
     {
       "path": "backend/src/LinguaDesk.Api/Features/Operations/MonetaryAdmissionService.cs",
@@ -231,7 +231,7 @@
     }
   ],
   "source_map_sha256": "25cbad25cb72e9f5d08197052f9f477140a22b79d50c02e1da8623bd579743eb",
-  "baseline_commit": "9ad9d7b1c425d2831c09c9c69383f2dbe356f4de",
+  "baseline_commit": "0458098eeb26afecaaf1f030c92d758828664324",
   "locked_files": {
     "docs/00-SDD-Planning-Workflow.md": "183ae93148ff594f9f1e021aa7543baa8878e9cc0bcfd69ebc696c28976e2945",
     "docs/00-workflow/execution.md": "f362a1384cefef24ba204e0723e3190857c8cca9bcd91908136932e19c5caf02",

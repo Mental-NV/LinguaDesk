@@ -35,8 +35,9 @@ public sealed partial class OperationSettlementService(
         string? target,
         string? mode,
         Guid operationId,
-        CancellationToken cancellationToken) =>
-        SettleAsync(accountId, family, source, sourceSelection, target, mode, operationId, succeed: true, cancellationToken);
+        CancellationToken cancellationToken,
+        long? monthlyCapMinorUnits = null) =>
+        SettleAsync(accountId, family, source, sourceSelection, target, mode, operationId, succeed: true, cancellationToken, monthlyCapMinorUnits);
 
     public Task<SettlementResult> SettleFailureAsync(
         string accountId,
@@ -46,8 +47,9 @@ public sealed partial class OperationSettlementService(
         string? target,
         string? mode,
         Guid operationId,
-        CancellationToken cancellationToken) =>
-        SettleAsync(accountId, family, source, sourceSelection, target, mode, operationId, succeed: false, cancellationToken);
+        CancellationToken cancellationToken,
+        long? monthlyCapMinorUnits = null) =>
+        SettleAsync(accountId, family, source, sourceSelection, target, mode, operationId, succeed: false, cancellationToken, monthlyCapMinorUnits);
 
     private async Task<SettlementResult> SettleAsync(
         string accountId,
@@ -58,7 +60,8 @@ public sealed partial class OperationSettlementService(
         string? mode,
         Guid operationId,
         bool succeed,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken,
+        long? monthlyCapMinorUnits = null)
     {
         ArgumentException.ThrowIfNullOrEmpty(accountId);
         var allowances = options.Value;
@@ -96,7 +99,7 @@ public sealed partial class OperationSettlementService(
             return new(
                 SettlementOutcome.UnknownOperation,
                 null,
-                await SnapshotAsync(accountId, observed, allowances.UserDailyAllowanceCharacters, cancellationToken),
+                await SnapshotAsync(accountId, observed, allowances, monthlyCapMinorUnits, cancellationToken),
                 observed);
         }
 
@@ -106,7 +109,7 @@ public sealed partial class OperationSettlementService(
             return new(
                 SettlementOutcome.IdentityConflict,
                 null,
-                await SnapshotAsync(accountId, observed, allowances.UserDailyAllowanceCharacters, cancellationToken),
+                await SnapshotAsync(accountId, observed, allowances, monthlyCapMinorUnits, cancellationToken),
                 observed);
         }
 
@@ -117,7 +120,7 @@ public sealed partial class OperationSettlementService(
             return new(
                 SettlementOutcome.DuplicateObserved,
                 existing,
-                await SnapshotAsync(accountId, observed, allowances.UserDailyAllowanceCharacters, cancellationToken),
+                await SnapshotAsync(accountId, observed, allowances, monthlyCapMinorUnits, cancellationToken),
                 observed);
         }
 
@@ -128,7 +131,7 @@ public sealed partial class OperationSettlementService(
             return new(
                 SettlementOutcome.Fenced,
                 existing,
-                await SnapshotAsync(accountId, observed, allowances.UserDailyAllowanceCharacters, cancellationToken),
+                await SnapshotAsync(accountId, observed, allowances, monthlyCapMinorUnits, cancellationToken),
                 observed);
         }
 
@@ -147,7 +150,7 @@ public sealed partial class OperationSettlementService(
         {
             await transaction.RollbackAsync(cancellationToken);
             database.ChangeTracker.Clear();
-            return await RereadAfterRaceAsync(accountId, operationKey, fingerprint, targetState, allowances.UserDailyAllowanceCharacters, cancellationToken);
+            return await RereadAfterRaceAsync(accountId, operationKey, fingerprint, targetState, allowances, monthlyCapMinorUnits, cancellationToken);
         }
 
         var scalarCount = existing.ScalarCount;
@@ -179,7 +182,7 @@ public sealed partial class OperationSettlementService(
         return new(
             SettlementOutcome.Settled,
             existing,
-            await SnapshotAsync(accountId, committed, allowances.UserDailyAllowanceCharacters, cancellationToken),
+            await SnapshotAsync(accountId, committed, allowances, monthlyCapMinorUnits, cancellationToken),
             committed);
     }
 
@@ -188,7 +191,8 @@ public sealed partial class OperationSettlementService(
         string operationKey,
         string fingerprint,
         string targetState,
-        int allowance,
+        OperationAdmissionOptions allowances,
+        long? monthlyCapMinorUnits,
         CancellationToken cancellationToken)
     {
         var reread = await database.OperationSubmissions
@@ -197,7 +201,7 @@ public sealed partial class OperationSettlementService(
                 submission => submission.AccountId == accountId && submission.OperationId == operationKey,
                 cancellationToken);
         var observed = timeProvider.GetUtcNow();
-        var usage = await SnapshotAsync(accountId, observed, allowance, cancellationToken);
+        var usage = await SnapshotAsync(accountId, observed, allowances, monthlyCapMinorUnits, cancellationToken);
         if (reread is null)
         {
             return new(SettlementOutcome.UnknownOperation, null, usage, observed);
@@ -216,9 +220,19 @@ public sealed partial class OperationSettlementService(
     private Task<UsageSnapshotData> SnapshotAsync(
         string accountId,
         DateTimeOffset serverTime,
-        int allowance,
+        OperationAdmissionOptions allowances,
+        long? monthlyCapMinorUnits,
         CancellationToken cancellationToken) =>
-        LedgerSnapshot.ReadAsync(database, accountId, OperationAdmissionService.DayString(serverTime), serverTime, allowance, cancellationToken);
+        LedgerSnapshot.ReadAsync(
+            database,
+            accountId,
+            OperationAdmissionService.DayString(serverTime),
+            MonetaryAdmissionService.MonthString(serverTime),
+            serverTime,
+            allowances.UserDailyAllowanceCharacters,
+            allowances.GlobalDailyAllowanceCharacters,
+            monthlyCapMinorUnits ?? 0,
+            cancellationToken);
 
     private async Task<CharacterLedgerEntry> GetOrCreateLedgerAsync(
         string accountId,

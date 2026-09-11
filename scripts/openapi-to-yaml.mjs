@@ -51,6 +51,7 @@ function validateContract(document) {
       '/api/capabilities',
       '/api/operations',
       '/api/operations/{operationId}',
+      '/api/usage',
       '/api/accounts/register',
       '/api/accounts/confirm-email',
       '/api/accounts/resend-verification',
@@ -153,6 +154,38 @@ function validateContract(document) {
     )
   }
 
+  const usagePath = document.paths['/api/usage']
+  sameValues(Object.keys(usagePath), ['get'], 'usage operations')
+  const usageOperation = usagePath.get
+  expect(usageOperation.operationId === 'getCurrentUsage', 'unexpected usage operation ID')
+  expect(
+    typeof usageOperation.summary === 'string' && typeof usageOperation.description === 'string',
+    'getCurrentUsage descriptions are required',
+  )
+  sameValues(
+    Object.keys(usageOperation.responses ?? {}),
+    ['200', '400', '401', '403', '405', '503'],
+    'getCurrentUsage responses',
+  )
+  expect(usageOperation.security?.length === 2, 'getCurrentUsage must accept Bearer [REDACTED] cookie')
+  expect(usageOperation.security?.[0]?.bearerAuth !== undefined, 'getCurrentUsage Bearer [REDACTED] is missing')
+  expect(usageOperation.security?.[1]?.sessionCookie !== undefined, 'getCurrentUsage cookie security is missing')
+  for (const status of ['200', '400', '401', '403', '405', '503']) {
+    const selectedResponse = usageOperation.responses[status]
+    expect(selectedResponse.headers?.['Cache-Control']?.required === true, `getCurrentUsage ${status} must require Cache-Control`)
+    expect(selectedResponse.headers['Cache-Control'].schema?.type === 'string', `getCurrentUsage ${status} Cache-Control must be a string`)
+  }
+  expect(
+    usageOperation.responses['200'].content?.['application/json']?.schema?.$ref === '#/components/schemas/UsageSnapshot',
+    'getCurrentUsage success schema is missing',
+  )
+  for (const status of ['400', '401', '403', '503']) {
+    expect(
+      usageOperation.responses[status].content?.['application/problem+json']?.schema?.$ref === '#/components/schemas/OperationProblemDetails',
+      `getCurrentUsage ${status} Problem Details schema is missing`,
+    )
+  }
+
   const submitRequest = document.components.schemas.SubmitOperationRequest
   sameValues(submitRequest.required, ['operationId', 'family', 'source'], 'submit request required fields')
   sameValues(
@@ -191,10 +224,22 @@ function validateContract(document) {
   const usageSnapshot = document.components.schemas.UsageSnapshot
   sameValues(
     usageSnapshot.required,
-    ['day', 'resetAtUtc', 'consumedCharacters', 'reservedCharacters', 'allowanceCharacters', 'availableCharacters', 'revision'],
+    ['day', 'resetAtUtc', 'consumedCharacters', 'reservedCharacters', 'allowanceCharacters', 'availableCharacters', 'revision', 'availability'],
     'usage snapshot required fields',
   )
+  sameValues(
+    Object.keys(usageSnapshot.properties),
+    ['day', 'resetAtUtc', 'consumedCharacters', 'reservedCharacters', 'allowanceCharacters', 'availableCharacters', 'revision', 'availability'],
+    'usage snapshot fields',
+  )
   expect(usageSnapshot.properties.revision.type === 'integer', 'usage revision must be integer-only')
+  expect(usageSnapshot.properties.availability?.$ref === '#/components/schemas/UsageAvailability', 'usage availability schema is missing')
+  const usageAvailability = document.components.schemas.UsageAvailability
+  sameValues(
+    usageAvailability?.enum,
+    ['available', 'user-exhausted', 'service-exhausted', 'monetary-suspended', 'unavailable'],
+    'usage availability values',
+  )
   const operationProblem = document.components.schemas.OperationProblemDetails
   sameValues(
     operationProblem.required,

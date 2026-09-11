@@ -24,7 +24,8 @@ public sealed record UsageSnapshotData(
     int ReservedCharacters,
     int AllowanceCharacters,
     int AvailableCharacters,
-    long Revision);
+    long Revision,
+    UsageAvailability Availability);
 
 public sealed record AdmissionResult(
     AdmissionOutcome Outcome,
@@ -53,7 +54,8 @@ public sealed partial class OperationAdmissionService(
         string? target,
         string? mode,
         Guid operationId,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken,
+        long? monthlyCapMinorUnits = null)
     {
         ArgumentException.ThrowIfNullOrEmpty(accountId);
         var allowances = options.Value;
@@ -75,7 +77,7 @@ public sealed partial class OperationAdmissionService(
             return new(
                 AdmissionOutcome.InputIneligible,
                 null,
-                await SnapshotAsync(accountId, DayString(now), now, allowances.UserDailyAllowanceCharacters, cancellationToken),
+                await SnapshotAsync(accountId, DayString(now), now, allowances, monthlyCapMinorUnits, cancellationToken),
                 now,
                 ineligible.Value.Reason,
                 ineligible.Value.CharacterCount,
@@ -106,12 +108,12 @@ public sealed partial class OperationAdmissionService(
                 ? new(
                     AdmissionOutcome.DuplicateObserved,
                     existing,
-                    await SnapshotAsync(accountId, DayString(now), now, allowances.UserDailyAllowanceCharacters, cancellationToken),
+                    await SnapshotAsync(accountId, DayString(now), now, allowances, monthlyCapMinorUnits, cancellationToken),
                     now)
                 : new(
                     AdmissionOutcome.IdentityConflict,
                     null,
-                    await SnapshotAsync(accountId, DayString(now), now, allowances.UserDailyAllowanceCharacters, cancellationToken),
+                    await SnapshotAsync(accountId, DayString(now), now, allowances, monthlyCapMinorUnits, cancellationToken),
                     now);
         }
 
@@ -128,7 +130,7 @@ public sealed partial class OperationAdmissionService(
                 return new(
                     AdmissionOutcome.IdentityExpired,
                     null,
-                    await SnapshotAsync(accountId, DayString(transactionTime), transactionTime, allowances.UserDailyAllowanceCharacters, cancellationToken),
+                    await SnapshotAsync(accountId, DayString(transactionTime), transactionTime, allowances, monthlyCapMinorUnits, cancellationToken),
                     transactionTime);
             }
 
@@ -144,7 +146,7 @@ public sealed partial class OperationAdmissionService(
                 return new(
                     AdmissionOutcome.InsufficientUserCapacity,
                     null,
-                    await SnapshotAsync(accountId, admissionDay, transactionTime, allowances.UserDailyAllowanceCharacters, cancellationToken),
+                    await SnapshotAsync(accountId, admissionDay, transactionTime, allowances, monthlyCapMinorUnits, cancellationToken),
                     transactionTime,
                     CharacterCount: scalarCount,
                     SourceLimit: allowances.UserDailyAllowanceCharacters);
@@ -157,7 +159,7 @@ public sealed partial class OperationAdmissionService(
                 return new(
                     AdmissionOutcome.InsufficientGlobalCapacity,
                     null,
-                    await SnapshotAsync(accountId, admissionDay, transactionTime, allowances.UserDailyAllowanceCharacters, cancellationToken),
+                    await SnapshotAsync(accountId, admissionDay, transactionTime, allowances, monthlyCapMinorUnits, cancellationToken),
                     transactionTime,
                     CharacterCount: scalarCount,
                     SourceLimit: allowances.GlobalDailyAllowanceCharacters);
@@ -186,7 +188,7 @@ public sealed partial class OperationAdmissionService(
             return new(
                 AdmissionOutcome.Admitted,
                 submission,
-                await SnapshotAsync(accountId, admissionDay, transactionTime, allowances.UserDailyAllowanceCharacters, cancellationToken),
+                await SnapshotAsync(accountId, admissionDay, transactionTime, allowances, monthlyCapMinorUnits, cancellationToken),
                 transactionTime,
                 CharacterCount: scalarCount);
         }
@@ -205,14 +207,14 @@ public sealed partial class OperationAdmissionService(
                 return new(
                     AdmissionOutcome.DuplicateObserved,
                     raced,
-                    await SnapshotAsync(accountId, DayString(rereadTime), rereadTime, allowances.UserDailyAllowanceCharacters, cancellationToken),
+                    await SnapshotAsync(accountId, DayString(rereadTime), rereadTime, allowances, monthlyCapMinorUnits, cancellationToken),
                     rereadTime);
             }
 
             return new(
                 AdmissionOutcome.IdentityConflict,
                 null,
-                await SnapshotAsync(accountId, DayString(rereadTime), rereadTime, allowances.UserDailyAllowanceCharacters, cancellationToken),
+                await SnapshotAsync(accountId, DayString(rereadTime), rereadTime, allowances, monthlyCapMinorUnits, cancellationToken),
                 rereadTime);
         }
     }
@@ -220,7 +222,8 @@ public sealed partial class OperationAdmissionService(
     public async Task<(OperationSubmission? Submission, UsageSnapshotData Usage, DateTimeOffset ServerTime)> GetAsync(
         string accountId,
         Guid operationId,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken,
+        long? monthlyCapMinorUnits = null)
     {
         var now = timeProvider.GetUtcNow();
         var submission = await database.OperationSubmissions
@@ -230,7 +233,19 @@ public sealed partial class OperationAdmissionService(
                 cancellationToken);
         return (
             submission,
-            await SnapshotAsync(accountId, DayString(now), now, options.Value.UserDailyAllowanceCharacters, cancellationToken),
+            await SnapshotAsync(accountId, DayString(now), now, options.Value, monthlyCapMinorUnits, cancellationToken),
+            now);
+    }
+
+    public async Task<(UsageSnapshotData Usage, DateTimeOffset ServerTime)> GetUsageAsync(
+        string accountId,
+        CancellationToken cancellationToken,
+        long? monthlyCapMinorUnits = null)
+    {
+        ArgumentException.ThrowIfNullOrEmpty(accountId);
+        var now = timeProvider.GetUtcNow();
+        return (
+            await SnapshotAsync(accountId, DayString(now), now, options.Value, monthlyCapMinorUnits, cancellationToken),
             now);
     }
 
@@ -347,9 +362,19 @@ public sealed partial class OperationAdmissionService(
         string accountId,
         string day,
         DateTimeOffset serverTime,
-        int allowance,
+        OperationAdmissionOptions allowances,
+        long? monthlyCapMinorUnits,
         CancellationToken cancellationToken) =>
-        LedgerSnapshot.ReadAsync(database, accountId, day, serverTime, allowance, cancellationToken);
+        LedgerSnapshot.ReadAsync(
+            database,
+            accountId,
+            day,
+            MonetaryAdmissionService.MonthString(serverTime),
+            serverTime,
+            allowances.UserDailyAllowanceCharacters,
+            allowances.GlobalDailyAllowanceCharacters,
+            monthlyCapMinorUnits ?? 0,
+            cancellationToken);
 
     private static bool IsUniqueViolation(DbUpdateException exception) =>
         exception.InnerException is SqliteException sqlite

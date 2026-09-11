@@ -276,7 +276,7 @@ public static class OpenApiRegistration
                     }
                 }
 
-                if (endpointName is "submitLanguageOperation" or "getLanguageOperationStatus")
+                if (endpointName is "submitLanguageOperation" or "getLanguageOperationStatus" or "getCurrentUsage")
                 {
                     if (operation.Responses is not null)
                     {

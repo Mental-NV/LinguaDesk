@@ -5,6 +5,7 @@ using System.Text.Json;
 using LinguaDesk.Api.Features.Identity;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 namespace LinguaDesk.Api.Features.Operations;
 
@@ -96,12 +97,41 @@ public static class OperationsEndpoints
             return Results.StatusCode(StatusCodes.Status405MethodNotAllowed);
         }).ExcludeFromDescription();
 
+        endpoints.MapGet("/api/usage", GetUsageAsync)
+            .WithName("getCurrentUsage")
+            .WithGroupName("linguadesk")
+            .WithSummary("Read authoritative current-day usage")
+            .WithDescription(
+                "Returns the authoritative current-day user usage snapshot with a categorical availability signal. " +
+                "Usage reads never charge allowances, reserve exposure or dispatch work.")
+            .Produces<UsageSnapshot>(StatusCodes.Status200OK, "application/json")
+            .Produces<OperationProblemDetails>(StatusCodes.Status400BadRequest, "application/problem+json")
+            .Produces<OperationProblemDetails>(StatusCodes.Status401Unauthorized, "application/problem+json")
+            .Produces<OperationProblemDetails>(StatusCodes.Status403Forbidden, "application/problem+json")
+            .Produces(StatusCodes.Status405MethodNotAllowed)
+            .Produces<OperationProblemDetails>(StatusCodes.Status503ServiceUnavailable, "application/problem+json")
+            .RequireAuthorization(VerifiedAccountAuthorization.PolicyName);
+        endpoints.MapMethods("/api/usage", [
+            HttpMethods.Post,
+            HttpMethods.Head,
+            HttpMethods.Put,
+            HttpMethods.Patch,
+            HttpMethods.Delete,
+            HttpMethods.Options,
+        ], static (HttpContext context) =>
+        {
+            context.Response.Headers.CacheControl = "no-store";
+            context.Response.Headers.Allow = HttpMethods.Get;
+            return Results.StatusCode(StatusCodes.Status405MethodNotAllowed);
+        }).ExcludeFromDescription();
+
         return endpoints;
     }
 
     private static async Task<IResult> SubmitAsync(
         HttpContext context,
         OperationAdmissionService admissions,
+        IOptions<MonetaryAdmissionOptions> monetaryOptions,
         TimeProvider timeProvider,
         CancellationToken cancellationToken)
     {
@@ -211,9 +241,21 @@ public static class OperationsEndpoints
                 parsed.Target,
                 parsed.Mode,
                 identity.OperationId,
-                cancellationToken);
+                cancellationToken,
+                LedgerSnapshot.ResolveCapOrZero(monetaryOptions));
         }
         catch (Exception exception) when (exception is SqliteException or DbUpdateException)
+        {
+            return Problem(
+                StatusCodes.Status503ServiceUnavailable,
+                "Service unavailable",
+                "Operation submission is temporarily unavailable.",
+                correlationId,
+                "availability");
+        }
+
+        if ((outcome.Outcome is AdmissionOutcome.Admitted or AdmissionOutcome.DuplicateObserved)
+            && outcome.Usage.Availability == UsageAvailability.Unavailable)
         {
             return Problem(
                 StatusCodes.Status503ServiceUnavailable,
@@ -285,6 +327,7 @@ public static class OperationsEndpoints
         HttpContext context,
         string operationId,
         OperationAdmissionService admissions,
+        IOptions<MonetaryAdmissionOptions> monetaryOptions,
         TimeProvider timeProvider,
         CancellationToken cancellationToken)
     {
@@ -338,7 +381,11 @@ public static class OperationsEndpoints
         try
         {
             var (submission, usage, observedTime) =
-                await admissions.GetAsync(accountId, identity.OperationId, cancellationToken);
+                await admissions.GetAsync(
+                    accountId,
+                    identity.OperationId,
+                    cancellationToken,
+                    LedgerSnapshot.ResolveCapOrZero(monetaryOptions));
             if (submission is null)
             {
                 return Problem(
@@ -349,6 +396,16 @@ public static class OperationsEndpoints
                     "unknownOperation");
             }
 
+            if (usage.Availability == UsageAvailability.Unavailable)
+            {
+                return Problem(
+                    StatusCodes.Status503ServiceUnavailable,
+                    "Service unavailable",
+                    "Operation status is temporarily unavailable.",
+                    correlationId,
+                    "availability");
+            }
+
             return ToTerminal(submission, usage, observedTime);
         }
         catch (Exception exception) when (exception is SqliteException or DbUpdateException)
@@ -357,6 +414,64 @@ public static class OperationsEndpoints
                 StatusCodes.Status503ServiceUnavailable,
                 "Service unavailable",
                 "Operation status is temporarily unavailable.",
+                correlationId,
+                "availability");
+        }
+    }
+
+    private static async Task<IResult> GetUsageAsync(
+        HttpContext context,
+        OperationAdmissionService admissions,
+        IOptions<MonetaryAdmissionOptions> monetaryOptions,
+        CancellationToken cancellationToken)
+    {
+        context.Response.Headers.CacheControl = "no-store";
+        var correlationId = context.TraceIdentifier;
+        if (context.Request.QueryString.HasValue)
+        {
+            return Problem(
+                StatusCodes.Status400BadRequest,
+                "Invalid request",
+                "Usage reads accept no query parameters.",
+                correlationId,
+                "invalidRequest");
+        }
+
+        var accountId = context.User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (string.IsNullOrEmpty(accountId))
+        {
+            return Problem(
+                StatusCodes.Status401Unauthorized,
+                "Authentication required",
+                "Authentication is required to read current usage.",
+                correlationId,
+                "authenticationRequired");
+        }
+
+        try
+        {
+            var (usage, _) = await admissions.GetUsageAsync(
+                accountId,
+                cancellationToken,
+                LedgerSnapshot.ResolveCapOrZero(monetaryOptions));
+            if (usage.Availability == UsageAvailability.Unavailable)
+            {
+                return Problem(
+                    StatusCodes.Status503ServiceUnavailable,
+                    "Service unavailable",
+                    "Current usage is temporarily unavailable.",
+                    correlationId,
+                    "availability");
+            }
+
+            return Results.Json(ToUsage(usage), statusCode: StatusCodes.Status200OK);
+        }
+        catch (Exception exception) when (exception is SqliteException or DbUpdateException)
+        {
+            return Problem(
+                StatusCodes.Status503ServiceUnavailable,
+                "Service unavailable",
+                "Current usage is temporarily unavailable.",
                 correlationId,
                 "availability");
         }
@@ -435,7 +550,8 @@ public static class OperationsEndpoints
         usage.ReservedCharacters,
         usage.AllowanceCharacters,
         usage.AvailableCharacters,
-        usage.Revision);
+        usage.Revision,
+        usage.Availability);
 
     private static async Task<ParsedSubmission?> ParseSubmissionAsync(Stream body, CancellationToken cancellationToken)
     {

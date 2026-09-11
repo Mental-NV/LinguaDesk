@@ -37,7 +37,8 @@ public sealed partial class OperationRecoveryService(
         string? target,
         string? mode,
         Guid operationId,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken,
+        long? monthlyCapMinorUnits = null)
     {
         ArgumentException.ThrowIfNullOrEmpty(accountId);
         var allowances = options.Value;
@@ -74,7 +75,7 @@ public sealed partial class OperationRecoveryService(
             return new(
                 RecoveryOutcome.UnknownOperation,
                 null,
-                await SnapshotAsync(accountId, observed, allowances.UserDailyAllowanceCharacters, cancellationToken),
+                await SnapshotAsync(accountId, observed, allowances, monthlyCapMinorUnits, cancellationToken),
                 observed);
         }
 
@@ -84,7 +85,7 @@ public sealed partial class OperationRecoveryService(
             return new(
                 RecoveryOutcome.IdentityConflict,
                 null,
-                await SnapshotAsync(accountId, observed, allowances.UserDailyAllowanceCharacters, cancellationToken),
+                await SnapshotAsync(accountId, observed, allowances, monthlyCapMinorUnits, cancellationToken),
                 observed);
         }
 
@@ -95,7 +96,7 @@ public sealed partial class OperationRecoveryService(
             return new(
                 RecoveryOutcome.DuplicateObserved,
                 existing,
-                await SnapshotAsync(accountId, observed, allowances.UserDailyAllowanceCharacters, cancellationToken),
+                await SnapshotAsync(accountId, observed, allowances, monthlyCapMinorUnits, cancellationToken),
                 observed);
         }
 
@@ -106,7 +107,7 @@ public sealed partial class OperationRecoveryService(
             return new(
                 RecoveryOutcome.Fenced,
                 existing,
-                await SnapshotAsync(accountId, observed, allowances.UserDailyAllowanceCharacters, cancellationToken),
+                await SnapshotAsync(accountId, observed, allowances, monthlyCapMinorUnits, cancellationToken),
                 observed);
         }
 
@@ -125,7 +126,7 @@ public sealed partial class OperationRecoveryService(
         {
             await transaction.RollbackAsync(cancellationToken);
             database.ChangeTracker.Clear();
-            return await RereadAfterRaceAsync(accountId, operationKey, fingerprint, allowances.UserDailyAllowanceCharacters, cancellationToken);
+            return await RereadAfterRaceAsync(accountId, operationKey, fingerprint, allowances, monthlyCapMinorUnits, cancellationToken);
         }
 
         await ReleaseReservationAsync(existing, cancellationToken);
@@ -140,7 +141,7 @@ public sealed partial class OperationRecoveryService(
         return new(
             RecoveryOutcome.Interrupted,
             existing,
-            await SnapshotAsync(accountId, committed, allowances.UserDailyAllowanceCharacters, cancellationToken),
+            await SnapshotAsync(accountId, committed, allowances, monthlyCapMinorUnits, cancellationToken),
             committed);
     }
 
@@ -231,7 +232,8 @@ public sealed partial class OperationRecoveryService(
         string accountId,
         string operationKey,
         string fingerprint,
-        int allowance,
+        OperationAdmissionOptions allowances,
+        long? monthlyCapMinorUnits,
         CancellationToken cancellationToken)
     {
         var reread = await database.OperationSubmissions
@@ -240,7 +242,7 @@ public sealed partial class OperationRecoveryService(
                 submission => submission.AccountId == accountId && submission.OperationId == operationKey,
                 cancellationToken);
         var observed = timeProvider.GetUtcNow();
-        var usage = await SnapshotAsync(accountId, observed, allowance, cancellationToken);
+        var usage = await SnapshotAsync(accountId, observed, allowances, monthlyCapMinorUnits, cancellationToken);
         if (reread is null)
         {
             return new(RecoveryOutcome.UnknownOperation, null, usage, observed);
@@ -259,9 +261,19 @@ public sealed partial class OperationRecoveryService(
     private Task<UsageSnapshotData> SnapshotAsync(
         string accountId,
         DateTimeOffset serverTime,
-        int allowance,
+        OperationAdmissionOptions allowances,
+        long? monthlyCapMinorUnits,
         CancellationToken cancellationToken) =>
-        LedgerSnapshot.ReadAsync(database, accountId, OperationAdmissionService.DayString(serverTime), serverTime, allowance, cancellationToken);
+        LedgerSnapshot.ReadAsync(
+            database,
+            accountId,
+            OperationAdmissionService.DayString(serverTime),
+            MonetaryAdmissionService.MonthString(serverTime),
+            serverTime,
+            allowances.UserDailyAllowanceCharacters,
+            allowances.GlobalDailyAllowanceCharacters,
+            monthlyCapMinorUnits ?? 0,
+            cancellationToken);
 
     private async Task<long> CurrentRevisionAsync(CancellationToken cancellationToken)
     {

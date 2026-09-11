@@ -80,6 +80,22 @@ public sealed record OperationStatusResponse(
     [property: Description("Fresh current-day user usage snapshot.")]
     UsageSnapshot Usage);
 
+/// <summary>Categorical current-day availability computed from the same consistent read as the snapshot.</summary>
+[JsonConverter(typeof(JsonStringEnumConverter<UsageAvailability>))]
+public enum UsageAvailability
+{
+    [JsonStringEnumMemberName("available")]
+    Available,
+    [JsonStringEnumMemberName("user-exhausted")]
+    UserExhausted,
+    [JsonStringEnumMemberName("service-exhausted")]
+    ServiceExhausted,
+    [JsonStringEnumMemberName("monetary-suspended")]
+    MonetarySuspended,
+    [JsonStringEnumMemberName("unavailable")]
+    Unavailable,
+}
+
 /// <summary>Authoritative current-day user availability with a durable ordering revision.</summary>
 public sealed record UsageSnapshot(
     [property: Description("UTC day described by this snapshot, in yyyy-MM-dd form.")]
@@ -95,7 +111,9 @@ public sealed record UsageSnapshot(
     [property: Description("Nonnegative remaining reservable characters.")]
     int AvailableCharacters,
     [property: Description("Durable monotonically increasing snapshot revision.")]
-    long Revision);
+    long Revision,
+    [property: Description("Categorical availability: `available`, `user-exhausted`, `service-exhausted`, `monetary-suspended` or `unavailable`.")]
+    UsageAvailability Availability);
 
 public sealed class OperationProblemDetails
 {

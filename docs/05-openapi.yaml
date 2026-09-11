@@ -291,6 +291,85 @@ paths:
       security:
         - bearerAuth: []
         - sessionCookie: []
+  /api/usage:
+    get:
+      tags:
+        - OperationsEndpoints
+      summary: Read authoritative current-day usage
+      description: Returns the authoritative current-day user usage snapshot with a categorical availability signal. Usage reads never charge allowances, reserve exposure or dispatch work.
+      operationId: getCurrentUsage
+      responses:
+        "200":
+          description: OK
+          headers:
+            Cache-Control:
+              description: Always `no-store` for language-operation admission responses.
+              required: true
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UsageSnapshot"
+        "400":
+          description: Bad Request
+          headers:
+            Cache-Control:
+              description: Always `no-store` for language-operation admission responses.
+              required: true
+              schema:
+                type: string
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/OperationProblemDetails"
+        "401":
+          description: Unauthorized
+          headers:
+            Cache-Control:
+              description: Always `no-store` for language-operation admission responses.
+              required: true
+              schema:
+                type: string
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/OperationProblemDetails"
+        "403":
+          description: Forbidden
+          headers:
+            Cache-Control:
+              description: Always `no-store` for language-operation admission responses.
+              required: true
+              schema:
+                type: string
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/OperationProblemDetails"
+        "405":
+          description: Method Not Allowed
+          headers:
+            Cache-Control:
+              description: Always `no-store` for language-operation admission responses.
+              required: true
+              schema:
+                type: string
+        "503":
+          description: Service Unavailable
+          headers:
+            Cache-Control:
+              description: Always `no-store` for language-operation admission responses.
+              required: true
+              schema:
+                type: string
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/OperationProblemDetails"
+      security:
+        - bearerAuth: []
+        - sessionCookie: []
   /api/accounts/register:
     post:
       tags:
@@ -2026,6 +2105,15 @@ components:
         target:
           description: Translation target language.
           $ref: "#/components/schemas/LanguageId"
+    UsageAvailability:
+      enum:
+        - available
+        - user-exhausted
+        - service-exhausted
+        - monetary-suspended
+        - unavailable
+      type: string
+      description: "Categorical availability: `available`, `user-exhausted`, `service-exhausted`, `monetary-suspended` or `unavailable`."
     UsageSnapshot:
       required:
         - day
@@ -2035,6 +2123,7 @@ components:
         - allowanceCharacters
         - availableCharacters
         - revision
+        - availability
       type: object
       properties:
         day:
@@ -2064,6 +2153,9 @@ components:
           type: integer
           description: Durable monotonically increasing snapshot revision.
           format: int64
+        availability:
+          description: "Categorical availability: `available`, `user-exhausted`, `service-exhausted`, `monetary-suspended` or `unavailable`."
+          $ref: "#/components/schemas/UsageAvailability"
       description: Fresh current-day user usage snapshot.
     VerificationProblemDetails:
       required:

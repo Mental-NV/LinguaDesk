@@ -64,6 +64,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/usage": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Read authoritative current-day usage
+         * @description Returns the authoritative current-day user usage snapshot with a categorical availability signal. Usage reads never charge allowances, reserve exposure or dispatch work.
+         */
+        get: operations["getCurrentUsage"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/accounts/register": {
         parameters: {
             query?: never;
@@ -868,6 +888,11 @@ export interface components {
             /** @description Translation target language. */
             target: components["schemas"]["LanguageId"];
         };
+        /**
+         * @description Categorical availability: `available`, `user-exhausted`, `service-exhausted`, `monetary-suspended` or `unavailable`.
+         * @enum {string}
+         */
+        UsageAvailability: "available" | "user-exhausted" | "service-exhausted" | "monetary-suspended" | "unavailable";
         /** @description Fresh current-day user usage snapshot. */
         UsageSnapshot: {
             /** @description UTC day described by this snapshot, in yyyy-MM-dd form. */
@@ -902,6 +927,8 @@ export interface components {
              * @description Durable monotonically increasing snapshot revision.
              */
             revision: number;
+            /** @description Categorical availability: `available`, `user-exhausted`, `service-exhausted`, `monetary-suspended` or `unavailable`. */
+            availability: components["schemas"]["UsageAvailability"];
         };
         VerificationProblemDetails: {
             /** @description RFC 9457 problem type reference. */
@@ -1185,6 +1212,81 @@ export interface operations {
                 content: {
                     "application/problem+json": components["schemas"]["OperationProblemDetails"];
                 };
+            };
+            /** @description Service Unavailable */
+            503: {
+                headers: {
+                    /** @description Always `no-store` for language-operation admission responses. */
+                    "Cache-Control": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["OperationProblemDetails"];
+                };
+            };
+        };
+    };
+    getCurrentUsage: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    /** @description Always `no-store` for language-operation admission responses. */
+                    "Cache-Control": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UsageSnapshot"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    /** @description Always `no-store` for language-operation admission responses. */
+                    "Cache-Control": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["OperationProblemDetails"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    /** @description Always `no-store` for language-operation admission responses. */
+                    "Cache-Control": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["OperationProblemDetails"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    /** @description Always `no-store` for language-operation admission responses. */
+                    "Cache-Control": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["OperationProblemDetails"];
+                };
+            };
+            /** @description Method Not Allowed */
+            405: {
+                headers: {
+                    /** @description Always `no-store` for language-operation admission responses. */
+                    "Cache-Control": string;
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Service Unavailable */
             503: {
