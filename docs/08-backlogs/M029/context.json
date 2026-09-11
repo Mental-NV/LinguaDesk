@@ -1,0 +1,131 @@
+{
+  "version": 1,
+  "scope": "M029",
+  "sources": [
+    {
+      "path": "docs/07-roadmap.md",
+      "ids": [
+        "M029"
+      ],
+      "use": "excerpt",
+      "reason": "Selected outcome, exit criterion, prerequisites and verification allocation",
+      "sha256": "cd833e71a7a223cca28f43dbbad927ed7482191ba8852acc988e5247df0fc7a6"
+    },
+    {
+      "path": "docs/01-PRD.md",
+      "ids": [
+        "FR-004",
+        "FR-005",
+        "FR-012",
+        "FR-013",
+        "FR-014",
+        "FR-016",
+        "FR-017",
+        "FR-018",
+        "FR-022",
+        "FR-023",
+        "FR-024",
+        "FR-028",
+        "NFR-004"
+      ],
+      "use": "excerpt",
+      "reason": "Selected rewriting behavior, eligibility mapping, usage/accounting and privacy constraint",
+      "sha256": "217064ca116a69ed4944965090fd0ea207bc64f96574343b03c2d5fb33142682"
+    },
+    {
+      "path": "docs/02-ux-specification.md",
+      "heading": "8. Rewriting contract",
+      "use": "excerpt",
+      "reason": "Canonical rewrite page contract: mode dropdown, limits, plain result, no auto-submit",
+      "sha256": "2460d441fdce1ae3f961bbb24f1d930dac76727abb4563a266acd03a8a6307c5"
+    },
+    {
+      "path": "docs/ux/processing.md",
+      "heading": "6.3 Exact message IDs and disposition",
+      "use": "excerpt",
+      "reason": "Normative message copy for processing, validation, failure, usage and copy states",
+      "sha256": "2dc4106342973b68395dd28ee84f7fb38614a0c308d401c747218c13f671632b"
+    },
+    {
+      "path": "docs/ux/acceptance.md",
+      "ids": [
+        "UX-AC-038",
+        "UX-AC-039",
+        "UX-AC-040",
+        "UX-AC-043",
+        "UX-AC-044",
+        "UX-AC-045",
+        "UX-AC-046",
+        "UX-AC-047",
+        "UX-AC-051",
+        "UX-AC-065"
+      ],
+      "use": "excerpt",
+      "reason": "Selected rewriting acceptance scenarios and authoritative-usage rule",
+      "sha256": "26eafc217c5fcb393abdbe706e3f399e1602e1f29047a1ffb235344fe032b42e"
+    },
+    {
+      "path": "docs/06-verification-plan.md",
+      "heading": "4.5 Required user-visible transformation evidence",
+      "use": "excerpt",
+      "reason": "M029 Done criteria: dedicated E2E identity, auth paths, UI assertion rule",
+      "sha256": "6194052f4ac8eee995c55e4b10294c4a1b36f9290fbeae9cc5655df7e3a24898"
+    },
+    {
+      "path": "docs/06-verification-plan.md",
+      "heading": "2.2 Stable check groups",
+      "use": "excerpt",
+      "reason": "V-001/V-002/V-003/V-005/V-010/V-012 assertion ownership for the slice",
+      "sha256": "3ff38df95d5cde583f90f26653175be5497beeb859758da8b77fbd7efac0b661"
+    },
+    {
+      "path": "docs/verification/frontend.md",
+      "heading": "4.1 Shared UI fixtures",
+      "use": "excerpt",
+      "reason": "Canonical fixtures, seeds, W-OK/W-LONG counts and E2E account baseline",
+      "sha256": "64b4c731cca9e0505cf985d37c7ef7fea10fa96d6681276c1d749ed3b3d835f3"
+    },
+    {
+      "path": "docs/03-architecture.md",
+      "heading": "8. Frontend and Agent Development Rules",
+      "use": "excerpt",
+      "reason": "Reducer/transport rules, counting consistency and generated-contract gate",
+      "sha256": "994b9f3f8c2d94623069b4ea47c49cc2492c2880d220d1733569dd9213aad636"
+    },
+    {
+      "path": "docs/product/open-questions.md",
+      "ids": [
+        "Q-001",
+        "Q-003",
+        "Q-004",
+        "Q-005",
+        "Q-006",
+        "Q-008",
+        "Q-010"
+      ],
+      "use": "excerpt",
+      "reason": "Question dispositions: specified shared design vs pending non-blocking items",
+      "sha256": "78018481743f480e9ffb61f370af8419a3ab7a40286020d4a28345c053e9e19c"
+    },
+    {
+      "path": "docs/08-backlogs/M027/spec.md",
+      "use": "reference",
+      "reason": "Dependency evidence: rewriting API/accounting wire reused, not re-proven",
+      "sha256": "bf63e38fdb3af0d8047228acbd343dcec5b151915c2322961d2d1e71be4d4d11"
+    },
+    {
+      "path": "docs/08-backlogs/M028/spec.md",
+      "use": "reference",
+      "reason": "Dependency evidence: workspace/route/fixture/E2E pattern extended, not re-proven",
+      "sha256": "3354e824bc7052f1117eeed9858c9e0e7f6ad864c57a32e9c31c044bfd808953"
+    }
+  ],
+  "source_map_sha256": "0b3891287a5165cc1494ad6c3ce06b66edf09141e1bda661f748e806645ee7a2",
+  "baseline_commit": "5853f69e28c7b1a6c350314b74060dd557ed4dc3",
+  "locked_files": {
+    "docs/00-SDD-Planning-Workflow.md": "5ccca040d0f0d50fac47632643306e7224a8d2e5460df0958e7e7c333146db89",
+    "docs/00-workflow/execution.md": "f362a1384cefef24ba204e0723e3190857c8cca9bcd91908136932e19c5caf02",
+    "docs/08-backlogs/M029/spec.md": "5f44a14226df33a259f07dcb1e9c08f0862ce0fdd13a596575e30f5676c378be",
+    "docs/08-backlogs/M029/plan.md": "9895212ec943861c5747dcb5b318127be1eda7b8c5e59ebf11029de4b5c0f937"
+  }
+}
