@@ -1,6 +1,6 @@
 # M015 — Validate language eligibility
 Status: selected
-Milestone: [M015 — Validate language eligibility](../07-roadmap.md#43-independently-testable-language-behavior)
+Milestone: [M015 — Validate language eligibility](../../07-roadmap.md#43-independently-testable-language-behavior)
 
 | Item | Outcome/value | Priority | Dependencies/blockers | State | Selected scope |
 | --- | --- | --- | --- | --- | --- |
