@@ -193,6 +193,8 @@ smoke() {
         Kestrel__Certificates__Default__KeyPath="$smoke_certificate_key" \
         Storage__DatabasePath="$smoke_database" \
         Security__DataProtectionKeysPath="$smoke_keys" \
+        MonetaryAdmission__MonthlyCapMinorUnits="1000000" \
+        MonetaryAdmission__Currency="USD" \
         dotnet "$api_dll" >"$smoke_log" 2>&1 &
     smoke_process_id=$!
 

@@ -155,11 +155,65 @@ async function submitLoginForm(
   await user.click(screen.getByRole('button', { name: 'Sign in' }))
 }
 
+function translationCapabilitiesResponse(): Response {
+  return jsonResponse(200, {
+    serverTimeUtc: '2026-09-11T08:30:00Z',
+    languages: [
+      { id: 'en', name: 'English' },
+      { id: 'ru', name: 'Russian' },
+      { id: 'ro', name: 'Romanian' },
+      { id: 'zh', name: 'Chinese' },
+    ],
+    sourceSelection: { default: 'auto', values: ['auto', 'en', 'ru', 'ro', 'zh'] },
+    chineseScriptPolicy: { acceptedInput: ['simplified', 'traditional'], output: 'simplified' },
+    countingPolicy: {
+      id: 'unicode-scalar-v1',
+      unit: 'unicodeScalar',
+      normalization: 'none',
+      lineEndings: 'preserve',
+      invalidUnicode: 'reject',
+      emptyOrWhitespace: 'reject',
+      whitespaceCodePointRanges: [],
+    },
+    translation: {
+      maximumSourceCharacters: 5000,
+      oversizeHandling: 'rejectWhole',
+      overallDeadlineSeconds: 30,
+      targetRequired: true,
+      supportedDirections: [],
+    },
+    rewriting: {
+      maximumSourceCharacters: 2000,
+      oversizeHandling: 'rejectWhole',
+      overallDeadlineSeconds: 30,
+      modes: [],
+    },
+    operationIdentity: {
+      format: 'uuidV7',
+      validForSeconds: 86400,
+      maximumFutureSkewSeconds: 300,
+    },
+  })
+}
+
+function translationUsageResponse(): Response {
+  return jsonResponse(200, {
+    day: '2026-09-11',
+    resetAtUtc: '2026-09-12T00:00:00Z',
+    consumedCharacters: 0,
+    reservedCharacters: 0,
+    allowanceCharacters: 20000,
+    availableCharacters: 20000,
+    revision: 1,
+    availability: 'available',
+  })
+}
+
 function expectNoLanguageRequests(calls: readonly RecordedCall[]): void {
   for (const call of calls) {
     expect(call.url).not.toContain('/api/translate')
     expect(call.url).not.toContain('/api/rewrite')
-    expect(call.url).not.toContain('/api/usage')
+    expect(call.url).not.toContain('/api/operations')
   }
 }
 
@@ -169,6 +223,8 @@ describe('verified sign-in (AC-001)', () => {
     const { spy, calls } = stubFetch(async (url) => {
       if (url === '/api/accounts/antiforgery') return antiforgeryResponse()
       if (url === '/api/accounts/sign-in') return verifiedSignInResponse()
+      if (url === '/api/capabilities') return translationCapabilitiesResponse()
+      if (url === '/api/usage') return translationUsageResponse()
       throw new Error(`unexpected request to ${url}`)
     })
     renderApp('/login')
@@ -178,9 +234,11 @@ describe('verified sign-in (AC-001)', () => {
 
     const destinationHeading = await screen.findByRole('heading', { level: 1, name: 'Translation' })
     expect(destinationHeading).toHaveFocus()
-    expect(await screen.findByText('The translation workspace arrives in a later update.')).toBeVisible()
+    expect(screen.getByLabelText('Source text')).toBeVisible()
+    expect(screen.getByRole('button', { name: 'Translate' })).toBeVisible()
+    expect(await screen.findByText(/0 of 20,000 characters used/)).toBeVisible()
 
-    await waitFor(() => expect(spy).toHaveBeenCalledTimes(2))
+    await waitFor(() => expect(spy).toHaveBeenCalledTimes(4))
     expect(calls[0].url).toBe('/api/accounts/antiforgery')
     expect(calls[0].init?.method).toBe('GET')
     expect(calls[1].url).toBe('/api/accounts/sign-in')
@@ -195,7 +253,8 @@ describe('verified sign-in (AC-001)', () => {
     expect(screen.queryByLabelText('Password')).not.toBeInTheDocument()
     expect(document.body.textContent).not.toContain(VALID_PASSWORD)
     expect(document.body.textContent).not.toContain(REQUEST_TOKEN)
-    expect(spy).toHaveBeenCalledTimes(2)
+    expect(calls.filter((call) => call.url === '/api/accounts/sign-in')).toHaveLength(1)
+    expect(spy).toHaveBeenCalledTimes(4)
     expectNoLanguageRequests(calls)
   })
 
@@ -253,9 +312,11 @@ describe('verified sign-in (AC-001)', () => {
 
   it('submits once with Enter from the password field', async () => {
     const user = userEvent.setup()
-    const { spy } = stubFetch(async (url) => {
+    const { spy, calls } = stubFetch(async (url) => {
       if (url === '/api/accounts/antiforgery') return antiforgeryResponse()
       if (url === '/api/accounts/sign-in') return verifiedSignInResponse()
+      if (url === '/api/capabilities') return translationCapabilitiesResponse()
+      if (url === '/api/usage') return translationUsageResponse()
       throw new Error(`unexpected request to ${url}`)
     })
     renderApp('/login')
@@ -263,9 +324,10 @@ describe('verified sign-in (AC-001)', () => {
     await user.type(screen.getByLabelText('Email'), VALID_EMAIL)
     await user.type(screen.getByLabelText('Password'), `${VALID_PASSWORD}[Enter]`)
 
-    await waitFor(() => expect(spy).toHaveBeenCalledTimes(2))
     expect(await screen.findByRole('heading', { level: 1, name: 'Translation' })).toBeVisible()
-    expect(spy).toHaveBeenCalledTimes(2)
+    await waitFor(() => expect(spy).toHaveBeenCalledTimes(4))
+    expect(calls.filter((call) => call.url === '/api/accounts/sign-in')).toHaveLength(1)
+    expectNoLanguageRequests(calls)
   })
 })
 
@@ -407,6 +469,8 @@ describe('inline sign-out (AC-004)', () => {
       if (url === '/api/accounts/session') return verifiedSessionResponse()
       if (url === '/api/accounts/antiforgery') return antiforgeryResponse()
       if (url === '/api/accounts/sign-out') return signOut()
+      if (url === '/api/capabilities') return translationCapabilitiesResponse()
+      if (url === '/api/usage') return translationUsageResponse()
       throw new Error(`unexpected request to ${url}`)
     })
   }
@@ -442,6 +506,8 @@ describe('inline sign-out (AC-004)', () => {
           '/api/accounts/session',
           '/api/accounts/antiforgery',
           '/api/accounts/sign-out',
+          '/api/capabilities',
+          '/api/usage',
         ].includes(call.url),
       ).toBe(true)
     }
@@ -492,6 +558,8 @@ describe('inline sign-out (AC-004)', () => {
           '/api/accounts/session',
           '/api/accounts/antiforgery',
           '/api/accounts/sign-out',
+          '/api/capabilities',
+          '/api/usage',
         ].includes(call.url),
       ).toBe(true)
     }
@@ -628,6 +696,8 @@ describe('account transport failure (AC-006)', () => {
         if (attempt === 1) throw new TypeError('network down')
         return verifiedSignInResponse()
       }
+      if (url === '/api/capabilities') return translationCapabilitiesResponse()
+      if (url === '/api/usage') return translationUsageResponse()
       throw new Error(`unexpected request to ${url}`)
     })
     renderApp('/login')
@@ -646,7 +716,8 @@ describe('account transport failure (AC-006)', () => {
 
     expect(await screen.findByRole('heading', { level: 1, name: 'Translation' })).toBeVisible()
     expect(calls.filter((call) => call.url === '/api/accounts/sign-in')).toHaveLength(2)
-    expect(spy).toHaveBeenCalledTimes(4)
+    expect(calls.filter((call) => call.url === '/api/accounts/antiforgery')).toHaveLength(2)
+    expect(spy).toHaveBeenCalledTimes(6)
     expectNoLanguageRequests(calls)
   })
 })

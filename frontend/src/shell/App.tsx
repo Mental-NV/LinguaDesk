@@ -6,6 +6,7 @@ import {
   signOutLocalAccount,
 } from '../api/accounts'
 import { ForgotPasswordPage } from '../auth/ForgotPasswordPage'
+import { TranslatePage } from '../translate/TranslatePage'
 import { LoginPage, type SignInCompletionStatus } from '../auth/LoginPage'
 import { RegisterPage } from '../auth/RegisterPage'
 import { ResetPasswordPage } from '../auth/ResetPasswordPage'
@@ -299,6 +300,13 @@ export function App() {
       )
     }
     if (auth === 'verified') {
+      if (feature === 'translate') {
+        return (
+          <Page heading="Translation">
+            <TranslatePage onSignOut={handleSignOut} />
+          </Page>
+        )
+      }
       return <SignedInPlaceholder feature={feature} onSignOut={handleSignOut} />
     }
     if (auth === 'unverified' || pendingVerificationEmail !== null) {
