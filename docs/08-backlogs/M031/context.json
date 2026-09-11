@@ -1,0 +1,189 @@
+{
+  "version": 1,
+  "scope": "M031",
+  "sources": [
+    {
+      "path": "docs/07-roadmap.md",
+      "ids": [
+        "M031"
+      ],
+      "use": "excerpt",
+      "reason": "Selected outcome, exit criterion, prerequisites and verification allocation",
+      "sha256": "9a15f865e4b655d29ea3828301ebd6455dd11d9344626204afff043aa65ab88c"
+    },
+    {
+      "path": "docs/01-PRD.md",
+      "ids": [
+        "FR-026",
+        "FR-028",
+        "FR-034",
+        "FR-037"
+      ],
+      "use": "excerpt",
+      "reason": "Selected success-only charging, usage reporting, failure outcomes and meaningful-failure rules",
+      "sha256": "d99469d079f0b7da57f0c34c787103e874801bbeaf8c98f23aa26e145b5c8048"
+    },
+    {
+      "path": "docs/01-PRD.md",
+      "ids": [
+        "NFR-004"
+      ],
+      "use": "excerpt",
+      "reason": "Privacy constraint for recovery UI and evidence",
+      "sha256": "69cd79fdaccda2259f031a6957a166459698d13d3ea1cfc9fade17f6f99f2c12"
+    },
+    {
+      "path": "docs/ux/processing.md",
+      "heading": "6.1 Explicit submission and competing events",
+      "use": "excerpt",
+      "reason": "Normative unknown-outcome, Try-again and Check-status action rules",
+      "sha256": "a4d087f06c5838a6bfab872890d230507db57b6b1815ac68515c616164910b27"
+    },
+    {
+      "path": "docs/ux/processing.md",
+      "heading": "6.2 Response ordering and recovery",
+      "use": "excerpt",
+      "reason": "Canonical recovery: usage reconciliation, unknown-outcome copy, lost-output disclosure",
+      "sha256": "03432f40bd3da14bc09dbaac1148ba0944ed0386550f68dc8636e3e617ca5f37"
+    },
+    {
+      "path": "docs/ux/processing.md",
+      "heading": "6.3 Exact message IDs and disposition",
+      "use": "excerpt",
+      "reason": "Normative message copy for failure, allowance, budget and stale states cited by the ACs",
+      "sha256": "2dc4106342973b68395dd28ee84f7fb38614a0c308d401c747218c13f671632b"
+    },
+    {
+      "path": "docs/ux/processing.md",
+      "heading": "6.4 Announcements",
+      "use": "excerpt",
+      "reason": "Announcement rules for recovery actions on both pages",
+      "sha256": "1a6275fc9cc8e1a917ed2aefd809419af504f298397439bd8e40aa61196b1e12"
+    },
+    {
+      "path": "docs/ux/acceptance.md",
+      "ids": [
+        "UX-AC-036",
+        "UX-AC-068",
+        "UX-AC-069",
+        "UX-AC-070",
+        "UX-AC-071",
+        "UX-AC-072",
+        "UX-AC-073",
+        "UX-AC-074",
+        "UX-AC-075",
+        "UX-AC-076"
+      ],
+      "use": "excerpt",
+      "reason": "Selected definitive-failure, allowance, budget, usage-refresh, deadline, offline, unknown-outcome and stale-failure scenarios",
+      "sha256": "ee3373a56cda85f2b0d67109a9d13458c8119617813b96e5cfb627e0ea177368"
+    },
+    {
+      "path": "docs/api/operations.md",
+      "heading": "6. Completion, cancellation, and lost-response recovery",
+      "use": "excerpt",
+      "reason": "Outcome finality, status-read semantics and unknown/not-found handling the UI must reflect",
+      "sha256": "55358dd5c8b33bb25be35719b0a512ef7abf46497da2ea801d69b8ac4f882c5d"
+    },
+    {
+      "path": "docs/api/operations.md",
+      "heading": "8. Error semantics and client recovery",
+      "use": "excerpt",
+      "reason": "Error categories and client recovery mapping for failure vs unknown paths",
+      "sha256": "787b03e3f41e00492446ebe0f4b677a6c229562212f13a604897ae0197fecd8a"
+    },
+    {
+      "path": "docs/06-verification-plan.md",
+      "heading": "4.5 Required user-visible transformation evidence",
+      "use": "excerpt",
+      "reason": "M031 Done criteria: dedicated E2E identity, auth paths, UI assertion rule, M030-M032 regression row",
+      "sha256": "6194052f4ac8eee995c55e4b10294c4a1b36f9290fbeae9cc5655df7e3a24898"
+    },
+    {
+      "path": "docs/06-verification-plan.md",
+      "heading": "2.2 Stable check groups",
+      "use": "excerpt",
+      "reason": "V-002/V-003/V-005/V-009/V-010/V-012/V-015 assertion ownership for the slice",
+      "sha256": "3ff38df95d5cde583f90f26653175be5497beeb859758da8b77fbd7efac0b661"
+    },
+    {
+      "path": "docs/verification/frontend.md",
+      "heading": "4.1 Shared UI fixtures",
+      "use": "excerpt",
+      "reason": "Canonical fixtures, seeds, T-OK/W-OK counts and E2E account baseline",
+      "sha256": "64b4c731cca9e0505cf985d37c7ef7fea10fa96d6681276c1d749ed3b3d835f3"
+    },
+    {
+      "path": "docs/03-architecture.md",
+      "heading": "8. Frontend and Agent Development Rules",
+      "use": "excerpt",
+      "reason": "Reducer/transport rules, counting consistency and generated-contract gate",
+      "sha256": "994b9f3f8c2d94623069b4ea47c49cc2492c2880d220d1733569dd9213aad636"
+    },
+    {
+      "path": "docs/product/open-questions.md",
+      "ids": [
+        "Q-001",
+        "Q-003",
+        "Q-004",
+        "Q-005",
+        "Q-006",
+        "Q-008",
+        "Q-010"
+      ],
+      "use": "excerpt",
+      "reason": "Question dispositions: specified shared design vs pending non-blocking items",
+      "sha256": "78018481743f480e9ffb61f370af8419a3ab7a40286020d4a28345c053e9e19c"
+    },
+    {
+      "path": "docs/08-backlogs/M030/spec.md",
+      "use": "reference",
+      "reason": "Dependency evidence: competing-event hardening and E2E pattern extended, not re-proven",
+      "sha256": "0883674c5e8277094a7194a8e238854f3b0a11d1b16e4e2cebabb7a2dcda576e"
+    },
+    {
+      "path": "docs/08-backlogs/M024/spec.md",
+      "use": "reference",
+      "reason": "Dependency evidence: interrupted/outcome-finality and status-read backend semantics reused",
+      "sha256": "8989809cf0bc6adaa231c11d3437b7b1ab7b87212e68688b198a095d4c09e070"
+    },
+    {
+      "path": "docs/08-backlogs/M025/spec.md",
+      "use": "reference",
+      "reason": "Dependency evidence: authoritative usage snapshots and period ordering reused",
+      "sha256": "78c62938a1a597619b9ee3275a2163e4e2341c085b026cbcefac3d67c1333976"
+    },
+    {
+      "path": "frontend/src/translate/translationWorkspace.ts",
+      "use": "reference",
+      "reason": "Current translation reducer semantics the recovery states must extend",
+      "sha256": "37df4095147cfc79bdfec8126d470d372c6a65ebbe08721f43ce6d9381a5f5c4"
+    },
+    {
+      "path": "frontend/src/rewrite/rewritingWorkspace.ts",
+      "use": "reference",
+      "reason": "Current rewriting reducer semantics the recovery states must extend",
+      "sha256": "a9348696b25f251b4f5fbce1598adbbff98691d2d88fbffa2b531c86d8ea8099"
+    },
+    {
+      "path": "frontend/src/api/translation.ts",
+      "use": "reference",
+      "reason": "Current translation transport client the status-read client must follow",
+      "sha256": "00e771d941f14dff7bc97a9745ba602708963f3e40f6c4c912016f92f3ab7426"
+    },
+    {
+      "path": "frontend/src/api/rewriting.ts",
+      "use": "reference",
+      "reason": "Current rewriting transport client the status-read client must follow",
+      "sha256": "2f281d419f59e48847c61c78ca4ef2251386ad68c7aae64917c322216b3dd044"
+    }
+  ],
+  "source_map_sha256": "0cf9c43a58a389cd939d360c5ddaefb035b3dc580bb277bfc3e8ba7bf0373c35",
+  "baseline_commit": "fbaee862f39b2a456411cb9b3b9d41a5441e0bcb",
+  "locked_files": {
+    "docs/00-SDD-Planning-Workflow.md": "5ccca040d0f0d50fac47632643306e7224a8d2e5460df0958e7e7c333146db89",
+    "docs/00-workflow/execution.md": "f362a1384cefef24ba204e0723e3190857c8cca9bcd91908136932e19c5caf02",
+    "docs/08-backlogs/M031/spec.md": "8babc880925f341d364dfcb7aaed147023c2444b68470b595395613234506506",
+    "docs/08-backlogs/M031/plan.md": "2f97b393e2f766212b3f0aa7e7cb5b1efbedc3c3fa43539ad8f9edd3dd9802a2"
+  }
+}
