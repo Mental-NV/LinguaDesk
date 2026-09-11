@@ -112,6 +112,7 @@ export type TranslationWorkspaceAction =
       readonly observedAtMs: number
     }
   | { readonly type: 'submitFailed'; readonly revision: number; readonly error: TranslationError }
+  | { readonly type: 'submitAborted'; readonly revision: number }
   | { readonly type: 'resultEdited'; readonly value: string }
   | { readonly type: 'usageUpdated'; readonly usage: TranslationUsage; readonly observedAtMs: number }
   | { readonly type: 'copied'; readonly ok: boolean }
@@ -378,6 +379,11 @@ export function translationWorkspaceReducer(
     case 'submitFailed':
       if (action.revision !== state.requestRevision) return state
       return { ...state, phase: 'idle', error: action.error }
+    case 'submitAborted':
+      // Sign-out invalidates pending flights (M013 teardown): release the
+      // busy phase without touching text. Navigation never dispatches this.
+      if (action.revision !== state.requestRevision) return state
+      return { ...state, phase: 'idle' }
     case 'resultEdited':
       return { ...state, resultText: action.value, resultEdited: true, copyAlert: null }
     case 'usageUpdated':

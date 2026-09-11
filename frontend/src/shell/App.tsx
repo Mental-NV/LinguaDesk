@@ -8,6 +8,8 @@ import {
 import { ForgotPasswordPage } from '../auth/ForgotPasswordPage'
 import { RewritePage } from '../rewrite/RewritePage'
 import { TranslatePage } from '../translate/TranslatePage'
+import { WorkspaceStoreProvider } from './workspaces'
+import { useWorkspaceStores } from './workspaceStores'
 import { LoginPage, type SignInCompletionStatus } from '../auth/LoginPage'
 import { RegisterPage } from '../auth/RegisterPage'
 import { ResetPasswordPage } from '../auth/ResetPasswordPage'
@@ -99,7 +101,16 @@ function NotFoundPage() {
 }
 
 export function App() {
+  return (
+    <WorkspaceStoreProvider>
+      <Shell />
+    </WorkspaceStoreProvider>
+  )
+}
+
+function Shell() {
   const location = useLocation()
+  const stores = useWorkspaceStores()
   const [initialProtected] = useState(() => isProtectedPath(location.pathname))
   const [auth, setAuth] = useState<SessionState>(() =>
     initialProtected ? 'loading' : 'signedOut',
@@ -171,6 +182,11 @@ export function App() {
     if (signOutFlightRef.current > 0) return
     const flight = signOutFlightRef.current + 1
     signOutFlightRef.current = flight
+    // Sign-out keeps the M013 teardown guarantee: pending feature flights
+    // are invalidated so late responses cannot restore cleared text.
+    // Plain navigation does not abort; see the lifted workspace store.
+    stores?.translate.abortFlights()
+    stores?.rewrite.abortFlights()
     setSafeReturn('/translate')
     setPendingVerificationEmail(null)
     setExpiryNotice(false)
@@ -195,7 +211,7 @@ export function App() {
       signOutFlightRef.current = 0
       setSignOutPhase(result.kind === 'signedOut' ? 'idle' : 'failed')
     })()
-  }, [])
+  }, [stores])
 
   const rootEntry =
     signOutPhase !== 'idle' ? (

@@ -248,6 +248,23 @@ describe('rewriting reducer guards', () => {
     expect(staleFailure.phase).toBe('submitting')
   })
 
+  it('releases the busy phase on abort without touching text and ignores stale aborts', () => {
+    const submitting = rewritingWorkspaceReducer(loaded(W_OK), { type: 'submitRequested' })
+    const staleAbort = rewritingWorkspaceReducer(submitting, {
+      type: 'submitAborted',
+      revision: 0,
+    })
+    expect(staleAbort.phase).toBe('submitting')
+    const aborted = rewritingWorkspaceReducer(submitting, {
+      type: 'submitAborted',
+      revision: 1,
+    })
+    expect(aborted.phase).toBe('idle')
+    expect(aborted.source).toBe(W_OK)
+    expect(aborted.error).toBeNull()
+    expect(aborted.notice).toBeNull()
+  })
+
   it('protects a manually edited result from a pending response', () => {
     const submitting = rewritingWorkspaceReducer(loaded(W_OK), { type: 'submitRequested' })
     const edited = rewritingWorkspaceReducer(submitting, {

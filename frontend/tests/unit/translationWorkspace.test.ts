@@ -286,6 +286,23 @@ describe('translation reducer guards', () => {
   it('exposes the stale secondary line identifier', () => {
     expect(MESSAGE_STALE_SUCCESS).toBe('This update is no longer current and was not applied.')
   })
+
+  it('releases the busy phase on abort without touching text and ignores stale aborts', () => {
+    const submitting = translationWorkspaceReducer(loaded('Hello.'), { type: 'submitRequested' })
+    const staleAbort = translationWorkspaceReducer(submitting, {
+      type: 'submitAborted',
+      revision: 0,
+    })
+    expect(staleAbort.phase).toBe('submitting')
+    const aborted = translationWorkspaceReducer(submitting, {
+      type: 'submitAborted',
+      revision: 1,
+    })
+    expect(aborted.phase).toBe('idle')
+    expect(aborted.source).toBe('Hello.')
+    expect(aborted.error).toBeNull()
+    expect(aborted.notice).toBeNull()
+  })
 })
 
 describe('submit problem mapping', () => {

@@ -1,23 +1,12 @@
-import { useCallback, useEffect, useId, useReducer, useRef, useState } from 'react'
+import { useCallback, useEffect, useId, useState } from 'react'
 import { analyzeInput } from '../api/inputPolicy'
+import { useRewriteFeature } from '../shell/workspaceStores'
 import {
-  createOperationId,
-  fetchCurrentUsage,
-  fetchSubmitAntiforgeryToken,
-  fetchRewritingCapabilities,
-  submitRewritingOperation,
-} from '../api/rewriting'
-import {
-  MESSAGE_COPIED,
   MESSAGE_OFFLINE,
-  createInitialWorkspace,
   describeReadiness,
-  formatResetInstant,
   formatUsageLine,
-  mapSubmitProblem,
   selectInlineValidation,
   selectStatusLine,
-  rewritingWorkspaceReducer,
 } from './rewritingWorkspace'
 
 const LOAD_FAILURE_MESSAGE = 'Rewriting settings could not be loaded.' as const
@@ -28,9 +17,9 @@ interface RewritePageProps {
 }
 
 export function RewritePage({ onSignOut }: RewritePageProps) {
-  const [state, dispatch] = useReducer(rewritingWorkspaceReducer, undefined, () =>
-    createInitialWorkspace(),
-  )
+  const store = useRewriteFeature()
+  const { state, dispatch, loadCapabilities, submit, copyResult, saveScroll, readSavedScroll } =
+    store
   const formId = useId()
   const sourceId = `${formId}-source`
   const sourceLanguageId = `${formId}-source-language`
@@ -39,19 +28,7 @@ export function RewritePage({ onSignOut }: RewritePageProps) {
   const validationId = `${formId}-validation`
   const errorId = `${formId}-error`
 
-  const mountedRef = useRef(true)
-  const flightRef = useRef<AbortController | null>(null)
-  const copyTimerRef = useRef<number | null>(null)
   const [offline, setOffline] = useState(() => !window.navigator.onLine)
-
-  useEffect(() => {
-    mountedRef.current = true
-    return () => {
-      mountedRef.current = false
-      flightRef.current?.abort()
-      if (copyTimerRef.current !== null) window.clearTimeout(copyTimerRef.current)
-    }
-  }, [])
 
   useEffect(() => {
     const handleOnline = (): void => setOffline(false)
@@ -64,37 +41,27 @@ export function RewritePage({ onSignOut }: RewritePageProps) {
     }
   }, [setOffline])
 
-  const loadCapabilities = useCallback(() => {
-    dispatch({ type: 'capabilitiesRetried' })
-    flightRef.current?.abort()
-    const controller = new AbortController()
-    flightRef.current = controller
-    void (async () => {
-      const capabilities = await fetchRewritingCapabilities({ signal: controller.signal })
-      if (!mountedRef.current || controller.signal.aborted) return
-      if (capabilities.kind === 'ok') {
-        dispatch({ type: 'capabilitiesLoaded', capabilities: capabilities.capabilities })
-        const usage = await fetchCurrentUsage({ signal: controller.signal })
-        if (!mountedRef.current || controller.signal.aborted) return
-        if (usage.kind === 'ok') {
-          dispatch({ type: 'usageUpdated', usage: usage.usage, observedAtMs: Date.now() })
-        }
-      } else {
-        dispatch({ type: 'capabilitiesFailed' })
+  const capabilities = state.capabilities
+  const capabilitiesFailed = state.capabilitiesFailed
+  useEffect(() => {
+    // The lifted store survives navigation: reload only when no capabilities
+    // settled yet, so returning to this page never aborts a hidden flight.
+    if (capabilities === null && !capabilitiesFailed) loadCapabilities()
+  }, [capabilities, capabilitiesFailed, loadCapabilities])
+
+  useEffect(() => {
+    const saved = readSavedScroll()
+    if (saved > 0) {
+      try {
+        window.scrollTo(0, saved)
+      } catch {
+        /* jsdom and other non-visual runtimes ignore programmatic scroll */
       }
-    })()
-  }, [])
-
-  useEffect(() => {
-    loadCapabilities()
-  }, [loadCapabilities])
-
-  useEffect(() => {
-    if (state.notice === MESSAGE_COPIED) {
-      if (copyTimerRef.current !== null) window.clearTimeout(copyTimerRef.current)
-      copyTimerRef.current = window.setTimeout(() => dispatch({ type: 'noticeDismissed' }), 2000)
     }
-  }, [state.notice])
+    return () => {
+      saveScroll(window.scrollY)
+    }
+  }, [saveScroll, readSavedScroll])
 
   const maximumSourceCharacters =
     state.capabilities?.maximumSourceCharacters ?? 2000
@@ -117,103 +84,11 @@ export function RewritePage({ onSignOut }: RewritePageProps) {
     [state.capabilities],
   )
 
-  const handleRewrite = useCallback(() => {
-    if (state.composing || state.capabilities === null) return
-    const current = describeReadiness(state, state.capabilities.maximumSourceCharacters)
-    if (!current.canSubmit) return
-    const revision = state.requestRevision + 1
-    const captured = {
-      source: state.source,
-      sourceSelection: state.sourceSelection,
-      mode: state.mode,
-    }
-    dispatch({ type: 'submitRequested' })
-    flightRef.current?.abort()
-    const controller = new AbortController()
-    flightRef.current = controller
-    void (async () => {
-      const bootstrap = await fetchSubmitAntiforgeryToken({ signal: controller.signal })
-      if (!mountedRef.current || controller.signal.aborted) return
-      if (bootstrap.kind !== 'ok') {
-        dispatch({
-          type: 'submitFailed',
-          revision,
-          error: mapSubmitProblem({ httpStatus: null }),
-        })
-        return
-      }
-      const outcome = await submitRewritingOperation(
-        {
-          operationId: createOperationId(),
-          source: captured.source,
-          sourceSelection: captured.sourceSelection,
-          mode: captured.mode,
-          antiforgeryToken: bootstrap.requestToken,
-        },
-        { signal: controller.signal },
-      )
-      if (!mountedRef.current || controller.signal.aborted) return
-      if (outcome.kind === 'succeeded') {
-        dispatch({
-          type: 'submitSucceeded',
-          revision,
-          rewrittenText: outcome.rewrittenText,
-          characterCount: outcome.characterCount,
-          usage: outcome.usage,
-          observedAtMs: Date.now(),
-        })
-        return
-      }
-      if (outcome.kind === 'pending') {
-        const usage = await fetchCurrentUsage({ signal: controller.signal })
-        if (mountedRef.current && !controller.signal.aborted && usage.kind === 'ok') {
-          dispatch({ type: 'usageUpdated', usage: usage.usage, observedAtMs: Date.now() })
-        }
-        if (!mountedRef.current || controller.signal.aborted) return
-        dispatch({
-          type: 'submitFailed',
-          revision,
-          error: mapSubmitProblem({ httpStatus: null }),
-        })
-        return
-      }
-      if (outcome.kind === 'network') {
-        dispatch({
-          type: 'submitFailed',
-          revision,
-          error: mapSubmitProblem({ httpStatus: null }),
-        })
-        return
-      }
-      const reset =
-        outcome.resetAtUtc === null
-          ? undefined
-          : formatResetInstant(outcome.resetAtUtc, Date.now())
-      dispatch({
-        type: 'submitFailed',
-        revision,
-        error: mapSubmitProblem({
-          httpStatus: outcome.httpStatus,
-          category: outcome.category,
-          reason: outcome.reason,
-          resetAtUtc: reset,
-          characterCount: outcome.characterCount,
-          limit: outcome.limit,
-        }),
-      })
-    })()
-  }, [state])
+  // Explicit submission, transport and stale fencing live in the lifted
+  // store so a pending operation survives navigation to the sibling page.
+  const handleRewrite = submit
 
-  const handleCopy = useCallback(() => {
-    void (async () => {
-      try {
-        await window.navigator.clipboard.writeText(state.resultText)
-        if (mountedRef.current) dispatch({ type: 'copied', ok: true })
-      } catch {
-        if (mountedRef.current) dispatch({ type: 'copied', ok: false })
-      }
-    })()
-  }, [state.resultText])
+  const handleCopy = copyResult
 
   const sourceOptions = state.capabilities
     ? [
