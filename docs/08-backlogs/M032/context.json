@@ -1,0 +1,151 @@
+{
+  "version": 1,
+  "scope": "M032",
+  "sources": [
+    {
+      "path": "docs/07-roadmap.md",
+      "ids": [
+        "M032"
+      ],
+      "use": "excerpt",
+      "reason": "Selected outcome, exit criterion, prerequisites and verification allocation",
+      "sha256": "52d6a2a9a3939b6e79ab6fb88f1b14b5a5643f4df7529c07d42ea392a405a243"
+    },
+    {
+      "path": "docs/01-PRD.md",
+      "ids": [
+        "FR-038"
+      ],
+      "use": "excerpt",
+      "reason": "Selected English-UI/defaults and non-persistent-preference rules",
+      "sha256": "39c0dcc0963a74681298fa28f167c2671000a4c91c43dd057f5f28aca7df9d37"
+    },
+    {
+      "path": "docs/01-PRD.md",
+      "ids": [
+        "NFR-004"
+      ],
+      "use": "excerpt",
+      "reason": "Privacy constraint for teardown UI and evidence",
+      "sha256": "69cd79fdaccda2259f031a6957a166459698d13d3ea1cfc9fade17f6f99f2c12"
+    },
+    {
+      "path": "docs/02-ux-specification.md",
+      "heading": "3. Information architecture and workspace lifecycle",
+      "use": "excerpt",
+      "reason": "Normative reset dialog, teardown, restoration and footer behavior",
+      "sha256": "a3a82f588a66fabf8ca331a2a72cf57e78752e9b6458c385315f843f2eee33a9"
+    },
+    {
+      "path": "docs/ux/processing.md",
+      "heading": "6.3 Exact message IDs and disposition",
+      "use": "excerpt",
+      "reason": "Normative MSG-037 and related message copy cited by the ACs",
+      "sha256": "2dc4106342973b68395dd28ee84f7fb38614a0c308d401c747218c13f671632b"
+    },
+    {
+      "path": "docs/ux/acceptance.md",
+      "ids": [
+        "UX-AC-002",
+        "UX-AC-003",
+        "UX-AC-015",
+        "UX-AC-016",
+        "UX-AC-084",
+        "UX-AC-085",
+        "UX-AC-086",
+        "UX-AC-087"
+      ],
+      "use": "excerpt",
+      "reason": "Selected reset/teardown/restoration scenarios plus the preserved-navigation regression guard",
+      "sha256": "5bb99830f17570b687701f7b954a281019d29fcf431320a7a0eb5543cabce916"
+    },
+    {
+      "path": "docs/06-verification-plan.md",
+      "heading": "2.2 Stable check groups",
+      "use": "excerpt",
+      "reason": "V-002/V-010/V-012/V-015 assertion ownership for the slice",
+      "sha256": "3ff38df95d5cde583f90f26653175be5497beeb859758da8b77fbd7efac0b661"
+    },
+    {
+      "path": "docs/06-verification-plan.md",
+      "heading": "4.5 Required user-visible transformation evidence",
+      "use": "excerpt",
+      "reason": "M032 Done criteria: dedicated E2E identity, auth paths, UI assertion rule, regression row",
+      "sha256": "6194052f4ac8eee995c55e4b10294c4a1b36f9290fbeae9cc5655df7e3a24898"
+    },
+    {
+      "path": "docs/verification/frontend.md",
+      "heading": "4.1 Shared UI fixtures",
+      "use": "excerpt",
+      "reason": "Canonical fixtures, seeds, counts and E2E account baseline",
+      "sha256": "64b4c731cca9e0505cf985d37c7ef7fea10fa96d6681276c1d749ed3b3d835f3"
+    },
+    {
+      "path": "docs/03-architecture.md",
+      "heading": "6.2 Privacy and retention (Q-004)",
+      "use": "excerpt",
+      "reason": "Memory-only text, no-store and teardown mechanics the UI must implement",
+      "sha256": "2f1cef5894770a228c1caa3a887884f38eb9f906a8a968d5238672957aed060b"
+    },
+    {
+      "path": "docs/03-architecture.md",
+      "heading": "8. Frontend and Agent Development Rules",
+      "use": "excerpt",
+      "reason": "Reducer/transport rules and generated-contract gate",
+      "sha256": "994b9f3f8c2d94623069b4ea47c49cc2492c2880d220d1733569dd9213aad636"
+    },
+    {
+      "path": "docs/product/open-questions.md",
+      "ids": [
+        "Q-004"
+      ],
+      "use": "excerpt",
+      "reason": "Question disposition: observable lifetime implemented here, durable retention pending",
+      "sha256": "f2c4fe62dd5b7d84d15f45776314c8639e29ff55b6c404fb38a0c0d263d6e2e1"
+    },
+    {
+      "path": "docs/08-backlogs/M031/spec.md",
+      "use": "reference",
+      "reason": "Dependency evidence: recovery states the reset path must clear, not re-prove",
+      "sha256": "8babc880925f341d364dfcb7aaed147023c2444b68470b595395613234506506"
+    },
+    {
+      "path": "docs/08-backlogs/M030/spec.md",
+      "use": "reference",
+      "reason": "Dependency evidence: competing-event preservation rules the reset path must not break",
+      "sha256": "0883674c5e8277094a7194a8e238854f3b0a11d1b16e4e2cebabb7a2dcda576e"
+    },
+    {
+      "path": "frontend/src/translate/translationWorkspace.ts",
+      "use": "reference",
+      "reason": "Current translation reducer semantics the clearing action must extend",
+      "sha256": "40f52c604ca70aeb52626ee312db380634b91fe4bbff3e4615809d0c2ee8fb14"
+    },
+    {
+      "path": "frontend/src/rewrite/rewritingWorkspace.ts",
+      "use": "reference",
+      "reason": "Current rewriting reducer semantics the clearing action must extend",
+      "sha256": "068ad98959048a7afbea06162374e8845a079e15156f0cab90df17c1f2387b58"
+    },
+    {
+      "path": "frontend/src/shell/workspaceStores.ts",
+      "use": "reference",
+      "reason": "Current lifted-store transport ownership the reset-all path must extend",
+      "sha256": "2ab053c03bdc0d63d323b24e23ac4cebf005ed3ff5afd8033c784724ca665332"
+    },
+    {
+      "path": "frontend/src/shell/App.tsx",
+      "use": "reference",
+      "reason": "Current sign-out/expiry shell the teardown wiring must extend",
+      "sha256": "74e9cd002e9e08dcbd854b784958d2fd8d5177e99f7af58ad02e1c70adfce88d"
+    }
+  ],
+  "source_map_sha256": "b279d3246e1ee0f0bff1d4348637119859270703c1355c4bd86147d9e92a75be",
+  "baseline_commit": "13c7c557c3501d70e820a2f5c9280ae6e39e1308",
+  "locked_files": {
+    "docs/00-SDD-Planning-Workflow.md": "5ccca040d0f0d50fac47632643306e7224a8d2e5460df0958e7e7c333146db89",
+    "docs/00-workflow/execution.md": "f362a1384cefef24ba204e0723e3190857c8cca9bcd91908136932e19c5caf02",
+    "docs/08-backlogs/M032/spec.md": "9848cedad50aab4e90d571e3a35a3fb7e5da091c6e6bee79507e4503009cbc7b",
+    "docs/08-backlogs/M032/plan.md": "0e54351dea03994ccb7c8024aa7fe4fff43640adb9c6447cb5a066176f4ed044"
+  }
+}
