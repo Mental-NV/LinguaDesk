@@ -9,6 +9,7 @@ solution="$repository_root/backend/LinguaDesk.slnx"
 plan_prompt_template="$script_directory/plan.prompt.md"
 implement_prompt_template="$script_directory/implement.prompt.md"
 context_repair_prompt_template="$script_directory/context-repair.prompt.md"
+verification_repair_prompt_template="$script_directory/verification-repair.prompt.md"
 muse_stream_renderer="$script_directory/muse_stream.py"
 codex_model="gpt-5.6-sol"
 codex_reasoning_effort="medium"
@@ -20,6 +21,18 @@ muse_max_attempts=${MUSE_RUNNER_MAX_ATTEMPTS:-3}
 muse_retry_delay_seconds=${MUSE_RUNNER_RETRY_DELAY_SECONDS:-5}
 runner="codex"
 context_repair_max_attempts=3
+verification_repair_max_attempts=3
+run_directory=""
+verification_log=""
+current_stage="startup"
+
+report_exit() {
+    local status=$?
+    if [ "$status" -ne 0 ] && [ -n "$run_directory" ]; then
+        echo "Milestone automation stopped during $current_stage (exit $status). Work is preserved; logs: $run_directory" >&2
+    fi
+}
+trap report_exit EXIT
 
 usage() {
     echo "Usage: $0 [-codex|-claude|--muse] \"MILESTONE_OR_RANGE[, MILESTONE_OR_RANGE...]\"" >&2
@@ -178,6 +191,7 @@ run_muse_harness() {
         : > "$output_file"
         agent_status=0
         run_muse_once "$attempt_prompt" | tee "$output_file" || agent_status=$?
+        cp "$output_file" "$output_file.attempt-$attempt"
 
         if [ "$agent_status" -eq 0 ]; then
             return 0
@@ -206,30 +220,28 @@ run_agent() {
     local output_file
     local agent_status=0
     prompt=$(sed "s/{{MILESTONE}}/$milestone/g" "$template")
-    output_file=$(mktemp)
+    prompt=${prompt//\{\{VERIFICATION_LOG\}\}/$verification_log}
+    output_file=$(mktemp "$run_directory/$milestone-$(basename "$template").XXXXXX")
 
-    # Stream live through tee so intermediate results are visible while the
-    # run is in progress; the file copy is only for the status-line check.
+    # Stream live and retain the transcript for status validation and recovery.
     if [ "$runner" = "claude" ]; then
         run_claude_harness "$prompt" 2>&1 | tee "$output_file" || agent_status=$?
     elif [ "$runner" = "muse" ]; then
         # The Muse harness owns tee so each retry replaces the status-check
-        # capture while every attempt remains visible in the terminal.
+        # capture; each attempt also retains its own transcript.
         run_muse_harness "$prompt" "$output_file" || agent_status=$?
     else
         run_codex_harness "$prompt" 2>&1 | tee "$output_file" || agent_status=$?
     fi
 
     if [ "$agent_status" -ne 0 ]; then
-        rm -f "$output_file"
+        echo "Agent ($runner) failed (exit $agent_status). Transcript: $output_file" >&2
         return "$agent_status"
     fi
 
     if ! grep -Fxq "$expected_status" "$output_file"; then
-        rm -f "$output_file"
-        fail "Agent ($runner) did not report the required status '$expected_status'. Inspect the working tree before resuming."
+        fail "Agent ($runner) did not report the required status '$expected_status'. Inspect the working tree and transcript: $output_file"
     fi
-    rm -f "$output_file"
 }
 
 pull_changes() {
@@ -283,6 +295,25 @@ validate_context_with_repair() {
     fail "Context validation for $milestone still fails after $context_repair_max_attempts AI repair attempts. Inspect the working tree before resuming."
 }
 
+verify_with_repair() {
+    local milestone=$1
+    local attempt=0
+    while true; do
+        current_stage="$milestone verification attempt $attempt"
+        verification_log="$run_directory/$milestone-verification-$attempt.log"
+        if bash scripts/verify-milestone.sh "$milestone" 2>&1 | tee "$verification_log"; then
+            return 0
+        fi
+        if [ "$attempt" -ge "$verification_repair_max_attempts" ]; then
+            fail "Verification for $milestone still fails after $verification_repair_max_attempts AI repair attempts. Failed command and output: $verification_log"
+        fi
+        attempt=$((attempt + 1))
+        current_stage="$milestone verification repair $attempt/$verification_repair_max_attempts"
+        echo "Verification failed; asking the AI agent to repair $milestone (attempt $attempt/$verification_repair_max_attempts)..."
+        run_agent "$verification_repair_prompt_template" "$milestone" "MILESTONE_VERIFICATION_REPAIR_STATUS: COMPLETE"
+    done
+}
+
 while [ "$#" -gt 0 ]; do
     case "$1" in
         -codex|--codex) runner="codex"; shift ;;
@@ -320,6 +351,8 @@ require_command python3
 [ -f "$plan_prompt_template" ] || fail "Plan prompt not found: $plan_prompt_template"
 [ -f "$implement_prompt_template" ] || fail "Implementation prompt not found: $implement_prompt_template"
 [ -f "$context_repair_prompt_template" ] || fail "Context repair prompt not found: $context_repair_prompt_template"
+[ -f "$verification_repair_prompt_template" ] || fail "Verification repair prompt not found: $verification_repair_prompt_template"
+[ -f "$repository_root/scripts/verify-milestone.sh" ] || fail "Milestone verification script not found."
 [ -f "$muse_stream_renderer" ] || fail "Muse stream renderer not found: $muse_stream_renderer"
 
 actual_root=$(git -C "$repository_root" rev-parse --show-toplevel)
@@ -329,6 +362,9 @@ fi
 
 cd "$repository_root"
 ensure_clean_repository
+mkdir -p "$repository_root/artifacts/milestone-runs"
+run_directory=$(mktemp -d "$repository_root/artifacts/milestone-runs/run.XXXXXX")
+echo "Milestone run logs: $run_directory"
 python3 automation/context.py audit
 
 for milestone in "${milestones[@]}"; do
@@ -352,6 +388,7 @@ for milestone in "${milestones[@]}"; do
     if has_milestone_commit "$milestone" planned && python3 automation/context.py check "$milestone"; then
         echo "$milestone already has a planning commit and current context lock. Reusing it."
     else
+        current_stage="$milestone planning"
         echo "Planning $milestone..."
         run_agent "$plan_prompt_template" "$milestone" "MILESTONE_AUTOMATION_STATUS: READY"
         pull_changes "$milestone planned"
@@ -360,20 +397,16 @@ for milestone in "${milestones[@]}"; do
     fi
 
     echo "Implementing $milestone..."
+    current_stage="$milestone implementation"
     python3 automation/context.py check "$milestone"
     run_agent "$implement_prompt_template" "$milestone" "MILESTONE_AUTOMATION_STATUS: COMPLETE"
+    current_stage="$milestone upstream integration"
     pull_changes "$milestone implemented"
-    python3 automation/context.py audit
 
     echo "Testing $milestone..."
-    ./scripts/backend.sh check
-    ./scripts/backend.sh smoke
-    ./scripts/contract.sh check
-    ./scripts/ai.sh check
-    ./scripts/ai.sh probe
-    ./scripts/frontend.sh check
-    ./scripts/frontend.sh smoke
+    verify_with_repair "$milestone"
 
+    current_stage="$milestone commit"
     commit_changes "$milestone implemented"
     echo "$milestone completed."
 done

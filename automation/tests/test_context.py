@@ -332,14 +332,20 @@ class RunnerTests(unittest.TestCase):
                 'context.py', 'run-milestones.sh', 'muse_stream.py',
                 'plan.prompt.md', 'implement.prompt.md',
                 'context-repair.prompt.md',
+                'verification-repair.prompt.md',
             ):
                 shutil.copyfile(MODULE.parent / name, root / 'automation' / name)
             (root / 'docs/08-backlogs').mkdir(parents=True)
             (root / 'docs/07-roadmap.md').write_text('| M015 | Test |\n')
             (root / 'README.md').write_text('# Test\n')
+            (root / '.gitignore').write_text('artifacts/\n')
             (root / 'backend').mkdir()
             (root / 'backend/LinguaDesk.slnx').write_text('test')
             (root / 'scripts').mkdir()
+            shutil.copyfile(
+                MODULE.parent.parent / 'scripts/verify-milestone.sh',
+                root / 'scripts/verify-milestone.sh',
+            )
             for name in ('backend.sh', 'contract.sh', 'ai.sh', 'frontend.sh'):
                 file = root / 'scripts' / name
                 file.write_text('#!/bin/sh\nexit 0\n')
@@ -348,6 +354,17 @@ class RunnerTests(unittest.TestCase):
             bodies = {
                 'dotnet': 'exit 0',
                 'codex': (
+                    'if printf "%s" "$*" | grep -q "Repair failed verification"; then\n'
+                    '  printf "%s\\n" "$*" > artifacts/repair-prompt\n'
+                    '  echo repair >> artifacts/repair-count\n'
+                    '  if [ "${VERIFICATION_FIXTURE_MODE:-}" = "success" ]; then touch artifacts/repaired; fi\n'
+                    '  if [ "${VERIFICATION_FIXTURE_MODE:-}" = "blocked" ]; then\n'
+                    '    echo MILESTONE_VERIFICATION_REPAIR_STATUS: BLOCKED\n'
+                    '  else\n'
+                    '    echo MILESTONE_VERIFICATION_REPAIR_STATUS: COMPLETE\n'
+                    '  fi\n'
+                    '  exit 0\n'
+                    'fi\n'
                     'if printf "%s" "$*" | grep -q "Repair the planning context"; then\n'
                     '  count=1\n'
                     '  if [ -n "${CONTEXT_REPAIR_FIXTURE_COUNT_FILE:-}" ]; then\n'
@@ -699,6 +716,76 @@ class RunnerTests(unittest.TestCase):
             self.assertEqual((root / 'REMOTE.md').read_text(), 'upstream change\n')
             self.assertIn('implementation', (root / 'README.md').read_text())
             self.assertEqual(git('log', '-1', '--format=%s').strip(), 'M015 implemented')
+
+    def prepare_verification_failure(self, root, git):
+        self.prepare_plan(root, git)
+        (root / 'scripts/backend.sh').write_text(
+            '#!/bin/sh\nmkdir -p artifacts\necho "$1" >> artifacts/backend-checks\n'
+        )
+        (root / 'scripts/ai.sh').write_text(
+            '#!/bin/sh\n'
+            'if [ ! -f artifacts/repaired ]; then echo "obsolete AI guard"; exit 23; fi\n'
+        )
+        git('add', '.')
+        git('commit', '-m', 'Fixture failing gate')
+
+    def test_verification_repair_reruns_all_gates_before_commit(self):
+        with self.fixture() as (root, env, git):
+            self.prepare_verification_failure(root, git)
+            env.update(CODEX_FIXTURE_MODE='complete', VERIFICATION_FIXTURE_MODE='success')
+            result = self.run_fixture(root, env)
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertEqual((root / 'artifacts/repair-count').read_text().splitlines(), ['repair'])
+            self.assertEqual((root / 'artifacts/backend-checks').read_text().splitlines(),
+                             ['check', 'smoke', 'check', 'smoke'])
+            self.assertEqual(git('log', '-1', '--format=%s').strip(), 'M015 implemented')
+            logs = list((root / 'artifacts/milestone-runs').glob('*/M015-verification-0.log'))
+            self.assertEqual(len(logs), 1)
+            self.assertIn('FAILED (exit 23): bash scripts/ai.sh check', logs[0].read_text())
+            repair_prompt = (root / 'artifacts/repair-prompt').read_text()
+            self.assertIn(str(logs[0]), repair_prompt)
+            self.assertNotIn('{{VERIFICATION_LOG}}', repair_prompt)
+            self.assertEqual(git('status', '--porcelain'), '')
+
+    def test_verification_noop_repairs_stop_without_commit(self):
+        with self.fixture() as (root, env, git):
+            self.prepare_verification_failure(root, git)
+            before = git('rev-parse', 'HEAD')
+            env.update(CODEX_FIXTURE_MODE='complete', VERIFICATION_FIXTURE_MODE='noop')
+            result = self.run_fixture(root, env)
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn('still fails after 3 AI repair attempts', result.stderr)
+            self.assertEqual(len((root / 'artifacts/repair-count').read_text().splitlines()), 3)
+            self.assertEqual(before, git('rev-parse', 'HEAD'))
+            self.assertIn('implementation', (root / 'README.md').read_text())
+            self.assertIn('Work is preserved; logs:', result.stderr)
+
+    def test_verification_blocked_status_stops_without_retry_or_commit(self):
+        with self.fixture() as (root, env, git):
+            self.prepare_verification_failure(root, git)
+            before = git('rev-parse', 'HEAD')
+            env.update(CODEX_FIXTURE_MODE='complete', VERIFICATION_FIXTURE_MODE='blocked')
+            result = self.run_fixture(root, env)
+            self.assertNotEqual(result.returncode, 0)
+            self.assertEqual(len((root / 'artifacts/repair-count').read_text().splitlines()), 1)
+            self.assertEqual(before, git('rev-parse', 'HEAD'))
+            transcripts = list((root / 'artifacts/milestone-runs').glob('*/M015-verification-repair.prompt.md.*'))
+            self.assertEqual(len(transcripts), 1)
+            self.assertIn('STATUS: BLOCKED', transcripts[0].read_text())
+
+    def test_stale_implementation_context_blocks_commit(self):
+        with self.fixture() as (root, env, git):
+            self.prepare_plan(root, git)
+            cli = root / 'fake-bin/codex'
+            cli.write_text('#!/bin/sh\necho changed >> docs/source.md\n'
+                           'echo MILESTONE_AUTOMATION_STATUS: COMPLETE\n')
+            git('add', '.')
+            git('commit', '-m', 'Fixture stale implementation')
+            before = git('rev-parse', 'HEAD')
+            result = self.run_fixture(root, env)
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn('FAILED (exit 1): python3 automation/context.py check M015', result.stdout)
+            self.assertEqual(before, git('rev-parse', 'HEAD'))
 
 
 if __name__ == '__main__':
