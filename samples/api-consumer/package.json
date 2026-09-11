@@ -1,0 +1,13 @@
+{
+  "name": "@linguadesk/api-consumer-sample",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "M033 standalone independent API consumer: plain fetch against the local host, no React.",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "run": "node consumer.mjs"
+  }
+}
