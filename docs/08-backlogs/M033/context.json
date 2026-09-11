@@ -1,0 +1,105 @@
+{
+  "version": 1,
+  "scope": "M033",
+  "sources": [
+    {
+      "path": "docs/07-roadmap.md",
+      "ids": [
+        "M033"
+      ],
+      "use": "excerpt",
+      "reason": "Selected outcome, exit criterion, prerequisites and verification allocation",
+      "sha256": "10884f72d78d79af29e6baea81096bcfb3e257cfac5843a643cfdd7ffeaef400"
+    },
+    {
+      "path": "docs/01-PRD.md",
+      "ids": [
+        "FR-035",
+        "FR-036",
+        "FR-037",
+        "RG-005"
+      ],
+      "use": "excerpt",
+      "reason": "Selected independent-consumer requirements and release-gate portion",
+      "sha256": "1ff58282856881de4c7fb2cad3844d6c0773ef9bdfcd9b3af82f18d9dd285d18"
+    },
+    {
+      "path": "docs/05-api-design.md",
+      "heading": "8. Error semantics and client recovery",
+      "use": "excerpt",
+      "reason": "Failure categories and recovery guidance the sample must surface",
+      "sha256": "380d4b195dbb4dc1b66ccd34501f661b431e1662c2fd2d357d19ae23888785af"
+    },
+    {
+      "path": "docs/05-api-design.md",
+      "heading": "9. Privacy, compatibility, and contract generation",
+      "use": "excerpt",
+      "reason": "Contract-generation rules and privacy constraints for the sample and review",
+      "sha256": "5ec8007e40b6d488b3fab1a2cedd7b3ad1419a693a7959b76c05b5d511013350"
+    },
+    {
+      "path": "docs/05-api-design.md",
+      "heading": "10. Acceptance scenarios and readiness",
+      "use": "excerpt",
+      "reason": "API-AC-013 consumer portion and API-AC-014 contract-agreement portion",
+      "sha256": "4da19263d7c132a1c578cfd1f90814b9c1b9dd819e0470cedd7b60d90c5c97c1"
+    },
+    {
+      "path": "docs/06-verification-plan.md",
+      "heading": "2.2 Stable check groups",
+      "use": "excerpt",
+      "reason": "V-009 assertion ownership for the slice",
+      "sha256": "3ff38df95d5cde583f90f26653175be5497beeb859758da8b77fbd7efac0b661"
+    },
+    {
+      "path": "docs/verification/backend.md",
+      "heading": "3.1 Database, HTTP and published-host harness",
+      "use": "excerpt",
+      "reason": "Isolated-host, fake-adapter and determinism rules for the sample run",
+      "sha256": "c493bc0519d9271615893303f036c333d6c38d279a75c1b2863778d944c4e794"
+    },
+    {
+      "path": "docs/03-architecture.md",
+      "heading": "8.3 API behavioral design and generated contract",
+      "use": "excerpt",
+      "reason": "Generated-contract gate and sample-against-generated-types rule",
+      "sha256": "14eeacbef7471e3cdb6651582e4537db4ec7a30b5525f015c4a08b7d4bfb8660"
+    },
+    {
+      "path": "docs/product/open-questions.md",
+      "ids": [
+        "Q-003",
+        "Q-006"
+      ],
+      "use": "excerpt",
+      "reason": "Question dispositions: shared wire semantics reused, remaining account details non-blocking",
+      "sha256": "d8d95ce5c9d54c7331447de126991b55eb72e92989638921b309887ac69a145f"
+    },
+    {
+      "path": "docs/08-backlogs/M026/spec.md",
+      "use": "reference",
+      "reason": "Dependency evidence: translation operation behavior the sample exercises, not re-proven",
+      "sha256": "883ab4c49c18219f9b2bb3426e0dcfc2712df2a2c03811d2f5cecdbecc65a5d7"
+    },
+    {
+      "path": "docs/08-backlogs/M027/spec.md",
+      "use": "reference",
+      "reason": "Dependency evidence: rewriting operation behavior the sample exercises, not re-proven",
+      "sha256": "bf63e38fdb3af0d8047228acbd343dcec5b151915c2322961d2d1e71be4d4d11"
+    },
+    {
+      "path": "scripts/contract.sh",
+      "use": "reference",
+      "reason": "Contract generate/check commands the plan gates AC-005 on",
+      "sha256": "d514721c6a6beca458a884f9af172cda279fbaf36529dc1e1709e76dfb4471b9"
+    }
+  ],
+  "source_map_sha256": "b1e85e863eae8a7a5476c8f4243f890dbb2adfb9b8961ab12a5fb51e71a17aef",
+  "baseline_commit": "fbbe72504c7cfc80ef86f15832d71e098bbd808c",
+  "locked_files": {
+    "docs/00-SDD-Planning-Workflow.md": "5ccca040d0f0d50fac47632643306e7224a8d2e5460df0958e7e7c333146db89",
+    "docs/00-workflow/execution.md": "f362a1384cefef24ba204e0723e3190857c8cca9bcd91908136932e19c5caf02",
+    "docs/08-backlogs/M033/spec.md": "dea842d60eb3dbf9f7a0b10aa799886619681f433d225490db64079ac98c1777",
+    "docs/08-backlogs/M033/plan.md": "b0fc16e2f18c5db4709aaf5dbe749c516d802cea3b2182d045d66788a4a005c8"
+  }
+}
