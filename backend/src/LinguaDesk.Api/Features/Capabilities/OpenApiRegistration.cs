@@ -5,6 +5,7 @@ using LinguaDesk.Api.Features.Identity.Registration;
 using LinguaDesk.Api.Features.Identity.Verification;
 using LinguaDesk.Api.Features.Identity.Recovery;
 using LinguaDesk.Api.Features.Identity.Session;
+using LinguaDesk.Api.Features.Operations;
 using Microsoft.AspNetCore.OpenApi;
 using Microsoft.OpenApi;
 
@@ -180,6 +181,26 @@ public static class OpenApiRegistration
                         schema.MaxLength = 254;
                     }
 
+                    if (property.DeclaringType == typeof(SubmitOperationRequest)
+                        && string.Equals(property.Name, nameof(SubmitOperationRequest.OperationId), StringComparison.Ordinal))
+                    {
+                        schema.Format = "uuid";
+                    }
+
+                    if (property.DeclaringType == typeof(SubmitOperationRequest)
+                        && string.Equals(property.Name, nameof(SubmitOperationRequest.Source), StringComparison.Ordinal))
+                    {
+                        schema.MinLength = 1;
+                        schema.MaxLength = 5000;
+                    }
+
+                    if (property.DeclaringType == typeof(UsageSnapshot)
+                        && string.Equals(property.Name, nameof(UsageSnapshot.Revision), StringComparison.Ordinal))
+                    {
+                        schema.Type = JsonSchemaType.Integer;
+                        schema.Pattern = null;
+                    }
+
                     if (property.DeclaringType == typeof(ForgotPasswordRequest)
                         && string.Equals(property.Name, nameof(ForgotPasswordRequest.Email), StringComparison.Ordinal))
                     {
@@ -253,6 +274,35 @@ public static class OpenApiRegistration
                             Schema = new OpenApiSchema { Type = JsonSchemaType.String },
                         };
                     }
+                }
+
+                if (endpointName is "submitLanguageOperation" or "getLanguageOperationStatus")
+                {
+                    if (operation.Responses is not null)
+                    {
+                        foreach (var operationResponse in operation.Responses.Values.OfType<OpenApiResponse>())
+                        {
+                            operationResponse.Headers ??= new Dictionary<string, IOpenApiHeader>(StringComparer.OrdinalIgnoreCase);
+                            operationResponse.Headers["Cache-Control"] = new OpenApiHeader
+                            {
+                                Description = "Always `no-store` for language-operation admission responses.",
+                                Required = true,
+                                Schema = new OpenApiSchema { Type = JsonSchemaType.String },
+                            };
+                        }
+                    }
+
+                    operation.Security =
+                    [
+                        new OpenApiSecurityRequirement
+                        {
+                            [new OpenApiSecuritySchemeReference("bearerAuth", context.Document)] = [],
+                        },
+                        new OpenApiSecurityRequirement
+                        {
+                            [new OpenApiSecuritySchemeReference("sessionCookie", context.Document)] = [],
+                        },
+                    ];
                 }
 
                 if (endpointName is "getAccountAntiforgeryToken" or "signInLocalAccount"

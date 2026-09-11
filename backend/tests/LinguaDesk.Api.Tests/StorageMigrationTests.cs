@@ -12,6 +12,7 @@ public sealed class StorageMigrationTests
 {
     private const string InitialMigrationId = "20260908221711_InitialStorage";
     private const string LocalAccountsMigrationId = "20260909120834_LocalAccounts";
+    private const string OperationAdmissionMigrationId = "20260911024223_OperationAdmission";
 
     [TestMethod]
     public async Task ModelMatchesSnapshotWithoutOpeningOrCreatingDatabase()
@@ -32,7 +33,7 @@ public sealed class StorageMigrationTests
         await using (var context = database.CreateContext())
         {
             var applied = await context.Database.GetAppliedMigrationsAsync();
-            CollectionAssert.AreEqual(new[] { InitialMigrationId, LocalAccountsMigrationId }, applied.ToArray());
+            CollectionAssert.AreEqual(new[] { InitialMigrationId, LocalAccountsMigrationId, OperationAdmissionMigrationId }, applied.ToArray());
             Assert.AreEqual(
                 4L,
                 await ExecuteScalarAsync<long>(
@@ -53,7 +54,7 @@ public sealed class StorageMigrationTests
 
         await using var verification = database.CreateContext();
         var repeatedHistory = await verification.Database.GetAppliedMigrationsAsync();
-        CollectionAssert.AreEqual(new[] { InitialMigrationId, LocalAccountsMigrationId }, repeatedHistory.ToArray());
+        CollectionAssert.AreEqual(new[] { InitialMigrationId, LocalAccountsMigrationId, OperationAdmissionMigrationId }, repeatedHistory.ToArray());
         Assert.AreEqual("preserved", await ExecuteScalarAsync<string>(verification, "SELECT value FROM test_fixture WHERE id = 1;"));
     }
 
@@ -74,7 +75,7 @@ public sealed class StorageMigrationTests
 
         await using var verification = database.CreateContext();
         CollectionAssert.AreEqual(
-            new[] { InitialMigrationId, LocalAccountsMigrationId },
+            new[] { InitialMigrationId, LocalAccountsMigrationId, OperationAdmissionMigrationId },
             (await verification.Database.GetAppliedMigrationsAsync()).ToArray());
         Assert.AreEqual(
             "preserved",

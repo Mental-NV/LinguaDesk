@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Routing;
 using LinguaDesk.Api.Features.Capabilities;
 using LinguaDesk.Api.Features.Identity;
+using LinguaDesk.Api.Features.Operations;
 using LinguaDesk.Api.Features.Identity.Registration;
 using LinguaDesk.Api.Features.Identity.Bearer;
 using LinguaDesk.Api.Features.Identity.Session;
@@ -36,6 +37,7 @@ builder.Services.AddLinguaDeskPersistence(
     builder.Environment,
     isContractGeneration);
 builder.Services.AddLinguaDeskAccounts();
+builder.Services.AddLinguaDeskOperations();
 builder.Services.AddLinguaDeskSecurity(builder.Configuration, isContractGeneration);
 builder.Services.AddLinguaDeskReadiness(builder.Environment, isContractGeneration);
 
@@ -86,6 +88,7 @@ app.MapHealthChecks(
     .ExcludeFromDescription();
 
 app.MapCapabilities();
+app.MapOperations();
 app.MapRegistration();
 app.MapAccountVerification();
 app.MapAccountRecovery();

@@ -19,7 +19,7 @@
       "path": "docs/delivery/current.md",
       "use": "reference",
       "reason": "Dependency states (M003/M005/M007 Done) and selected-scope status at planning time",
-      "sha256": "d2fd3ade63ee26212146e95808ea46803a9501aad7647942d314a498d7b91b52"
+      "sha256": "a30c1e055de010fe621afb71fe86ad24ef89a4638c9b12e98606177b155fc4da"
     },
     {
       "path": "docs/01-PRD.md",
@@ -150,7 +150,7 @@
       ],
       "use": "reference",
       "reason": "Canonical V-group allocation for the selected scenario portions",
-      "sha256": "82dc0259e2a3229251c659bb5faad2f6fad33e34edb726b72821dee8f342e04f"
+      "sha256": "8b67c9443fd369ff4daa83f4cf177fa24bcb83740ba71a5d5ecfda96bfe5eb30"
     },
     {
       "path": "docs/08-backlogs/M003/backlog.md",
@@ -174,7 +174,7 @@
       "path": "backend/src/LinguaDesk.Api/Infrastructure/Persistence/LinguaDeskDbContext.cs",
       "use": "reference",
       "reason": "Current Identity store boundary the operation/ledger migration extends",
-      "sha256": "9bf583a65b756c1aaaaf830cd46a9618b0a049b04bf90a3a3f020d1ca149b636"
+      "sha256": "8869aa6b47119b5ef7d39838fe7772d0a1f01ae2aa73c39a952878286b5d5214"
     },
     {
       "path": "backend/src/LinguaDesk.Core/ProductCatalog.cs",
@@ -192,7 +192,7 @@
       "path": "docs/05-openapi.yaml",
       "use": "reference",
       "reason": "Current generated wire contract extended by the first operation slice",
-      "sha256": "22b93dd18adf85cb57a9d65b788fea1c05549ed0977b55ef612ae198c587120a"
+      "sha256": "be4cda68f95eabc537ca5227459ff8f43cd921535aa209b8930a0692c035ad71"
     },
     {
       "path": "scripts/backend.sh",
@@ -208,7 +208,7 @@
     }
   ],
   "source_map_sha256": "c133d3bef3c34655eda33b2100c04d527637d7f75339c680a026bbb1ea2662fd",
-  "baseline_commit": "b38abb1ceb0e84ad5423ff7e039cca5712d49e80",
+  "baseline_commit": "172e160d53f2ec290bfa7fd36445b4bb29e18361",
   "locked_files": {
     "docs/00-SDD-Planning-Workflow.md": "183ae93148ff594f9f1e021aa7543baa8878e9cc0bcfd69ebc696c28976e2945",
     "docs/00-workflow/execution.md": "f362a1384cefef24ba204e0723e3190857c8cca9bcd91908136932e19c5caf02",

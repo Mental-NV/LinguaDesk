@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 
@@ -16,6 +17,17 @@ internal static class SessionAuthentication
 
 internal sealed class CurrentAccountCookieEvents(UserManager<IdentityUser> users, TimeProvider timeProvider) : CookieAuthenticationEvents
 {
+    public override Task RedirectToLogin(RedirectContext<CookieAuthenticationOptions> context)
+    {
+        if (context.Request.Path.StartsWithSegments("/api", StringComparison.OrdinalIgnoreCase))
+        {
+            context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+            return Task.CompletedTask;
+        }
+
+        return base.RedirectToLogin(context);
+    }
+
     public override async Task ValidatePrincipal(CookieValidatePrincipalContext context)
     {
         if (context.Properties.ExpiresUtc is null || timeProvider.GetUtcNow() >= context.Properties.ExpiresUtc.Value)

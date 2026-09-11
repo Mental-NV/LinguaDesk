@@ -25,6 +25,260 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/CapabilitiesResponse"
+  /api/operations:
+    post:
+      tags:
+        - OperationsEndpoints
+      summary: Submit one logical language operation
+      description: Validates, fingerprint-matches and atomically reserves exactly one logical operation per verified account identity against both daily character allowances. Identical identities observe the pending reservation; changed payloads conflict. No provider dispatch occurs.
+      operationId: submitLanguageOperation
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SubmitOperationRequest"
+        required: true
+      responses:
+        "202":
+          description: Accepted
+          headers:
+            Cache-Control:
+              description: Always `no-store` for language-operation admission responses.
+              required: true
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OperationPendingResponse"
+        "400":
+          description: Bad Request
+          headers:
+            Cache-Control:
+              description: Always `no-store` for language-operation admission responses.
+              required: true
+              schema:
+                type: string
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/OperationProblemDetails"
+        "401":
+          description: Unauthorized
+          headers:
+            Cache-Control:
+              description: Always `no-store` for language-operation admission responses.
+              required: true
+              schema:
+                type: string
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/OperationProblemDetails"
+        "403":
+          description: Forbidden
+          headers:
+            Cache-Control:
+              description: Always `no-store` for language-operation admission responses.
+              required: true
+              schema:
+                type: string
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/OperationProblemDetails"
+        "405":
+          description: Method Not Allowed
+          headers:
+            Cache-Control:
+              description: Always `no-store` for language-operation admission responses.
+              required: true
+              schema:
+                type: string
+        "409":
+          description: Conflict
+          headers:
+            Cache-Control:
+              description: Always `no-store` for language-operation admission responses.
+              required: true
+              schema:
+                type: string
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/OperationProblemDetails"
+        "410":
+          description: Gone
+          headers:
+            Cache-Control:
+              description: Always `no-store` for language-operation admission responses.
+              required: true
+              schema:
+                type: string
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/OperationProblemDetails"
+        "415":
+          description: Unsupported Media Type
+          headers:
+            Cache-Control:
+              description: Always `no-store` for language-operation admission responses.
+              required: true
+              schema:
+                type: string
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/OperationProblemDetails"
+        "422":
+          description: Unprocessable Entity
+          headers:
+            Cache-Control:
+              description: Always `no-store` for language-operation admission responses.
+              required: true
+              schema:
+                type: string
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/OperationProblemDetails"
+        "429":
+          description: Too Many Requests
+          headers:
+            Cache-Control:
+              description: Always `no-store` for language-operation admission responses.
+              required: true
+              schema:
+                type: string
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/OperationProblemDetails"
+        "503":
+          description: Service Unavailable
+          headers:
+            Cache-Control:
+              description: Always `no-store` for language-operation admission responses.
+              required: true
+              schema:
+                type: string
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/OperationProblemDetails"
+      security:
+        - bearerAuth: []
+        - sessionCookie: []
+  /api/operations/{operationId}:
+    get:
+      tags:
+        - OperationsEndpoints
+      summary: Read one submitted operation reservation
+      description: Returns the pending reservation metadata for an account-owned operation identity with a fresh current-day usage snapshot. Status reads never dispatch work.
+      operationId: getLanguageOperationStatus
+      parameters:
+        - name: operationId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          headers:
+            Cache-Control:
+              description: Always `no-store` for language-operation admission responses.
+              required: true
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OperationPendingResponse"
+        "400":
+          description: Bad Request
+          headers:
+            Cache-Control:
+              description: Always `no-store` for language-operation admission responses.
+              required: true
+              schema:
+                type: string
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/OperationProblemDetails"
+        "401":
+          description: Unauthorized
+          headers:
+            Cache-Control:
+              description: Always `no-store` for language-operation admission responses.
+              required: true
+              schema:
+                type: string
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/OperationProblemDetails"
+        "403":
+          description: Forbidden
+          headers:
+            Cache-Control:
+              description: Always `no-store` for language-operation admission responses.
+              required: true
+              schema:
+                type: string
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/OperationProblemDetails"
+        "404":
+          description: Not Found
+          headers:
+            Cache-Control:
+              description: Always `no-store` for language-operation admission responses.
+              required: true
+              schema:
+                type: string
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/OperationProblemDetails"
+        "405":
+          description: Method Not Allowed
+          headers:
+            Cache-Control:
+              description: Always `no-store` for language-operation admission responses.
+              required: true
+              schema:
+                type: string
+        "410":
+          description: Gone
+          headers:
+            Cache-Control:
+              description: Always `no-store` for language-operation admission responses.
+              required: true
+              schema:
+                type: string
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/OperationProblemDetails"
+        "503":
+          description: Service Unavailable
+          headers:
+            Cache-Control:
+              description: Always `no-store` for language-operation admission responses.
+              required: true
+              schema:
+                type: string
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/OperationProblemDetails"
+      security:
+        - bearerAuth: []
+        - sessionCookie: []
   /api/accounts/register:
     post:
       tags:
@@ -1154,6 +1408,12 @@ components:
         - none
       type: string
       description: Unicode normalization applied before counting; none for this policy.
+    OperationFamily:
+      enum:
+        - translation
+        - rewriting
+      type: string
+      description: Language operation family.
     OperationIdentityCapability:
       required:
         - format
@@ -1178,6 +1438,123 @@ components:
         - uuidV7
       type: string
       description: Client-generated operation identity format.
+    OperationPendingResponse:
+      required:
+        - operationId
+        - family
+        - status
+        - characterCount
+        - admissionDay
+        - deadlineUtc
+        - serverTimeUtc
+        - usage
+      type: object
+      properties:
+        operationId:
+          type: string
+          description: Operation identity echoed from the submission.
+          format: uuid
+        family:
+          description: Language operation family.
+          $ref: "#/components/schemas/OperationFamily"
+        status:
+          description: Terminal state in this slice is always `pending`.
+          $ref: "#/components/schemas/OperationStatus"
+        characterCount:
+          type: integer
+          description: Reserved Unicode scalar count charged on a later successful settlement.
+          format: int32
+        admissionDay:
+          type: string
+          description: UTC day owning the reservation, in yyyy-MM-dd form.
+        deadlineUtc:
+          type: string
+          description: Server-controlled overall deadline for the operation.
+          format: date-time
+        serverTimeUtc:
+          type: string
+          description: Current server time in UTC.
+          format: date-time
+        usage:
+          description: Fresh current-day user usage snapshot.
+          $ref: "#/components/schemas/UsageSnapshot"
+    OperationProblemDetails:
+      required:
+        - title
+        - status
+        - detail
+        - category
+        - correlationId
+      type: object
+      properties:
+        type:
+          type:
+            - "null"
+            - string
+          description: RFC 9457 problem type reference.
+        title:
+          type: string
+          description: Short, stable problem summary.
+        status:
+          type: integer
+          description: HTTP status code for this occurrence.
+          format: int32
+        detail:
+          type: string
+          description: Safe explanation that never echoes submitted text.
+        category:
+          type: string
+          description: LinguaDesk error category.
+        correlationId:
+          type: string
+          description: Opaque request correlation identifier.
+        serverTimeUtc:
+          type:
+            - "null"
+            - string
+          description: Current server time in UTC for identity and allowance recovery.
+          format: date-time
+        resetAtUtc:
+          type:
+            - "null"
+            - string
+          description: Next UTC midnight resetting both daily allowances; present for allowance denials.
+          format: date-time
+        reason:
+          type:
+            - "null"
+            - string
+          description: Machine-readable eligibility reason; present for input eligibility failures.
+        characterCount:
+          pattern: ^-?(?:0|[1-9]\d*)$
+          type:
+            - "null"
+            - integer
+            - string
+          description: Submitted scalar count; present when safely countable.
+          format: int32
+        limit:
+          pattern: ^-?(?:0|[1-9]\d*)$
+          type:
+            - "null"
+            - integer
+            - string
+          description: Applicable character limit; present for oversize and allowance failures.
+          format: int32
+        errors:
+          type:
+            - "null"
+            - object
+          additionalProperties:
+            type: array
+            items:
+              type: string
+          description: Field messages for structural request failures.
+    OperationStatus:
+      enum:
+        - pending
+      type: string
+      description: Terminal state in this slice is always `pending`.
     OversizeHandling:
       enum:
         - rejectWhole
@@ -1515,6 +1892,40 @@ components:
         - zh
       type: string
       description: Source selection used when a client omits the setting.
+    SubmitOperationRequest:
+      required:
+        - operationId
+        - family
+        - source
+      type: object
+      properties:
+        operationId:
+          type: string
+          description: Client-generated UUIDv7 operation identity, unique within the account across both families.
+          format: uuid
+        family:
+          description: "Language operation family: `translation` or `rewriting`."
+          $ref: "#/components/schemas/OperationFamily"
+        source:
+          maxLength: 5000
+          minLength: 1
+          type: string
+          description: Exact decoded full source text; line endings are significant and preserved.
+        sourceSelection:
+          type:
+            - "null"
+            - string
+          description: Effective source selection; `auto` when omitted.
+        target:
+          type:
+            - "null"
+            - string
+          description: Required translation target language; absent for rewriting.
+        mode:
+          type:
+            - "null"
+            - string
+          description: Rewriting mode; the catalog default when omitted; absent for translation.
     TranslationCapability:
       required:
         - maximumSourceCharacters
@@ -1556,6 +1967,45 @@ components:
         target:
           description: Translation target language.
           $ref: "#/components/schemas/LanguageId"
+    UsageSnapshot:
+      required:
+        - day
+        - resetAtUtc
+        - consumedCharacters
+        - reservedCharacters
+        - allowanceCharacters
+        - availableCharacters
+        - revision
+      type: object
+      properties:
+        day:
+          type: string
+          description: UTC day described by this snapshot, in yyyy-MM-dd form.
+        resetAtUtc:
+          type: string
+          description: Next UTC midnight resetting both daily allowances.
+          format: date-time
+        consumedCharacters:
+          type: integer
+          description: Characters consumed by settled successes on this day.
+          format: int32
+        reservedCharacters:
+          type: integer
+          description: Characters currently reserved by pending operations on this day.
+          format: int32
+        allowanceCharacters:
+          type: integer
+          description: Configured user daily character allowance.
+          format: int32
+        availableCharacters:
+          type: integer
+          description: Nonnegative remaining reservable characters.
+          format: int32
+        revision:
+          type: integer
+          description: Durable monotonically increasing snapshot revision.
+          format: int64
+      description: Fresh current-day user usage snapshot.
     VerificationProblemDetails:
       required:
         - title
@@ -1617,6 +2067,7 @@ components:
       scheme: bearer
 tags:
   - name: CapabilitiesEndpoints
+  - name: OperationsEndpoints
   - name: RegistrationEndpoints
   - name: VerificationEndpoints
   - name: RecoveryEndpoints

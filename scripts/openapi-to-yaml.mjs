@@ -49,6 +49,8 @@ function validateContract(document) {
     Object.keys(document.paths ?? {}),
     [
       '/api/capabilities',
+      '/api/operations',
+      '/api/operations/{operationId}',
       '/api/accounts/register',
       '/api/accounts/confirm-email',
       '/api/accounts/resend-verification',
@@ -77,6 +79,116 @@ function validateContract(document) {
   expect(response.headers['Cache-Control'].schema?.type === 'string', 'Cache-Control header must be a string')
   const responseSchema = response.content?.['application/json']?.schema
   expect(responseSchema?.$ref === '#/components/schemas/CapabilitiesResponse', 'JSON response schema is missing')
+
+  const submitPath = document.paths['/api/operations']
+  sameValues(Object.keys(submitPath), ['post'], 'submit operations')
+  const submitOperation = submitPath.post
+  expect(submitOperation.operationId === 'submitLanguageOperation', 'unexpected submit operation ID')
+  expect(
+    typeof submitOperation.summary === 'string' && typeof submitOperation.description === 'string',
+    'submitLanguageOperation descriptions are required',
+  )
+  sameValues(
+    Object.keys(submitOperation.responses ?? {}),
+    ['202', '400', '401', '403', '405', '409', '410', '415', '422', '429', '503'],
+    'submitLanguageOperation responses',
+  )
+  expect(submitOperation.requestBody?.required === true, 'submitLanguageOperation request body must be required')
+  expect(
+    submitOperation.requestBody.content?.['application/json']?.schema?.$ref === '#/components/schemas/SubmitOperationRequest',
+    'submitLanguageOperation JSON request schema is missing',
+  )
+  expect(submitOperation.security?.length === 2, 'submitLanguageOperation must accept Bearer or cookie')
+  expect(submitOperation.security?.[0]?.bearerAuth !== undefined, 'submitLanguageOperation Bearer auth is missing')
+  expect(submitOperation.security?.[1]?.sessionCookie !== undefined, 'submitLanguageOperation cookie security is missing')
+  for (const status of ['202', '400', '401', '403', '405', '409', '410', '415', '422', '429', '503']) {
+    const selectedResponse = submitOperation.responses[status]
+    expect(selectedResponse.headers?.['Cache-Control']?.required === true, `submitLanguageOperation ${status} must require Cache-Control`)
+    expect(selectedResponse.headers['Cache-Control'].schema?.type === 'string', `submitLanguageOperation ${status} Cache-Control must be a string`)
+  }
+  expect(
+    submitOperation.responses['202'].content?.['application/json']?.schema?.$ref === '#/components/schemas/OperationPendingResponse',
+    'submitLanguageOperation success schema is missing',
+  )
+  for (const status of ['400', '401', '403', '409', '410', '415', '422', '429', '503']) {
+    expect(
+      submitOperation.responses[status].content?.['application/problem+json']?.schema?.$ref === '#/components/schemas/OperationProblemDetails',
+      `submitLanguageOperation ${status} Problem Details schema is missing`,
+    )
+  }
+
+  const statusPath = document.paths['/api/operations/{operationId}']
+  sameValues(Object.keys(statusPath), ['get'], 'status operations')
+  const statusOperation = statusPath.get
+  expect(statusOperation.operationId === 'getLanguageOperationStatus', 'unexpected status operation ID')
+  expect(
+    typeof statusOperation.summary === 'string' && typeof statusOperation.description === 'string',
+    'getLanguageOperationStatus descriptions are required',
+  )
+  sameValues(
+    Object.keys(statusOperation.responses ?? {}),
+    ['200', '400', '401', '403', '404', '405', '410', '503'],
+    'getLanguageOperationStatus responses',
+  )
+  expect(statusOperation.security?.length === 2, 'getLanguageOperationStatus must accept Bearer or cookie')
+  expect(statusOperation.security?.[0]?.bearerAuth !== undefined, 'getLanguageOperationStatus Bearer auth is missing')
+  expect(statusOperation.security?.[1]?.sessionCookie !== undefined, 'getLanguageOperationStatus cookie security is missing')
+  for (const status of ['200', '400', '401', '403', '404', '405', '410', '503']) {
+    const selectedResponse = statusOperation.responses[status]
+    expect(selectedResponse.headers?.['Cache-Control']?.required === true, `getLanguageOperationStatus ${status} must require Cache-Control`)
+    expect(selectedResponse.headers['Cache-Control'].schema?.type === 'string', `getLanguageOperationStatus ${status} Cache-Control must be a string`)
+  }
+  expect(
+    statusOperation.responses['200'].content?.['application/json']?.schema?.$ref === '#/components/schemas/OperationPendingResponse',
+    'getLanguageOperationStatus success schema is missing',
+  )
+  for (const status of ['400', '401', '403', '404', '410', '503']) {
+    expect(
+      statusOperation.responses[status].content?.['application/problem+json']?.schema?.$ref === '#/components/schemas/OperationProblemDetails',
+      `getLanguageOperationStatus ${status} Problem Details schema is missing`,
+    )
+  }
+
+  const submitRequest = document.components.schemas.SubmitOperationRequest
+  sameValues(submitRequest.required, ['operationId', 'family', 'source'], 'submit request required fields')
+  sameValues(
+    Object.keys(submitRequest.properties),
+    ['operationId', 'family', 'source', 'sourceSelection', 'target', 'mode'],
+    'submit request fields',
+  )
+  expect(submitRequest.properties.operationId.format === 'uuid', 'submit operation ID format is missing')
+  expect(submitRequest.properties.source.minLength === 1, 'submit source minimum is missing')
+  expect(submitRequest.properties.source.maxLength === 5000, 'submit source maximum is missing')
+  const pendingResponse = document.components.schemas.OperationPendingResponse
+  sameValues(
+    pendingResponse.required,
+    ['operationId', 'family', 'status', 'characterCount', 'admissionDay', 'deadlineUtc', 'serverTimeUtc', 'usage'],
+    'pending response required fields',
+  )
+  sameValues(
+    Object.keys(pendingResponse.properties),
+    ['operationId', 'family', 'status', 'characterCount', 'admissionDay', 'deadlineUtc', 'serverTimeUtc', 'usage'],
+    'pending response fields',
+  )
+  expect(pendingResponse.properties.characterCount.type === 'integer', 'pending character count must be integer-only')
+  const usageSnapshot = document.components.schemas.UsageSnapshot
+  sameValues(
+    usageSnapshot.required,
+    ['day', 'resetAtUtc', 'consumedCharacters', 'reservedCharacters', 'allowanceCharacters', 'availableCharacters', 'revision'],
+    'usage snapshot required fields',
+  )
+  expect(usageSnapshot.properties.revision.type === 'integer', 'usage revision must be integer-only')
+  const operationProblem = document.components.schemas.OperationProblemDetails
+  sameValues(
+    operationProblem.required,
+    ['title', 'status', 'detail', 'category', 'correlationId'],
+    'operation Problem Details required fields',
+  )
+  sameValues(
+    Object.keys(operationProblem.properties),
+    ['type', 'title', 'status', 'detail', 'category', 'correlationId', 'serverTimeUtc', 'resetAtUtc', 'reason', 'characterCount', 'limit', 'errors'],
+    'operation Problem Details fields',
+  )
 
   const registrationPath = document.paths['/api/accounts/register']
   sameValues(Object.keys(registrationPath), ['post'], 'registration operations')
@@ -423,7 +535,9 @@ function validateContract(document) {
     LanguageId: ['en', 'ru', 'ro', 'zh'],
     LineEndingPolicy: ['preserve'],
     NormalizationPolicy: ['none'],
+    OperationFamily: ['translation', 'rewriting'],
     OperationIdentityFormat: ['uuidV7'],
+    OperationStatus: ['pending'],
     OversizeHandling: ['rejectWhole'],
     RewritingModeId: [
       'correctionOnly',
