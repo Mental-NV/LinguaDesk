@@ -8,13 +8,18 @@ import {
   MESSAGE_RESULT_EDITED,
   MESSAGE_SIGN_IN,
   MESSAGE_STALE_SUCCESS,
+  MESSAGE_STATUS_NO_RECORD,
+  MESSAGE_STATUS_WINDOW_EXPIRED,
   MESSAGE_UNCERTAIN_SOURCE,
+  MESSAGE_UNKNOWN_OUTCOME,
   MESSAGE_UNSUPPORTED_CONTENT,
   MESSAGE_UPDATING,
   MESSAGE_UP_TO_DATE,
+  MESSAGE_USAGE_UNAVAILABLE,
   MESSAGE_VERIFY_EMAIL,
   createInitialWorkspace,
   describeReadiness,
+  formatLostOutputNotice,
   formatStaleChargeNotice,
   formatUsageLine,
   mapSubmitProblem,
@@ -212,7 +217,7 @@ describe('translation reducer guards', () => {
     const staleFailure = translationWorkspaceReducer(second, {
       type: 'submitFailed',
       revision: 1,
-      error: { text: MESSAGE_PROCESSING_FAILURE, canRetry: true },
+      error: { text: MESSAGE_PROCESSING_FAILURE, canRetry: true, canCheckStatus: false },
     })
     expect(staleFailure.error).toBeNull()
     expect(staleFailure.phase).toBe('submitting')
@@ -262,7 +267,7 @@ describe('translation reducer guards', () => {
       ...loaded('Hello.'),
       hasResult: true,
       resultText: 'Bună.',
-      error: { text: MESSAGE_PROCESSING_FAILURE, canRetry: true },
+      error: { text: MESSAGE_PROCESSING_FAILURE, canRetry: true, canCheckStatus: false },
     }
     const edited = translationWorkspaceReducer(failed, {
       type: 'sourceChanged',
@@ -368,5 +373,161 @@ describe('usage formatting', () => {
     expect(formatUsageLine(usage, nowMs)).toBe(
       '7,546 of 20,000 characters used · 12,454 remaining · Resets 00:00 UTC (in 6 hours)',
     )
+  })
+})
+
+describe('recovery from unavailable or unknown outcomes', () => {
+  const operationId = '0193a5b2-2c1d-7a11-9a22-334455667788'
+
+  function unknownOutcome(source = 'Hello.'): TranslationWorkspaceState {
+    const submitting = translationWorkspaceReducer(loaded(source), { type: 'submitRequested' })
+    return translationWorkspaceReducer(submitting, {
+      type: 'submitUnknownOutcome',
+      revision: submitting.requestRevision,
+      operationId,
+    })
+  }
+
+  it('retains the operation identity for Check status and forbids retry and resubmission', () => {
+    const state = unknownOutcome()
+    expect(state.phase).toBe('idle')
+    expect(state.error).toEqual({
+      text: MESSAGE_UNKNOWN_OUTCOME,
+      canRetry: false,
+      canCheckStatus: true,
+    })
+    expect(state.pendingOperationId).toBe(operationId)
+    expect(
+      describeReadiness(state, capabilities.maximumSourceCharacters).canSubmit,
+    ).toBe(false)
+  })
+
+  it('ignores a stale unknown outcome', () => {
+    const first = translationWorkspaceReducer(loaded('Hello.'), { type: 'submitRequested' })
+    const second = translationWorkspaceReducer(
+      { ...first, phase: 'idle', source: 'Hello, again.' },
+      { type: 'submitRequested' },
+    )
+    const stale = translationWorkspaceReducer(second, {
+      type: 'submitUnknownOutcome',
+      revision: 1,
+      operationId,
+    })
+    expect(stale.error).toBeNull()
+    expect(stale.pendingOperationId).toBeNull()
+    expect(stale.phase).toBe('submitting')
+  })
+
+  it('resolves no-record and window-expired answers with new-submission guidance', () => {
+    const noRecord = translationWorkspaceReducer(unknownOutcome(), {
+      type: 'statusResolved',
+      revision: 1,
+      operationId,
+      resolution: { outcome: 'noRecord' },
+    })
+    expect(noRecord.error).toEqual({
+      text: MESSAGE_STATUS_NO_RECORD,
+      canRetry: true,
+      canCheckStatus: false,
+    })
+    expect(noRecord.pendingOperationId).toBeNull()
+    expect(
+      describeReadiness(
+        { ...noRecord, source: 'Hello, the meeting starts at 14:30. Please go.' },
+        capabilities.maximumSourceCharacters,
+      ).canSubmit,
+    ).toBe(true)
+
+    const expired = translationWorkspaceReducer(unknownOutcome(), {
+      type: 'statusResolved',
+      revision: 1,
+      operationId,
+      resolution: { outcome: 'windowExpired' },
+    })
+    expect(expired.error?.text).toBe(MESSAGE_STATUS_WINDOW_EXPIRED)
+    expect(expired.error).toMatchObject({ canRetry: true, canCheckStatus: false })
+    expect(expired.pendingOperationId).toBeNull()
+  })
+
+  it('discloses a succeeded-but-unavailable outcome with its confirmed charge', () => {
+    const resolved = translationWorkspaceReducer(unknownOutcome(), {
+      type: 'statusResolved',
+      revision: 1,
+      operationId,
+      resolution: {
+        outcome: 'succeededLostOutput',
+        characterCount: 46,
+        usage,
+        observedAtMs: 1_000,
+      },
+    })
+    expect(resolved.error).toBeNull()
+    expect(resolved.pendingOperationId).toBeNull()
+    expect(resolved.notice).toBe(formatLostOutputNotice(46))
+    expect(resolved.usage?.consumedCharacters).toBe(7546)
+    expect(resolved.resultText).toBe('')
+  })
+
+  it('reports a terminal failure with zero-charge semantics and retry', () => {
+    const resolved = translationWorkspaceReducer(unknownOutcome(), {
+      type: 'statusResolved',
+      revision: 1,
+      operationId,
+      resolution: { outcome: 'terminalFailure', usage, observedAtMs: 1_000 },
+    })
+    expect(resolved.error).toEqual({
+      text: MESSAGE_PROCESSING_FAILURE,
+      canRetry: true,
+      canCheckStatus: false,
+    })
+    expect(resolved.pendingOperationId).toBeNull()
+    expect(resolved.usage?.consumedCharacters).toBe(7546)
+  })
+
+  it('keeps the unknown state while the operation is still pending', () => {
+    const resolved = translationWorkspaceReducer(unknownOutcome(), {
+      type: 'statusResolved',
+      revision: 1,
+      operationId,
+      resolution: { outcome: 'stillPending', usage, observedAtMs: 1_000 },
+    })
+    expect(resolved.error?.text).toBe(MESSAGE_UNKNOWN_OUTCOME)
+    expect(resolved.pendingOperationId).toBe(operationId)
+    expect(resolved.usage?.consumedCharacters).toBe(7546)
+  })
+
+  it('ignores a late status answer after an edit or a newer submission', () => {
+    const edited = translationWorkspaceReducer(unknownOutcome(), {
+      type: 'sourceChanged',
+      source: 'Hello, updated.',
+    })
+    expect(edited.error).toBeNull()
+    expect(edited.pendingOperationId).toBeNull()
+
+    const late = translationWorkspaceReducer(edited, {
+      type: 'statusResolved',
+      revision: 1,
+      operationId,
+      resolution: { outcome: 'noRecord' },
+    })
+    expect(late.error).toBeNull()
+    expect(late.pendingOperationId).toBeNull()
+  })
+
+  it('marks usage unavailable on refresh failure and replaces it on the next read', () => {
+    const failed = translationWorkspaceReducer(loaded('Hello.'), {
+      type: 'usageRefreshFailed',
+    })
+    expect(failed.usageUnavailable).toBe(true)
+    expect(failed.notice).toBe(MESSAGE_USAGE_UNAVAILABLE)
+
+    const refreshed = translationWorkspaceReducer(failed, {
+      type: 'usageUpdated',
+      usage,
+      observedAtMs: 2_000,
+    })
+    expect(refreshed.usageUnavailable).toBe(false)
+    expect(refreshed.notice).toBeNull()
+    expect(refreshed.usage?.consumedCharacters).toBe(7546)
   })
 })

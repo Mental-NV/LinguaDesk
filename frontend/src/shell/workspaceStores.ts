@@ -11,6 +11,7 @@ import {
 import {
   createOperationId as createTranslationOperationId,
   fetchCurrentUsage as fetchTranslationUsage,
+  fetchOperationStatus as fetchTranslationOperationStatus,
   fetchSubmitAntiforgeryToken as fetchTranslationAntiforgeryToken,
   fetchTranslationCapabilities,
   submitTranslationOperation,
@@ -18,6 +19,7 @@ import {
 import {
   createOperationId as createRewritingOperationId,
   fetchCurrentUsage as fetchRewritingUsage,
+  fetchOperationStatus as fetchRewritingOperationStatus,
   fetchSubmitAntiforgeryToken as fetchRewritingAntiforgeryToken,
   fetchRewritingCapabilities,
   submitRewritingOperation,
@@ -60,6 +62,8 @@ export interface TranslateFeatureStore {
   readonly dispatch: Dispatch<TranslationWorkspaceAction>
   readonly loadCapabilities: () => void
   readonly submit: () => void
+  readonly checkStatus: () => void
+  readonly refreshUsage: () => void
   readonly copyResult: () => void
   readonly saveScroll: (scrollY: number) => void
   readonly readSavedScroll: () => number
@@ -71,6 +75,8 @@ export interface RewriteFeatureStore {
   readonly dispatch: Dispatch<RewritingWorkspaceAction>
   readonly loadCapabilities: () => void
   readonly submit: () => void
+  readonly checkStatus: () => void
+  readonly refreshUsage: () => void
   readonly copyResult: () => void
   readonly saveScroll: (scrollY: number) => void
   readonly readSavedScroll: () => number
@@ -85,6 +91,10 @@ export function useTranslateFeatureInstance(): TranslateFeatureStore {
   )
   const aliveRef = useRef(true)
   const flightRef = useRef<AbortController | null>(null)
+  // Read-only recovery flights (Check status, Refresh usage) own a separate
+  // controller so they never abort a paid submission, and a new submission
+  // supersedes them. Sign-out aborts both.
+  const readRef = useRef<AbortController | null>(null)
   const copyTimerRef = useRef<number | null>(null)
   const scrollRef = useRef(0)
   const revisionRef = useRef(0)
@@ -97,6 +107,7 @@ export function useTranslateFeatureInstance(): TranslateFeatureStore {
     return () => {
       aliveRef.current = false
       flightRef.current?.abort()
+      readRef.current?.abort()
       if (copyTimerRef.current !== null) window.clearTimeout(copyTimerRef.current)
     }
   }, [])
@@ -130,7 +141,7 @@ export function useTranslateFeatureInstance(): TranslateFeatureStore {
   }, [])
 
   const submit = useCallback(() => {
-    if (state.composing || state.capabilities === null) return
+    if (state.composing || state.capabilities === null || state.pendingOperationId !== null) return
     const current = describeTranslationReadiness(state, state.capabilities.maximumSourceCharacters)
     if (!current.canSubmit) return
     const revision = state.requestRevision + 1
@@ -140,24 +151,25 @@ export function useTranslateFeatureInstance(): TranslateFeatureStore {
       target: state.target,
     }
     const languageName = state.capabilities.languages[captured.sourceSelection] ?? captured.sourceSelection
+    const operationId = createTranslationOperationId()
     dispatch({ type: 'submitRequested' })
     flightRef.current?.abort()
+    readRef.current?.abort()
     const controller = new AbortController()
     flightRef.current = controller
     void (async () => {
       const bootstrap = await fetchTranslationAntiforgeryToken({ signal: controller.signal })
       if (!aliveRef.current || controller.signal.aborted) return
       if (bootstrap.kind !== 'ok') {
-        dispatch({
-          type: 'submitFailed',
-          revision,
-          error: mapTranslationSubmitProblem({ httpStatus: null }),
-        })
+        // Transport interruption before dispatch (UX-AC-075): the outcome is
+        // unknown even though nothing was sent, so Check status resolves it
+        // read-only instead of asserting a zero charge.
+        dispatch({ type: 'submitUnknownOutcome', revision, operationId })
         return
       }
       const outcome = await submitTranslationOperation(
         {
-          operationId: createTranslationOperationId(),
+          operationId,
           source: captured.source,
           sourceSelection: captured.sourceSelection,
           target: captured.target,
@@ -191,11 +203,9 @@ export function useTranslateFeatureInstance(): TranslateFeatureStore {
         return
       }
       if (outcome.kind === 'network') {
-        dispatch({
-          type: 'submitFailed',
-          revision,
-          error: mapTranslationSubmitProblem({ httpStatus: null }),
-        })
+        // The POST may still have arrived: retain the identity for Check
+        // status and assert neither success nor zero charge.
+        dispatch({ type: 'submitUnknownOutcome', revision, operationId })
         return
       }
       const reset =
@@ -218,6 +228,113 @@ export function useTranslateFeatureInstance(): TranslateFeatureStore {
     })()
   }, [state])
 
+  const checkStatus = useCallback(() => {
+    const pendingId = state.pendingOperationId
+    if (pendingId === null || state.error?.canCheckStatus !== true) return
+    const revision = state.requestRevision
+    readRef.current?.abort()
+    const controller = new AbortController()
+    readRef.current = controller
+    void (async () => {
+      const check = await fetchTranslationOperationStatus(pendingId, {
+        signal: controller.signal,
+      })
+      if (!aliveRef.current || controller.signal.aborted) return
+      const observedAtMs = Date.now()
+      switch (check.kind) {
+        case 'ok':
+          if (check.status === 'succeeded') {
+            dispatch({
+              type: 'statusResolved',
+              revision,
+              operationId: pendingId,
+              resolution: {
+                outcome: 'succeededLostOutput',
+                characterCount: check.characterCount,
+                usage: check.usage,
+                observedAtMs,
+              },
+            })
+          } else if (check.status === 'failed' || check.status === 'interrupted') {
+            dispatch({
+              type: 'statusResolved',
+              revision,
+              operationId: pendingId,
+              resolution: {
+                outcome: 'terminalFailure',
+                usage: check.usage,
+                observedAtMs,
+              },
+            })
+          } else {
+            dispatch({
+              type: 'statusResolved',
+              revision,
+              operationId: pendingId,
+              resolution: { outcome: 'stillPending', usage: check.usage, observedAtMs },
+            })
+          }
+          return
+        case 'unknownRecord':
+          dispatch({
+            type: 'statusResolved',
+            revision,
+            operationId: pendingId,
+            resolution: { outcome: 'noRecord' },
+          })
+          return
+        case 'windowExpired':
+          dispatch({
+            type: 'statusResolved',
+            revision,
+            operationId: pendingId,
+            resolution: { outcome: 'windowExpired' },
+          })
+          return
+        case 'unauthorized':
+          dispatch({
+            type: 'statusResolved',
+            revision,
+            operationId: pendingId,
+            resolution: {
+              outcome: 'auth',
+              error: mapTranslationSubmitProblem({ httpStatus: 401 }),
+            },
+          })
+          return
+        case 'forbidden':
+          dispatch({
+            type: 'statusResolved',
+            revision,
+            operationId: pendingId,
+            resolution: {
+              outcome: 'auth',
+              error: mapTranslationSubmitProblem({ httpStatus: 403 }),
+            },
+          })
+          return
+        case 'unavailable':
+          // The unknown outcome is preserved; the user can check again.
+          return
+      }
+    })()
+  }, [state])
+
+  const refreshUsage = useCallback(() => {
+    readRef.current?.abort()
+    const controller = new AbortController()
+    readRef.current = controller
+    void (async () => {
+      const usage = await fetchTranslationUsage({ signal: controller.signal })
+      if (!aliveRef.current || controller.signal.aborted) return
+      if (usage.kind === 'ok') {
+        dispatch({ type: 'usageUpdated', usage: usage.usage, observedAtMs: Date.now() })
+      } else {
+        dispatch({ type: 'usageRefreshFailed' })
+      }
+    })()
+  }, [])
+
   const copyResult = useCallback(() => {
     const value = state.resultText
     void (async () => {
@@ -239,6 +356,7 @@ export function useTranslateFeatureInstance(): TranslateFeatureStore {
   const abortFlights = useCallback(() => {
     const revision = revisionRef.current
     flightRef.current?.abort()
+    readRef.current?.abort()
     dispatch({ type: 'submitAborted', revision })
   }, [])
 
@@ -248,12 +366,24 @@ export function useTranslateFeatureInstance(): TranslateFeatureStore {
       dispatch,
       loadCapabilities,
       submit,
+      checkStatus,
+      refreshUsage,
       copyResult,
       saveScroll,
       readSavedScroll,
       abortFlights,
     }),
-    [state, loadCapabilities, submit, copyResult, saveScroll, readSavedScroll, abortFlights],
+    [
+      state,
+      loadCapabilities,
+      submit,
+      checkStatus,
+      refreshUsage,
+      copyResult,
+      saveScroll,
+      readSavedScroll,
+      abortFlights,
+    ],
   )
 }
 
@@ -265,6 +395,10 @@ export function useRewriteFeatureInstance(): RewriteFeatureStore {
   )
   const aliveRef = useRef(true)
   const flightRef = useRef<AbortController | null>(null)
+  // Read-only recovery flights (Check status, Refresh usage) own a separate
+  // controller so they never abort a paid submission, and a new submission
+  // supersedes them. Sign-out aborts both.
+  const readRef = useRef<AbortController | null>(null)
   const copyTimerRef = useRef<number | null>(null)
   const scrollRef = useRef(0)
   const revisionRef = useRef(0)
@@ -277,6 +411,7 @@ export function useRewriteFeatureInstance(): RewriteFeatureStore {
     return () => {
       aliveRef.current = false
       flightRef.current?.abort()
+      readRef.current?.abort()
       if (copyTimerRef.current !== null) window.clearTimeout(copyTimerRef.current)
     }
   }, [])
@@ -310,7 +445,7 @@ export function useRewriteFeatureInstance(): RewriteFeatureStore {
   }, [])
 
   const submit = useCallback(() => {
-    if (state.composing || state.capabilities === null) return
+    if (state.composing || state.capabilities === null || state.pendingOperationId !== null) return
     const current = describeRewritingReadiness(state, state.capabilities.maximumSourceCharacters)
     if (!current.canSubmit) return
     const revision = state.requestRevision + 1
@@ -319,24 +454,25 @@ export function useRewriteFeatureInstance(): RewriteFeatureStore {
       sourceSelection: state.sourceSelection,
       mode: state.mode,
     }
+    const operationId = createRewritingOperationId()
     dispatch({ type: 'submitRequested' })
     flightRef.current?.abort()
+    readRef.current?.abort()
     const controller = new AbortController()
     flightRef.current = controller
     void (async () => {
       const bootstrap = await fetchRewritingAntiforgeryToken({ signal: controller.signal })
       if (!aliveRef.current || controller.signal.aborted) return
       if (bootstrap.kind !== 'ok') {
-        dispatch({
-          type: 'submitFailed',
-          revision,
-          error: mapRewritingSubmitProblem({ httpStatus: null }),
-        })
+        // Transport interruption before dispatch (UX-AC-075): the outcome is
+        // unknown even though nothing was sent, so Check status resolves it
+        // read-only instead of asserting a zero charge.
+        dispatch({ type: 'submitUnknownOutcome', revision, operationId })
         return
       }
       const outcome = await submitRewritingOperation(
         {
-          operationId: createRewritingOperationId(),
+          operationId,
           source: captured.source,
           sourceSelection: captured.sourceSelection,
           mode: captured.mode,
@@ -370,11 +506,9 @@ export function useRewriteFeatureInstance(): RewriteFeatureStore {
         return
       }
       if (outcome.kind === 'network') {
-        dispatch({
-          type: 'submitFailed',
-          revision,
-          error: mapRewritingSubmitProblem({ httpStatus: null }),
-        })
+        // The POST may still have arrived: retain the identity for Check
+        // status and assert neither success nor zero charge.
+        dispatch({ type: 'submitUnknownOutcome', revision, operationId })
         return
       }
       const reset =
@@ -395,6 +529,113 @@ export function useRewriteFeatureInstance(): RewriteFeatureStore {
       })
     })()
   }, [state])
+
+  const checkStatus = useCallback(() => {
+    const pendingId = state.pendingOperationId
+    if (pendingId === null || state.error?.canCheckStatus !== true) return
+    const revision = state.requestRevision
+    readRef.current?.abort()
+    const controller = new AbortController()
+    readRef.current = controller
+    void (async () => {
+      const check = await fetchRewritingOperationStatus(pendingId, {
+        signal: controller.signal,
+      })
+      if (!aliveRef.current || controller.signal.aborted) return
+      const observedAtMs = Date.now()
+      switch (check.kind) {
+        case 'ok':
+          if (check.status === 'succeeded') {
+            dispatch({
+              type: 'statusResolved',
+              revision,
+              operationId: pendingId,
+              resolution: {
+                outcome: 'succeededLostOutput',
+                characterCount: check.characterCount,
+                usage: check.usage,
+                observedAtMs,
+              },
+            })
+          } else if (check.status === 'failed' || check.status === 'interrupted') {
+            dispatch({
+              type: 'statusResolved',
+              revision,
+              operationId: pendingId,
+              resolution: {
+                outcome: 'terminalFailure',
+                usage: check.usage,
+                observedAtMs,
+              },
+            })
+          } else {
+            dispatch({
+              type: 'statusResolved',
+              revision,
+              operationId: pendingId,
+              resolution: { outcome: 'stillPending', usage: check.usage, observedAtMs },
+            })
+          }
+          return
+        case 'unknownRecord':
+          dispatch({
+            type: 'statusResolved',
+            revision,
+            operationId: pendingId,
+            resolution: { outcome: 'noRecord' },
+          })
+          return
+        case 'windowExpired':
+          dispatch({
+            type: 'statusResolved',
+            revision,
+            operationId: pendingId,
+            resolution: { outcome: 'windowExpired' },
+          })
+          return
+        case 'unauthorized':
+          dispatch({
+            type: 'statusResolved',
+            revision,
+            operationId: pendingId,
+            resolution: {
+              outcome: 'auth',
+              error: mapRewritingSubmitProblem({ httpStatus: 401 }),
+            },
+          })
+          return
+        case 'forbidden':
+          dispatch({
+            type: 'statusResolved',
+            revision,
+            operationId: pendingId,
+            resolution: {
+              outcome: 'auth',
+              error: mapRewritingSubmitProblem({ httpStatus: 403 }),
+            },
+          })
+          return
+        case 'unavailable':
+          // The unknown outcome is preserved; the user can check again.
+          return
+      }
+    })()
+  }, [state])
+
+  const refreshUsage = useCallback(() => {
+    readRef.current?.abort()
+    const controller = new AbortController()
+    readRef.current = controller
+    void (async () => {
+      const usage = await fetchRewritingUsage({ signal: controller.signal })
+      if (!aliveRef.current || controller.signal.aborted) return
+      if (usage.kind === 'ok') {
+        dispatch({ type: 'usageUpdated', usage: usage.usage, observedAtMs: Date.now() })
+      } else {
+        dispatch({ type: 'usageRefreshFailed' })
+      }
+    })()
+  }, [])
 
   const copyResult = useCallback(() => {
     const value = state.resultText
@@ -417,6 +658,7 @@ export function useRewriteFeatureInstance(): RewriteFeatureStore {
   const abortFlights = useCallback(() => {
     const revision = revisionRef.current
     flightRef.current?.abort()
+    readRef.current?.abort()
     dispatch({ type: 'submitAborted', revision })
   }, [])
 
@@ -426,12 +668,24 @@ export function useRewriteFeatureInstance(): RewriteFeatureStore {
       dispatch,
       loadCapabilities,
       submit,
+      checkStatus,
+      refreshUsage,
       copyResult,
       saveScroll,
       readSavedScroll,
       abortFlights,
     }),
-    [state, loadCapabilities, submit, copyResult, saveScroll, readSavedScroll, abortFlights],
+    [
+      state,
+      loadCapabilities,
+      submit,
+      checkStatus,
+      refreshUsage,
+      copyResult,
+      saveScroll,
+      readSavedScroll,
+      abortFlights,
+    ],
   )
 }
 

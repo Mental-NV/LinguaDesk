@@ -8,13 +8,18 @@ import {
   MESSAGE_RESULT_EDITED,
   MESSAGE_SIGN_IN,
   MESSAGE_STALE_SUCCESS,
+  MESSAGE_STATUS_NO_RECORD,
+  MESSAGE_STATUS_WINDOW_EXPIRED,
   MESSAGE_UNCERTAIN_SOURCE,
+  MESSAGE_UNKNOWN_OUTCOME,
   MESSAGE_UNSUPPORTED_CONTENT,
   MESSAGE_UPDATING,
   MESSAGE_UP_TO_DATE,
+  MESSAGE_USAGE_UNAVAILABLE,
   MESSAGE_VERIFY_EMAIL,
   createInitialWorkspace,
   describeReadiness,
+  formatLostOutputNotice,
   formatStaleChargeNotice,
   formatUsageLine,
   mapSubmitProblem,
@@ -242,7 +247,7 @@ describe('rewriting reducer guards', () => {
     const staleFailure = rewritingWorkspaceReducer(second, {
       type: 'submitFailed',
       revision: 1,
-      error: { text: MESSAGE_PROCESSING_FAILURE, canRetry: true },
+      error: { text: MESSAGE_PROCESSING_FAILURE, canRetry: true, canCheckStatus: false },
     })
     expect(staleFailure.error).toBeNull()
     expect(staleFailure.phase).toBe('submitting')
@@ -309,7 +314,7 @@ describe('rewriting reducer guards', () => {
       ...loaded(W_OK),
       hasResult: true,
       resultText: W_RESULT,
-      error: { text: MESSAGE_PROCESSING_FAILURE, canRetry: true },
+      error: { text: MESSAGE_PROCESSING_FAILURE, canRetry: true, canCheckStatus: false },
     }
     const edited = rewritingWorkspaceReducer(failed, {
       type: 'sourceChanged',
@@ -406,5 +411,135 @@ describe('usage formatting', () => {
     expect(formatUsageLine(usage, nowMs)).toBe(
       '7,546 of 20,000 characters used · 12,454 remaining · Resets 00:00 UTC (in 6 hours)',
     )
+  })
+})
+
+describe('recovery from unavailable or unknown outcomes', () => {
+  const operationId = '0193a5b2-2c1d-7a11-9a22-334455667788'
+
+  function unknownOutcome(source = W_OK): RewritingWorkspaceState {
+    const submitting = rewritingWorkspaceReducer(loaded(source), { type: 'submitRequested' })
+    return rewritingWorkspaceReducer(submitting, {
+      type: 'submitUnknownOutcome',
+      revision: submitting.requestRevision,
+      operationId,
+    })
+  }
+
+  it('retains the operation identity for Check status and forbids retry and resubmission', () => {
+    const state = unknownOutcome()
+    expect(state.phase).toBe('idle')
+    expect(state.error).toEqual({
+      text: MESSAGE_UNKNOWN_OUTCOME,
+      canRetry: false,
+      canCheckStatus: true,
+    })
+    expect(state.pendingOperationId).toBe(operationId)
+    expect(
+      describeReadiness(state, capabilities.maximumSourceCharacters).canSubmit,
+    ).toBe(false)
+  })
+
+  it('resolves no-record and window-expired answers with new-submission guidance', () => {
+    const noRecord = rewritingWorkspaceReducer(unknownOutcome(), {
+      type: 'statusResolved',
+      revision: 1,
+      operationId,
+      resolution: { outcome: 'noRecord' },
+    })
+    expect(noRecord.error).toEqual({
+      text: MESSAGE_STATUS_NO_RECORD,
+      canRetry: true,
+      canCheckStatus: false,
+    })
+    expect(noRecord.pendingOperationId).toBeNull()
+
+    const expired = rewritingWorkspaceReducer(unknownOutcome(), {
+      type: 'statusResolved',
+      revision: 1,
+      operationId,
+      resolution: { outcome: 'windowExpired' },
+    })
+    expect(expired.error?.text).toBe(MESSAGE_STATUS_WINDOW_EXPIRED)
+    expect(expired.error).toMatchObject({ canRetry: true, canCheckStatus: false })
+    expect(expired.pendingOperationId).toBeNull()
+  })
+
+  it('discloses a succeeded-but-unavailable outcome with its confirmed charge', () => {
+    const resolved = rewritingWorkspaceReducer(unknownOutcome(), {
+      type: 'statusResolved',
+      revision: 1,
+      operationId,
+      resolution: {
+        outcome: 'succeededLostOutput',
+        characterCount: 46,
+        usage,
+        observedAtMs: 1_000,
+      },
+    })
+    expect(resolved.error).toBeNull()
+    expect(resolved.pendingOperationId).toBeNull()
+    expect(resolved.notice).toBe(formatLostOutputNotice(46))
+    expect(resolved.usage?.consumedCharacters).toBe(7546)
+    expect(resolved.resultText).toBe('')
+  })
+
+  it('reports a terminal failure with retry and keeps the unknown state while pending', () => {
+    const terminal = rewritingWorkspaceReducer(unknownOutcome(), {
+      type: 'statusResolved',
+      revision: 1,
+      operationId,
+      resolution: { outcome: 'terminalFailure', usage, observedAtMs: 1_000 },
+    })
+    expect(terminal.error).toEqual({
+      text: MESSAGE_PROCESSING_FAILURE,
+      canRetry: true,
+      canCheckStatus: false,
+    })
+    expect(terminal.pendingOperationId).toBeNull()
+
+    const pending = rewritingWorkspaceReducer(unknownOutcome(), {
+      type: 'statusResolved',
+      revision: 1,
+      operationId,
+      resolution: { outcome: 'stillPending', usage, observedAtMs: 1_000 },
+    })
+    expect(pending.error?.text).toBe(MESSAGE_UNKNOWN_OUTCOME)
+    expect(pending.pendingOperationId).toBe(operationId)
+  })
+
+  it('ignores a late status answer after an edit and clears the unknown state on edit', () => {
+    const edited = rewritingWorkspaceReducer(unknownOutcome(), {
+      type: 'modeChanged',
+      value: 'simple',
+    })
+    expect(edited.error).toBeNull()
+    expect(edited.pendingOperationId).toBeNull()
+
+    const late = rewritingWorkspaceReducer(edited, {
+      type: 'statusResolved',
+      revision: 1,
+      operationId,
+      resolution: { outcome: 'noRecord' },
+    })
+    expect(late.error).toBeNull()
+    expect(late.pendingOperationId).toBeNull()
+  })
+
+  it('marks usage unavailable on refresh failure and replaces it on the next read', () => {
+    const failed = rewritingWorkspaceReducer(loaded(W_OK), {
+      type: 'usageRefreshFailed',
+    })
+    expect(failed.usageUnavailable).toBe(true)
+    expect(failed.notice).toBe(MESSAGE_USAGE_UNAVAILABLE)
+
+    const refreshed = rewritingWorkspaceReducer(failed, {
+      type: 'usageUpdated',
+      usage,
+      observedAtMs: 2_000,
+    })
+    expect(refreshed.usageUnavailable).toBe(false)
+    expect(refreshed.notice).toBeNull()
+    expect(refreshed.usage?.consumedCharacters).toBe(7546)
   })
 })

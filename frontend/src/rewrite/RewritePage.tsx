@@ -18,8 +18,17 @@ interface RewritePageProps {
 
 export function RewritePage({ onSignOut }: RewritePageProps) {
   const store = useRewriteFeature()
-  const { state, dispatch, loadCapabilities, submit, copyResult, saveScroll, readSavedScroll } =
-    store
+  const {
+    state,
+    dispatch,
+    loadCapabilities,
+    submit,
+    checkStatus,
+    refreshUsage,
+    copyResult,
+    saveScroll,
+    readSavedScroll,
+  } = store
   const formId = useId()
   const sourceId = `${formId}-source`
   const sourceLanguageId = `${formId}-source-language`
@@ -185,7 +194,13 @@ export function RewritePage({ onSignOut }: RewritePageProps) {
       {state.error === null ? null : (
         <div className="server-alert" id={errorId} role="alert">
           <p>{state.error.text}</p>
-          {state.error.canRetry ? (
+          {state.error.canCheckStatus ? (
+            <p>
+              <button type="button" className="secondary-button" onClick={checkStatus}>
+                Check status
+              </button>
+            </p>
+          ) : state.error.canRetry ? (
             <p>
               <button type="button" className="secondary-button" onClick={handleRewrite}>
                 Try again
@@ -246,6 +261,13 @@ export function RewritePage({ onSignOut }: RewritePageProps) {
           <p>Usage is unavailable until the first successful submission.</p>
         ) : (
           <p>{formatUsageLine(state.usage, state.usageObservedAtMs)}</p>
+        )}
+        {state.usage === null && !state.usageUnavailable ? null : (
+          <p>
+            <button type="button" className="secondary-button" onClick={refreshUsage}>
+              Refresh usage
+            </button>
+          </p>
         )}
       </section>
     </div>

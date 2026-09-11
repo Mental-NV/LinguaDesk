@@ -157,29 +157,29 @@
       "path": "frontend/src/translate/translationWorkspace.ts",
       "use": "reference",
       "reason": "Current translation reducer semantics the recovery states must extend",
-      "sha256": "37df4095147cfc79bdfec8126d470d372c6a65ebbe08721f43ce6d9381a5f5c4"
+      "sha256": "40f52c604ca70aeb52626ee312db380634b91fe4bbff3e4615809d0c2ee8fb14"
     },
     {
       "path": "frontend/src/rewrite/rewritingWorkspace.ts",
       "use": "reference",
       "reason": "Current rewriting reducer semantics the recovery states must extend",
-      "sha256": "a9348696b25f251b4f5fbce1598adbbff98691d2d88fbffa2b531c86d8ea8099"
+      "sha256": "068ad98959048a7afbea06162374e8845a079e15156f0cab90df17c1f2387b58"
     },
     {
       "path": "frontend/src/api/translation.ts",
       "use": "reference",
       "reason": "Current translation transport client the status-read client must follow",
-      "sha256": "00e771d941f14dff7bc97a9745ba602708963f3e40f6c4c912016f92f3ab7426"
+      "sha256": "c270d68a999cf37ca525451ac1f27d8a3789dacf0d24764f7a39da5826abc042"
     },
     {
       "path": "frontend/src/api/rewriting.ts",
       "use": "reference",
       "reason": "Current rewriting transport client the status-read client must follow",
-      "sha256": "2f281d419f59e48847c61c78ca4ef2251386ad68c7aae64917c322216b3dd044"
+      "sha256": "525a0016f84316cc1164a336ebec538999d01245f9f3c33c4d3785d8e604cb61"
     }
   ],
   "source_map_sha256": "0cf9c43a58a389cd939d360c5ddaefb035b3dc580bb277bfc3e8ba7bf0373c35",
-  "baseline_commit": "fbaee862f39b2a456411cb9b3b9d41a5441e0bcb",
+  "baseline_commit": "843a37dca766f44822f38f4f2aa4645628f99ac0",
   "locked_files": {
     "docs/00-SDD-Planning-Workflow.md": "5ccca040d0f0d50fac47632643306e7224a8d2e5460df0958e7e7c333146db89",
     "docs/00-workflow/execution.md": "f362a1384cefef24ba204e0723e3190857c8cca9bcd91908136932e19c5caf02",

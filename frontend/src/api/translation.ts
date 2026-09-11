@@ -4,6 +4,7 @@ import type { TranslationCapabilities, TranslationUsage } from '../translate/tra
 
 type CapabilitiesBody = operations['getCapabilities']['responses']['200']['content']['application/json']
 type SubmitBody = operations['submitLanguageOperation']['requestBody']['content']['application/json']
+type StatusBody = operations['getLanguageOperationStatus']['responses']['200']['content']['application/json']
 type SuccessBody = components['schemas']['TranslationSuccessResponse']
 type PendingBody = components['schemas']['OperationPendingResponse']
 type ProblemBody = components['schemas']['OperationProblemDetails']
@@ -190,6 +191,67 @@ export async function submitTranslationOperation(
     return { kind: 'pending' }
   }
   return toProblem(response.status, await readProblem(response))
+}
+
+export type OperationStatusCheck =
+  | {
+      readonly kind: 'ok'
+      readonly status: 'pending' | 'succeeded' | 'failed' | 'interrupted'
+      readonly characterCount: number
+      readonly admissionDay: string
+      readonly usage: TranslationUsage
+    }
+  | { readonly kind: 'unknownRecord' }
+  | { readonly kind: 'windowExpired' }
+  | { readonly kind: 'unauthorized' }
+  | { readonly kind: 'forbidden' }
+  | { readonly kind: 'unavailable' }
+
+/**
+ * Read-only status read for the original operation identity (M031 recovery).
+ * Never dispatches provider work, charges, or creates claims: a GET against
+ * the existing `getLanguageOperationStatus` wire shape only. 404 means no
+ * account-owned record exists (nothing is known); 410 means the replay
+ * window ended; any other failure preserves the unknown outcome.
+ */
+export async function fetchOperationStatus(
+  operationId: string,
+  options: TransportOptions = {},
+): Promise<OperationStatusCheck> {
+  let response: Response
+  try {
+    response = await fetch(`${OPERATIONS_PATH}/${encodeURIComponent(operationId)}`, {
+      method: 'GET',
+      signal: options.signal,
+    })
+  } catch {
+    return { kind: 'unavailable' }
+  }
+  if (response.status === 404) return { kind: 'unknownRecord' }
+  if (response.status === 410) return { kind: 'windowExpired' }
+  if (response.status === 401) return { kind: 'unauthorized' }
+  if (response.status === 403) return { kind: 'forbidden' }
+  if (response.status !== 200) return { kind: 'unavailable' }
+  try {
+    const body = (await response.json()) as StatusBody
+    if (
+      body.status !== 'pending' &&
+      body.status !== 'succeeded' &&
+      body.status !== 'failed' &&
+      body.status !== 'interrupted'
+    ) {
+      return { kind: 'unavailable' }
+    }
+    return {
+      kind: 'ok',
+      status: body.status,
+      characterCount: body.characterCount,
+      admissionDay: body.admissionDay,
+      usage: toUsage(body.usage),
+    }
+  } catch {
+    return { kind: 'unavailable' }
+  }
 }
 
 export type AntiforgeryResult =

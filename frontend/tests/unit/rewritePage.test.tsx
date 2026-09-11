@@ -101,7 +101,15 @@ interface OperationPost {
   antiforgery: string | null
 }
 
-function installFetch(operationsHandler: (call: number) => Response | Promise<Response>) {
+interface FetchOverrides {
+  readonly status?: (url: string) => Response | Promise<Response>
+  readonly usage?: () => Response | Promise<Response>
+}
+
+function installFetch(
+  operationsHandler: (call: number) => Response | Promise<Response>,
+  overrides: FetchOverrides = {},
+) {
   const operations: OperationPost[] = []
   const calls: string[] = []
   let operationCalls = 0
@@ -119,7 +127,12 @@ function installFetch(operationsHandler: (call: number) => Response | Promise<Re
         })
       }
       if (url === '/api/usage') {
+        if (overrides.usage !== undefined) return await overrides.usage()
         return new Response(JSON.stringify(usageBody), { status: 200 })
+      }
+      if (url.startsWith('/api/operations/') && (init?.method ?? 'GET') === 'GET') {
+        if (overrides.status !== undefined) return await overrides.status(url)
+        return new Response(JSON.stringify({ title: 'Not found' }), { status: 404 })
       }
       if (url === '/api/operations' && (init?.method ?? 'GET') === 'POST') {
         operationCalls += 1
@@ -450,5 +463,112 @@ describe('rewrite workspace components', () => {
     const usageSection = screen.getByRole('region', { name: 'Usage' })
     expect(usageSection).toBeVisible()
     expect(within(usageSection).getByText(/characters used/)).toBeVisible()
+  })
+
+  it('shows unknown-outcome recovery with Check status and resolves no-record read-only', async () => {
+    const user = userEvent.setup()
+    const { operations, calls } = installFetch(async () => {
+      throw new TypeError('fetch failed')
+    })
+    await renderReadyWorkspace()
+    await fillValidWorkspace(user)
+    await user.click(screen.getByRole('button', { name: 'Rewrite' }))
+
+    expect(
+      await screen.findByText(
+        'We couldn’t confirm whether this request completed. Your text is safe. Check its status before trying again.',
+      ),
+    ).toBeVisible()
+    expect(screen.getByRole('button', { name: 'Check status' })).toBeVisible()
+    expect(screen.queryByRole('button', { name: 'Try again' })).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Rewrite' })).toBeDisabled()
+    expect(screen.getByLabelText('Source text')).toHaveValue(W_OK)
+    await waitFor(() => expect(operations).toHaveLength(1))
+
+    await user.click(screen.getByRole('button', { name: 'Check status' }))
+    expect(
+      await screen.findByText(
+        'We found no record of this request, so its outcome is unknown. Your text is safe. You can submit it as a new request.',
+      ),
+    ).toBeVisible()
+    expect(screen.getByRole('button', { name: 'Try again' })).toBeVisible()
+    expect(screen.getByRole('button', { name: 'Rewrite' })).toBeEnabled()
+    // The status read issues exactly one GET and zero operation posts.
+    expect(operations).toHaveLength(1)
+    expect(calls.filter((call) => call.startsWith('GET /api/operations/'))).toHaveLength(1)
+  })
+
+  it('reports an interrupted outcome with zero charge and retry', async () => {
+    const user = userEvent.setup()
+    const { operations } = installFetch(
+      async () => {
+        throw new TypeError('fetch failed')
+      },
+      {
+        status: () =>
+          jsonResponse(
+            {
+              operationId: '0193a5b2-2c1d-7a11-9a22-334455667788',
+              family: 'rewriting',
+              status: 'interrupted',
+              characterCount: 0,
+              admissionDay: '2026-09-11',
+              deadlineUtc: '2026-09-11T08:30:30Z',
+              outputAvailable: false,
+              serverTimeUtc: '2026-09-11T08:30:00Z',
+              usage: usageBody,
+            },
+            200,
+          ),
+      },
+    )
+    await renderReadyWorkspace()
+    await fillValidWorkspace(user)
+    await user.click(screen.getByRole('button', { name: 'Rewrite' }))
+    await screen.findByRole('button', { name: 'Check status' })
+
+    await user.click(screen.getByRole('button', { name: 'Check status' }))
+    expect(
+      await screen.findByText(
+        'We couldn’t process this text. Your text and previous result are safe.',
+      ),
+    ).toBeVisible()
+    expect(screen.getByRole('button', { name: 'Try again' })).toBeVisible()
+    expect(operations).toHaveLength(1)
+  })
+
+  it('refreshes usage read-only and reports an unavailable update', async () => {
+    const user = userEvent.setup()
+    let usageFailing = false
+    const { operations } = installFetch(() => jsonResponse(successBody(), 201), {
+      usage: () =>
+        usageFailing
+          ? Promise.resolve(new Response('{}', { status: 503 }))
+          : Promise.resolve(jsonResponse(usageBody, 200)),
+    })
+    await renderReadyWorkspace()
+    await fillValidWorkspace(user)
+    await user.click(screen.getByRole('button', { name: 'Rewrite' }))
+    await screen.findByLabelText('Result')
+
+    const postsBefore = operations.length
+    await user.click(screen.getByRole('button', { name: 'Refresh usage' }))
+    await waitFor(() =>
+      expect(screen.getByRole('region', { name: 'Usage' })).toHaveTextContent(
+        /7,546 of 20,000 characters used/,
+      ),
+    )
+    expect(operations.length).toBe(postsBefore)
+
+    usageFailing = true
+    await user.click(screen.getByRole('button', { name: 'Refresh usage' }))
+    expect(await screen.findByText('Usage update unavailable')).toBeVisible()
+    expect(operations.length).toBe(postsBefore)
+    expect(screen.getByLabelText('Result')).toHaveValue(W_RESULT)
+
+    usageFailing = false
+    await user.click(screen.getByRole('button', { name: 'Refresh usage' }))
+    await waitFor(() => expect(screen.queryByText('Usage update unavailable')).not.toBeInTheDocument())
+    expect(operations.length).toBe(postsBefore)
   })
 })

@@ -26,6 +26,17 @@ export const MESSAGE_MONETARY_SUSPENDED =
   'LinguaDesk processing is temporarily unavailable because its service budget has been reached. Your text is safe. Try again after service resumes.' as const
 export const MESSAGE_OFFLINE =
   'You’re offline. Keep editing. When you’re back online, select Translate or Rewrite to process your text.' as const
+export const MESSAGE_UNKNOWN_OUTCOME =
+  'We couldn’t confirm whether this request completed. Your text is safe. Check its status before trying again.' as const
+export const MESSAGE_STATUS_NO_RECORD =
+  'We found no record of this request, so its outcome is unknown. Your text is safe. You can submit it as a new request.' as const
+export const MESSAGE_STATUS_WINDOW_EXPIRED =
+  'The status window for this request has expired, so its outcome is unknown. Your text is safe. You can submit it as a new request.' as const
+export const MESSAGE_USAGE_UNAVAILABLE = 'Usage update unavailable' as const
+
+export function formatLostOutputNotice(characterCount: number): string {
+  return `The request completed and ${characterCount} characters were counted toward your usage, but the result text is no longer available. Submit again to generate a new result.`
+}
 
 export function formatOversizeMessage(excess: number): string {
   return `Rewriting is limited to 2,000 characters. Remove ${excess} characters to continue.`
@@ -67,6 +78,7 @@ export type RewritingPhase = 'idle' | 'submitting'
 export interface RewritingError {
   readonly text: string
   readonly canRetry: boolean
+  readonly canCheckStatus: boolean
 }
 
 export interface RewritingWorkspaceState {
@@ -87,9 +99,32 @@ export interface RewritingWorkspaceState {
   readonly requestRevision: number
   readonly appliedRevision: number
   readonly staleChargePending: number | null
+  readonly pendingOperationId: string | null
+  readonly usageUnavailable: boolean
   readonly capabilities: RewritingCapabilities | null
   readonly capabilitiesFailed: boolean
 }
+
+export type RewritingStatusResolution =
+  | {
+      readonly outcome: 'succeededLostOutput'
+      readonly characterCount: number
+      readonly usage: RewritingUsage
+      readonly observedAtMs: number
+    }
+  | {
+      readonly outcome: 'terminalFailure'
+      readonly usage: RewritingUsage
+      readonly observedAtMs: number
+    }
+  | {
+      readonly outcome: 'stillPending'
+      readonly usage: RewritingUsage
+      readonly observedAtMs: number
+    }
+  | { readonly outcome: 'noRecord' }
+  | { readonly outcome: 'windowExpired' }
+  | { readonly outcome: 'auth'; readonly error: RewritingError }
 
 export type RewritingWorkspaceAction =
   | { readonly type: 'sourceChanged'; readonly source: string }
@@ -110,9 +145,17 @@ export type RewritingWorkspaceAction =
       readonly observedAtMs: number
     }
   | { readonly type: 'submitFailed'; readonly revision: number; readonly error: RewritingError }
+  | { readonly type: 'submitUnknownOutcome'; readonly revision: number; readonly operationId: string }
+  | {
+      readonly type: 'statusResolved'
+      readonly revision: number
+      readonly operationId: string
+      readonly resolution: RewritingStatusResolution
+    }
   | { readonly type: 'submitAborted'; readonly revision: number }
   | { readonly type: 'resultEdited'; readonly value: string }
   | { readonly type: 'usageUpdated'; readonly usage: RewritingUsage; readonly observedAtMs: number }
+  | { readonly type: 'usageRefreshFailed' }
   | { readonly type: 'copied'; readonly ok: boolean }
   | { readonly type: 'noticeDismissed' }
 
@@ -145,6 +188,8 @@ export function createInitialWorkspace(modeDefault = 'correctionOnly'): Rewritin
     requestRevision: 0,
     appliedRevision: 0,
     staleChargePending: null,
+    pendingOperationId: null,
+    usageUnavailable: false,
     capabilities: null,
     capabilitiesFailed: false,
   }
@@ -183,6 +228,7 @@ export function describeReadiness(
     canSubmit:
       state.phase === 'idle' &&
       !state.composing &&
+      state.pendingOperationId === null &&
       validation.isValid,
     excess: validation.input.excess,
   }
@@ -228,8 +274,8 @@ function asCount(value: unknown): number | null {
 export function mapSubmitProblem(input: SubmitProblemInput): RewritingError {
   const category = asText(input.category)
   const reason = asText(input.reason)
-  if (input.httpStatus === 401) return { text: MESSAGE_SIGN_IN, canRetry: false }
-  if (input.httpStatus === 403) return { text: MESSAGE_VERIFY_EMAIL, canRetry: false }
+  if (input.httpStatus === 401) return { text: MESSAGE_SIGN_IN, canRetry: false, canCheckStatus: false }
+  if (input.httpStatus === 403) return { text: MESSAGE_VERIFY_EMAIL, canRetry: false, canCheckStatus: false }
   if (input.httpStatus === 429) {
     const reset = asText(input.resetAtUtc) ?? 'the next reset'
     return {
@@ -238,23 +284,24 @@ export function mapSubmitProblem(input: SubmitProblemInput): RewritingError {
           ? formatGlobalAllowanceMessage(reset)
           : formatUserAllowanceMessage(reset),
       canRetry: false,
+      canCheckStatus: false,
     }
   }
   if (input.httpStatus === 422) {
-    if (reason === 'uncertain') return { text: MESSAGE_UNCERTAIN_SOURCE, canRetry: false }
+    if (reason === 'uncertain') return { text: MESSAGE_UNCERTAIN_SOURCE, canRetry: false, canCheckStatus: false }
     if (reason === 'oversizedSource') {
       const count = asCount(input.characterCount)
       const limit = asCount(input.limit)
       const excess = count !== null && limit !== null ? Math.max(0, count - limit) : 0
-      return { text: formatOversizeMessage(excess), canRetry: false }
+      return { text: formatOversizeMessage(excess), canRetry: false, canCheckStatus: false }
     }
-    return { text: MESSAGE_UNSUPPORTED_CONTENT, canRetry: false }
+    return { text: MESSAGE_UNSUPPORTED_CONTENT, canRetry: false, canCheckStatus: false }
   }
   if (input.httpStatus === 503 && category === 'monetarySuspension') {
-    return { text: MESSAGE_MONETARY_SUSPENDED, canRetry: false }
+    return { text: MESSAGE_MONETARY_SUSPENDED, canRetry: false, canCheckStatus: false }
   }
-  if (input.httpStatus === 504) return { text: MESSAGE_DEADLINE, canRetry: true }
-  return { text: MESSAGE_PROCESSING_FAILURE, canRetry: true }
+  if (input.httpStatus === 504) return { text: MESSAGE_DEADLINE, canRetry: true, canCheckStatus: false }
+  return { text: MESSAGE_PROCESSING_FAILURE, canRetry: true, canCheckStatus: false }
 }
 
 export function rewritingWorkspaceReducer(
@@ -268,6 +315,7 @@ export function rewritingWorkspaceReducer(
         source: action.source,
         resultOutdated: state.hasResult ? true : state.resultOutdated,
         error: null,
+        pendingOperationId: null,
       }
     case 'sourceSelectionChanged':
       return {
@@ -275,6 +323,7 @@ export function rewritingWorkspaceReducer(
         sourceSelection: action.value,
         resultOutdated: state.hasResult ? true : state.resultOutdated,
         error: null,
+        pendingOperationId: null,
       }
     case 'modeChanged':
       return {
@@ -282,6 +331,7 @@ export function rewritingWorkspaceReducer(
         mode: action.value,
         resultOutdated: state.hasResult ? true : state.resultOutdated,
         error: null,
+        pendingOperationId: null,
       }
     case 'compositionStarted':
       return { ...state, composing: true }
@@ -303,6 +353,7 @@ export function rewritingWorkspaceReducer(
         // edits made after this activation are protected from its response.
         resultEdited: false,
         error: null,
+        pendingOperationId: null,
         notice: null,
         copyAlert: null,
       }
@@ -349,6 +400,94 @@ export function rewritingWorkspaceReducer(
     case 'submitFailed':
       if (action.revision !== state.requestRevision) return state
       return { ...state, phase: 'idle', error: action.error }
+    case 'submitUnknownOutcome':
+      // Transport interruption (UX-AC-075): the request may still have arrived,
+      // so neither success nor zero charge is asserted. The original identity
+      // is retained for a read-only Check status; retry stays forbidden until
+      // that read returns a terminal answer.
+      if (action.revision !== state.requestRevision) return state
+      return {
+        ...state,
+        phase: 'idle',
+        error: { text: MESSAGE_UNKNOWN_OUTCOME, canRetry: false, canCheckStatus: true },
+        pendingOperationId: action.operationId,
+      }
+    case 'statusResolved': {
+      // Fenced by captured revision and the retained identity: an intervening
+      // edit or newer submission drops the pending identity, so late answers
+      // never replace newer workspace state nor trigger retry.
+      if (
+        action.revision !== state.requestRevision ||
+        state.pendingOperationId === null ||
+        state.pendingOperationId !== action.operationId
+      ) {
+        return state
+      }
+      const resolution = action.resolution
+      switch (resolution.outcome) {
+        case 'succeededLostOutput':
+          return {
+            ...state,
+            phase: 'idle',
+            error: null,
+            pendingOperationId: null,
+            usage: resolution.usage,
+            usageObservedAtMs: resolution.observedAtMs,
+            usageUnavailable: false,
+            notice: formatLostOutputNotice(resolution.characterCount),
+          }
+        case 'terminalFailure':
+          return {
+            ...state,
+            phase: 'idle',
+            error: {
+              text: MESSAGE_PROCESSING_FAILURE,
+              canRetry: true,
+              canCheckStatus: false,
+            },
+            pendingOperationId: null,
+            usage: resolution.usage,
+            usageObservedAtMs: resolution.observedAtMs,
+          }
+        case 'stillPending':
+          return {
+            ...state,
+            usage: resolution.usage,
+            usageObservedAtMs: resolution.observedAtMs,
+          }
+        case 'noRecord':
+          return {
+            ...state,
+            phase: 'idle',
+            error: {
+              text: MESSAGE_STATUS_NO_RECORD,
+              canRetry: true,
+              canCheckStatus: false,
+            },
+            pendingOperationId: null,
+          }
+        case 'windowExpired':
+          return {
+            ...state,
+            phase: 'idle',
+            error: {
+              text: MESSAGE_STATUS_WINDOW_EXPIRED,
+              canRetry: true,
+              canCheckStatus: false,
+            },
+            pendingOperationId: null,
+          }
+        case 'auth':
+          return {
+            ...state,
+            phase: 'idle',
+            error: resolution.error,
+            pendingOperationId: null,
+          }
+        default:
+          return state
+      }
+    }
     case 'submitAborted':
       // Sign-out invalidates pending flights (M013 teardown): release the
       // busy phase without touching text. Navigation never dispatches this.
@@ -357,7 +496,15 @@ export function rewritingWorkspaceReducer(
     case 'resultEdited':
       return { ...state, resultText: action.value, resultEdited: true, copyAlert: null }
     case 'usageUpdated':
-      return { ...state, usage: action.usage, usageObservedAtMs: action.observedAtMs }
+      return {
+        ...state,
+        usage: action.usage,
+        usageObservedAtMs: action.observedAtMs,
+        usageUnavailable: false,
+        notice: state.notice === MESSAGE_USAGE_UNAVAILABLE ? null : state.notice,
+      }
+    case 'usageRefreshFailed':
+      return { ...state, usageUnavailable: true, notice: MESSAGE_USAGE_UNAVAILABLE }
     case 'copied':
       return {
         ...state,

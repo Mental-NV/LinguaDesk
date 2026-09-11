@@ -87,7 +87,15 @@ interface OperationPost {
   antiforgery: string | null
 }
 
-function installFetch(operationsHandler: (call: number) => Response | Promise<Response>) {
+interface FetchOverrides {
+  readonly status?: (url: string) => Response | Promise<Response>
+  readonly usage?: () => Response | Promise<Response>
+}
+
+function installFetch(
+  operationsHandler: (call: number) => Response | Promise<Response>,
+  overrides: FetchOverrides = {},
+) {
   const operations: OperationPost[] = []
   const calls: string[] = []
   let operationCalls = 0
@@ -105,7 +113,12 @@ function installFetch(operationsHandler: (call: number) => Response | Promise<Re
         })
       }
       if (url === '/api/usage') {
+        if (overrides.usage !== undefined) return await overrides.usage()
         return new Response(JSON.stringify(usageBody), { status: 200 })
+      }
+      if (url.startsWith('/api/operations/') && (init?.method ?? 'GET') === 'GET') {
+        if (overrides.status !== undefined) return await overrides.status(url)
+        return new Response(JSON.stringify({ title: 'Not found' }), { status: 404 })
       }
       if (url === '/api/operations' && (init?.method ?? 'GET') === 'POST') {
         operationCalls += 1
@@ -121,6 +134,20 @@ function installFetch(operationsHandler: (call: number) => Response | Promise<Re
     }),
   )
   return { operations, calls }
+}
+
+function statusBody(status: string, characterCount = 0, consumed = 7592) {
+  return {
+    operationId: '0193a5b2-2c1d-7a11-9a22-334455667788',
+    family: 'translation',
+    status,
+    characterCount,
+    admissionDay: '2026-09-11',
+    deadlineUtc: '2026-09-11T08:30:30Z',
+    outputAvailable: false,
+    serverTimeUtc: '2026-09-11T08:30:00Z',
+    usage: { ...usageBody, consumedCharacters: consumed },
+  }
 }
 
 function jsonResponse(payload: unknown, status: number): Response {
@@ -427,5 +454,100 @@ describe('translate workspace components', () => {
     const usageSection = screen.getByRole('region', { name: 'Usage' })
     expect(usageSection).toBeVisible()
     expect(within(usageSection).getByText(/characters used/)).toBeVisible()
+  })
+
+  it('shows unknown-outcome recovery with Check status and resolves no-record read-only', async () => {
+    const user = userEvent.setup()
+    const { operations, calls } = installFetch(async () => {
+      throw new TypeError('fetch failed')
+    })
+    await renderReadyWorkspace()
+    await fillValidWorkspace(user)
+    await user.click(screen.getByRole('button', { name: 'Translate' }))
+
+    expect(
+      await screen.findByText(
+        'We couldn’t confirm whether this request completed. Your text is safe. Check its status before trying again.',
+      ),
+    ).toBeVisible()
+    expect(screen.getByRole('button', { name: 'Check status' })).toBeVisible()
+    expect(screen.queryByRole('button', { name: 'Try again' })).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Translate' })).toBeDisabled()
+    expect(screen.getByLabelText('Source text')).toHaveValue(TOK_A)
+    await waitFor(() => expect(operations).toHaveLength(1))
+
+    await user.click(screen.getByRole('button', { name: 'Check status' }))
+    expect(
+      await screen.findByText(
+        'We found no record of this request, so its outcome is unknown. Your text is safe. You can submit it as a new request.',
+      ),
+    ).toBeVisible()
+    expect(screen.getByRole('button', { name: 'Try again' })).toBeVisible()
+    expect(screen.getByRole('button', { name: 'Translate' })).toBeEnabled()
+    // The status read issues exactly one GET and zero operation posts.
+    expect(operations).toHaveLength(1)
+    expect(calls.filter((call) => call.startsWith('GET /api/operations/'))).toHaveLength(1)
+  })
+
+  it('discloses a succeeded-but-unavailable outcome with its confirmed charge', async () => {
+    const user = userEvent.setup()
+    const { operations, calls } = installFetch(
+      async () => {
+        throw new TypeError('fetch failed')
+      },
+      {
+        status: () => jsonResponse(statusBody('succeeded', 46), 200),
+      },
+    )
+    await renderReadyWorkspace()
+    await fillValidWorkspace(user)
+    await user.click(screen.getByRole('button', { name: 'Translate' }))
+    await screen.findByRole('button', { name: 'Check status' })
+
+    await user.click(screen.getByRole('button', { name: 'Check status' }))
+    expect(
+      await screen.findByText(
+        'The request completed and 46 characters were counted toward your usage, but the result text is no longer available. Submit again to generate a new result.',
+      ),
+    ).toBeVisible()
+    expect(screen.queryByLabelText('Result')).not.toBeInTheDocument()
+    expect(await screen.findByText(/7,592 of 20,000 characters used/)).toBeVisible()
+    expect(operations).toHaveLength(1)
+    expect(calls.filter((call) => call.startsWith('GET /api/operations/'))).toHaveLength(1)
+  })
+
+  it('refreshes usage read-only and reports an unavailable update', async () => {
+    const user = userEvent.setup()
+    let usageFailing = false
+    const { operations } = installFetch(() => jsonResponse(successBody(), 201), {
+      usage: () =>
+        usageFailing
+          ? Promise.resolve(new Response('{}', { status: 503 }))
+          : Promise.resolve(jsonResponse(usageBody, 200)),
+    })
+    await renderReadyWorkspace()
+    await fillValidWorkspace(user)
+    await user.click(screen.getByRole('button', { name: 'Translate' }))
+    await screen.findByLabelText('Result')
+
+    const postsBefore = operations.length
+    await user.click(screen.getByRole('button', { name: 'Refresh usage' }))
+    await waitFor(() =>
+      expect(screen.getByRole('region', { name: 'Usage' })).toHaveTextContent(
+        /7,546 of 20,000 characters used/,
+      ),
+    )
+    expect(operations.length).toBe(postsBefore)
+
+    usageFailing = true
+    await user.click(screen.getByRole('button', { name: 'Refresh usage' }))
+    expect(await screen.findByText('Usage update unavailable')).toBeVisible()
+    expect(operations.length).toBe(postsBefore)
+    expect(screen.getByLabelText('Result')).toHaveValue(RO_FIXTURE)
+
+    usageFailing = false
+    await user.click(screen.getByRole('button', { name: 'Refresh usage' }))
+    await waitFor(() => expect(screen.queryByText('Usage update unavailable')).not.toBeInTheDocument())
+    expect(operations.length).toBe(postsBefore)
   })
 })
