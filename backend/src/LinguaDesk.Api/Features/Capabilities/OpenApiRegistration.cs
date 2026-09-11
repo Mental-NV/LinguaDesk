@@ -33,6 +33,15 @@ public static class OpenApiRegistration
                         "No compatibility or deprecation guarantee is implied.",
                 };
                 document.Components ??= new OpenApiComponents();
+                if (document.Components.Schemas is not null
+                    && document.Components.Schemas.TryGetValue("RewritingSuccessResponse", out var rewritingSchema)
+                    && rewritingSchema is not null
+                    && !document.Components.Schemas.ContainsKey("TranslationSuccessResponse"))
+                {
+                    document.Components.Schemas["TranslationSuccessResponse"] =
+                        OperationsSuccessSchemas.CloneRewritingAsTranslation(rewritingSchema);
+                }
+
                 document.Components.SecuritySchemes ??= new Dictionary<string, IOpenApiSecurityScheme>();
                 document.Components.SecuritySchemes["sessionCookie"] = new OpenApiSecurityScheme
                 {
@@ -274,6 +283,24 @@ public static class OpenApiRegistration
                             Schema = new OpenApiSchema { Type = JsonSchemaType.String },
                         };
                     }
+                }
+
+                if (string.Equals(endpointName, "submitLanguageOperation", StringComparison.Ordinal)
+                    && operation.Responses is not null
+                    && operation.Responses.TryGetValue("201", out var created)
+                    && created is OpenApiResponse createdResponse
+                    && createdResponse.Content?.TryGetValue("application/json", out var createdMedia) == true
+                    && createdMedia is OpenApiMediaType createdJson)
+                {
+                    createdJson.Schema = new OpenApiSchema
+                    {
+                        Description = "Synchronous success: TranslationSuccessResponse for translation submissions, RewritingSuccessResponse for rewriting submissions.",
+                        AnyOf =
+                        [
+                            new OpenApiSchemaReference("TranslationSuccessResponse", context.Document),
+                            new OpenApiSchemaReference("RewritingSuccessResponse", context.Document),
+                        ],
+                    };
                 }
 
                 if (endpointName is "submitLanguageOperation" or "getLanguageOperationStatus" or "getCurrentUsage")

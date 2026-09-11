@@ -21,10 +21,11 @@ public static class OperationsEndpoints
                 "Validates, fingerprint-matches and atomically reserves exactly one logical operation per verified " +
                 "account identity against both daily character allowances. Identical identities observe the pending " +
                 "reservation or the settled success/failure/interrupted metadata; changed payloads conflict. " +
-                "Translation submissions execute synchronously through the configured provider behind the stored deadline " +
-                "and return complete text or a classified failure; rewriting submissions remain pending reservations until M027.")
+                "Translation and rewriting submissions execute synchronously through the configured provider behind the stored deadline " +
+                "and return complete text or a classified failure; submissions without a configured provider remain pending reservations.")
             .Accepts<SubmitOperationRequest>("application/json")
             .Produces<TranslationSuccessResponse>(StatusCodes.Status201Created, "application/json")
+            .Produces<RewritingSuccessResponse>(StatusCodes.Status201Created, "application/json")
             .Produces<OperationPendingResponse>(StatusCodes.Status202Accepted, "application/json")
             .Produces<OperationStatusResponse>(StatusCodes.Status200OK, "application/json")
             .Produces<OperationProblemDetails>(StatusCodes.Status400BadRequest, "application/problem+json")
@@ -136,6 +137,7 @@ public static class OperationsEndpoints
         HttpContext context,
         OperationAdmissionService admissions,
         TranslationOperationCoordinator translator,
+        RewritingOperationCoordinator rewriter,
         IOptions<MonetaryAdmissionOptions> monetaryOptions,
         TimeProvider timeProvider,
         CancellationToken cancellationToken)
@@ -176,6 +178,10 @@ public static class OperationsEndpoints
             return Problem(StatusCodes.Status400BadRequest, "Invalid request", "The JSON request body is malformed.", correlationId, "invalidRequest");
         }
         catch (InvalidOperationException exception) when (exception.InnerException is DecoderFallbackException)
+        {
+            return Problem(StatusCodes.Status400BadRequest, "Invalid request", "The JSON request body is malformed.", correlationId, "invalidRequest");
+        }
+        catch (InvalidOperationException)
         {
             return Problem(StatusCodes.Status400BadRequest, "Invalid request", "The JSON request body is malformed.", correlationId, "invalidRequest");
         }
@@ -284,6 +290,22 @@ public static class OperationsEndpoints
                 outcome.ServerTime,
                 cancellationToken);
             return MapTranslationExecution(execution, correlationId);
+        }
+
+        if (outcome.Outcome == AdmissionOutcome.Admitted
+            && string.Equals(parsed.Family, OperationAdmissionService.FamilyRewriting, StringComparison.Ordinal))
+        {
+            var execution = await rewriter.ExecuteAdmittedAsync(
+                accountId,
+                parsed.Source,
+                parsed.SourceSelection,
+                parsed.Mode,
+                identity.OperationId,
+                outcome.Submission!,
+                outcome.Usage,
+                outcome.ServerTime,
+                cancellationToken);
+            return MapRewritingExecution(execution, correlationId);
         }
 
         return outcome.Outcome switch
@@ -542,6 +564,56 @@ public static class OperationsEndpoints
         ToFamily(execution.Submission),
         OperationStatus.Succeeded,
         execution.TranslatedText!,
+        execution.Submission.ScalarCount,
+        execution.Submission.AdmissionDay,
+        execution.Submission.DeadlineUtc,
+        execution.ServerTime,
+        ToUsage(execution.Usage));
+
+    internal static IResult MapRewritingExecution(
+        RewritingExecutionResult execution,
+        string correlationId) =>
+        execution.Outcome switch
+        {
+            RewritingExecutionOutcome.Succeeded => Results.Json(
+                ToRewritingSuccess(execution),
+                statusCode: StatusCodes.Status201Created),
+            RewritingExecutionOutcome.ProviderUnavailable => Results.Json(
+                ToPending(execution.Submission!, execution.Usage, execution.ServerTime),
+                statusCode: StatusCodes.Status202Accepted),
+            RewritingExecutionOutcome.InputEligibilityRejected => Problem(
+                StatusCodes.Status422UnprocessableEntity,
+                "Input not eligible",
+                "The rewriting provider classified the source as not eligible for transformation; no character charge was made.",
+                correlationId,
+                "inputEligibility",
+                reason: execution.EligibilityReason,
+                characterCount: execution.Submission?.ScalarCount),
+            RewritingExecutionOutcome.MonetarySuspended => Problem(
+                MonetaryAdmissionProblem.SuspensionStatus,
+                MonetaryAdmissionProblem.Describe(MonetaryAdmissionOutcome.DeniedOverCap).Title,
+                MonetaryAdmissionProblem.Describe(MonetaryAdmissionOutcome.DeniedOverCap).Detail,
+                correlationId,
+                MonetaryAdmissionProblem.SuspensionCategory),
+            RewritingExecutionOutcome.DeadlineExceeded or RewritingExecutionOutcome.Cancelled => Problem(
+                StatusCodes.Status504GatewayTimeout,
+                "Rewriting deadline exceeded",
+                "The rewriting did not complete within the server-established deadline; no character charge was made.",
+                correlationId,
+                RewritingProblemCategories.DeadlineExceeded),
+            _ => Problem(
+                StatusCodes.Status503ServiceUnavailable,
+                "Rewriting unavailable",
+                "The rewriting could not be completed; no character charge was made.",
+                correlationId,
+                RewritingProblemCategories.ProcessingFailure),
+        };
+
+    internal static RewritingSuccessResponse ToRewritingSuccess(RewritingExecutionResult execution) => new(
+        Guid.Parse(execution.Submission!.OperationId),
+        ToFamily(execution.Submission),
+        OperationStatus.Succeeded,
+        execution.RewrittenText!,
         execution.Submission.ScalarCount,
         execution.Submission.AdmissionDay,
         execution.Submission.DeadlineUtc,

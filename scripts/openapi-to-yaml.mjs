@@ -111,10 +111,18 @@ function validateContract(document) {
     submitOperation.responses['202'].content?.['application/json']?.schema?.$ref === '#/components/schemas/OperationPendingResponse',
     'submitLanguageOperation success schema is missing',
   )
+  const createdSchema = submitOperation.responses['201'].content?.['application/json']?.schema
   expect(
-    submitOperation.responses['201'].content?.['application/json']?.schema?.$ref === '#/components/schemas/TranslationSuccessResponse',
-    'submitLanguageOperation translation success schema is missing',
+    Array.isArray(createdSchema?.anyOf) && createdSchema.anyOf.length === 2,
+    'submitLanguageOperation 201 must document both success envelopes',
   )
+  sameValues(
+    createdSchema?.anyOf?.map((variant) => variant?.$ref),
+    ['#/components/schemas/TranslationSuccessResponse', '#/components/schemas/RewritingSuccessResponse'],
+    'submitLanguageOperation 201 success variants',
+  )
+  referencedSchema(document, '#/components/schemas/TranslationSuccessResponse')
+  referencedSchema(document, '#/components/schemas/RewritingSuccessResponse')
   expect(
     submitOperation.responses['200'].content?.['application/json']?.schema?.$ref === '#/components/schemas/OperationStatusResponse',
     'submitLanguageOperation settled duplicate schema is missing',

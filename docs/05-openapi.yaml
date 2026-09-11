@@ -30,7 +30,7 @@ paths:
       tags:
         - OperationsEndpoints
       summary: Submit one logical language operation
-      description: Validates, fingerprint-matches and atomically reserves exactly one logical operation per verified account identity against both daily character allowances. Identical identities observe the pending reservation or the settled success/failure/interrupted metadata; changed payloads conflict. Translation submissions execute synchronously through the configured provider behind the stored deadline and return complete text or a classified failure; rewriting submissions remain pending reservations until M027.
+      description: Validates, fingerprint-matches and atomically reserves exactly one logical operation per verified account identity against both daily character allowances. Identical identities observe the pending reservation or the settled success/failure/interrupted metadata; changed payloads conflict. Translation and rewriting submissions execute synchronously through the configured provider behind the stored deadline and return complete text or a classified failure; submissions without a configured provider remain pending reservations.
       operationId: submitLanguageOperation
       requestBody:
         content:
@@ -62,7 +62,10 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/TranslationSuccessResponse"
+                anyOf:
+                  - $ref: "#/components/schemas/TranslationSuccessResponse"
+                  - $ref: "#/components/schemas/RewritingSuccessResponse"
+                description: "Synchronous success: TranslationSuccessResponse for translation submissions, RewritingSuccessResponse for rewriting submissions."
         "202":
           description: Accepted
           headers:
@@ -1962,6 +1965,50 @@ components:
         - tone
       type: string
       description: Correction, writing-style, or tone category.
+    RewritingSuccessResponse:
+      required:
+        - operationId
+        - family
+        - status
+        - rewrittenText
+        - characterCount
+        - admissionDay
+        - deadlineUtc
+        - serverTimeUtc
+        - usage
+      type: object
+      properties:
+        operationId:
+          type: string
+          description: Operation identity echoed from the submission.
+          format: uuid
+        family:
+          description: Language operation family.
+          $ref: "#/components/schemas/OperationFamily"
+        status:
+          description: "Observed operation state: `pending`, `succeeded`, `failed` or `interrupted`."
+          $ref: "#/components/schemas/OperationStatus"
+        rewrittenText:
+          type: string
+          description: Complete validated rewritten text in the resolved source language. Never logged, traced or persisted.
+        characterCount:
+          type: integer
+          description: Committed Unicode scalar charge for the full submitted source.
+          format: int32
+        admissionDay:
+          type: string
+          description: UTC day owning the charge (the stored admission day), in yyyy-MM-dd form.
+        deadlineUtc:
+          type: string
+          description: Server-controlled overall deadline for the operation.
+          format: date-time
+        serverTimeUtc:
+          type: string
+          description: Current server time in UTC.
+          format: date-time
+        usage:
+          description: Fresh current-day user usage snapshot.
+          $ref: "#/components/schemas/UsageSnapshot"
     SessionProblemDetails:
       required:
         - title

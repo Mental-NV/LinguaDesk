@@ -35,7 +35,7 @@ export interface paths {
         put?: never;
         /**
          * Submit one logical language operation
-         * @description Validates, fingerprint-matches and atomically reserves exactly one logical operation per verified account identity against both daily character allowances. Identical identities observe the pending reservation or the settled success/failure/interrupted metadata; changed payloads conflict. Translation submissions execute synchronously through the configured provider behind the stored deadline and return complete text or a classified failure; rewriting submissions remain pending reservations until M027.
+         * @description Validates, fingerprint-matches and atomically reserves exactly one logical operation per verified account identity against both daily character allowances. Identical identities observe the pending reservation or the settled success/failure/interrupted metadata; changed payloads conflict. Translation and rewriting submissions execute synchronously through the configured provider behind the stored deadline and return complete text or a classified failure; submissions without a configured provider remain pending reservations.
          */
         post: operations["submitLanguageOperation"];
         delete?: never;
@@ -791,6 +791,38 @@ export interface components {
          * @enum {string}
          */
         RewritingModeKind: "correction" | "style" | "tone";
+        RewritingSuccessResponse: {
+            /**
+             * Format: uuid
+             * @description Operation identity echoed from the submission.
+             */
+            operationId: string;
+            /** @description Language operation family. */
+            family: components["schemas"]["OperationFamily"];
+            /** @description Observed operation state: `pending`, `succeeded`, `failed` or `interrupted`. */
+            status: components["schemas"]["OperationStatus"];
+            /** @description Complete validated rewritten text in the resolved source language. Never logged, traced or persisted. */
+            rewrittenText: string;
+            /**
+             * Format: int32
+             * @description Committed Unicode scalar charge for the full submitted source.
+             */
+            characterCount: number;
+            /** @description UTC day owning the charge (the stored admission day), in yyyy-MM-dd form. */
+            admissionDay: string;
+            /**
+             * Format: date-time
+             * @description Server-controlled overall deadline for the operation.
+             */
+            deadlineUtc: string;
+            /**
+             * Format: date-time
+             * @description Current server time in UTC.
+             */
+            serverTimeUtc: string;
+            /** @description Fresh current-day user usage snapshot. */
+            usage: components["schemas"]["UsageSnapshot"];
+        };
         SessionProblemDetails: {
             /** @description RFC 9457 problem type reference. */
             type?: null | string;
@@ -1046,7 +1078,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["TranslationSuccessResponse"];
+                    "application/json": components["schemas"]["TranslationSuccessResponse"] | components["schemas"]["RewritingSuccessResponse"];
                 };
             };
             /** @description Accepted */

@@ -15,6 +15,8 @@ public static class OperationsRegistrationExtensions
         services.AddScoped<OperationAdmissionService>();
         services.AddScoped<ITranslationClientProvider, UnavailableTranslationClientProvider>();
         services.AddScoped<TranslationOperationCoordinator>();
+        services.AddScoped<IRewritingClientProvider, UnavailableRewritingClientProvider>();
+        services.AddScoped<RewritingOperationCoordinator>();
         services.AddScoped<OperationSettlementService>();
         services.AddScoped<OperationRecoveryService>();
         services.AddHostedService<OperationRecoveryHostedService>();

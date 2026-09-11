@@ -11,7 +11,7 @@ identity, one character reservation settling exactly once on the
 admission day, per-attempt monetary admission in its own cost month,
 and a fresh M025 usage snapshot on every response. The request
 carries exactly one mode from the nine-value catalog (default
-correction); eligibility classifies the source language and the
+correctionOnly); eligibility classifies the source language and the
 transformation returns same-language corrected/styled text, which may
 validly equal the source for already-correct correction-only input.
 Local validation precedes reservation; paid eligibility runs only
@@ -22,7 +22,7 @@ product policy, no live serving, no UI.
 
 1. Contract first: extend `backend/src/LinguaDesk.Api/Features/Operations/OperationsContract.cs`
    with the rewrite submit fields (family-scoped source, mode with
-   correction default, optional source hint), success envelope
+   correctionOnly default, optional source hint), success envelope
    (complete text, charged count, charge day) and wire-fixed Problem
    Details category names per API §8; keep DF-001/DF-002 placeholders
    out. Add actual C# DTOs/metadata, then generate and review OpenAPI

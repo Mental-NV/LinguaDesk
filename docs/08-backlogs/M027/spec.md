@@ -6,10 +6,10 @@ Sources: [context manifest](context.json); [backlog](backlog.md).
 
 Included: one explicit rewriting operation through the real
 host/accounting pipeline for an independent verified Bearer [REDACTED] No SPA execution.
-The request carries family `rewrite`, exactly one supported mode
-(`correction`, `simple`, `casual`, `business`, `academic`,
+The request carries family `rewriting`, exactly one supported mode
+(`correctionOnly`, `simple`, `casual`, `business`, `academic`,
 `enthusiastic`, `friendly`, `confident`, `diplomatic`; omitted mode
-resolves to `correction` before payload matching), an optional manual
+resolves to `correctionOnly` before payload matching), an optional manual
 source hint (default automatic detection), the complete source text
 and a client-generated UUIDv7 operation identity. The host
 authenticates (Bearer, verified-account gate), validates shape/mode/
@@ -54,7 +54,7 @@ traceability only, no obligation).
 | AC | Observable success/failure/boundary | Upstream source/ID |
 | --- | --- | --- |
 | AC-001 | A verified Bearer [REDACTED] submits a new valid rewrite identity with an explicit mode and receives either synchronous success (complete validated same-language rewritten text, charged scalar count, admission-day period, fresh usage snapshot) or 202 pending with a status reference; a later status read reports the terminal outcome metadata. | FR-012/013/014/035–037; API-AC-013 (rewriting portion) |
-| AC-002 | Malformed JSON, unknown/duplicate fields, invalid Unicode, unknown mode, combined modes, empty or whitespace-only source, or oversized source is rejected (400/422 input categories) with zero provider dispatch, zero character charge and no admitted operation. Omitted mode defaults to correction; explicit correction and omitted mode fingerprint identically. | FR-004/007/014/024/037; API-AC-001 (rewriting portion); LLM-AC-002/003 (rewriting portions) |
+| AC-002 | Malformed JSON, unknown/duplicate fields, invalid Unicode, unknown mode, combined modes, empty or whitespace-only source, or oversized source is rejected (400/422 input categories) with zero provider dispatch, zero character charge and no admitted operation. Omitted mode defaults to correctionOnly; explicit correctionOnly and omitted mode fingerprint identically. | FR-004/007/014/024/037; API-AC-001 (rewriting portion); LLM-AC-002/003 (rewriting portions) |
 | AC-003 | Uncertain, unsupported, substantially mixed or source-mismatched input ends as an eligibility rejection (422) with no transformation dispatch and no character charge; paid detection exposure stays private accounting metadata only. | FR-004/005; AI §3.1; LLM-AC-004 (rewriting portion) |
 | AC-004 | Success commits exactly one full-source `unicode-scalar-v1` charge on the stored admission day — including a valid correction-only pass that leaves correct text unchanged; a duplicate same-identity/same-payload read returns the original outcome metadata (output unavailable on replay) with fresh usage and no new charge or dispatch; a same-identity/different-payload resubmission conflicts (409). A mode change is a different payload. | FR-013/024/026; API §5.2/6.1/7.1; API-AC-004/005/006 (rewriting portions) |
 | AC-005 | Classified fake-provider transient/invalid-output/refusal exhausts the bounded chain to a terminal 503 processing failure with zero character charge; overall deadline expiry is a terminal 504 with zero charge; denied per-attempt monetary admission stops further dispatch (503 monetary suspension). Fallback, when configured, receives the original complete source and mode. | FR-032–034; AI §6/7; LLM-AC-008/009/010 (rewriting portions) |
