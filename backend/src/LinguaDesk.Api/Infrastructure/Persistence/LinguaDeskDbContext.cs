@@ -14,6 +14,10 @@ public sealed class LinguaDeskDbContext(DbContextOptions<LinguaDeskDbContext> op
 
     public DbSet<LedgerRevision> LedgerRevisions => Set<LedgerRevision>();
 
+    public DbSet<MonetaryCostLedger> MonetaryCostLedgers => Set<MonetaryCostLedger>();
+
+    public DbSet<MonetaryAttemptReservation> MonetaryAttemptReservations => Set<MonetaryAttemptReservation>();
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
@@ -42,6 +46,21 @@ public sealed class LinguaDeskDbContext(DbContextOptions<LinguaDeskDbContext> op
         {
             entity.HasKey(revision => revision.Id);
             entity.HasData(new LedgerRevision { Id = LedgerRevision.SingletonId, Value = 0 });
+        });
+        builder.Entity<MonetaryCostLedger>(entity =>
+        {
+            entity.HasKey(ledger => ledger.CostMonth);
+            entity.Property(ledger => ledger.CostMonth).HasMaxLength(7).IsRequired();
+        });
+        builder.Entity<MonetaryAttemptReservation>(entity =>
+        {
+            entity.HasIndex(reservation => reservation.AttemptId).IsUnique();
+            entity.Property(reservation => reservation.AttemptId).HasMaxLength(64).IsRequired();
+            entity.Property(reservation => reservation.OperationReference).HasMaxLength(128).IsRequired();
+            entity.Property(reservation => reservation.CostMonth).HasMaxLength(7).IsRequired();
+            entity.Property(reservation => reservation.TariffReference).HasMaxLength(256).IsRequired();
+            entity.Property(reservation => reservation.State).HasMaxLength(16).IsRequired();
+            entity.Property(reservation => reservation.EvidenceReference).HasMaxLength(128);
         });
     }
 }

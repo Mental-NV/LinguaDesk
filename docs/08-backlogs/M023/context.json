@@ -12,7 +12,7 @@
       "path": "docs/delivery/current.md",
       "reason": "Dependency state (M021/M022 Done) and selected-scope status at planning time",
       "use": "reference",
-      "sha256": "85399727ea383cf0b65649a2825cb8f827696f0988a4005773f43bb0eb86bd02"
+      "sha256": "35953c4d33c5eb1f1e6c184f7de6ff4ff7087bc9475708ba680c659257bfc6f2"
     },
     {
       "ids": [
@@ -121,7 +121,7 @@
       "path": "docs/verification/coverage.md",
       "reason": "Canonical V-006 allocation for the selected monetary scenario",
       "use": "reference",
-      "sha256": "e6c4748a955d298cbbd163d7133a2d2279e84e36a7510d58dcee7256e6a9679e"
+      "sha256": "b86e68a28fa8b5287c53e70349276fcc883ae51460f3e6cdd21ef368666b2223"
     },
     {
       "path": "docs/08-backlogs/M021/backlog.md",
@@ -169,7 +169,7 @@
       "path": "backend/src/LinguaDesk.Api/Infrastructure/Persistence/LinguaDeskDbContext.cs",
       "reason": "Current entity configuration the monetary migration extends",
       "use": "reference",
-      "sha256": "8869aa6b47119b5ef7d39838fe7772d0a1f01ae2aa73c39a952878286b5d5214"
+      "sha256": "ec084a8daefa875db238a6c7fbedc44769b2f08956bfe34ecafdbf832970bc8b"
     },
     {
       "path": "backend/src/LinguaDesk.Infrastructure.Ai/CandidateProfile.cs",
@@ -192,7 +192,7 @@
   ],
   "version": 1,
   "source_map_sha256": "85face50bb0aa032a7ca078fcf4a16079920a62e94b3d02cb4e6ae31f225e432",
-  "baseline_commit": "abf29c4a44cfd1afffc04a1a5aa73c70bc3133b6",
+  "baseline_commit": "8f8005ebb99ac8bcd1d83b30eed725298de2223a",
   "locked_files": {
     "docs/00-SDD-Planning-Workflow.md": "183ae93148ff594f9f1e021aa7543baa8878e9cc0bcfd69ebc696c28976e2945",
     "docs/00-workflow/execution.md": "f362a1384cefef24ba204e0723e3190857c8cca9bcd91908136932e19c5caf02",

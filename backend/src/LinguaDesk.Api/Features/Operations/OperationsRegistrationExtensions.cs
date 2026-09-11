@@ -10,8 +10,11 @@ public static class OperationsRegistrationExtensions
     {
         services.AddOptions<OperationAdmissionOptions>().BindConfiguration(OperationAdmissionOptions.SectionName);
         services.AddSingleton<IValidateOptions<OperationAdmissionOptions>, OperationAdmissionOptionsValidator>();
+        services.AddOptions<MonetaryAdmissionOptions>().BindConfiguration(MonetaryAdmissionOptions.SectionName);
+        services.AddSingleton<IValidateOptions<MonetaryAdmissionOptions>, MonetaryAdmissionOptionsValidator>();
         services.AddScoped<OperationAdmissionService>();
         services.AddScoped<OperationSettlementService>();
+        services.AddScoped<MonetaryAdmissionService>();
         services.AddSingleton<OperationFingerprintKeyProvider>(serviceProvider =>
             new OperationFingerprintKeyProvider(
                 serviceProvider.GetRequiredService<IDataProtectionProvider>(),
@@ -26,4 +29,12 @@ internal sealed class OperationAdmissionOptionsValidator : IValidateOptions<Oper
         options.UserDailyAllowanceCharacters > 0 && options.GlobalDailyAllowanceCharacters > 0
             ? ValidateOptionsResult.Success
             : ValidateOptionsResult.Fail("Operation allowance configuration must use positive character limits.");
+}
+
+internal sealed class MonetaryAdmissionOptionsValidator : IValidateOptions<MonetaryAdmissionOptions>
+{
+    public ValidateOptionsResult Validate(string? name, MonetaryAdmissionOptions options) =>
+        options.MonthlyCapMinorUnits > 0 && !string.IsNullOrWhiteSpace(options.Currency)
+            ? ValidateOptionsResult.Success
+            : ValidateOptionsResult.Fail("Monetary admission configuration must set a positive monthly cap and a non-empty currency.");
 }

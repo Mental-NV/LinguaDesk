@@ -225,7 +225,7 @@ Read the complete contracts at [UX Section 12](../ux/acceptance.md#12-acceptance
 | API-AC-007 | V-005, V-016; M022 AC-002/AC-005/AC-006 passed the failure-window portion (failure releases with zero charge, cross-midnight success charges the admission day, restart-preserved settlement/revision with fenced late attempts and zero-dispatch reads) |
 | API-AC-008 | V-005, V-014 |
 | API-AC-009 | V-005, V-002, V-003 |
-| API-AC-010 | V-006 |
+| API-AC-010 | V-006; M023 AC-001–008 passed the monetary-ceiling portion (per-attempt conservative bound reserved against the configured cap with 503 monetary-suspension denial and no writes, unknown/unbounded ineligible, 8 parallel admissions committing within the cap, settle-once/release with missing-evidence retention, cross-month carryover with original-month settlement attribution, restart-preserved ledgers with duplicate observation, amount-free logs/problems/TEXT columns, zero contract drift) |
 | API-AC-011 | V-005, V-002, V-003 |
 | API-AC-012 | V-004, V-015; M006 registration duplicate, M007 resend, M008 invalid-credential/strict secret-safe portions and M009 bearer non-enumeration/strict secret-safe portions passed, reset later |
 | API-AC-013 | V-009 |
