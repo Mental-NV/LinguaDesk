@@ -1,6 +1,6 @@
 # LinguaDesk — UX/UI Specification
 
-**Document:** #2 · **Version:** 1.7 · **Status:** Simplified MVP ready for scoped planning; verification methods consolidated in #6; runtime evidence pending
+**Document:** #2 · **Version:** 1.9 · **Status:** Simplified MVP ready for scoped planning; authenticated UI/E2E handoff explicit; runtime evidence pending
 **Updated:** September 11, 2026 (UTC)
 
 ## 1. Authority, inputs, and scope
@@ -10,6 +10,8 @@
 This document owns current routes, layout, controls, messages, state transitions and acceptance contracts. `Must` is binding for the **active MVP**; rows marked **Deferred** or **Retired** impose no current implementation/test gate. The 17 UX-US, 112 UX-AC, and original 44 UX-MSG IDs remain traceable; some are amended and some inactive. In compact references, AC/US/MSG mean UX-AC/UX-US/UX-MSG. IDs are never reused for unrelated behavior.
 
 No sentence alternatives, sentence identities, comparison/highlighting, Show changes, debounce, Google controls, truncation overlays, custom selectors or tools sheets ship in MVP. No replacement read-only diff is required yet. Use native inputs/selects, inline settings, explicit processing buttons, and plain editable results. Removed targeted metadata preservation and the duplicate correction toggle are not later-phase obligations. PRD Section 3.1 is the sole deferred-feature register; Git `54343c3` retains the old detailed design only as historical input.
+
+The minimum usable workspace outcome is two end-user journeys: a verified user can translate text in `/translate`, and a verified user can correct or restyle text in `/rewrite`. Account pages, protected routes, capability selectors, API operations and standalone AI behavior are prerequisites or independent-client outcomes; none is evidence that either web journey exists. Each journey is complete only when the published SPA exposes the controls in Sections 5, 7 and 8 and returns an editable/copyable result through the integrated application path.
 
 Automatic **source detection remains**; automatic **submission does not**. A workspace is one verified tab's in-memory source, settings, result and operation state. A current response must match its workspace generation, feature, submitted source/settings revision and result-edit revision. Source/settings edits, manual result edits, reset and session teardown can make a response outdated.
 
@@ -246,6 +248,10 @@ See [UX acceptance contracts](ux/acceptance.md#1210-curated-visual-regression).
 ## 13. Verification boundaries
 
 [Verification plan Sections 2–4](06-verification-plan.md#2-verification-layers-and-check-catalog) define the lowest sufficient evidence for each assertion and distinguish fixtures, integrated smoke and live/manual checks. The [local acceptance allocation](verification/coverage.md#82-local-acceptance-allocation) preserves every UX-AC ID and its current disposition. No scenario here is a claim of a passing test.
+
+[Roadmap M028](07-roadmap.md#45-useful-end-to-end-product-increments) owns the first complete Translation UI outcome and [M029](07-roadmap.md#45-useful-end-to-end-product-increments) owns the first complete Rewriting UI outcome. [Verification plan Section 4.5](06-verification-plan.md#45-required-user-visible-transformation-evidence) defines the minimum evidence that prevents API, LLM or mocked-component work from being reported as either end-user outcome.
+
+Every selected UI-facing feature must have a published end-to-end case executed as #6's dedicated verified synthetic user. At least one suite case performs the visible Email/Password/Sign in flow; subsequent feature cases may begin from the documented authenticated fixture, but they still exercise the real protected route and application API and must assert the resulting controls, messages, text and usage in the UI. A successful request observed only in network logs is not UX acceptance.
 
 ## 14. MVP traceability
 

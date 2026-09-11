@@ -10,6 +10,8 @@ Mutable #7 status owner. Read for selection/dependency checks and closeout; do n
 | --- | --- | --- | --- |
 | — | None | Select and lock the next milestone before implementation | — |
 
+**Next recommended delivery train:** M026 → M028 → M027 → M029. Select M026 next as the bounded API enabler, then deliver M028 before beginning Rewriting unless a recorded blocker requires another eligible choice. M028 is the first milestone after M025 that establishes an end-user language outcome: the predefined verified E2E user can translate text in the published UI with the outcome asserted in-browser. M029 then establishes rewriting under the same dedicated-user contract. At least one published E2E case must sign in through the visible login form; other cases may use only #6's real-auth fixture. M026/M027 alone remain independent-client outcomes and do not satisfy either web journey.
+
 M019 completed the independent-track enabler for the explicit live provider path required by M015–M018. The bounded access check reached `DeepSeek-V4.1-Flash` with one dispatch through the configured shared credential and returned `deepseek-flash` with known usage and no unresolved reservation; no credential value entered diagnostics or evidence. The same actual key may serve every LinguaDesk operation routed to DeepSeek. Quality, performance, context-limit and production-serving qualification remain unverified; D-19's route-specific providers and longer fallback chains remain later DF-004 work.
 
 ## Completed milestones
@@ -42,4 +44,4 @@ M019 completed the independent-track enabler for the explicit live provider path
 | M024 | Done | [Backlog](../08-backlogs/M024/backlog.md), [spec](../08-backlogs/M024/spec.md), [tasks/evidence](../08-backlogs/M024/tasks.md#completion-record) |
 | M025 | Done | [Backlog](../08-backlogs/M025/backlog.md), [spec](../08-backlogs/M025/spec.md), [tasks/evidence](../08-backlogs/M025/tasks.md#completion-record) |
 
-All roadmap milestones other than completed M001–M025 are Candidate with no selected package and evidence pending. Full product and release evidence remains pending in #6 coverage.
+All roadmap milestones other than completed M001–M025 are Candidate with no selected package and evidence pending. The M026 → M028 → M027 → M029 recommendation does not select or create a package; the next planning pass must lock M026 under #0. Full product and release evidence remains pending in #6 coverage.

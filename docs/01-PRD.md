@@ -1,6 +1,6 @@
 # LinguaDesk — Product Requirements Document
 
-**Version:** 0.7 · **Status:** Simplified MVP product baseline; verification ownership/handoffs updated; deferred scope explicit; P-005/P-006 remain proposed · **Updated:** September 11, 2026 (UTC)
+**Version:** 0.8 · **Status:** Simplified MVP product baseline; end-user delivery gates explicit; deferred scope explicit; P-005/P-006 remain proposed · **Updated:** September 11, 2026 (UTC)
 
 This document consolidates the discovery decisions. It specifies product outcomes for later UX, architecture, API, and feature specifications. It contains no implementation plan or development task breakdown.
 
@@ -31,6 +31,7 @@ The initial client is a React SPA with separate Translation and Rewriting pages.
 | Recover predictably | Fallback, stale-response, validation, and total-failure acceptance criteria pass without losing source text or charging failed operations |
 | Enable independent clients | An API consumer can authenticate with a local account, translate, rewrite, and obtain usage information without depending on the SPA |
 | Keep usage bounded | Enforce the per-request limits, shared character allowances, UTC reset, and successful-operation accounting |
+| Deliver usable web workflows | A verified user can translate text and rewrite text in the published SPA, receive a complete editable/copyable result, and retain their work through validation or processing failure |
 | Demonstrate an accessible web product | Core journeys work on desktop/mobile browsers and with keyboard and screen-reader access |
 
 “Usable” means acceptable without editing or with only minor edits. The minimum quality standard applies to primary and fallback model configurations. Adoption, weekly activity, revenue, and hiring conversion targets have not been agreed; the audience estimate is not an adoption commitment.
@@ -221,7 +222,7 @@ Apply the same criteria to every model/settings configuration on the routes it m
 
 | Gate | Required evidence |
 | --- | --- |
-| RG-001 — Core behavior | All current MVP Must criteria pass: explicit submission, validation/oversize blocking, single-dropdown defaults, source protection, stale/manual-edit protection, editable/copyable complete output. Deferred/retired criteria are not required. |
+| RG-001 — Core behavior | A verified user can complete both current whole-text operations in the published web UI: select the required language/mode, explicitly submit, receive a complete editable/copyable result, and retain source/prior result through validation or failure. All other current MVP Must criteria also pass, including oversize blocking, single-dropdown defaults and stale/manual-edit protection. API-only, standalone-LLM or route-shell evidence does not satisfy these user-facing outcomes. Deferred/retired criteria are not required. |
 | RG-002 — Quality | Fixed-set results meet NFR-001, human checks cover every language, and no critical meaning/factual error remains in the release evaluation set. |
 | RG-003 — Performance | Benchmark results meet NFR-002; maximum-length cases and fallback scenarios respect overall deadlines. Failed/time-out requests do not count as timely completions. |
 | RG-004 — Accounting and recovery | Verify user/global sharing, UTC reset, full-submission charges, zero charge for rejected oversize input, duplicate/retry protection, configured fallback/failures, stale successes, interruption/status recovery and concurrent requests. |

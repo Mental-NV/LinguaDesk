@@ -1,7 +1,7 @@
 # LinguaDesk — Verification Plan
 
-**Document:** #6 · **Version:** 1.12 · **Status:** Current design; implementation/evidence status is maintained in delivery/current.md and verification/coverage.md
-**Updated:** 2026-09-09
+**Document:** #6 · **Version:** 1.14 · **Status:** Current design; dedicated-user authenticated UI/E2E gates explicit; implementation/evidence status is maintained in delivery/current.md and verification/coverage.md
+**Updated:** 2026-09-11
 
 ## 1. Authority, ownership and scope
 
@@ -54,7 +54,7 @@ V-IDs name shared verification groups, not backlog tasks. Selected packages refi
 | V-009 | Independent authenticated API consumer, wire errors/recovery and generated schema/client drift; HTTP integration and reproducible contract generation |
 | V-010 | Native editing/caret/selection/clipboard, focus/keyboard/IME events, history/storage/bfcache and reflow; focused browser contracts |
 | V-011 | Seven curated visual baselines, semantic/accessibility scans, actual browser/device/AT checks and manual design review |
-| V-012 | Published SPA/API/local cookie auth/migrated database with fake external adapters; small integrated smoke, routing/static delivery/TLS and lifecycle checks |
+| V-012 | Published SPA/API/local cookie auth/migrated database with fake external adapters and the dedicated verified E2E account; at least one real login-form journey, reusable real-auth browser state for other cases, and visible-outcome coverage for every selected UI-facing feature; routing/static delivery/TLS and lifecycle checks |
 | V-013 | Each candidate's fixed quality/eligibility corpus, AI grading and human review; live qualification and configured-chain evidence |
 | V-014 | Real API performance at defined concurrency, maximum-length requests, fallback/deadline evidence; measured load and controlled fault runs |
 | V-015 | Synthetic text/secret sentinels absent from application database/logs/traces/errors/storage/history/cache and retained backups; privacy/lifecycle inspection and tests |
@@ -95,6 +95,24 @@ See [Frontend and browser verification](verification/frontend.md#43-manual-acces
 ### 4.4 Curated visual regression
 
 See [Frontend and browser verification](verification/frontend.md#44-curated-visual-regression).
+
+### 4.5 Required user-visible transformation evidence
+
+Translation and Rewriting are separate user outcomes. Each requires focused state/component checks **and** a published integrated browser journey. The integrated journey runs the built SPA through the real local cookie-auth, API, migrated SQLite and durable accounting/recovery boundaries. It may use the deterministic provider adapter so functional UI evidence is repeatable, but it must not intercept the application's `/api` calls or replace the workspace with a test-only screen. Live model quality remains V-013 and is not inferred from deterministic text.
+
+**Dedicated E2E identity and database setup:** the canonical published-suite account is the synthetic verified local user `m013-verified@example.test` with password `Maple!River2026`. These fixed values are test data, not secrets, and must never identify a production account. Before the published host serves browser cases, the harness applies migrations to a fresh isolated SQLite database and creates this account through ASP.NET Identity with `EmailConfirmed = true`. Seeding is available only in the `Smoke` environment, runs as a bounded setup step rather than a public endpoint, and must fail closed in every other environment. The temporary database and data-protection keys are owned by the run and removed afterward. The account starts with the documented usage/availability baseline; feature-created operations are the only changes counted by the case. The password value must not appear in host logs, test reports, traces or screenshots; the harness scans produced text artifacts and fails if it is exposed.
+
+**Authentication paths:** at least one published E2E case starts signed out at `/login`, fills the predefined email/password, activates **Sign in**, and asserts successful protected-route navigation plus visible authenticated content. Other cases may avoid repeating the form by using a documented Playwright authentication fixture that obtains antiforgery state and signs in the same predefined user through the real published account API, then supplies the resulting same-origin cookie storage state to the browser context. The bypass may skip only form interaction: it may not inject or forge cookies, write session records directly, disable auth/antiforgery/authorization middleware, add a test-only login endpoint, intercept account/operation APIs or use an in-memory replacement host.
+
+**UI assertion rule:** every selected UI-facing feature has one or more published E2E cases operating as the predefined user. Each case performs the user action through semantic browser locators and asserts the visible outcome—for example route/heading, enabled or disabled control, validation/status text, source/result value, usage display, focus or clipboard result—in addition to any supplemental request-count or database assertion. A 2xx response, persisted row, trace entry or component test without the corresponding browser-visible outcome does not satisfy the feature.
+
+| User-visible outcome | Milestone and required evidence | Minimum observed behavior before Done | Insufficient on its own |
+| --- | --- | --- | --- |
+| Translate text in the UI | M028; V-001/V-002/V-003 focused checks, V-010 native browser checks and V-012 dedicated-user published E2E cases | The predefined verified user opens `/translate`, chooses a valid source/target, enters text, waits without causing a request, activates **Translate** once, receives one complete result, sees authoritative usage, edits the result and copies its exact value. Oversize/invalid input and a controlled definitive failure preserve the source and prior result without a successful-operation charge. | M016 AI output, M026 HTTP success, generated client types, a mocked component response, a route screenshot or E2E network assertions without UI assertions |
+| Rewrite text in the UI | M029; V-001/V-002/V-003 focused checks, V-010 native browser checks and V-012 dedicated-user published E2E cases | The predefined verified user opens `/rewrite`, sees **Correction only** by default, chooses one supported mode when desired, enters text, waits without causing a request, activates **Rewrite** once, receives one complete same-language result, sees authoritative usage, and edits/copies the result while the source remains unchanged. Oversize/invalid input and a controlled definitive failure preserve work without a successful-operation charge. | M017 AI output, M027 HTTP success, generated client types, a mocked component response, a route screenshot or E2E network assertions without UI assertions |
+| Keep both journeys trustworthy | M030–M032; V-002/V-003/V-005/V-010/V-015 plus dedicated-user V-012 regressions | Navigation, competing callbacks, manual edits, unknown outcomes, reset and session teardown preserve the current workspace/usage rules across both features, with each selected UI behavior asserted in the published browser. | One happy-path browser trip or backend-only stale/accounting tests |
+
+Each milestone record identifies the route, controls, activation count, API operation/status, displayed result, usage transition, edit/copy observation and failure-path result. M028/M029 establish functional web availability with a controlled provider; V-013/V-014, Section 4.2–4.4 and RG-002/003/006 still govern live quality, performance and the complete browser/device/accessibility claim.
 
 ## 5. LLM quality and candidate qualification (Q-005)
 
