@@ -77,6 +77,27 @@ public static class TranslationPipeline
                 probe.ResourceSha256);
         }
 
+        return await TransformAsync(input, eligibility, client, cancellationToken).ConfigureAwait(false);
+    }
+
+    public static async Task<TranslationOutcome> TransformAsync(
+        TranslationInput input,
+        EligibilityOutcome acceptedEligibility,
+        IChatClient client,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(input);
+        ArgumentNullException.ThrowIfNull(acceptedEligibility);
+        ArgumentNullException.ThrowIfNull(client);
+
+        if (acceptedEligibility.Decision != EligibilityDecision.Eligible)
+        {
+            throw new ArgumentException(
+                "The transformation stage requires an accepted eligible classification.",
+                nameof(acceptedEligibility));
+        }
+
+        var eligibility = acceptedEligibility;
         var resolved = eligibility.ResolvedLanguage!;
         var target = input.Target!;
         if (string.Equals(resolved, target, StringComparison.Ordinal))

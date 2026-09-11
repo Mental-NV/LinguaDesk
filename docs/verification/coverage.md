@@ -38,22 +38,22 @@ This is the sole cross-document product coverage matrix; the source documents re
 | FR-026 | API §5–7; architecture §7; UX §6 | V-005, V-002, V-003 | Unselected → Pending |
 | FR-027 | API §7; architecture §7 | V-005, V-003 | Unselected → Pending |
 | FR-028 | API §7; UX §6/9 | V-005, V-002, V-003, V-009 | Unselected → Pending |
-| FR-029 | AI §5; architecture §5 | V-007, V-008, V-013 | Unselected → Pending |
-| FR-030 | AI §5–6 | V-007, V-013 | Unselected → Pending |
+| FR-029 | AI §5; architecture §5 | V-007, V-008, V-013 | [M018 AC-001/006](../08-backlogs/M018/spec.md#acceptance) per-family chain validation and primary-only live wire settings portion → Passed (development evidence; qualification and serving startup remain unselected) |
+| FR-030 | AI §5–6 | V-007, V-013 | [M018 AC-001](../08-backlogs/M018/spec.md#acceptance) one primary plus zero-or-one fallback per family with no route/mode selection portion → Passed (development evidence; DF-004 routing remains deferred) |
 | FR-031 | PRD DF-004 | — | Not applicable — Deferred |
-| FR-032 | AI §6 | V-007, V-008, V-014 | Unselected → Pending |
-| FR-033 | AI §4/6–7; API §8 | V-007, V-008, V-005, V-009 | Unselected → Pending |
-| FR-034 | AI §6–7; UX §6; API §6 | V-007, V-013, V-014, V-005, V-003 | Unselected → Pending |
+| FR-032 | AI §6 | V-007, V-008, V-014 | [M018 AC-002](../08-backlogs/M018/spec.md#acceptance) bounded-order traversal portion (both three-dispatch paths per family, eligibility reuse, exactly-once visits, no retry/repair/hedge) → Passed (development evidence; percentile measurement stays with V-014) |
+| FR-033 | AI §4/6–7; API §8 | V-007, V-008, V-005, V-009 | [M018 AC-003](../08-backlogs/M018/spec.md#acceptance) eligible-trigger versus terminal mapping including credential-scope skip → Passed (development evidence; API error mapping remains unselected) |
+| FR-034 | AI §6–7; UX §6; API §6 | V-007, V-013, V-014, V-005, V-003 | [M018 AC-005](../08-backlogs/M018/spec.md#acceptance) same-criteria fallback success, zero-charge failure and invisible-fallback shape portion → Passed (development evidence; quality evaluation and durable settlement remain unselected) |
 | FR-035 | API §2/5/9 | V-009, V-005 | Unselected → Pending |
 | FR-036 | API §2–3/7 | V-004, V-009, V-005 | [BI-005](../08-backlogs/M005/backlog.md) → [AC-001–006](../08-backlogs/M005/spec.md#4-selected-acceptance) public choices/limits and generated-type portion and [M009 / BI-009](../08-backlogs/M009/backlog.md) → [AC-001–007](../08-backlogs/M009/spec.md#acceptance) bearer auth portion → Passed; language/usage independence remains unselected |
 | FR-037 | API §8; AI §7; UX §6/9 | V-009, V-003, V-004, V-005, V-007 | Unselected → Pending |
 | FR-038 | UX §3/8; architecture §6/8 | V-002, V-003, V-010, V-015 | [M013 / BI-013](../08-backlogs/M013/backlog.md) in-memory auth/safe-return teardown portion → Passed; workspace-text lifecycle and full requirement remain pending |
 | NFR-001 | PRD §8; AI §3–5 | V-013 | Unselected → Pending |
-| NFR-002 | PRD §7; AI §6; API §6 | V-014, V-007, V-005 | Unselected → Pending |
+| NFR-002 | PRD §7; AI §6; API §6 | V-014, V-007, V-005 | [M018 AC-004/006](../08-backlogs/M018/spec.md#acceptance) original-deadline enforcement portion (captured once, no-fit refusal, cancellation fencing, fake-time proof, live per-case timings) → Passed (development evidence; percentile/load measurement stays with V-014) |
 | NFR-003 | UX §6; architecture §7; API §5–7 | V-002, V-005, V-007, V-010, V-016 | Unselected → Pending |
 | NFR-004 | UX §3; architecture §6; AI §8; API §9 | V-015, V-010, V-005 | [M007 AC-002/004/006](../08-backlogs/M007/spec.md#acceptance) account-secret/no-store slice → Passed; text lifecycle, browser and operation persistence coverage remain unselected |
 | NFR-005 | UX §4–5/10 | V-003, V-010, V-011 | Unselected → Pending |
-| NFR-006 | architecture §7; AI §5–6; API §7 | V-006, V-008, V-013, V-014 | Unselected → Pending |
+| NFR-006 | architecture §7; AI §5–6; API §7 | V-006, V-008, V-013, V-014 | [M018 AC-005/006](../08-backlogs/M018/spec.md#acceptance) per-dispatch admission and conservative-exposure portion (reserve-before-launch, denial stop, unresolved retention, live settled actuals) → Passed (development evidence; monetary cap and durable accounting remain unselected) |
 | NFR-007 | UX §4–5; Should priority retained | V-011 | Unselected → Pending |
 | NFR-008 | PRD P-005; no added acceptance | — | Not applicable — Proposed |
 | RG-001 | PRD §8; active functional rows above | V-001, V-002, V-003, V-004, V-005, V-007, V-009, V-010, V-012 | Unselected → Pending |

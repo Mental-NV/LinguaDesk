@@ -199,13 +199,13 @@
       "path": "backend/src/LinguaDesk.Infrastructure.Ai/TranslationPipeline.cs",
       "use": "reference",
       "reason": "Single-candidate translation pipeline traversed unchanged by the orchestrator",
-      "sha256": "4689a28ebda1d0b58594aea4c8e6673ea87d0049004246211401fefc128bf1e5"
+      "sha256": "7f4b904935a0bf21aff590886507e7b6391d79e25f57c99c8dd68a951cf9db0e"
     },
     {
       "path": "backend/src/LinguaDesk.Infrastructure.Ai/RewritingPipeline.cs",
       "use": "reference",
       "reason": "Single-candidate rewriting pipeline traversed unchanged by the orchestrator",
-      "sha256": "3088c5dad28a2c7ee2eb24a2b6c0cdc75165b1217219fc23547806a41b82b4ed"
+      "sha256": "d1662f11aef74fbf7024753ea7261d2a2e123a0a2b6475a3ad9fcc19449764c5"
     },
     {
       "path": "backend/src/LinguaDesk.Infrastructure.Ai/EligibilityPipeline.cs",
@@ -247,7 +247,7 @@
       "path": "backend/tools/LinguaDesk.Ai.Evaluation/Program.cs",
       "use": "reference",
       "reason": "Runner extended with the budgeted chain-bounds workflow",
-      "sha256": "53955901108ab9e1f5ed68b10a3cefe14a64cfba3626f718852055c7c4b550ad"
+      "sha256": "a0370599adbfcc0862c6dfd2daf9c69bd8f3db8af3b51a99d6181d52888944db"
     },
     {
       "path": "backend/tools/LinguaDesk.Ai.Evaluation/EvaluateTranslation.cs",
@@ -259,11 +259,11 @@
       "path": "scripts/ai.sh",
       "use": "reference",
       "reason": "Offline AI check and live-command surface extended by this slice",
-      "sha256": "2a5e9ce8d448ca7cff638d19b3c341252e2aadfaad3ee222100bdccdf0134667"
+      "sha256": "6f0d32d3fcb2d7161bb10d98f754a58310b348c8ec9140be816ba9552510866e"
     }
   ],
   "source_map_sha256": "95f133ae2362c3695be93a7103c0c89954571bbd1983e35e6b283818791fd046",
-  "baseline_commit": "aac00741f1b3bef8c6a29a4084dabc4664707d2d",
+  "baseline_commit": "43b04a7c12f71bef6bfeef44b893365acd47756a",
   "locked_files": {
     "docs/00-SDD-Planning-Workflow.md": "183ae93148ff594f9f1e021aa7543baa8878e9cc0bcfd69ebc696c28976e2945",
     "docs/00-workflow/execution.md": "f362a1384cefef24ba204e0723e3190857c8cca9bcd91908136932e19c5caf02",

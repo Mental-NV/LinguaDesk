@@ -119,9 +119,21 @@ bash scripts/ai.sh evaluate-translation --live --profile DeepSeek-V4.1-Flash --m
 # report under artifacts/rewriting/.
 bash scripts/ai.sh evaluate-rewriting --profile DeepSeek-V4.1-Flash --max-dispatches 80 --max-spend-usd 0.50
 bash scripts/ai.sh evaluate-rewriting --live --profile DeepSeek-V4.1-Flash --max-dispatches 80 --max-spend-usd 0.50
+
+# Run the small chain-bounds slice offline (scripted pairs through the
+# primary-only chain, no credential, no network) or live (--live) through
+# the selected profile under the explicit finite dispatch, spend, and
+# overall-deadline budget. The slice covers five translation directions
+# (both Chinese input scripts) plus one rewriting cell per language. The
+# live path refuses any configured fallback: injected faults are proven
+# deterministically offline, and the live slice records only natural
+# primary-only calls with attempt/usage/exposure/deadline metadata.
+# Both write a sanitized metadata-only report under artifacts/chain-bounds/.
+bash scripts/ai.sh evaluate-chain-bounds --profile DeepSeek-V4.1-Flash --max-dispatches 24 --max-spend-usd 0.50
+bash scripts/ai.sh evaluate-chain-bounds --live --profile DeepSeek-V4.1-Flash --max-dispatches 24 --max-spend-usd 0.50
 ```
 
-`check`, `inspect`, `probe`, and `conformance` clear common provider credential variables and point outbound HTTP proxies at an unreachable loopback address. They start no API/frontend process, open no database, and write no persistent evaluation report; `check` writes only generated build output and `artifacts/test-results/ai.trx`. The default offline `evaluate-eligibility`, `evaluate-translation`, and `evaluate-rewriting` runs work the same way: scripted responses for the allowlisted synthetic slice, no credential read, no network, plus a metadata-only report under `artifacts/eligibility/`, `artifacts/translation/`, or `artifacts/rewriting/`. Only `verify-access` and the `--live` evaluation runs use the network and the host credential: each reads the key exclusively from `LINGUADESK_AIEVALUATION__CREDENTIALS__<REF>__APIKEY` (for example `...__DEEPSEEK__APIKEY` for `CredentialRef` `deepseek`), stays within the explicit finite dispatch and spend budget, and prints a sanitized report naming only the reference, disposition, usage, and exposure — never the key. A missing or blank credential exits blocked (`3`) with zero dispatches and no scripted fallback. The runner accepts no source, configuration, credential, or arbitrary text argument.
+`check`, `inspect`, `probe`, and `conformance` clear common provider credential variables and point outbound HTTP proxies at an unreachable loopback address. They start no API/frontend process, open no database, and write no persistent evaluation report; `check` writes only generated build output and `artifacts/test-results/ai.trx`. The default offline `evaluate-eligibility`, `evaluate-translation`, `evaluate-rewriting`, and `evaluate-chain-bounds` runs work the same way: scripted responses for the allowlisted synthetic slice, no credential read, no network, plus a metadata-only report under `artifacts/eligibility/`, `artifacts/translation/`, `artifacts/rewriting/`, or `artifacts/chain-bounds/`. Only `verify-access` and the `--live` evaluation runs use the network and the host credential: each reads the key exclusively from `LINGUADESK_AIEVALUATION__CREDENTIALS__<REF>__APIKEY` (for example `...__DEEPSEEK__APIKEY` for `CredentialRef` `deepseek`), stays within the explicit finite dispatch and spend budget, and prints a sanitized report naming only the reference, disposition, usage, and exposure — never the key. A missing or blank credential exits blocked (`3`) with zero dispatches and no scripted fallback. The runner accepts no source, configuration, credential, or arbitrary text argument.
 
 Inspection deliberately prints the checked-in synthetic source containing a quote, newline, and instruction-like phrase. `probe` labels its observation `raw_scripted_observation` and reports `live: false` and `validated: false`. Neither command classifies a product input, validates a response, transforms text, qualifies a model/provider, measures quality/cost/performance, or proves a release gate. Those behaviors remain later selected milestones.
 

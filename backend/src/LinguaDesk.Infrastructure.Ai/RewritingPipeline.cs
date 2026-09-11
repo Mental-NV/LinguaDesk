@@ -102,6 +102,29 @@ public static class RewritingPipeline
                 probe.ResourceSha256);
         }
 
+        return await TransformAsync(input, mode, eligibility, client, cancellationToken).ConfigureAwait(false);
+    }
+
+    public static async Task<RewritingOutcome> TransformAsync(
+        RewritingInput input,
+        string mode,
+        EligibilityOutcome acceptedEligibility,
+        IChatClient client,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(input);
+        ArgumentException.ThrowIfNullOrWhiteSpace(mode);
+        ArgumentNullException.ThrowIfNull(acceptedEligibility);
+        ArgumentNullException.ThrowIfNull(client);
+
+        if (acceptedEligibility.Decision != EligibilityDecision.Eligible)
+        {
+            throw new ArgumentException(
+                "The transformation stage requires an accepted eligible classification.",
+                nameof(acceptedEligibility));
+        }
+
+        var eligibility = acceptedEligibility;
         var resolved = eligibility.ResolvedLanguage!;
         var snapshot = RewritingPrompt.Create(input.Source, resolved, mode);
 

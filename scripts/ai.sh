@@ -13,7 +13,7 @@ expected_sdk="10.0.302"
 configuration="Release"
 
 usage() {
-    echo "Usage: bash scripts/ai.sh {setup|check|inspect|probe|conformance|verify-access --profile <id> --max-dispatches <n> --max-spend-usd <amount>|evaluate-eligibility [--live] --profile <id> --max-dispatches <n> --max-spend-usd <amount>|evaluate-translation [--live] --profile <id> --max-dispatches <n> --max-spend-usd <amount>|evaluate-rewriting [--live] --profile <id> --max-dispatches <n> --max-spend-usd <amount>}" >&2
+    echo "Usage: bash scripts/ai.sh {setup|check|inspect|probe|conformance|verify-access --profile <id> --max-dispatches <n> --max-spend-usd <amount>|evaluate-eligibility [--live] --profile <id> --max-dispatches <n> --max-spend-usd <amount>|evaluate-translation [--live] --profile <id> --max-dispatches <n> --max-spend-usd <amount>|evaluate-rewriting [--live] --profile <id> --max-dispatches <n> --max-spend-usd <amount>|evaluate-chain-bounds [--live] --profile <id> --max-dispatches <n> --max-spend-usd <amount>}" >&2
 }
 
 require_command() {
@@ -222,6 +222,13 @@ case "$mode" in
             run_live evaluate-rewriting "$@"
         else
             run_offline dotnet "$runner_dll" evaluate-rewriting "$@"
+        fi
+        ;;
+    evaluate-chain-bounds)
+        if [ "${1:-}" = "--live" ]; then
+            run_live evaluate-chain-bounds "$@"
+        else
+            run_offline dotnet "$runner_dll" evaluate-chain-bounds "$@"
         fi
         ;;
     *)
