@@ -1,0 +1,175 @@
+{
+  "version": 1,
+  "scope": "M015",
+  "sources": [
+    {
+      "path": "docs/07-roadmap.md",
+      "ids": [
+        "M015"
+      ],
+      "use": "excerpt",
+      "reason": "Selected milestone outcome, prerequisites and verification allocation",
+      "sha256": "6bf1ab5776d2b3c7d03b864ca7639670fa0bcc00a176948e1591b6d4694be6fa"
+    },
+    {
+      "path": "docs/01-PRD.md",
+      "ids": [
+        "FR-004",
+        "FR-005",
+        "FR-006",
+        "FR-007"
+      ],
+      "use": "excerpt",
+      "reason": "Selected language eligibility, supported languages, scripts and length limits",
+      "sha256": "f03f1bebb37bb59fc94a3c100f550f85081f9f0a7fa2404dc1e8ccc663282064"
+    },
+    {
+      "path": "docs/04-llm-specification.md",
+      "heading": "3. Input eligibility and operation behavior",
+      "use": "excerpt",
+      "reason": "Canonical eligibility validation, classification rules and terminal-outcome behavior",
+      "sha256": "437a82f2d0967d372f2aec1e661e50fc5442ccf0fd7d868d2f21188c8779c32c"
+    },
+    {
+      "path": "docs/04-llm-specification.md",
+      "heading": "4.2 Internal JSON response envelopes",
+      "use": "excerpt",
+      "reason": "Strict eligibility envelope contract implemented by the parser",
+      "sha256": "f3dc257dd3cfd7b96bdcc5310a64eebb62a4034ea3e71a2a8119aa602a615bee"
+    },
+    {
+      "path": "docs/04-llm-specification.md",
+      "heading": "4.3 Output validity and limits of runtime checks",
+      "use": "reference",
+      "reason": "Truncation/refusal rejection and checker limits; open if validator behavior changes",
+      "sha256": "11142b87b7327329bacc323e5a95c9fbc46f07c0fd970d9287899f6847cd28f9"
+    },
+    {
+      "path": "docs/04-llm-specification.md",
+      "heading": "5.2 Evaluation profiles and credentials",
+      "use": "excerpt",
+      "reason": "Credential-reference boundary and budget rules for the bounded live slice",
+      "sha256": "aed1d7d39463f41eb56a54d22092387444dcd6c64e0f8d0177837abeab19305d"
+    },
+    {
+      "path": "docs/04-llm-specification.md",
+      "heading": "9.1 Host-independent capability",
+      "use": "excerpt",
+      "reason": "M015 live-development evidence requirement and its non-qualification scope",
+      "sha256": "7011349294b0556076c7f4293400dd49f2b1730cccdf704e4e1b92c8842d579e"
+    },
+    {
+      "path": "docs/04-llm-specification.md",
+      "heading": "10. Local acceptance scenarios and handoffs",
+      "use": "excerpt",
+      "reason": "LLM-AC-003/004/005/007/008/013 allocation for the eligibility slice",
+      "sha256": "2a61831246c3c9219255aa7f7b0fed38df27b698cd1436164570604a8c2358dc"
+    },
+    {
+      "path": "docs/04-llm-specification.md",
+      "heading": "8. Privacy and owner diagnostics",
+      "use": "excerpt",
+      "reason": "Secret handling and diagnostic limits for the live slice and reports",
+      "sha256": "e0b358fa0bf8cc8d895415f818a234086a6462741042a3260004cd6beaeb5f26"
+    },
+    {
+      "path": "docs/06-verification-plan.md",
+      "heading": "2.2 Stable check groups",
+      "use": "excerpt",
+      "reason": "V-001/V-007/V-008 assertion ownership for this slice",
+      "sha256": "95bf3bf55aa828bb457ff50d877178be6fb2fe7c3532fb21bae72cdfc7e49902"
+    },
+    {
+      "path": "docs/verification/backend.md",
+      "heading": "3.3 Independent AI workflows",
+      "use": "excerpt",
+      "reason": "Host-independent build, offline and live-run workflow rules",
+      "sha256": "93dfae45cbdb8562309e250ab771ac5787ffb79f8517a148ca90702123b936b8"
+    },
+    {
+      "path": "docs/06-verification-plan.md",
+      "heading": "7.2 Evaluation report and data boundary",
+      "use": "excerpt",
+      "reason": "Sanitized live-slice report contents and synthetic-only data boundary",
+      "sha256": "78b45b543edb17f05571ea0bff7ad2322fd8c4d02f7aa8f4c314209c2c5ed008"
+    },
+    {
+      "path": "docs/product/open-questions.md",
+      "ids": [
+        "Q-001",
+        "Q-005",
+        "Q-007"
+      ],
+      "use": "excerpt",
+      "reason": "Question dispositions bounding this development-evidence increment",
+      "sha256": "27ba55e348830b7d21f16af84279e07a3c01073ec8188d1bc579f1b953474b2d"
+    },
+    {
+      "path": "docs/product/deferred-scope.md",
+      "ids": [
+        "DF-001",
+        "DF-004",
+        "DF-006"
+      ],
+      "use": "excerpt",
+      "reason": "Deferred context/routing/prefix scope excluded from this slice",
+      "sha256": "f99634612fe3c00d6bcbd276f7956111b3332e999253f27b4fbca8d85eeba2cb"
+    },
+    {
+      "path": "docs/08-backlogs/M004/spec.md",
+      "use": "reference",
+      "reason": "Completed AI inner-loop dependency; open only for regression questions",
+      "sha256": "f44774a5418c16ab57f1f3b8ae12104a48fd5e2a77d68369bef8f7d9841254bc"
+    },
+    {
+      "path": "docs/08-backlogs/M005/spec.md",
+      "use": "reference",
+      "reason": "Completed shared input/contract dependency; open only for regression questions",
+      "sha256": "da5938537df39deb4fe4fe82c918010440deb39165ff3d2c684a79db0d76c12d"
+    },
+    {
+      "path": "docs/08-backlogs/M019/spec.md",
+      "use": "reference",
+      "reason": "Completed adapter/credential/budget dependency consumed by the live slice",
+      "sha256": "670f54f4461664919a34caaac7157799f8995393b7255f06d093a0ec64b803be"
+    },
+    {
+      "path": "docs/decisions/ADR-012.md",
+      "use": "reference",
+      "reason": "Shared AI boundary decision; open if the slice changes it",
+      "sha256": "3f60892d42cd948b27a4870d4a53248b36b0f4ec6dea7c9da2a059f1c37a0ffd"
+    },
+    {
+      "path": "backend/src/LinguaDesk.Core/ScalarInputPolicy.cs",
+      "use": "reference",
+      "reason": "unicode-scalar-v1 counting reused by the zero-dispatch gates",
+      "sha256": "f9060fc2611b571b74ae701341a1166bebf637ae55453c22aacb5c4997ccdec0"
+    },
+    {
+      "path": "backend/src/LinguaDesk.Infrastructure.Ai/Prompts/eligibility.v1.txt",
+      "use": "reference",
+      "reason": "Prompt bundle consumed unchanged by the eligibility pipeline",
+      "sha256": "4f61eb19baced2342dd1a4b27f3b08846184f202674e90243ad2a635c37eb380"
+    },
+    {
+      "path": "backend/tools/LinguaDesk.Ai.Evaluation/Program.cs",
+      "use": "reference",
+      "reason": "Runner extended with the budgeted evaluate-eligibility workflow",
+      "sha256": "4994348e289feff18340498d758fa4ff2087d7db547f4135c820ed03a0cb61dc"
+    },
+    {
+      "path": "scripts/ai.sh",
+      "use": "reference",
+      "reason": "Offline AI check and live-command surface extended by this slice",
+      "sha256": "f46d6c091ede39309cdec72e846cda9ad426ff29c594e3608ab9d69a989410fb"
+    }
+  ],
+  "source_map_sha256": "3dbcc9be4e552ccd84c31451616564572dad1f599a18db9d6a7faec9d9f08ef9",
+  "baseline_commit": "71ac6a2cf09bcd0563261e63def236ab3c334f6a",
+  "locked_files": {
+    "docs/00-SDD-Planning-Workflow.md": "183ae93148ff594f9f1e021aa7543baa8878e9cc0bcfd69ebc696c28976e2945",
+    "docs/00-workflow/execution.md": "f362a1384cefef24ba204e0723e3190857c8cca9bcd91908136932e19c5caf02",
+    "docs/08-backlogs/M015/spec.md": "7f77e19521eefb475c0313c73553218f4e4ed4d1b475dbb919c42ca88185624d",
+    "docs/08-backlogs/M015/plan.md": "7066f226c67dd24b40889a959a2061fa9bcc574ddafc92ed84ae0098813c3d54"
+  }
+}
