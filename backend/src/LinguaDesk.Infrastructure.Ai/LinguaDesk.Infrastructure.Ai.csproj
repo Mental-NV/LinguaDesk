@@ -6,6 +6,9 @@
     <PackageReference Include="Microsoft.Extensions.AI.Abstractions" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\LinguaDesk.Core\LinguaDesk.Core.csproj" />
+  </ItemGroup>
+  <ItemGroup>
     <EmbeddedResource Include="Prompts/eligibility.v1.txt" />
   </ItemGroup>
 </Project>

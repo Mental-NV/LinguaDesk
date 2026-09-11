@@ -155,17 +155,17 @@
       "path": "backend/tools/LinguaDesk.Ai.Evaluation/Program.cs",
       "use": "reference",
       "reason": "Runner extended with the budgeted evaluate-eligibility workflow",
-      "sha256": "4994348e289feff18340498d758fa4ff2087d7db547f4135c820ed03a0cb61dc"
+      "sha256": "153303aacf49373e4bd129dce24107c639064fa0f9b538cbe3a4c3342ab6f301"
     },
     {
       "path": "scripts/ai.sh",
       "use": "reference",
       "reason": "Offline AI check and live-command surface extended by this slice",
-      "sha256": "f46d6c091ede39309cdec72e846cda9ad426ff29c594e3608ab9d69a989410fb"
+      "sha256": "f4c057dfcc5beb22d381e8411f5b6c9c4acd9aeb9de2812420cd9eafaca78b85"
     }
   ],
   "source_map_sha256": "3dbcc9be4e552ccd84c31451616564572dad1f599a18db9d6a7faec9d9f08ef9",
-  "baseline_commit": "71ac6a2cf09bcd0563261e63def236ab3c334f6a",
+  "baseline_commit": "c9d011b516707819925d2436d4b94baec10481a0",
   "locked_files": {
     "docs/00-SDD-Planning-Workflow.md": "183ae93148ff594f9f1e021aa7543baa8878e9cc0bcfd69ebc696c28976e2945",
     "docs/00-workflow/execution.md": "f362a1384cefef24ba204e0723e3190857c8cca9bcd91908136932e19c5caf02",

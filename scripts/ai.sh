@@ -13,7 +13,7 @@ expected_sdk="10.0.302"
 configuration="Release"
 
 usage() {
-    echo "Usage: bash scripts/ai.sh {setup|check|inspect|probe|conformance|verify-access --profile <id> --max-dispatches <n> --max-spend-usd <amount>}" >&2
+    echo "Usage: bash scripts/ai.sh {setup|check|inspect|probe|conformance|verify-access --profile <id> --max-dispatches <n> --max-spend-usd <amount>|evaluate-eligibility [--live] --profile <id> --max-dispatches <n> --max-spend-usd <amount>}" >&2
 }
 
 require_command() {
@@ -202,6 +202,13 @@ case "$mode" in
         ;;
     verify-access)
         run_live verify-access "$@"
+        ;;
+    evaluate-eligibility)
+        if [ "${1:-}" = "--live" ]; then
+            run_live evaluate-eligibility "$@"
+        else
+            run_offline dotnet "$runner_dll" evaluate-eligibility "$@"
+        fi
         ;;
     *)
         usage

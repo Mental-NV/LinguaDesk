@@ -6,4 +6,7 @@
   <ItemGroup>
     <ProjectReference Include="../../src/LinguaDesk.Infrastructure.Ai/LinguaDesk.Infrastructure.Ai.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="../../src/LinguaDesk.Core/LinguaDesk.Core.csproj" />
+  </ItemGroup>
 </Project>

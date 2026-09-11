@@ -38,6 +38,7 @@ internal static class Program
             "probe" when args.Length == 1 => await ProbeAsync().ConfigureAwait(false),
             "conformance" when args.Length == 1 => await ConformanceAsync().ConfigureAwait(false),
             "verify-access" => await VerifyAccessAsync(args[1..]).ConfigureAwait(false),
+            "evaluate-eligibility" => await EvaluateEligibility.RunAsync(args[1..]).ConfigureAwait(false),
             _ => UnknownCommand(),
         };
     }
@@ -336,7 +337,8 @@ internal static class Program
     private static void WriteUsage() =>
         Console.Error.WriteLine(
             "Usage: dotnet LinguaDesk.Ai.Evaluation.dll {inspect|probe|conformance|" +
-            "verify-access --profile <id> --max-dispatches <n> --max-spend-usd <amount>}");
+            "verify-access --profile <id> --max-dispatches <n> --max-spend-usd <amount>|" +
+            "evaluate-eligibility [--offline|--live] --profile <id> --max-dispatches <n> --max-spend-usd <amount> [--output <path>]}");
 
     private sealed record VerifyAccessOptions(string Profile, int MaxDispatches, decimal MaxSpendUsd)
     {
