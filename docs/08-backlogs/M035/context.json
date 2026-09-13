@@ -1,0 +1,112 @@
+{
+  "version": 1,
+  "scope": "M035",
+  "sources": [
+    {
+      "path": "docs/07-roadmap.md",
+      "ids": [
+        "M035"
+      ],
+      "use": "excerpt",
+      "reason": "Selected milestone outcome, exit criterion, prerequisite (M020) and verification basis",
+      "sha256": "3ff5eed1ccfe31e16449c7ef4b4bafa0a956661761beb62e1414e0cb59e5f62f"
+    },
+    {
+      "path": "docs/delivery/current.md",
+      "use": "reference",
+      "reason": "Dependency states (M020 Done, next train M035→M036→M037) at planning time",
+      "sha256": "483636464a3f6c14a440d2b201873441da5f7f2015bd0ffc0deb9260e4e4e7eb"
+    },
+    {
+      "path": "docs/01-PRD.md",
+      "heading": "8. Evaluation and release acceptance",
+      "use": "excerpt",
+      "reason": "Product thresholds constraining the batch: 90% gate, per-direction/per-language denominators, critical-error classes, human checks in every language",
+      "sha256": "48ff6ef9096791b72c75f29e33226fe6c88945728a41aab472ee957f4e4a5e34"
+    },
+    {
+      "path": "docs/04-llm-specification.md",
+      "heading": "9.2 Evaluation ownership and data boundary",
+      "use": "excerpt",
+      "reason": "Evaluation data boundary: no production workspace text in corpus material",
+      "sha256": "b6b2e7d83a908e75bb919f3daf4321eff7168688ef8575e5882fa749029afeb8"
+    },
+    {
+      "path": "docs/06-verification-plan.md",
+      "heading": "2. Verification layers and check catalog",
+      "use": "excerpt",
+      "reason": "V-013 check-group assertions allocated to M035 (corpus-construction portion)",
+      "sha256": "21ff32e68c1d2ccb4a9e48f0d6f6ae5b3a2cf56c9d11c522f6ccbe16ccf78aae"
+    },
+    {
+      "path": "docs/verification/llm-evaluation.md",
+      "heading": "5.0 Evidence layers and live-development gate",
+      "use": "excerpt",
+      "reason": "Frozen-corpus qualification layer boundary: what this batch enables vs what M036 proves",
+      "sha256": "5413b284205daea48321479a5c5f02deee0905999c72a11420053689c8cfc601"
+    },
+    {
+      "path": "docs/verification/llm-evaluation.md",
+      "heading": "5.1 Versioned corpus and reference construction",
+      "use": "excerpt",
+      "reason": "Canonical corpus composition, case field set, coverage tags and review rules the batch must satisfy",
+      "sha256": "569f0f1f57d79742dd9c1b03b63ec67f86eac51c9cfe49ff15a77444b2836be3"
+    },
+    {
+      "path": "docs/verification/llm-evaluation.md",
+      "heading": "5.2 Rubric and denominator",
+      "use": "reference",
+      "reason": "Boundary: rubric/denominator execution belongs to M036 grading, not this batch",
+      "sha256": "664c3fb0b7843c52d8cc27a685ba1ce7307baf4f1ab2814f3fde6c817cbc51d8"
+    },
+    {
+      "path": "docs/verification/llm-evaluation.md",
+      "heading": "5.3 AI grading and human review",
+      "use": "reference",
+      "reason": "Boundary: output grading and per-candidate human review belong to M036; only corpus-reference review approvers overlap",
+      "sha256": "9383cfe52a06b3394cf732b23ef76820d9a4e3fa0d84687e216f85cee5c2bc58"
+    },
+    {
+      "path": "docs/verification/llm-evaluation.md",
+      "heading": "5.4 Qualification and changes",
+      "use": "reference",
+      "reason": "Boundary: qualification dispositions and revision rules belong to M036/G1; freeze-revision rule cited in spec",
+      "sha256": "30440f5e2c4f1555c94a9d4192f7e1f3cf4981c3cbe6e2248c5e12cd34094c92"
+    },
+    {
+      "path": "docs/product/open-questions.md",
+      "ids": [
+        "Q-005"
+      ],
+      "use": "reference",
+      "reason": "Open disposition bounding M035: design specified, executable corpus evidence pending, question stays open",
+      "sha256": "4674418563546e3fc5603df7a63032a9714a062ffd73aa89681d6f28ee46d76b"
+    },
+    {
+      "path": "docs/08-backlogs/M020/backlog.md",
+      "use": "reference",
+      "reason": "Dependency evidence: combined-report workflow is the consumer contract, reused not re-proven",
+      "sha256": "fc3446d58c39b890881f36140f6cb7629b54119dc518b79615fca151e3d84d45"
+    },
+    {
+      "path": "backend/tools/LinguaDesk.Ai.Evaluation/EvaluateTranslation.cs",
+      "use": "reference",
+      "reason": "Development-slice case shape and IDs the frozen batch must stay disjoint from",
+      "sha256": "929301f05d2cd21f86b44ba27e07f0a3a9a63260d6da77d18252005532290eda"
+    },
+    {
+      "path": "backend/tools/LinguaDesk.Ai.Evaluation/EvaluateRewriting.cs",
+      "use": "reference",
+      "reason": "Development-slice case shape and IDs the frozen batch must stay disjoint from",
+      "sha256": "66cc227bca2a023fff77b60ca7534cfd659e8f7fd51e745157537560353c1cec"
+    }
+  ],
+  "source_map_sha256": "046d8d55d9aa728c0c47f70887b7987dae4ce404f2b099531c8df2ab8b2ef417",
+  "baseline_commit": "82e355b2bafca6d4b2916b29f9c69659e2cc6f3d",
+  "locked_files": {
+    "docs/00-SDD-Planning-Workflow.md": "5ccca040d0f0d50fac47632643306e7224a8d2e5460df0958e7e7c333146db89",
+    "docs/00-workflow/execution.md": "f362a1384cefef24ba204e0723e3190857c8cca9bcd91908136932e19c5caf02",
+    "docs/08-backlogs/M035/spec.md": "afa47c9276ff0398ee84f50b272627f00ce2f1edad4b66434e8b79959b039083",
+    "docs/08-backlogs/M035/plan.md": "5fb20a9921e3db3eabd0632b3cef75900b82e1e6b4fcea214120ccbaaffdb833"
+  }
+}
