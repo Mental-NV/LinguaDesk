@@ -1,0 +1,165 @@
+{
+  "version": 1,
+  "scope": "M036",
+  "sources": [
+    {
+      "path": "docs/07-roadmap.md",
+      "ids": [
+        "M036"
+      ],
+      "use": "excerpt",
+      "reason": "Selected milestone outcome, exit criterion, prerequisites (M019, M020, M035) and verification basis",
+      "sha256": "ae808994f705d898c190ac1e83a1efedfe98405f847984f18a5711750dca9462"
+    },
+    {
+      "path": "docs/07-roadmap.md",
+      "ids": [
+        "M035",
+        "M019",
+        "M020"
+      ],
+      "use": "reference",
+      "reason": "Dependency rows: batch, access and report predecessors whose semantics are reused, not re-proven",
+      "sha256": "3637117d8963e955d94b91a9006c3b80d0b4be7d39211ceb4b046c7eb4229aab"
+    },
+    {
+      "path": "docs/delivery/current.md",
+      "use": "reference",
+      "reason": "Dependency states at planning time (M019/M020/M035 Done, M035 waiver carried forward, train M035→M036→M037)",
+      "sha256": "ab18ec51a3d8a42158c8767f5ba485d9a8a2181192462818aa389c2d9aedcfaf"
+    },
+    {
+      "path": "docs/01-PRD.md",
+      "heading": "8. Evaluation and release acceptance",
+      "use": "excerpt",
+      "reason": "Product evaluation rules constraining the run: fixed-set grading, critical-error classes, per-route/language recording, 90% gate",
+      "sha256": "48ff6ef9096791b72c75f29e33226fe6c88945728a41aab472ee957f4e4a5e34"
+    },
+    {
+      "path": "docs/01-PRD.md",
+      "heading": "7. Nonfunctional requirements",
+      "use": "excerpt",
+      "reason": "NFR-001 quality threshold (not claimable at n=1/direction) and NFR-006 cost bounds framing the admitted budget",
+      "sha256": "5b245c8cc29f59c2ad682d9a5d2af5efe078c791eef956a46ebae2caa1e78098"
+    },
+    {
+      "path": "docs/06-verification-plan.md",
+      "heading": "2. Verification layers and check catalog",
+      "use": "excerpt",
+      "reason": "V-008 (adapter/live evidence) and V-013 (corpus/grading/review) check-group assertions allocated to M036",
+      "sha256": "21ff32e68c1d2ccb4a9e48f0d6f6ae5b3a2cf56c9d11c522f6ccbe16ccf78aae"
+    },
+    {
+      "path": "docs/verification/llm-evaluation.md",
+      "heading": "5.0 Evidence layers and live-development gate",
+      "use": "excerpt",
+      "reason": "Frozen-corpus qualification layer boundary: live_qualification disposition, budget admission, no fixture/live mixing",
+      "sha256": "5413b284205daea48321479a5c5f02deee0905999c72a11420053689c8cfc601"
+    },
+    {
+      "path": "docs/verification/llm-evaluation.md",
+      "heading": "5.1 Versioned corpus and reference construction",
+      "use": "reference",
+      "reason": "Boundary: corpus construction contract the frozen B1 input already satisfies (weakened under M035 waiver)",
+      "sha256": "569f0f1f57d79742dd9c1b03b63ec67f86eac51c9cfe49ff15a77444b2836be3"
+    },
+    {
+      "path": "docs/verification/llm-evaluation.md",
+      "heading": "5.2 Rubric and denominator",
+      "use": "excerpt",
+      "reason": "Grading execution contract: anchored 0-3 scale, usable-case definition, denominator includes all assigned cases",
+      "sha256": "664c3fb0b7843c52d8cc27a685ba1ce7307baf4f1ab2814f3fde6c817cbc51d8"
+    },
+    {
+      "path": "docs/verification/llm-evaluation.md",
+      "heading": "5.3 AI grading and human review",
+      "use": "excerpt",
+      "reason": "Grading/review execution contract: pinned blinded judge, calibration, seeded sample plus all flags, adjudication",
+      "sha256": "9383cfe52a06b3394cf732b23ef76820d9a4e3fa0d84687e216f85cee5c2bc58"
+    },
+    {
+      "path": "docs/verification/llm-evaluation.md",
+      "heading": "5.4 Qualification and changes",
+      "use": "excerpt",
+      "reason": "Candidate-only (no fallback rescue) evaluation, revision/rerun rules, no qualification claim beyond this batch",
+      "sha256": "30440f5e2c4f1555c94a9d4192f7e1f3cf4981c3cbe6e2248c5e12cd34094c92"
+    },
+    {
+      "path": "docs/06-verification-plan.md",
+      "heading": "7. Execution gates and evidence",
+      "use": "excerpt",
+      "reason": "Qualification gate placement and §7.2 versioned-report/data-boundary field requirements",
+      "sha256": "89a61877faf427cce65e85ac6767373885394ed6c26b5f9455e7ecf1cfcfdc07"
+    },
+    {
+      "path": "docs/04-llm-specification.md",
+      "heading": "5. Provider configuration and capability evidence",
+      "use": "excerpt",
+      "reason": "Selected candidate DeepSeek-V4.1-Flash, evaluation profile/credential separation, budget and live-evaluation workflow",
+      "sha256": "942d6ccc2e479ff970bc49e100d1ebea2d4ec7c1884fbaf4d1f96130351b29aa"
+    },
+    {
+      "path": "docs/04-llm-specification.md",
+      "heading": "6. Routing, attempts, and time bounds",
+      "use": "excerpt",
+      "reason": "Dispatch bounds (≤2 primary-only, ≤3 with fallback), stage timeouts and finalization reserve for the admitted budget",
+      "sha256": "baa98d196e4549008323072028dbe1ad47138ac267479e8d8ad125263b5a4cfd"
+    },
+    {
+      "path": "docs/04-llm-specification.md",
+      "heading": "9. Independent development and evaluation",
+      "use": "reference",
+      "reason": "Evaluation ownership and data boundary: no production text in corpus material or reports",
+      "sha256": "6306fb8e9f2193fc07df67da7ba1740ba122bf42e0b655476b4496d5833e7aea"
+    },
+    {
+      "path": "docs/product/open-questions.md",
+      "ids": [
+        "Q-001",
+        "Q-005",
+        "Q-007"
+      ],
+      "use": "reference",
+      "reason": "Open dispositions bounding M036: cap/serving, corpus-to-qualification execution, attempt/deadline policy inputs",
+      "sha256": "27ba55e348830b7d21f16af84279e07a3c01073ec8188d1bc579f1b953474b2d"
+    },
+    {
+      "path": "docs/08-backlogs/M035/spec.md",
+      "use": "reference",
+      "reason": "Dependency evidence: B1 input contract (composition, freeze hash, weakened review, successor gaps)",
+      "sha256": "afa47c9276ff0398ee84f50b272627f00ce2f1edad4b66434e8b79959b039083"
+    },
+    {
+      "path": "docs/08-backlogs/M035/backlog.md",
+      "use": "reference",
+      "reason": "Dependency evidence: BI-035 outcome and freeze-gate ownership consumed by BI-036",
+      "sha256": "786a76428f52c91cc94110768a105cb99258750c6eb9acbdb9a9b0cea191f0c3"
+    },
+    {
+      "path": "backend/tools/LinguaDesk.Ai.Evaluation/Corpus/batch-b1.json",
+      "use": "reference",
+      "reason": "Frozen B1 input: run must verify byte-identity against the spec-pinned hash before dispatch",
+      "sha256": "aebdc2dc482487d726a55953f9de1a46d66aa09b6693e353696d50e16cb83012"
+    },
+    {
+      "path": "backend/tools/LinguaDesk.Ai.Evaluation/README.md",
+      "use": "reference",
+      "reason": "Runner surface extended by this milestone: budgets, offline/live modes, B1 explicitly not yet a CLI input",
+      "sha256": "2680f0749d9654b15064cfecbd62416bb265ad66d55d87d060eef623c71f8788"
+    },
+    {
+      "path": "backend/tools/LinguaDesk.Ai.Evaluation/Program.cs",
+      "use": "reference",
+      "reason": "Command dispatcher the new evaluate-batch command extends; verifies no B1/grading path exists yet",
+      "sha256": "aa4df8e64fed1dc1407bb138fb451c47904e5e15db5ac3bab36ae22fecf1fffd"
+    }
+  ],
+  "source_map_sha256": "807195a3d62845923ca9bad8f8b6edbaa526883b562ba8bfc35d3b68d3b56fa1",
+  "baseline_commit": "cb321504df94f179e133130d85b1f0d82edb6d99",
+  "locked_files": {
+    "docs/00-SDD-Planning-Workflow.md": "5ccca040d0f0d50fac47632643306e7224a8d2e5460df0958e7e7c333146db89",
+    "docs/00-workflow/execution.md": "f362a1384cefef24ba204e0723e3190857c8cca9bcd91908136932e19c5caf02",
+    "docs/08-backlogs/M036/spec.md": "15fa56d35c9a5cb17cb5ee7347802f2fce9aa3ccbdf1c81deb9c742dfc5b21c8",
+    "docs/08-backlogs/M036/plan.md": "128648166fba89101bf1d7010225019cb9d3fe64b6689341786e0eeed4803e6c"
+  }
+}
