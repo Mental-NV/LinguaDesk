@@ -15,7 +15,7 @@ public static class RegistrationEndpoints
             .WithGroupName("linguadesk")
             .WithSummary("Register a local account")
             .WithDescription(
-                "Creates an unverified local account when the normalized email is new and always returns the same verification-required acknowledgment for a valid duplicate. No authentication credential is issued.")
+                "Creates an automatically verified local account when the normalized email is new and always returns the same sign-in-required acknowledgment for a valid duplicate. No authentication credential is issued.")
             .Accepts<RegistrationRequest>("application/json")
             .Produces<RegistrationAccepted>(StatusCodes.Status202Accepted, "application/json")
             .Produces<RegistrationProblemDetails>(StatusCodes.Status400BadRequest, "application/problem+json")
@@ -105,7 +105,7 @@ public static class RegistrationEndpoints
         return outcome switch
         {
             RegistrationOutcome.Accepted => Results.Json(
-                new RegistrationAccepted(RegistrationStatus.VerificationRequired),
+                new RegistrationAccepted(RegistrationStatus.SignInRequired),
                 statusCode: StatusCodes.Status202Accepted),
             RegistrationOutcome.InvalidPassword => Problem(StatusCodes.Status400BadRequest, "Invalid request",
                 "One or more account fields are invalid.", correlationId,

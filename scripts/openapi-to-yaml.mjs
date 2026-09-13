@@ -42,7 +42,7 @@ function assertPropertyDescriptions(document) {
 function validateContract(document) {
   expect(/^3\.1(?:\.|$)/u.test(document.openapi), 'document must use OpenAPI 3.1')
   expect(document.info?.title === 'LinguaDesk API', 'unexpected API title')
-  expect(document.info?.version === '0.1.0-m010', 'unexpected artifact version')
+  expect(document.info?.version === '0.1.0-m034', 'unexpected artifact version')
   expect(typeof document.info?.description === 'string', 'artifact description is required')
 
   sameValues(
@@ -333,7 +333,7 @@ function validateContract(document) {
   )
   sameValues(
     document.components.schemas.RegistrationStatus.enum,
-    ['verificationRequired'],
+    ['signInRequired'],
     'registration status values',
   )
 

@@ -1,12 +1,15 @@
 import { expect, test, type Page } from '@playwright/test'
 
-const REGISTER_PASSWORD = 'Maple!River2026'
+const SIGN_IN_PASSWORD = process.env.LINGUADESK_SMOKE_ACCOUNT_PASSWORD
+const UNVERIFIED_EMAIL = process.env.LINGUADESK_SMOKE_UNVERIFIED_EMAIL
 const SYNTHETIC_USER_ID = 'm012-synthetic-user'
 const SYNTHETIC_CODE = 'c3ludGhldGljLWNvZGU'
 
-function uniqueEmail(prefix: string): string {
-  return `${prefix}-${Date.now()}-${Math.floor(Math.random() * 1_000_000)}@example.test`
+if (!SIGN_IN_PASSWORD || !UNVERIFIED_EMAIL) {
+  throw new Error('The published unverified-account smoke configuration is required.')
 }
+const SMOKE_PASSWORD: string = SIGN_IN_PASSWORD
+const SMOKE_UNVERIFIED_EMAIL: string = UNVERIFIED_EMAIL
 
 function accountRequests(page: Page): string[] {
   const observed: string[] = []
@@ -18,20 +21,15 @@ function accountRequests(page: Page): string[] {
   return observed
 }
 
-async function fillRegistrationForm(page: Page, email: string) {
-  await page.getByLabel('Email').fill(email)
-  await page.getByLabel('Password', { exact: true }).fill(REGISTER_PASSWORD)
-  await page.getByLabel('Confirm password').fill(REGISTER_PASSWORD)
-}
-
-async function registerAndEnterVerifyPage(page: Page, email: string) {
-  await page.goto('/register')
-  await fillRegistrationForm(page, email)
-  await page.getByRole('button', { name: 'Create account' }).click()
+async function signInUnverifiedAndEnterVerifyPage(page: Page) {
+  await page.goto('/login')
+  await page.getByLabel('Email').fill(SMOKE_UNVERIFIED_EMAIL)
+  await page.getByLabel('Password').fill(SMOKE_PASSWORD)
+  await page.getByRole('button', { name: 'Sign in' }).click()
   await expect(page).toHaveURL(/\/verify-email$/)
   await expect(page.getByRole('heading', { name: 'Verify your email' })).toBeFocused()
   await expect(page.getByText('Check your email to verify your account.')).toBeVisible()
-  await expect(page.getByText(email)).toBeVisible()
+  await expect(page.getByRole('textbox', { name: 'Email' })).toHaveValue(SMOKE_UNVERIFIED_EMAIL)
 }
 
 test('invalid verification link returns the real generic 400 and shows the resend path', async ({
@@ -63,8 +61,7 @@ test('invalid verification link returns the real generic 400 and shows the resen
 })
 
 test('real resend returns 202 with server cooldown behavior', async ({ page }) => {
-  const email = uniqueEmail('m012-resend')
-  await registerAndEnterVerifyPage(page, email)
+  await signInUnverifiedAndEnterVerifyPage(page)
 
   const resendPosts: string[] = []
   let resendBody: unknown = null
@@ -81,7 +78,7 @@ test('real resend returns 202 with server cooldown behavior', async ({ page }) =
   await expect(page.getByText(/You can request another email in \d+ seconds\./)).toBeVisible()
 
   expect(resendPosts).toHaveLength(1)
-  expect(resendBody).toEqual({ email })
+  expect(resendBody).toEqual({ email: SMOKE_UNVERIFIED_EMAIL })
 })
 
 test('direct no-material entry routes away and reload clears query state', async ({ page }) => {
@@ -100,9 +97,8 @@ test('direct no-material entry routes away and reload clears query state', async
 test('unverified protected navigation stays on verification without language work', async ({
   page,
 }) => {
-  const email = uniqueEmail('m012-guarded')
   const observed = accountRequests(page)
-  await registerAndEnterVerifyPage(page, email)
+  await signInUnverifiedAndEnterVerifyPage(page)
 
   await page.getByRole('link', { name: 'Translation' }).click()
   await expect(page).toHaveURL(/\/verify-email$/)

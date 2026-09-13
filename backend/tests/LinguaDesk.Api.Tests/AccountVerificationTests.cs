@@ -22,7 +22,7 @@ public sealed class AccountVerificationTests
     private const string ValidPassword = "Maple!River2026";
 
     [TestMethod]
-    public async Task CapturedRegistrationDeliveryConfirmsDurablyAndEnablesCurrentPolicy()
+    public async Task CapturedResendDeliveryConfirmsDurablyAndEnablesCurrentPolicy()
     {
         await using var database = StorageTestDatabase.Create();
         await database.MigrateAsync();
@@ -31,8 +31,9 @@ public sealed class AccountVerificationTests
         await using var factory = new AccountWebApplicationFactory(database.DatabasePath, keysPath, sender);
         using var client = factory.CreateClient();
 
-        using var registration = await RegisterAsync(client, "roundtrip@example.test");
-        Assert.AreEqual(HttpStatusCode.Accepted, registration.StatusCode);
+        await SeedAccountAsync(factory, "roundtrip@example.test", emailConfirmed: false);
+        using var resend = await ResendAsync(client, "roundtrip@example.test");
+        Assert.AreEqual(HttpStatusCode.Accepted, resend.StatusCode);
         var delivery = sender.Deliveries.Single();
         Assert.AreEqual("roundtrip@example.test", delivery.Destination);
         Assert.IsGreaterThan(0, delivery.UserId.Length);
@@ -70,8 +71,10 @@ public sealed class AccountVerificationTests
         var sender = new CapturingConfirmationSender();
         await using var factory = new AccountWebApplicationFactory(database.DatabasePath, keysPath, sender);
         using var client = factory.CreateClient();
-        using (await RegisterAsync(client, "first@example.test")) { }
-        using (await RegisterAsync(client, "second@example.test")) { }
+        await SeedAccountAsync(factory, "first@example.test", emailConfirmed: false);
+        await SeedAccountAsync(factory, "second@example.test", emailConfirmed: false);
+        using (await ResendAsync(client, "first@example.test")) { }
+        using (await ResendAsync(client, "second@example.test")) { }
         var first = sender.Deliveries.First();
         var second = sender.Deliveries.Last();
         var corruptCode = first.Code[..^1] + (first.Code[^1] == 'A' ? "B" : "A");
@@ -116,7 +119,8 @@ public sealed class AccountVerificationTests
         await using (var firstFactory = new AccountWebApplicationFactory(database.DatabasePath, keysPath, sender))
         {
             using var firstClient = firstFactory.CreateClient();
-            using (await RegisterAsync(firstClient, "restart-confirm@example.test")) { }
+            await SeedAccountAsync(firstFactory, "restart-confirm@example.test", emailConfirmed: false);
+            using (await ResendAsync(firstClient, "restart-confirm@example.test")) { }
         }
 
         var delivery = sender.Deliveries.Single();
@@ -174,7 +178,8 @@ public sealed class AccountVerificationTests
             sender,
             emailConfirmationTokenLifespan: TimeSpan.Zero);
         using var client = factory.CreateClient();
-        using (await RegisterAsync(client, "expired@example.test")) { }
+        await SeedAccountAsync(factory, "expired@example.test", emailConfirmed: false);
+        using (await ResendAsync(client, "expired@example.test")) { }
         var delivery = sender.Deliveries.Single();
 
         using var response = await client.PostAsJsonAsync(
@@ -194,15 +199,8 @@ public sealed class AccountVerificationTests
         var sender = new CapturingConfirmationSender();
         await using var factory = new AccountWebApplicationFactory(database.DatabasePath, keysPath, sender);
         using var client = factory.CreateClient();
-        using (await RegisterAsync(client, "known@example.test")) { }
-        using (await RegisterAsync(client, "confirmed@example.test")) { }
-        var confirmed = sender.Deliveries.Last();
-        using (var response = await client.PostAsJsonAsync(
-            "/api/accounts/confirm-email",
-            new { userId = confirmed.UserId, code = confirmed.Code }))
-        {
-            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
-        }
+        await SeedAccountAsync(factory, "known@example.test", emailConfirmed: false);
+        await SeedAccountAsync(factory, "confirmed@example.test", emailConfirmed: true);
 
         using var known = await ResendAsync(client, "known@example.test");
         var knownBody = await known.Content.ReadAsStringAsync();
@@ -211,7 +209,7 @@ public sealed class AccountVerificationTests
         AssertEquivalentAcknowledgment(known, knownBody, alreadyConfirmed, await alreadyConfirmed.Content.ReadAsStringAsync());
         AssertEquivalentAcknowledgment(known, knownBody, unknown, await unknown.Content.ReadAsStringAsync());
         Assert.AreEqual("{\"status\":\"verificationRequested\",\"retryAfterSeconds\":60}", knownBody);
-        Assert.HasCount(2, sender.Deliveries);
+        Assert.HasCount(1, sender.Deliveries);
     }
 
     [TestMethod]
@@ -226,7 +224,7 @@ public sealed class AccountVerificationTests
             database.DatabasePath, keysPath, sender, timeProvider: time))
         {
             using var firstClient = firstFactory.CreateClient();
-            using (await RegisterAsync(firstClient, "cooldown@example.test")) { }
+            await SeedAccountAsync(firstFactory, "cooldown@example.test", emailConfirmed: false);
             using (await ResendAsync(firstClient, "cooldown@example.test")) { }
             time.Advance(TimeSpan.FromSeconds(59));
             using (await ResendAsync(firstClient, "cooldown@example.test")) { }
@@ -258,7 +256,7 @@ public sealed class AccountVerificationTests
     }
 
     [TestMethod]
-    public async Task FailedRegistrationDeliveryRecoversAfterCooldownAndConfirms()
+    public async Task FailedResendDeliveryRecoversAfterCooldownAndConfirms()
     {
         await using var database = StorageTestDatabase.Create();
         await database.MigrateAsync();
@@ -268,8 +266,9 @@ public sealed class AccountVerificationTests
         await using var factory = new AccountWebApplicationFactory(
             database.DatabasePath, keysPath, sender, timeProvider: time);
         using var client = factory.CreateClient();
-        using var registration = await RegisterAsync(client, "recover@example.test");
-        Assert.AreEqual(HttpStatusCode.Accepted, registration.StatusCode);
+        await SeedAccountAsync(factory, "recover@example.test", emailConfirmed: false);
+        using var initialResend = await ResendAsync(client, "recover@example.test");
+        Assert.AreEqual(HttpStatusCode.Accepted, initialResend.StatusCode);
         Assert.AreEqual(1, sender.Attempts);
         Assert.HasCount(0, sender.Deliveries);
 
@@ -294,7 +293,8 @@ public sealed class AccountVerificationTests
         await using var factory = new AccountWebApplicationFactory(
             database.DatabasePath, keysPath, sender, timeProvider: time);
         using var client = factory.CreateClient();
-        using (await RegisterAsync(client, "throwing@example.test")) { }
+        await SeedAccountAsync(factory, "throwing@example.test", emailConfirmed: false);
+        using (await ResendAsync(client, "throwing@example.test")) { }
         time.Advance(TimeSpan.FromSeconds(60));
         using var known = await ResendAsync(client, "throwing@example.test");
         var knownBody = await known.Content.ReadAsStringAsync();
@@ -314,7 +314,8 @@ public sealed class AccountVerificationTests
         var sender = new CapturingConfirmationSender();
         await using var factory = new AccountWebApplicationFactory(database.DatabasePath, keysPath, sender);
         using var client = factory.CreateClient();
-        using (await RegisterAsync(client, "boundary@example.test")) { }
+        await SeedAccountAsync(factory, "boundary@example.test", emailConfirmed: false);
+        using (await ResendAsync(client, "boundary@example.test")) { }
         var delivery = sender.Deliveries.Single();
 
         using var duplicate = new StringContent(
@@ -385,8 +386,18 @@ public sealed class AccountVerificationTests
         }
     }
 
-    private static Task<HttpResponseMessage> RegisterAsync(HttpClient client, string email) =>
-        client.PostAsJsonAsync("/api/accounts/register", new { email, password = ValidPassword });
+    private static async Task SeedAccountAsync(
+        AccountWebApplicationFactory factory,
+        string email,
+        bool emailConfirmed)
+    {
+        using var scope = factory.Services.CreateScope();
+        var users = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
+        var result = await users.CreateAsync(
+            new IdentityUser { UserName = email, Email = email, EmailConfirmed = emailConfirmed },
+            ValidPassword);
+        Assert.IsTrue(result.Succeeded, string.Join(",", result.Errors.Select(error => error.Code)));
+    }
 
     private static Task<HttpResponseMessage> ResendAsync(HttpClient client, string email) =>
         client.PostAsJsonAsync("/api/accounts/resend-verification", new { email });

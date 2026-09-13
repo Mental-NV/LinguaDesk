@@ -1,4 +1,3 @@
-using LinguaDesk.Api.Features.Identity.Verification;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
@@ -7,7 +6,6 @@ namespace LinguaDesk.Api.Features.Identity.Registration;
 
 public sealed class RegistrationCoordinator(
     UserManager<IdentityUser> users,
-    AccountVerificationDeliveryCoordinator delivery,
     RegistrationGate gate,
     ILogger<RegistrationCoordinator> logger)
 {
@@ -31,7 +29,7 @@ public sealed class RegistrationCoordinator(
                 return RegistrationOutcome.Accepted;
             }
 
-            var user = new IdentityUser { UserName = request.Email, Email = request.Email, EmailConfirmed = false };
+            var user = new IdentityUser { UserName = request.Email, Email = request.Email, EmailConfirmed = true };
             var result = await users.CreateAsync(user, request.Password);
             if (!result.Succeeded)
             {
@@ -43,12 +41,6 @@ public sealed class RegistrationCoordinator(
 
                 return RegistrationOutcome.InvalidPassword;
             }
-
-            await delivery.RequestInitialDeliveryWhileGateHeldAsync(
-                user,
-                request.Email,
-                correlationId,
-                cancellationToken);
 
             return RegistrationOutcome.Accepted;
         }

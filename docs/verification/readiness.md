@@ -10,8 +10,8 @@ Q-005 is **specified at design level** by Sections 5–6. The corpus, implementa
 | --- | --- |
 | Selected implementation and #10 commands | Executable suites, actual packages/test names, deterministic fixtures, report locations and CI gates |
 | Q-001/Q-007 | Chosen serving/billing arrangement, credentials, verified adapter/settings/context bounds, qualified primary/optional fallback and an actual monetary ceiling before paid serving |
-| Q-003/Q-006 | M005 resolves public capability/count/artifact mechanics; M006 resolves registration DTO/status/error fields, email/password/duplicate/delivery-intent behavior and unverified current-state guard for its package. Confirmation/sign-in/token/antiforgery/usage/language/status details remain due before their handlers/clients; generated review precedes dependent client adoption |
+| Q-003/Q-006 | M005 resolves public capability/count/artifact mechanics; M034 amends registration to automatic verification with a generic sign-in-required acknowledgment and no delivery while retaining the unverified current-state guard. Real confirmation/reset delivery is deferred under DF-008; generated review precedes dependent client adoption |
 | Q-004 | M006 explicitly creates durable account/key records without deletion/retention claims. Remaining deletion, backup/aggregate/unresolved-exposure retention and reconciliation rules block their related features/launch, not selected registration; prove later lifecycle/restart/restore against them |
 | Quality and performance evidence | Frozen approved corpus, qualified reviewers/judge configuration, explicit run budgets and actual candidate/chain/API reports |
-| Browser/AT and operations | Access to supported current/previous actual versions/devices/AT; real email and published-host/restore evidence |
+| Browser/AT and operations | Access to supported current/previous actual versions/devices/AT and published-host/restore evidence; real email evidence is excluded until DF-008 is reactivated |
 | Q-008/Q-010 / P-005/P-006 | Product-owner disposition of proposed safeguards/compatibility before making them binding; RG-008 reviews current launch dependencies only |

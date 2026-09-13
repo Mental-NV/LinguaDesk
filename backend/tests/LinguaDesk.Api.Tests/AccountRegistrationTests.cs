@@ -13,7 +13,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -27,7 +26,7 @@ public sealed class AccountRegistrationTests
     private const string ValidPassword = "Maple!River2026";
 
     [TestMethod]
-    public async Task UniqueRegistrationCreatesOneDurableUnconfirmedAccountAndDeliveryIntent()
+    public async Task UniqueRegistrationCreatesOneDurableVerifiedAccountWithoutDelivery()
     {
         await using var database = StorageTestDatabase.Create();
         await database.MigrateAsync();
@@ -48,12 +47,13 @@ public sealed class AccountRegistrationTests
         Assert.IsFalse(response.Headers.Contains("Set-Cookie"));
         Assert.IsFalse(response.Headers.Contains("WWW-Authenticate"));
         Assert.IsFalse(response.Headers.Contains("Location"));
-        Assert.AreEqual("{\"status\":\"verificationRequired\"}", body);
-        Assert.HasCount(1, sender.Deliveries);
+        Assert.AreEqual("{\"status\":\"signInRequired\"}", body);
+        Assert.HasCount(0, sender.Deliveries);
 
         await using var verification = database.CreateContext();
         var account = await verification.Users.SingleAsync();
-        Assert.IsFalse(account.EmailConfirmed);
+        Assert.IsTrue(account.EmailConfirmed);
+        Assert.AreEqual(0, await verification.UserTokens.CountAsync());
         Assert.IsNotNull(account.PasswordHash);
         var hasher = new PasswordHasher<IdentityUser>();
         Assert.AreNotEqual(
@@ -164,10 +164,11 @@ public sealed class AccountRegistrationTests
 
         await using var verification = database.CreateContext();
         Assert.AreEqual(validCases.Length, await verification.Users.CountAsync());
-        Assert.HasCount(validCases.Length, sender.Deliveries);
+        Assert.HasCount(0, sender.Deliveries);
         foreach (var item in validCases)
         {
             var account = await verification.Users.SingleAsync(user => user.Email == item.Email);
+            Assert.IsTrue(account.EmailConfirmed);
             var hasher = new PasswordHasher<IdentityUser>();
             Assert.AreNotEqual(
                 PasswordVerificationResult.Failed,
@@ -210,11 +211,83 @@ public sealed class AccountRegistrationTests
 
         await using var verification = database.CreateContext();
         Assert.AreEqual(1, await verification.Users.CountAsync());
-        Assert.HasCount(1, sender.Deliveries);
+        Assert.HasCount(0, sender.Deliveries);
+        Assert.IsTrue((await verification.Users.SingleAsync()).EmailConfirmed);
     }
 
     [TestMethod]
-    public async Task DeliveryFailureKeepsTheGenericAcknowledgmentAndUnconfirmedAccount()
+    public async Task DuplicateRegistrationDoesNotVerifyOrMutateAnExistingUnverifiedAccount()
+    {
+        await using var database = StorageTestDatabase.Create();
+        await database.MigrateAsync();
+        var keysPath = Directory.CreateDirectory(Path.Combine(database.RootPath, "keys")).FullName;
+        var sender = new CapturingConfirmationSender();
+        await using var factory = new AccountWebApplicationFactory(database.DatabasePath, keysPath, sender);
+        using var client = factory.CreateClient();
+
+        string originalPasswordHash;
+        string accountId;
+        using (var scope = factory.Services.CreateScope())
+        {
+            var users = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
+            var account = new IdentityUser
+            {
+                UserName = "legacy.unverified@example.test",
+                Email = "legacy.unverified@example.test",
+                EmailConfirmed = false,
+            };
+            var created = await users.CreateAsync(account, ValidPassword);
+            Assert.IsTrue(created.Succeeded, string.Join("; ", created.Errors.Select(error => error.Code)));
+            originalPasswordHash = account.PasswordHash!;
+            accountId = account.Id;
+        }
+
+        using var response = await client.PostAsJsonAsync(
+            "/api/accounts/register",
+            new { email = "LEGACY.UNVERIFIED@example.test", password = "Different!Password2026" });
+
+        Assert.AreEqual(HttpStatusCode.Accepted, response.StatusCode);
+        Assert.AreEqual("{\"status\":\"signInRequired\"}", await response.Content.ReadAsStringAsync());
+        Assert.HasCount(0, sender.Deliveries);
+        await using var verification = database.CreateContext();
+        var persisted = await verification.Users.SingleAsync();
+        Assert.AreEqual(accountId, persisted.Id);
+        Assert.AreEqual(originalPasswordHash, persisted.PasswordHash);
+        Assert.IsFalse(persisted.EmailConfirmed);
+        Assert.AreEqual(0, await verification.UserTokens.CountAsync());
+    }
+
+    [TestMethod]
+    public async Task NewlyRegisteredAccountCanExplicitlySignInAsVerified()
+    {
+        await using var database = StorageTestDatabase.Create();
+        await database.MigrateAsync();
+        var keysPath = Directory.CreateDirectory(Path.Combine(database.RootPath, "keys")).FullName;
+        await using var factory = new AccountWebApplicationFactory(
+            database.DatabasePath,
+            keysPath,
+            new CapturingConfirmationSender());
+        using var client = factory.CreateClient();
+
+        using (var registration = await client.PostAsJsonAsync(
+            "/api/accounts/register",
+            new { email = "sign.in@example.test", password = ValidPassword }))
+        {
+            Assert.AreEqual(HttpStatusCode.Accepted, registration.StatusCode);
+            Assert.IsFalse(registration.Headers.Contains("Set-Cookie"));
+        }
+
+        using var signIn = await client.PostAsJsonAsync(
+            "/api/accounts/bearer-sign-in",
+            new { email = "sign.in@example.test", password = ValidPassword });
+        var body = await signIn.Content.ReadFromJsonAsync<JsonElement>();
+        Assert.AreEqual(HttpStatusCode.OK, signIn.StatusCode);
+        Assert.AreEqual("verified", body.GetProperty("verificationStatus").GetString());
+        Assert.IsGreaterThan(20, body.GetProperty("accessToken").GetString()?.Length ?? 0);
+    }
+
+    [TestMethod]
+    public async Task RegistrationDoesNotInvokeConfiguredConfirmationSender()
     {
         await using var database = StorageTestDatabase.Create();
         await database.MigrateAsync();
@@ -228,10 +301,10 @@ public sealed class AccountRegistrationTests
             new { email = "delivery.failure@example.test", password = ValidPassword });
 
         Assert.AreEqual(HttpStatusCode.Accepted, response.StatusCode);
-        Assert.AreEqual("{\"status\":\"verificationRequired\"}", await response.Content.ReadAsStringAsync());
-        Assert.AreEqual(1, sender.Attempts);
+        Assert.AreEqual("{\"status\":\"signInRequired\"}", await response.Content.ReadAsStringAsync());
+        Assert.AreEqual(0, sender.Attempts);
         await using var verification = database.CreateContext();
-        Assert.IsFalse((await verification.Users.SingleAsync()).EmailConfirmed);
+        Assert.IsTrue((await verification.Users.SingleAsync()).EmailConfirmed);
     }
 
     [TestMethod]
@@ -254,9 +327,12 @@ public sealed class AccountRegistrationTests
         var account = await users.FindByEmailAsync("policy@example.test");
         Assert.IsNotNull(account);
         var principal = Principal(account.Id);
-        Assert.IsFalse((await authorization.AuthorizeAsync(principal, null, VerifiedAccountAuthorization.PolicyName)).Succeeded);
+        Assert.IsTrue((await authorization.AuthorizeAsync(principal, null, VerifiedAccountAuthorization.PolicyName)).Succeeded);
         Assert.IsFalse((await authorization.AuthorizeAsync(Principal("missing"), null, VerifiedAccountAuthorization.PolicyName)).Succeeded);
 
+        account.EmailConfirmed = false;
+        Assert.IsTrue((await users.UpdateAsync(account)).Succeeded);
+        Assert.IsFalse((await authorization.AuthorizeAsync(principal, null, VerifiedAccountAuthorization.PolicyName)).Succeeded);
         account.EmailConfirmed = true;
         Assert.IsTrue((await users.UpdateAsync(account)).Succeeded);
         Assert.IsTrue((await authorization.AuthorizeAsync(principal, null, VerifiedAccountAuthorization.PolicyName)).Succeeded);
@@ -321,11 +397,12 @@ public sealed class AccountRegistrationTests
 
         await using var verification = database.CreateContext();
         Assert.AreEqual(1, await verification.Users.CountAsync());
-        Assert.HasCount(1, sender.Deliveries);
+        Assert.HasCount(0, sender.Deliveries);
+        Assert.IsTrue((await verification.Users.SingleAsync()).EmailConfirmed);
     }
 
     [TestMethod]
-    public async Task ConfirmationMaterialRemainsValidAcrossAHostRestartWithTheSameKeys()
+    public async Task AutomaticVerificationRemainsDurableAcrossAHostRestart()
     {
         await using var database = StorageTestDatabase.Create();
         await database.MigrateAsync();
@@ -340,7 +417,7 @@ public sealed class AccountRegistrationTests
             Assert.AreEqual(HttpStatusCode.Accepted, response.StatusCode);
         }
 
-        var delivery = sender.Deliveries.Single();
+        Assert.HasCount(0, sender.Deliveries);
         await using var secondFactory = new AccountWebApplicationFactory(
             database.DatabasePath,
             keysPath,
@@ -349,11 +426,7 @@ public sealed class AccountRegistrationTests
         var users = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
         var account = await users.FindByEmailAsync("restart@example.test");
         Assert.IsNotNull(account);
-        Assert.IsTrue(await users.VerifyUserTokenAsync(
-            account,
-            LinguaDeskEmailConfirmationTokenPolicy.ProviderName,
-            UserManager<IdentityUser>.ConfirmEmailTokenPurpose,
-            Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(delivery.Code))));
+        Assert.IsTrue(account.EmailConfirmed);
     }
 
     [TestMethod]

@@ -1,5 +1,5 @@
 import { useEffect, useId, useRef, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { analyzeInput } from '../api/inputPolicy'
 import { registerLocalAccount } from '../api/accounts'
 
@@ -12,6 +12,7 @@ const PASSWORD_POLICY_MESSAGE = 'Password must meet all requirements.' as const
 const CONFLICT_MESSAGE =
   'We couldn\u2019t create an account with these details. Try signing in or use a different email.' as const
 const RETRY_MESSAGE = 'We couldn\u2019t complete this request. Try again.' as const
+const ACCEPTED_MESSAGE = 'Account registration accepted. Sign in to continue.' as const
 
 const MIN_PASSWORD_SCALARS = 15 as const
 const MAX_PASSWORD_SCALARS = 128 as const
@@ -81,12 +82,7 @@ function validateLocal(email: string, password: string, confirm: string): FieldI
   return found
 }
 
-interface RegisterPageProps {
-  readonly onRegistered: (email: string) => void
-}
-
-export function RegisterPage({ onRegistered }: RegisterPageProps) {
-  const navigate = useNavigate()
+export function RegisterPage() {
   const formId = useId()
   const emailId = `${formId}-email`
   const passwordId = `${formId}-password`
@@ -103,12 +99,14 @@ export function RegisterPage({ onRegistered }: RegisterPageProps) {
   const [issues, setIssues] = useState<readonly FieldIssue[]>([])
   const [serverFields, setServerFields] = useState<readonly ('email' | 'password')[]>([])
   const [serverAlert, setServerAlert] = useState<'conflict' | 'retry' | null>(null)
+  const [accepted, setAccepted] = useState(false)
 
   const emailRef = useRef<HTMLInputElement>(null)
   const passwordRef = useRef<HTMLInputElement>(null)
   const confirmRef = useRef<HTMLInputElement>(null)
   const lastSecretRef = useRef<'password' | 'confirm' | null>(null)
   const serverAlertRef = useRef<HTMLDivElement>(null)
+  const acceptedRef = useRef<HTMLDivElement>(null)
   const submissionRef = useRef(0)
   const pendingFocusRef = useRef<FieldName | null>(null)
   const mountedRef = useRef(true)
@@ -124,6 +122,10 @@ export function RegisterPage({ onRegistered }: RegisterPageProps) {
       abortRef.current?.abort()
     }
   }, [])
+
+  useEffect(() => {
+    if (accepted) acceptedRef.current?.focus()
+  }, [accepted])
 
   const fieldId = (field: FieldName): string =>
     field === 'email' ? emailId : field === 'password' ? passwordId : confirmId
@@ -237,8 +239,10 @@ export function RegisterPage({ onRegistered }: RegisterPageProps) {
       }
       if (!mountedRef.current || submissionRef.current !== submissionId) return
       if (result.kind === 'accepted') {
-        onRegistered(email)
-        navigate('/verify-email')
+        setPassword('')
+        setConfirm('')
+        setSubmitting(false)
+        setAccepted(true)
         return
       }
       setPassword('')
@@ -261,6 +265,17 @@ export function RegisterPage({ onRegistered }: RegisterPageProps) {
   const passwordIssue = issueMessage('password')
   const confirmIssue = issueMessage('confirm')
   const passwordType = showPassword ? 'text' : 'password'
+
+  if (accepted) {
+    return (
+      <div ref={acceptedRef} role="status" tabIndex={-1}>
+        <p>{ACCEPTED_MESSAGE}</p>
+        <p>
+          <Link className="primary-link" to="/login">Go to sign in</Link>
+        </p>
+      </div>
+    )
+  }
 
   return (
     <form aria-label="Create account" noValidate onSubmit={handleSubmit}>

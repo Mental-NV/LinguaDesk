@@ -268,7 +268,7 @@ function Shell() {
       <Navigate to={safeReturn} replace />
     ) : (
       <Page heading="Create account">
-        <RegisterPage onRegistered={setPendingVerificationEmail} />
+        <RegisterPage />
       </Page>
     )
 

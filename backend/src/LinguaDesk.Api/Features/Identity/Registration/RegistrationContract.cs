@@ -10,14 +10,14 @@ public sealed record RegistrationRequest(
     string Password);
 
 public sealed record RegistrationAccepted(
-    [property: Description("Always `verificationRequired` for an accepted new or existing normalized email.")]
+    [property: Description("Always `signInRequired` for an accepted new or existing normalized email.")]
     RegistrationStatus Status);
 
 [JsonConverter(typeof(JsonStringEnumConverter<RegistrationStatus>))]
 public enum RegistrationStatus
 {
-    [JsonStringEnumMemberName("verificationRequired")]
-    VerificationRequired,
+    [JsonStringEnumMemberName("signInRequired")]
+    SignInRequired,
 }
 
 public sealed class RegistrationProblemDetails

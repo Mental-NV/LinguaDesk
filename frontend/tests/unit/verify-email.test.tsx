@@ -5,11 +5,9 @@ import { MemoryRouter, useLocation } from 'react-router-dom'
 import { App } from '../../src/shell/App'
 
 const VALID_EMAIL = 'verify-visitor@example.test'
-const VALID_PASSWORD = 'Maple!River2026'
 const SYNTHETIC_USER_ID = 'synthetic-user-id'
 const SYNTHETIC_CODE = 'c3ludGhldGljLWNvZGU'
 
-const STATUS_MESSAGE = 'Check your email to verify your account.'
 const RESEND_SUCCESS_MESSAGE = 'Verification email sent.'
 const INVALID_LINK_MESSAGE = 'This verification link is invalid or has expired.'
 const RETRY_MESSAGE = 'We couldn\u2019t complete this request. Try again.'
@@ -20,10 +18,6 @@ function jsonResponse(status: number, body: unknown): Response {
     status,
     headers: { 'Content-Type': 'application/json' },
   })
-}
-
-function registrationResponse(): Response {
-  return jsonResponse(202, { status: 'verificationRequired' })
 }
 
 function resendResponse(retryAfterSeconds = 60): Response {
@@ -96,13 +90,8 @@ function renderApp(path: string) {
   return seen
 }
 
-async function registerAndEnterVerifyPage(user: ReturnType<typeof userEvent.setup>) {
-  renderApp('/register')
-  await user.type(screen.getByLabelText('Email'), VALID_EMAIL)
-  await user.type(screen.getByLabelText('Password'), VALID_PASSWORD)
-  await user.type(screen.getByLabelText('Confirm password'), VALID_PASSWORD)
-  await user.click(screen.getByRole('button', { name: 'Create account' }))
-  expect(await screen.findByText(STATUS_MESSAGE)).toBeVisible()
+async function enterVerifyPageForUnverifiedSession() {
+  renderApp('/translate')
   expect(await screen.findByRole('heading', { level: 1, name: 'Verify your email' })).toHaveFocus()
 }
 
@@ -125,12 +114,12 @@ afterEach(() => {
 })
 
 describe('verification status and guarded navigation (AC-001)', () => {
-  it('shows the in-memory email and redirects unverified protected navigation without language work', async () => {
+  it('routes a retained unverified session to verification without language work', async () => {
     const user = userEvent.setup()
-    const { spy, calls } = stubFetch(async () => registrationResponse())
-    await registerAndEnterVerifyPage(user)
+    const { spy, calls } = stubFetch(async () => unverifiedSessionResponse())
+    await enterVerifyPageForUnverifiedSession()
 
-    expect(screen.getByText(VALID_EMAIL)).toBeVisible()
+    expect(screen.getByLabelText('Email')).toHaveValue('')
 
     await user.click(screen.getByRole('link', { name: 'Translation' }))
     await waitFor(() =>
@@ -145,8 +134,9 @@ describe('verification status and guarded navigation (AC-001)', () => {
 describe('verification resend (AC-002)', () => {
   it('sends exactly one email-only request, shows success, honors the server cooldown, then reenables', async () => {
     const user = userEvent.setup()
-    stubFetch(async () => registrationResponse())
-    await registerAndEnterVerifyPage(user)
+    stubFetch(async () => unverifiedSessionResponse())
+    await enterVerifyPageForUnverifiedSession()
+    await user.type(screen.getByLabelText('Email'), VALID_EMAIL)
 
     vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout', 'setInterval', 'clearInterval', 'Date'] })
     const { spy, calls } = stubFetch(
@@ -189,8 +179,9 @@ describe('verification resend (AC-002)', () => {
 
   it('disables resend during flight and ignores duplicate activation', async () => {
     const user = userEvent.setup()
-    stubFetch(async () => registrationResponse())
-    await registerAndEnterVerifyPage(user)
+    stubFetch(async () => unverifiedSessionResponse())
+    await enterVerifyPageForUnverifiedSession()
+    await user.type(screen.getByLabelText('Email'), VALID_EMAIL)
 
     let release!: (value: Response) => void
     const gate = new Promise<Response>((resolve) => {
@@ -211,8 +202,8 @@ describe('verification resend (AC-002)', () => {
 
   it('sends no request for a syntactically invalid email with linked errors and field focus', async () => {
     const user = userEvent.setup()
-    stubFetch(async () => registrationResponse())
-    await registerAndEnterVerifyPage(user)
+    stubFetch(async () => unverifiedSessionResponse())
+    await enterVerifyPageForUnverifiedSession()
 
     const { spy } = stubFetch(async () => resendResponse())
     const emailField = screen.getByLabelText('Email')
@@ -262,8 +253,8 @@ describe('verification link consumption (AC-003)', () => {
 
   it('offers protected continuation after a verified session read with a single bodyless GET', async () => {
     const user = userEvent.setup()
-    stubFetch(async () => registrationResponse())
-    await registerAndEnterVerifyPage(user)
+    stubFetch(async () => unverifiedSessionResponse())
+    await enterVerifyPageForUnverifiedSession()
 
     const { spy, calls } = stubFetch(async (url, init) => {
       if (url === '/api/accounts/session') return verifiedSessionResponse()
@@ -317,8 +308,8 @@ describe('verification invalid and status variants (AC-004)', () => {
 
   it('keeps a still-unverified session on the page with guidance after one session read', async () => {
     const user = userEvent.setup()
-    stubFetch(async () => registrationResponse())
-    await registerAndEnterVerifyPage(user)
+    stubFetch(async () => unverifiedSessionResponse())
+    await enterVerifyPageForUnverifiedSession()
 
     const { spy, calls } = stubFetch(async () => unverifiedSessionResponse())
     await user.click(screen.getByRole('button', { name: 'I’ve verified my email' }))
@@ -338,8 +329,9 @@ describe('verification invalid and status variants (AC-004)', () => {
 describe('verification failure and ordering (AC-005)', () => {
   it('shows the generic retry message without false success and permits one explicit retry', async () => {
     const user = userEvent.setup()
-    stubFetch(async () => registrationResponse())
-    await registerAndEnterVerifyPage(user)
+    stubFetch(async () => unverifiedSessionResponse())
+    await enterVerifyPageForUnverifiedSession()
+    await user.type(screen.getByLabelText('Email'), VALID_EMAIL)
 
     const { spy } = stubFetch(async () => {
       throw new TypeError('network down')
@@ -381,7 +373,6 @@ describe('verification failure and ordering (AC-005)', () => {
   })
 
   it('routes direct no-material entry back to registration', async () => {
-    stubFetch(async () => registrationResponse())
     const seen = renderApp('/verify-email')
 
     expect(await screen.findByRole('heading', { level: 1, name: 'Create account' })).toBeVisible()
@@ -392,12 +383,12 @@ describe('verification failure and ordering (AC-005)', () => {
 describe('verification keyboard and focus (AC-006)', () => {
   it('submits resend once with Enter and keeps native controls operable', async () => {
     const user = userEvent.setup()
-    stubFetch(async () => registrationResponse())
-    await registerAndEnterVerifyPage(user)
+    stubFetch(async () => unverifiedSessionResponse())
+    await enterVerifyPageForUnverifiedSession()
 
     const { spy } = stubFetch(async () => resendResponse(60))
     const emailField = screen.getByLabelText('Email')
-    emailField.focus()
+    await user.type(emailField, VALID_EMAIL)
     await user.keyboard('{Enter}')
 
     await waitFor(() => expect(spy).toHaveBeenCalledTimes(1))

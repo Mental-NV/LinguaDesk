@@ -1,7 +1,7 @@
 # LinguaDesk — API Behavioral Design
 
-**Document:** #5 · **Version:** 1.6 · **Status:** Current design; implementation/evidence status is maintained in delivery/current.md and verification/coverage.md
-**Updated:** 2026-09-09
+**Document:** #5 · **Version:** 1.7 · **Status:** Current design; automatic registration verification is temporary and real account email is deferred
+**Updated:** 2026-09-13
 
 ## 1. Authority, sources, and artifact lifecycle
 
@@ -24,7 +24,7 @@ Document #0 owns this lifecycle. C# owns editable wire structure; generated Open
 
 | Capability | Required observable behavior | Principal dependencies |
 | --- | --- | --- |
-| Local accounts | Register, sign in/out, confirm email, resend confirmation, recover/reset password and read current account/verification status | FR-001/002; UX #2 Section 9; identity design in Section 3 |
+| Local accounts | Register an automatically verified account, then sign in/out and read current account state. Existing confirmation/recovery endpoints remain dormant; real email verification and reset delivery are deferred under DF-008 | FR-001/002; UX #2 Section 9; identity design in Section 3 |
 | Translation | Submit one complete source and an explicit target; automatic/manual source choice; return complete validated target text | FR-003–011; #4 eligibility/output contracts |
 | Rewriting | Submit complete source and exactly one current PRD writing mode; default to Correction only when omitted | FR-012–018; no combined translation-and-rewrite operation |
 | Capabilities | Read supported languages/modes, limits, counting policy, operation deadline and retry-identity validity | FR-036; accessible without SPA execution |
@@ -135,7 +135,7 @@ These shared scenarios guide selected packages; [#6 Section 8](verification/cove
 | --- | --- | --- |
 | API-AC-001 | The scalar fixtures and L−1/L/L+1 agree in C#/TypeScript; invalid Unicode and oversize input never reach a provider | FR-007/024 |
 | API-AC-002 | Both auth modes access the same API; invalid bearer cannot fall back to cookie; cookie mutations require antiforgery | FR-001/036, #3 |
-| API-AC-003 | Unverified account can complete its verification journey but cannot invoke an LLM; reset/revocation invalidates subsequent protected access/refresh | FR-002, Q-004/Q-006 |
+| API-AC-003 | A newly registered account is durably verified without email and can sign in explicitly; any pre-existing unverified account remains denied. Retained reset/revocation behavior invalidates subsequent protected access/refresh | FR-002, Q-004/Q-006; DF-008 |
 | API-AC-004 | Concurrent identical identity/payload claims dispatch one logical operation; changed payload conflicts; no extra charge | FR-026/027 |
 | API-AC-005 | Equivalent JSON escapes match; changed newline/mode does not; expired UUID cannot re-dispatch after recovery metadata cleanup | FR-026/035, Q-003 |
 | API-AC-006 | Success lost in transport is recovered as success/output unavailable with original charge; no result storage/regeneration | FR-026/028/037, NFR-004 |
@@ -151,7 +151,7 @@ These shared scenarios guide selected packages; [#6 Section 8](verification/cove
 | Owner / question | Resolved here | Remaining decision and blocking stage |
 | --- | --- | --- |
 | Q-003, #5/#3 | Scalar/whitespace/newline count; identity matching/expiry; interrupted outcomes; daily/monthly attribution and ordered usage. M005 fixes the public count-policy/retry-bound fields and cross-runtime fixtures for its capability slice | Language-operation/accounting wire fields, fingerprint/key cleanup implementation and concurrency evidence before their selected slice completion |
-| Q-006, #5/#3 | Cookie plus Identity opaque bearer; auth precedence/lifecycle; recovery/error semantics; no public cancellation endpoint. M005 fixes capabilities/artifacts; M006 fixes registration wire, email/password policy, generic duplicate/delivery intent and unverified-state guard; M007 fixes body-only confirmation/resend, 24-hour email token and 60-second durable cooldown | Account status/sign-in/token/antiforgery/password-reset/usage/language operations, real delivery and any compatibility/versioning policy before their selected handlers/clients; P-006 remains proposed |
+| Q-006, #5/#3 | Cookie plus Identity opaque bearer; auth precedence/lifecycle; recovery/error semantics; no public cancellation endpoint. M034 amends registration to a generic sign-in-required response with automatic verification for new accounts and no delivery; the unverified-state guard and completed confirmation/reset contracts remain | Real email delivery and address-ownership verification are deferred under DF-008; any compatibility/versioning policy remains P-006 |
 | Q-004, #3/account design/#10 | Bounded operation recovery/stamp behavior; M006 creates durable account/key records without deletion/retention claims | Account deletion, backup/aggregate/unresolved-exposure retention and any further logout guarantees before those related features/launch; not a blocker to M006 creation |
 | Q-001, #4/#3 | Cost-month attribution and conservative unresolved carryover | Serving/billing bounds, attribution verification and actual cap before paid serving |
 | Q-005, #6 | Local acceptance scenarios retained here; [#6](06-verification-plan.md) specifies coverage and workloads | Executable release evidence |

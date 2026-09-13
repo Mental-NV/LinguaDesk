@@ -27,9 +27,9 @@ public static class OpenApiRegistration
                 document.Info = new()
                 {
                     Title = "LinguaDesk API",
-                    Version = "0.1.0-m010",
+                    Version = "0.1.0-m034",
                     Description =
-                        "Pre-release M010 contract containing implemented public capabilities, local-account registration/verification/password-recovery, browser cookie-session, and independent-client bearer operations. " +
+                        "Pre-release M034 contract containing implemented public capabilities, automatic-verification local-account registration, retained verification/password-recovery operations, browser cookie-session, and independent-client bearer operations. " +
                         "No compatibility or deprecation guarantee is implied.",
                 };
                 document.Components ??= new OpenApiComponents();

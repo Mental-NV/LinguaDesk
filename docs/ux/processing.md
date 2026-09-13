@@ -69,12 +69,12 @@ Current messages below are normative English copy. Deferred/retired IDs retain t
 | UX-MSG-028 | MVP | `Email or password is incorrect.` | Login form alert; focus email field; no account enumeration. |
 | UX-MSG-029 | Deferred | — | DF-007 Google cancellation; original copy is historical at `54343c3`. |
 | UX-MSG-030 | Deferred | — | DF-007 Google failure; original copy is historical at `54343c3`. |
-| UX-MSG-031 | MVP | `If an account exists for that email, we sent a reset link.` | Password-request success; replace form body; link `Back to sign in`. |
-| UX-MSG-032 | MVP | `This verification link is invalid or has expired.` | Verification page alert; action `Send a new verification email`. |
-| UX-MSG-033 | MVP | `This reset link is invalid or has expired.` | Reset page alert; action `Request a new reset link`. |
-| UX-MSG-034 | MVP | `Check your email to verify your account.` | Registration success page; includes `Resend verification email`. |
-| UX-MSG-035 | MVP | `Verification email sent.` | Resend success status; resend disabled for server-provided cooldown, visible countdown. |
-| UX-MSG-036 | MVP | `Password updated. Sign in with your new password.` | Reset success; action `Go to sign in`. |
+| UX-MSG-031 | Deferred (DF-008) | `If an account exists for that email, we sent a reset link.` | Retained dormant password-request success copy; no current real-delivery gate. |
+| UX-MSG-032 | Deferred (DF-008) | `This verification link is invalid or has expired.` | Retained dormant verification-page alert. |
+| UX-MSG-033 | Deferred (DF-008) | `This reset link is invalid or has expired.` | Retained dormant reset-page alert. |
+| UX-MSG-034 | MVP | `Account registration accepted. Sign in to continue.` | Registration success replaces the form; action `Go to sign in`; no email or verification route. |
+| UX-MSG-035 | Deferred (DF-008) | `Verification email sent.` | Retained dormant resend status; no current real-delivery gate. |
+| UX-MSG-036 | Deferred (DF-008) | `Password updated. Sign in with your new password.` | Retained dormant reset success. |
 | UX-MSG-037 | MVP | `Your session expired. Sign in again to continue.` | Login page banner after forced teardown. |
 | UX-MSG-038 | MVP | `Enter your email address.` | Required email field error. |
 | UX-MSG-039 | MVP | `Enter a valid email address.` | Email-shape error; no request. |
@@ -82,7 +82,7 @@ Current messages below are normative English copy. Deferred/retired IDs retain t
 | UX-MSG-041 | MVP | `Passwords do not match.` | Confirmation field error; focus confirmation. |
 | UX-MSG-042 | MVP | `Password must meet all requirements.` | Password-policy failure; requirements themselves come from the authoritative security contract. |
 | UX-MSG-043 | MVP | `We couldn’t create an account with these details. Try signing in or use a different email.` | Registration conflict/rejection; form remains populated except password fields. |
-| UX-MSG-044 | MVP | `We couldn’t send the email. Try again.` | Verification/reset delivery failure; action `Try again`; do not state whether an account exists. |
+| UX-MSG-044 | Deferred (DF-008) | `We couldn’t send the email. Try again.` | Retained dormant delivery failure; do not state whether an account exists. |
 | UX-MSG-045 | MVP | `Translation is limited to 5,000 characters. Remove {excess} characters to continue.` | Oversize error; no prefix submission or charge; retain complete source. |
 | UX-MSG-046 | MVP | `Ready to process. Select Translate or Rewrite.` | Eligible idle state; use the actual feature action name, no pending timer. |
 | UX-MSG-047 | MVP | `Input or settings changed. Previous result shown. Select Translate or Rewrite to update.` | Outdated result after input/settings change; use the actual feature action name. |

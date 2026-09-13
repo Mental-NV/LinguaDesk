@@ -3,79 +3,34 @@ Behavior: [spec](spec.md). Reviewed sources: [manifest](context.json).
 
 ## Execution brief
 
-Wire one real SMTP email adapter behind the existing
-`IAccountConfirmationSender` / `IAccountPasswordResetSender` seams so the
-unchanged M007/M010 journeys deliver real mail: env-configured credentials
-select the adapter (absent config keeps the `Unavailable*` defaults),
-plain-text templates assemble origin-bound links from the delivery records,
-and a bounded live smoke through the real host proves one confirmation and
-one reset end to end with redacted evidence. No endpoint, contract, policy
-or UI change is intended; any behavioral mismatch found becomes a reported
-finding, not a silent contract edit.
+Change the account-creation point to set the existing Identity confirmation flag and remove registration's initial-delivery call. Rename the accepted registration status to `signInRequired`, update the active web success state to offer explicit sign-in without a verification guard, retain unavailable production senders and all dormant verification/recovery contracts, then regenerate and review the declared contract. No database migration or external service is involved.
 
-Selected canonical excerpts arrive through the context packet. Do not copy
-them all here.
+Selected canonical excerpts arrive through the context packet. Do not copy them all here.
 
 ## Changes and order
 
-1. Adapter: new backend email sender (SMTP client, one provider) implementing
-   both sender interfaces; DI selects it only when the named email
-   environment variables are present, otherwise the existing `Unavailable*`
-   registrations stay. Capturing/failing test doubles stay test-only and
-   unreachable from production configuration.
-2. Messages and origin: minimal plain-text confirmation and reset templates
-   plus one configured public origin used only for link assembly; links carry
-   the existing `userId`/`code` wire values for the M012/M014 routes. No new
-   token, lifetime, cooldown or category.
-3. Configuration: named env vars for SMTP host/port/credentials/sender and
-   public origin, validated at startup only when email is enabled; invalid
-   email config fails that host start loudly, never silently falls back to
-   fake delivery. No secret is committed, logged or written to evidence.
-4. Live smoke (bounded, operator-gated): against a real host with the
-   configured adapter, resend to the test mailbox → confirm via delivered
-   material (AC-001); forgot-password to the test mailbox → reset via
-   delivered material (AC-002). Bounded to two delivered messages plus
-   operator-confirmed receipt; send failures keep generic acknowledgments.
-5. Order: adapter + templates → config/selection wiring → deterministic
-   regression (adapters unselected) → operator-gated live smoke → contract
-   regenerate/check + evidence redaction review → closeout.
-6. No migration, no rollout beyond host configuration, no production serving
-   claim. Rollback is the prior commit plus removing the email configuration.
+1. Backend registration: set `EmailConfirmed = true` only on a successfully created account; do not invoke the confirmation-delivery coordinator; return `signInRequired` while retaining the generic duplicate branch and no-credential response.
+2. Privacy/regression: prove no sender/cooldown work occurs for new accounts, duplicate registration cannot alter a row (especially a seeded unverified row), and `VerifiedAccount` still denies deliberately unverified accounts.
+3. Frontend registration: replace the form in place with UX-MSG-034, clear secrets, avoid echoing the address or installing a pending-verification guard, focus the result and offer `/login`.
+4. Deferred boundary: keep the unavailable confirmation/reset sender registrations and retained M007/M010/M012/M014 operations unchanged; remove the unfinished SMTP adapter/configuration/tests from this package and record restoration under DF-008.
+5. Contract and evidence: advance the pre-release document revision to M034, regenerate OpenAPI/TypeScript, inspect the semantic diff, run focused and aggregate checks, refresh the context lock and close the package.
+6. No migration or rollout step. Rollback restores unverified creation, registration delivery, the prior status enum and verification-routing UI together; a partial rollback is invalid.
 
 ## Verification map
 
 | AC / prerequisite | Task | Check / exact command or procedure | Evidence target |
 | --- | --- | --- | --- |
-| AC-001 | T004 | V-004/V-016: live resend → delivered confirmation → real `confirmLocalAccountEmail` 200 with `EmailConfirmed = true`; operator confirms receipt | tasks.md completion record |
-| AC-002 | T004 | V-004/V-016: live forgot → delivered reset → real `resetLocalAccountPassword` 200, old credential rejected, new credential accepted | tasks.md completion record |
-| AC-003 | T002 | V-004: unconfigured host keeps unavailable-sender behavior and generic acknowledgments; prod config cannot select test doubles | tasks.md completion record |
-| AC-004 | T005 | V-015: redaction inspection of logs, traces, evidence and fixtures for credentials/tokens/codes/addresses | tasks.md completion record |
-| AC-005 | T005 | V-009: `bash scripts/contract.sh check` clean (zero drift); delivered links consumed by unchanged M012/M014 paths | tasks.md completion record |
-| AC-006 | T003/T005 | `bash scripts/backend.sh check`, `bash scripts/backend.sh smoke`, `bash scripts/frontend.sh smoke` stay green | tasks.md completion record |
-| M007/M010 reuse | T001 | Dependency evidence confirmed from delivery/current.md; no contract/policy re-proof | tasks.md completion record |
+| AC-001/AC-002 | T002 | Focused `AccountRegistrationTests`: durable verified creation, no sender/cooldown, response headers/body, sequential/case/concurrent duplicate invariants and seeded-unverified duplicate | tasks.md completion record |
+| AC-003 | T003 | Focused registration/App unit tests and published registration Playwright case: in-place focused status, secrets/address absent, `/login` action and no verification guard | tasks.md completion record |
+| AC-004 | T002/T005 | Registration policy/sign-in tests plus aggregate backend/frontend checks; deliberately unverified seed remains denied | tasks.md completion record |
+| AC-005 | T001/T002 | DI inspection/tests and retained verification/recovery regression with email unconfigured; no SMTP files/configuration remain | tasks.md completion record |
+| AC-006 | T004/T005 | `bash scripts/contract.sh generate`, semantic diff, `bash scripts/contract.sh check`, aggregate checks | tasks.md completion record |
 | Readiness | T006 | `python3 automation/context.py check M034` fresh at close | tasks.md completion record |
 
 ## Context boundaries and risks
 
-Omitted domains and why: language operations, allowances, accounting and
-cost bounds (no character charge or monetary admission attaches to email;
-M021–M025 reused, not re-proven); translation/rewriting UI journeys
-(M028–M032 own that evidence); LLM evaluation corpora and qualification
-(Q-005/G1); performance workloads (G2/M037); device/AT/browser matrix
-(G3/M038/M039); backup/restore lifecycle (M040/M041, Q-004). Open on demand:
-M007/M010/M012/M014 specs for journey semantics the adapter touches; ADR
-index only if the adapter choice changes a recorded decision.
+Omitted domains and why: language-operation execution and accounting are unchanged except for consuming the existing `VerifiedAccount` policy; LLM evaluation, performance and provider selection are unrelated; deployment/backup lifecycle gains no migration or configuration; browser/AT matrices beyond the changed registration state remain owned by later aggregate gates. Open on demand: M007/M010 specs when diagnosing retained endpoint regressions, and M011/M013 specs for registration/sign-in behavior already reused rather than redesigned.
 
-Dependencies, assumptions, blockers: M007/M010 Done per delivery/current.md
-— satisfied. Assumption: one SMTP-capable provider and one test mailbox
-supplied by the operator. Blocker (known, execution-level): missing
-provider/mailbox access stops T004/T005 and blocks completion; record it,
-claim no gate. Human steps: operator supplies credentials + test mailbox +
-bounded-send approval before T004 (blocked gate: live smoke), and confirms
-receipt before closeout; owner: milestone operator; timing: start and smoke.
+Dependencies: M006 account persistence/policy, M011 registration UI and M013 sign-in are Done according to delivery/current.md. There is no external or human blocker. Primary risks are accidentally verifying an existing account through the duplicate path, leaving a pending-verification UI redirect, or deleting dormant security behavior that DF-008 will reactivate; dedicated tests and a narrow diff cover each risk.
 
-Risks: credentials leaking into evidence (named env vars only, redaction
-review in T005); smoke asserting only its own sends as proof of journeys
-(deterministic V-004 suites, not the smoke, own contract/policy evidence);
-link format drifting from M012/M014 consumption (AC-005 compatibility check);
-unbounded live sends (fixed bound of two delivered messages).
+Optional human walkthrough after automation: launch the app with the ordinary local scripts, register a fresh address, select `Go to sign in`, sign in with that address/password, and open Translation or Rewriting. Expected: no email is sent or requested, no database edit is needed, registration itself does not sign in, and the explicit sign-in grants normal verified access.

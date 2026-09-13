@@ -1,11 +1,11 @@
 # LinguaDesk — UX/UI Specification
 
-**Document:** #2 · **Version:** 1.9 · **Status:** Simplified MVP ready for scoped planning; authenticated UI/E2E handoff explicit; runtime evidence pending
-**Updated:** September 11, 2026 (UTC)
+**Document:** #2 · **Version:** 2.0 · **Status:** Simplified MVP with automatic registration verification; real account-email journeys deferred
+**Updated:** September 13, 2026 (UTC)
 
 ## 1. Authority, inputs, and scope
 
-[Document #0](00-SDD-Planning-Workflow.md) owns process; [PRD](01-PRD.md) owns active and deferred product scope and D-17–D-19. Current shared API behavior is in [#5](05-api-design.md). Runtime evidence is tracked separately in [delivery status](delivery/current.md).
+[Document #0](00-SDD-Planning-Workflow.md) owns process; [PRD](01-PRD.md) owns active and deferred product scope and D-17–D-20. Current shared API behavior is in [#5](05-api-design.md). Runtime evidence is tracked separately in [delivery status](delivery/current.md).
 
 This document owns current routes, layout, controls, messages, state transitions and acceptance contracts. `Must` is binding for the **active MVP**; rows marked **Deferred** or **Retired** impose no current implementation/test gate. The 17 UX-US, 112 UX-AC, and original 44 UX-MSG IDs remain traceable; some are amended and some inactive. In compact references, AC/US/MSG mean UX-AC/UX-US/UX-MSG. IDs are never reused for unrelated behavior.
 
@@ -37,9 +37,9 @@ See [Historical UX research](archive/ux-research.md#22-current-disposition-of-hi
 | --- | --- | --- |
 | `/` | `/login` or `/verify-email` respectively | `/translate` |
 | `/translate`, `/rewrite` | Require local sign-in, then verification; remember only the safe destination path | Requested feature, with heading focus |
-| `/login`, `/register` | Local email/password forms; no Google control | Redirect to last protected route unless sign-out confirmation is pending/failed |
-| `/verify-email` | Verification/link/resend/status UI; signed-out success offers Sign in to continue | Success offers explicit continuation to the last protected route |
-| `/forgot-password`, `/reset-password` | Local recovery forms; no automatic login after reset | Same recovery result behavior |
+| `/login`, `/register` | Local email/password forms; registration success stays on the page with explicit Go to sign in; no Google control | Redirect to last protected route unless sign-out confirmation is pending/failed |
+| `/verify-email` | Retained unverified-account/link/resend/status UI; real delivery is dormant under DF-008 | Success offers explicit continuation to the last protected route |
+| `/forgot-password`, `/reset-password` | Retained recovery forms; real delivery is dormant under DF-008 | Same retained recovery result behavior |
 | Unknown path | Page not found; Go to sign in / Verify email | Page not found; Go to Translation |
 
 **M002 staged shell — selected 2026-09-08:** Before account functionality exists, [package 002](08-backlogs/M002/spec.md#2-selected-story-and-staged-route-behavior) implements only signed-out informational navigation: root/protected feature routes lead to `/login`; `/login` and `/register` clearly state that their functionality is unavailable and expose no credential fields or submission. Unknown client pages offer Go to sign in. This is a bounded pre-account delivery state, not fake authentication, an accessible protected workspace or completed UX account acceptance. M011–M013 replace these informational states with the existing account contracts; the route table above remains the complete intended behavior. Shell links, heading focus, visual tokens and responsive access already apply.
@@ -183,9 +183,9 @@ DF-001/DF-002 later design must invalidate **all** assistance metadata on any ma
 
 Registration contains Email, Password, Confirm password, actual policy checklist, Show password, Create account, and Sign in. Login contains Email, Password, Show password, Sign in, Create account and Forgot password. Password reveal preserves selection. Invalid local submission sends no request, shows `Check the highlighted fields.` with linked errors, focuses the first invalid field, and exposes `aria-invalid`/descriptions. A current valid submission disables fields and guards duplicate click/Enter. Failed credential/policy/network responses clear password values and permit explicit recovery; keep email only in this in-memory auth journey.
 
-Registration success opens verification with MSG-034 and the in-memory email. Resend has a server-provided cooldown/countdown, announced success/failure, and no language operation. `I’ve verified my email` reads auth status only. Valid link success offers explicit continuation (sign-in first when signed out); invalid/expired link shows MSG-032 with a resend path. No verification action starts language processing.
+Registration success replaces the form with MSG-034 and an explicit Go to sign in link. It retains no email or password in the rendered success state and creates no pending-verification navigation guard. Registration neither signs in nor starts language processing. The created account is already verified by the temporary DF-008 substitute.
 
-Forgot password returns identical MSG-031 for known/unknown accounts. Reset uses current policy and confirmation; success shows MSG-036 and Go to sign in, never auto-login. Invalid/expired links show MSG-033 and no submit fields. Email delivery failure shows MSG-044 without account disclosure. Generic account network failure: `We couldn’t complete this request. Try again.` No Google copy/helper or linking screen exists.
+Existing unverified-account verification and password-recovery pages retain their previously implemented safe behavior for dormant compatibility, but real delivery and their MVP evidence obligation are deferred under DF-008. Generic account network failure remains `We couldn’t complete this request. Try again.` No Google copy/helper or linking screen exists.
 
 Old auth completions cannot navigate over a newer auth route or restore cleared passwords/text. Reconcile actual account status on the next protected navigation. Keep safe return paths only, not arbitrary external redirects.
 

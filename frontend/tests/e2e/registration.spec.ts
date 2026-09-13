@@ -9,7 +9,7 @@ async function fillRegistrationForm(page: Page) {
   await page.getByLabel('Confirm password').fill(REGISTER_PASSWORD)
 }
 
-test('registers once through the real API and reaches verification entry', async ({ page }) => {
+test('registers once through the real API and offers sign in without email verification', async ({ page }) => {
   const registerPosts: string[] = []
   page.on('request', (request) => {
     if (request.url().includes('/api/accounts/register') && request.method() === 'POST') {
@@ -22,10 +22,10 @@ test('registers once through the real API and reaches verification entry', async
   await fillRegistrationForm(page)
   await page.getByRole('button', { name: 'Create account' }).click()
 
-  await expect(page).toHaveURL(/\/verify-email$/)
-  await expect(page.getByRole('heading', { name: 'Verify your email' })).toBeFocused()
-  await expect(page.getByText('Check your email to verify your account.')).toBeVisible()
-  await expect(page.getByText(REGISTER_EMAIL)).toBeVisible()
+  await expect(page).toHaveURL(/\/register$/)
+  await expect(page.getByRole('status')).toBeFocused()
+  await expect(page.getByRole('link', { name: 'Go to sign in' })).toBeVisible()
+  await expect(page.getByText(REGISTER_EMAIL)).toHaveCount(0)
   await expect(page.getByLabel('Password')).toHaveCount(0)
   expect(registerPosts).toHaveLength(1)
 })
@@ -49,7 +49,7 @@ test('invalid local input sends no registration request', async ({ page }) => {
   expect(registerPosts).toHaveLength(0)
 })
 
-test('reload clears password state and the in-memory verification entry', async ({ page }) => {
+test('reload clears password state and registration success state', async ({ page }) => {
   await page.goto('/register')
   await page.getByLabel('Password', { exact: true }).fill(REGISTER_PASSWORD)
   await page.reload()
@@ -57,7 +57,7 @@ test('reload clears password state and the in-memory verification entry', async 
 
   await fillRegistrationForm(page)
   await page.getByRole('button', { name: 'Create account' }).click()
-  await expect(page).toHaveURL(/\/verify-email$/)
+  await expect(page.getByText('Account registration accepted. Sign in to continue.')).toBeVisible()
 
   await page.reload()
   await expect(page).toHaveURL(/\/register$/)

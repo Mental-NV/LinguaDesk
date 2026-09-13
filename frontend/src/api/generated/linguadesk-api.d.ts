@@ -95,7 +95,7 @@ export interface paths {
         put?: never;
         /**
          * Register a local account
-         * @description Creates an unverified local account when the normalized email is new and always returns the same verification-required acknowledgment for a valid duplicate. No authentication credential is issued.
+         * @description Creates an automatically verified local account when the normalized email is new and always returns the same sign-in-required acknowledgment for a valid duplicate. No authentication credential is issued.
          */
         post: operations["registerLocalAccount"];
         delete?: never;
@@ -672,7 +672,7 @@ export interface components {
             };
         };
         RegistrationAccepted: {
-            /** @description Always `verificationRequired` for an accepted new or existing normalized email. */
+            /** @description Always `signInRequired` for an accepted new or existing normalized email. */
             status: components["schemas"]["RegistrationStatus"];
         };
         RegistrationProblemDetails: {
@@ -709,10 +709,10 @@ export interface components {
             password: string;
         };
         /**
-         * @description Always `verificationRequired` for an accepted new or existing normalized email.
+         * @description Always `signInRequired` for an accepted new or existing normalized email.
          * @enum {string}
          */
-        RegistrationStatus: "verificationRequired";
+        RegistrationStatus: "signInRequired";
         ResendVerificationAccepted: {
             /** @description Always `verificationRequested` for a syntactically valid request. */
             status: components["schemas"]["ResendVerificationStatus"];

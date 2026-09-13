@@ -1,6 +1,6 @@
 # LinguaDesk
 
-LinguaDesk contains a minimal ASP.NET Core host, the M002 published signed-out web shell, explicit SQLite persistence, an independent offline AI development boundary, the M005 shared input/capability contract, and the M006–M009 local-account registration, email-verification, browser-session and bearer-access API slices. The React shell provides the local sign-in form (M013), registration (M011) and email-verification (M012) routes with guarded Translation/Rewriting placeholders pending M028/M029; recovery forms remain staged until M014. An independent client can register a durable unverified account, submit captured confirmation material, request another verification delivery, establish/read/end a secure cookie session, or sign in for opaque bearer access/refresh credentials and read current-account status through the account API. The runtime delivery adapter intentionally remains unavailable until M034 supplies real email, while deterministic tests inject capturing/failing adapters. Password reset, account-status UI, live email, editors, language-operation submissions, eligibility decisions, provider integrations, usage/accounting, and release deployment remain unimplemented.
+LinguaDesk contains a minimal ASP.NET Core host, a published React SPA, explicit SQLite persistence, an independent offline AI boundary, local accounts, authenticated Translation/Rewriting workspaces, usage/accounting and bounded provider pipelines. Under M034's temporary MVP substitute, every newly created local account is durably marked verified without sending email, registration issues no credential and offers explicit sign-in. Real email-address verification and email-delivered password recovery are deferred under DF-008; the previously implemented confirmation/recovery contracts remain dormant behind unavailable production senders.
 
 ## Prerequisites
 
@@ -42,6 +42,8 @@ bash scripts/backend.sh run
 ```
 
 If `Storage__DatabasePath` or `Security__DataProtectionKeysPath` is supplied explicitly, `run` respects that target and does not initialize that custom dependency. Use `scripts/storage.sh migrate` and provision the custom key directory yourself. The convenience behavior belongs to the development wrapper; the application itself never creates or migrates missing serving dependencies.
+
+Account email is not configured in the current MVP. Registration creates a verified account without sending email and returns a generic sign-in-required acknowledgment. Real confirmation and password-reset delivery require reactivation of DF-008; until then the retained resend/forgot-password endpoints use unavailable production senders and send nothing.
 
 Operation admission enforces the configured user and global daily character allowances (`Operations__UserDailyAllowanceCharacters` defaulting to 20000, `Operations__GlobalDailyAllowanceCharacters` defaulting to 2000000; both must stay positive) with a UTC-midnight reset. On first admission the server creates a Data-Protection-protected fingerprint key file inside the configured key directory; back it up and restore it together with the database, otherwise duplicate detection after a restore cannot match earlier reservations.
 

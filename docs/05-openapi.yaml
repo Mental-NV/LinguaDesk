@@ -2,8 +2,8 @@
 openapi: 3.1.1
 info:
   title: LinguaDesk API
-  description: Pre-release M010 contract containing implemented public capabilities, local-account registration/verification/password-recovery, browser cookie-session, and independent-client bearer operations. No compatibility or deprecation guarantee is implied.
-  version: 0.1.0-m010
+  description: Pre-release M034 contract containing implemented public capabilities, automatic-verification local-account registration, retained verification/password-recovery operations, browser cookie-session, and independent-client bearer operations. No compatibility or deprecation guarantee is implied.
+  version: 0.1.0-m034
 paths:
   /api/capabilities:
     get:
@@ -402,7 +402,7 @@ paths:
       tags:
         - RegistrationEndpoints
       summary: Register a local account
-      description: Creates an unverified local account when the normalized email is new and always returns the same verification-required acknowledgment for a valid duplicate. No authentication credential is issued.
+      description: Creates an automatically verified local account when the normalized email is new and always returns the same sign-in-required acknowledgment for a valid duplicate. No authentication credential is issued.
       operationId: registerLocalAccount
       requestBody:
         content:
@@ -1770,7 +1770,7 @@ components:
       type: object
       properties:
         status:
-          description: Always `verificationRequired` for an accepted new or existing normalized email.
+          description: Always `signInRequired` for an accepted new or existing normalized email.
           $ref: "#/components/schemas/RegistrationStatus"
     RegistrationProblemDetails:
       required:
@@ -1831,9 +1831,9 @@ components:
           writeOnly: true
     RegistrationStatus:
       enum:
-        - verificationRequired
+        - signInRequired
       type: string
-      description: Always `verificationRequired` for an accepted new or existing normalized email.
+      description: Always `signInRequired` for an accepted new or existing normalized email.
     ResendVerificationAccepted:
       required:
         - status

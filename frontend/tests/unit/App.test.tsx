@@ -130,13 +130,13 @@ describe('signed-out shell routes', () => {
   })
 })
 
-describe('unverified verification guard', () => {
-  it('keeps guarded entries on /verify-email while an unverified registration is pending', async () => {
+describe('automatic registration verification', () => {
+  it('offers sign in after registration and does not create a pending verification guard', async () => {
     const user = userEvent.setup()
     vi.stubGlobal(
       'fetch',
       vi.fn(async () =>
-        new Response(JSON.stringify({ status: 'verificationRequired' }), {
+        new Response(JSON.stringify({ status: 'signInRequired' }), {
           status: 202,
           headers: { 'Content-Type': 'application/json' },
         }),
@@ -163,15 +163,10 @@ describe('unverified verification guard', () => {
       await user.type(screen.getByLabelText('Password'), 'Maple!River2026')
       await user.type(screen.getByLabelText('Confirm password'), 'Maple!River2026')
       await user.click(screen.getByRole('button', { name: 'Create account' }))
-      expect(await screen.findByRole('heading', { level: 1, name: 'Verify your email' })).toBeInTheDocument()
-
-      for (const linkName of ['Translation', 'Rewriting', 'LinguaDesk home'] as const) {
-        await user.click(screen.getByRole('link', { name: linkName }))
-        await waitFor(() => expect(seen.pathname).toBe('/verify-email'))
-        expect(
-          screen.getByRole('heading', { level: 1, name: 'Verify your email' }),
-        ).toBeInTheDocument()
-      }
+      expect(await screen.findByText('Account registration accepted. Sign in to continue.')).toBeInTheDocument()
+      await user.click(screen.getByRole('link', { name: 'Translation' }))
+      await waitFor(() => expect(seen.pathname).toBe('/login'))
+      expect(screen.getByRole('heading', { level: 1, name: 'Sign in' })).toBeInTheDocument()
     } finally {
       vi.unstubAllGlobals()
     }

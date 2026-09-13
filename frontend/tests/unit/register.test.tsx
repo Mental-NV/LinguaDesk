@@ -15,7 +15,7 @@ function jsonResponse(status: number, body: unknown): Response {
 }
 
 function acceptanceResponse(): Response {
-  return jsonResponse(202, { status: 'verificationRequired' })
+  return jsonResponse(202, { status: 'signInRequired' })
 }
 
 function fieldRejectionResponse(): Response {
@@ -60,7 +60,7 @@ async function submitValidForm(user: ReturnType<typeof userEvent.setup>, email =
 }
 
 describe('registration valid submission', () => {
-  it('sends exactly one register request with only email and password, then shows verification entry', async () => {
+  it('sends exactly one register request with only email and password, then offers sign in', async () => {
     const user = userEvent.setup()
     const { spy, calls } = stubFetch(async () => acceptanceResponse())
     renderApp('/register')
@@ -74,9 +74,9 @@ describe('registration valid submission', () => {
     expect(Object.keys(JSON.parse(String(init?.body)))).toEqual(['email', 'password'])
     expect(JSON.parse(String(init?.body))).toEqual({ email: VALID_EMAIL, password: VALID_PASSWORD })
 
-    expect(await screen.findByText('Check your email to verify your account.')).toBeVisible()
-    expect(screen.getByText(VALID_EMAIL)).toBeVisible()
-    expect(await screen.findByRole('heading', { level: 1, name: 'Verify your email' })).toHaveFocus()
+    expect(await screen.findByText('Account registration accepted. Sign in to continue.')).toBeVisible()
+    expect(screen.getByRole('link', { name: 'Go to sign in' })).toHaveAttribute('href', '/login')
+    expect(screen.queryByText(VALID_EMAIL)).not.toBeInTheDocument()
     expect(screen.queryByLabelText('Password')).not.toBeInTheDocument()
     expect(screen.queryByLabelText('Confirm password')).not.toBeInTheDocument()
     expect(spy).toHaveBeenCalledTimes(1)
@@ -104,7 +104,7 @@ describe('registration valid submission', () => {
     expect(spy).toHaveBeenCalledTimes(1)
 
     release(acceptanceResponse())
-    expect(await screen.findByText('Check your email to verify your account.')).toBeVisible()
+    expect(await screen.findByText('Account registration accepted. Sign in to continue.')).toBeVisible()
     expect(spy).toHaveBeenCalledTimes(1)
   })
 })
@@ -209,7 +209,7 @@ describe('registration local validation', () => {
 
     await waitFor(() => expect(spy).toHaveBeenCalledTimes(1))
     expect(JSON.parse(String(calls[0].init?.body))).toEqual({ email: VALID_EMAIL, password: VALID_PASSWORD })
-    expect(await screen.findByText('Check your email to verify your account.')).toBeVisible()
+    expect(await screen.findByText('Account registration accepted. Sign in to continue.')).toBeVisible()
   })
 
   it('rejects malformed Unicode passwords without a request', async () => {
@@ -284,7 +284,7 @@ describe('registration server rejection', () => {
       email: VALID_EMAIL,
       password: VALID_PASSWORD,
     })
-    expect(await screen.findByText('Check your email to verify your account.')).toBeVisible()
+    expect(await screen.findByText('Account registration accepted. Sign in to continue.')).toBeVisible()
     expect(calls.every((call) => call.url === '/api/accounts/register')).toBe(true)
   })
 })
@@ -300,7 +300,7 @@ describe('registration transport failure and ordering', () => {
     await submitValidForm(user)
 
     expect(await screen.findByText('We couldn\u2019t complete this request. Try again.')).toBeVisible()
-    expect(screen.queryByText('Check your email to verify your account.')).not.toBeInTheDocument()
+    expect(screen.queryByText('Account registration accepted. Sign in to continue.')).not.toBeInTheDocument()
     expect(screen.getByLabelText('Password')).toHaveValue('')
     expect(screen.getByLabelText('Confirm password')).toHaveValue('')
     expect(screen.getByLabelText('Email')).toHaveValue(VALID_EMAIL)
@@ -314,12 +314,10 @@ describe('registration transport failure and ordering', () => {
       release = resolve
     })
     stubFetch(() => gate)
-    const onRegistered = vi.fn()
     const tree = render(
       <MemoryRouter initialEntries={['/register']}>
         <Routes>
-          <Route path="/register" element={<RegisterPage onRegistered={onRegistered} />} />
-          <Route path="/verify-email" element={<p>Verify your email</p>} />
+          <Route path="/register" element={<RegisterPage />} />
         </Routes>
       </MemoryRouter>,
     )
@@ -333,7 +331,7 @@ describe('registration transport failure and ordering', () => {
     release(acceptanceResponse())
     await gate
     await new Promise((resolve) => setTimeout(resolve, 0))
-    expect(onRegistered).not.toHaveBeenCalled()
+    expect(tree.container).toBeEmptyDOMElement()
   })
 })
 
@@ -351,7 +349,7 @@ describe('registration keyboard and reveal behavior', () => {
     await user.type(screen.getByLabelText('Confirm password'), `${VALID_PASSWORD}[Enter]`)
 
     await waitFor(() => expect(spy).toHaveBeenCalledTimes(1))
-    expect(await screen.findByText('Check your email to verify your account.')).toBeVisible()
+    expect(await screen.findByText('Account registration accepted. Sign in to continue.')).toBeVisible()
     expect(spy).toHaveBeenCalledTimes(1)
   })
 
