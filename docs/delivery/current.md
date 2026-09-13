@@ -8,7 +8,7 @@ Mutable #7 status owner. Read for selection/dependency checks and closeout; do n
 
 | ID | State | Dependency/readiness | Package |
 | --- | --- | --- | --- |
-| — | None | Select and lock the next milestone before implementation | — |
+| M035 | Done under owner waiver (B1 frozen `aebdc2dc…`; 4 human + AI review, 20 independent slots waived) | M020 Done; M036 may consume knowing evidence is weakened | [Package 035](../08-backlogs/M035/spec.md) |
 
 **Next recommended delivery train:** M035 → M036 → M037. M034 removed the account-email access blocker through the explicitly temporary DF-008 substitute; the next uncompleted roadmap work qualifies model quality and then records complete live API performance evidence.
 
