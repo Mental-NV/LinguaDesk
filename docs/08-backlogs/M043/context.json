@@ -1,0 +1,225 @@
+{
+  "scope": "M043",
+  "sources": [
+    {
+      "ids": [
+        "M043"
+      ],
+      "path": "docs/07-roadmap.md",
+      "reason": "Selected live-serving outcome, prerequisites, owning proposal and verification allocation",
+      "use": "excerpt",
+      "sha256": "59ab2c502459edd0cdde11ba829a96fe397a035e20f5c9c7e5e2a69d8c709d41"
+    },
+    {
+      "ids": [
+        "FR-003",
+        "FR-009",
+        "FR-010",
+        "FR-011",
+        "FR-012",
+        "FR-024"
+      ],
+      "path": "docs/01-PRD.md",
+      "reason": "Selected Translation/Rewriting behavior and success-only full-length charging",
+      "use": "excerpt",
+      "sha256": "17f89bb09ce56cfe945e3aae49ab3888d2b09b51a8fa9dce2b52ea7b0b806484"
+    },
+    {
+      "ids": [
+        "Q-001"
+      ],
+      "path": "docs/product/open-questions.md",
+      "reason": "Open provider/cost question; M043 consumes only the owner-locked serving slice",
+      "use": "excerpt",
+      "sha256": "b2566192f143f64e823994f5e67e7d20be9e9d7a9aee20c5fce62472f9cf9e53"
+    },
+    {
+      "ids": [
+        "DF-004",
+        "DF-003",
+        "DF-006",
+        "DF-008"
+      ],
+      "path": "docs/product/deferred-scope.md",
+      "reason": "Deferred fallback chains plus excluded pause-submission, prefix-charging and mail boundaries",
+      "use": "excerpt",
+      "sha256": "eb63b8021bf76efe63a4a9211719a8b8b852963646beb1db0fcca23321e57fa6"
+    },
+    {
+      "heading": "5.1 Active chains and candidate registry",
+      "path": "docs/04-llm-specification.md",
+      "reason": "Primary-only serving snapshot, credential-ref sharing and startup failure rules",
+      "use": "excerpt",
+      "sha256": "964db0e40d4e93592f2d7f9108cf3b17ad3791a79d4a453c3a6f843d9fbeb34e"
+    },
+    {
+      "heading": "5.4 Context and monetary bounds",
+      "path": "docs/04-llm-specification.md",
+      "reason": "Conservative per-attempt upper-bound method behind the per-operation ceiling",
+      "use": "excerpt",
+      "sha256": "42ea488007ed372eeddf9ef3b9c152e7e80db4a1995349a3e72fd77424c6bc8b"
+    },
+    {
+      "heading": "6.1 Explicit traversal",
+      "path": "docs/04-llm-specification.md",
+      "reason": "Dispatch bounds for the fallback-free serving path",
+      "use": "excerpt",
+      "sha256": "9fb20a040784b784a56939342a749a38b0e1d42b34420871886c2c91f249fe94"
+    },
+    {
+      "heading": "7. Error classification and recovery",
+      "path": "docs/04-llm-specification.md",
+      "reason": "Adapter dispositions, shared-credential blocking and honest invalid-key errors",
+      "use": "excerpt",
+      "sha256": "ffb52e572de013d56dd45a0ba703fc8ed586c2eb905a31626f3d4fdf78fe06c8"
+    },
+    {
+      "heading": "5.2 Configuration and diagnostics",
+      "path": "docs/03-architecture.md",
+      "reason": "Env-only credentials, fail-closed startup and redaction constraints",
+      "use": "excerpt",
+      "sha256": "cabb56d178250265ae9d5f022d77f3ccc62f3097a19c578b90b2598f443fbcf5"
+    },
+    {
+      "heading": "7.3 Monthly monetary ceiling",
+      "path": "docs/03-architecture.md",
+      "reason": "Admission equation and shared-credential exposure ledger beside the per-operation cap",
+      "use": "excerpt",
+      "sha256": "582984ef3930bedc74c3c2fafc4106d68dce63a6fc7107a3eb628f84a881ccef"
+    },
+    {
+      "heading": "7.2 Monetary admission and month boundaries",
+      "path": "docs/api/operations.md",
+      "reason": "Budget-denial stops dispatch including fallback; month attribution",
+      "use": "excerpt",
+      "sha256": "cc0523bf8cffde0df35236efc07824486bd2a3aad1bec5cc46a094cbe0866b44"
+    },
+    {
+      "heading": "8. Error semantics and client recovery",
+      "path": "docs/api/operations.md",
+      "reason": "Public budget/processing categories, no provider-error leakage, pending semantics",
+      "use": "excerpt",
+      "sha256": "787b03e3f41e00492446ebe0f4b677a6c229562212f13a604897ae0197fecd8a"
+    },
+    {
+      "heading": "7. Translation contract",
+      "path": "docs/02-ux-specification.md",
+      "reason": "Portal Translate behavior the live path must preserve",
+      "use": "excerpt",
+      "sha256": "2c779fd5e17bfcb0d1ea1b8c99c8d567791ac02b9f61e40b5cd245dab206ec9f"
+    },
+    {
+      "heading": "8. Rewriting contract",
+      "path": "docs/02-ux-specification.md",
+      "reason": "Portal Rewrite behavior the live path must preserve",
+      "use": "excerpt",
+      "sha256": "2460d441fdce1ae3f961bbb24f1d930dac76727abb4563a266acd03a8a6307c5"
+    },
+    {
+      "ids": [
+        "UX-MSG-013",
+        "UX-MSG-017"
+      ],
+      "path": "docs/ux/processing.md",
+      "reason": "Processing-failure vs budget-suspension copy for honest live failures",
+      "use": "excerpt",
+      "sha256": "59315ba6b9ecbdf048f88723a20aa5c96d43657c2e8baff59378dece7447de11"
+    },
+    {
+      "heading": "2.2 Stable check groups",
+      "path": "docs/06-verification-plan.md",
+      "reason": "V-002/V-005/V-006/V-008/V-009/V-012 evidence definitions",
+      "use": "excerpt",
+      "sha256": "3ff38df95d5cde583f90f26653175be5497beeb859758da8b77fbd7efac0b661"
+    },
+    {
+      "heading": "4.2 Browser lanes",
+      "path": "docs/verification/frontend.md",
+      "reason": "Browser lanes for the live portal journey evidence",
+      "use": "excerpt",
+      "sha256": "24b0e19b0b330638ecd0d87f0f6f952014faaa60ac4f8e4d404e560029693e04"
+    },
+    {
+      "heading": "3.1 Database, HTTP and published-host harness",
+      "path": "docs/verification/backend.md",
+      "reason": "Isolated-host harness rules reused by the live API suite",
+      "use": "excerpt",
+      "sha256": "c493bc0519d9271615893303f036c333d6c38d279a75c1b2863778d944c4e794"
+    },
+    {
+      "path": "docs/research/m043-live-serving-proposal-2026-09-15.md",
+      "reason": "Owning owner-locked proposal: candidate, cap, fail-fast and live-suite shape",
+      "use": "reference",
+      "sha256": "f520a1e38b767323fb8bccc34116bfeee8160f21c7a23981ce5a2ac6e8decbe0"
+    },
+    {
+      "path": "docs/08-backlogs/M019/spec.md",
+      "reason": "Dependency evidence for shared DeepSeek credential access",
+      "use": "reference",
+      "sha256": "670f54f4461664919a34caaac7157799f8995393b7255f06d093a0ec64b803be"
+    },
+    {
+      "path": "docs/08-backlogs/M028/spec.md",
+      "reason": "Dependency evidence for the portal Translate journey reused by live suites",
+      "use": "reference",
+      "sha256": "3354e824bc7052f1117eeed9858c9e0e7f6ad864c57a32e9c31c044bfd808953"
+    },
+    {
+      "path": "docs/08-backlogs/M029/spec.md",
+      "reason": "Dependency evidence for the portal Rewrite journey and deterministic provider boundary",
+      "use": "reference",
+      "sha256": "5f44a14226df33a259f07dcb1e9c08f0862ce0fdd13a596575e30f5676c378be"
+    },
+    {
+      "path": "backend/src/LinguaDesk.Api/Features/Operations/OperationsRegistrationExtensions.cs",
+      "reason": "Provider registration point changed by M043",
+      "use": "reference",
+      "sha256": "aee7b634d83b56c58e5cbe442eabf2634484e79553c8ed212b23d44f60eb8e58"
+    },
+    {
+      "path": "backend/src/LinguaDesk.Api/Features/Operations/TranslationOperationCoordinator.cs",
+      "reason": "Coordinator ceiling enforcement point (budget null today)",
+      "use": "reference",
+      "sha256": "d2830443f360842f64569a29a2edb8dc61eebd6c6a78c9192c0256845c5d14d7"
+    },
+    {
+      "path": "backend/src/LinguaDesk.Api/Features/Operations/RewritingOperationCoordinator.cs",
+      "reason": "Rewriting parity for ceiling enforcement",
+      "use": "reference",
+      "sha256": "133bd60628b1539c2afdc2d5dff2f4235777e7b96aa00f9a370b9a23a90cd34b"
+    },
+    {
+      "path": "backend/src/LinguaDesk.Api/Features/Operations/TranslationClientProvider.cs",
+      "reason": "Unavailable-provider interface boundary replaced when serving validates",
+      "use": "reference",
+      "sha256": "fbbdd01d513f721924d89dc13e6a355f5538176b96c1f39ec6d95abe38e64d6e"
+    },
+    {
+      "path": "scripts/backend.sh",
+      "reason": "run fail-fast and e2e-live script commands",
+      "use": "reference",
+      "sha256": "377c9652f76ace23925039451b1b545eb31c9b24fa7af6fe6c3ffb0d699699fa"
+    },
+    {
+      "path": "scripts/contract.sh",
+      "reason": "Zero-drift contract gate",
+      "use": "reference",
+      "sha256": "d514721c6a6beca458a884f9af172cda279fbaf36529dc1e1709e76dfb4471b9"
+    },
+    {
+      "path": "scripts/frontend.sh",
+      "reason": "Frontend regression and published smoke commands",
+      "use": "reference",
+      "sha256": "e5c7ead7f029621979ce0fa2317e086a1e4e324b70770f104816bc155d0cd437"
+    }
+  ],
+  "version": 1,
+  "source_map_sha256": "cb9e02d742be54870c615cb65943978a56ddc819fc9e54f8aa997c70348e04c4",
+  "baseline_commit": "f6dcf34cfd9e1fb4102674c75c3acb59026c3c2e",
+  "locked_files": {
+    "docs/00-SDD-Planning-Workflow.md": "5ccca040d0f0d50fac47632643306e7224a8d2e5460df0958e7e7c333146db89",
+    "docs/00-workflow/execution.md": "f362a1384cefef24ba204e0723e3190857c8cca9bcd91908136932e19c5caf02",
+    "docs/08-backlogs/M043/spec.md": "2cbed241d2a1d2ebe0e8206947cf4452c408ad5a81b7dcb7928fe7514c3e02f1",
+    "docs/08-backlogs/M043/plan.md": "371a897fe29f8ea0b2b498f69feabc9366e5362ecc271cda127737bc76a0185c"
+  }
+}
