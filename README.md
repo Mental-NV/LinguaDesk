@@ -9,7 +9,7 @@ LinguaDesk contains a minimal ASP.NET Core host, a published React SPA, explicit
 - Bash, curl, and `pkill` (normally supplied by the operating system or `procps`)
 - Access to the locked NuGet and npm packages; the repository-local EF tool and Chromium are installed explicitly by their setup commands
 
-Backend setup/check/run/smoke still requires no Node, frontend assets, browser, Docker daemon, credentials, external service, or development certificate. Checks and smoke create uniquely owned temporary dependencies. The development `run` wrapper explicitly prepares persistent local storage outside the repository; direct/published application serving still requires an explicitly migrated database and an existing writable Data Protection key directory.
+Backend setup/check/smoke still requires no Node, frontend assets, browser, Docker daemon, credentials, external service, or development certificate. Checks and smoke create uniquely owned temporary dependencies. The development `run` wrapper explicitly prepares persistent local storage outside the repository and additionally requires the live serving configuration plus the DeepSeek key (see below); direct/published application serving still requires an explicitly migrated database and an existing writable Data Protection key directory.
 
 ## Backend commands
 
@@ -31,7 +31,33 @@ bash scripts/backend.sh run
 # Build and start the real host on an OS-assigned loopback port, probe it,
 # and terminate the process and temporary output it owns within 30 seconds.
 bash scripts/backend.sh smoke
+
+# Opt-in live serving proof (owner-authorized, bounded spend): with
+# LINGUADESK_E2E_LIVE=1 and the DeepSeek key present, boot the API with
+# serving config on a temp database and prove Translate en->ru against real
+# LLM calls plus the real-login browser journey. Skipped without the flag and
+# never part of check/smoke/CI.
+LINGUADESK_E2E_LIVE=1 bash scripts/backend.sh e2e-live
 ```
+
+Live serving configuration is env-only. `run` refuses to start when it is
+absent or partial and names the missing variables:
+
+```sh
+Serving__Translation__CandidateId=DeepSeek-V4.1-Flash \
+Serving__Translation__CredentialRef=deepseek \
+Serving__Rewriting__CandidateId=DeepSeek-V4.1-Flash \
+Serving__Rewriting__CredentialRef=deepseek \
+LINGUADESK_AIEVALUATION__CREDENTIALS__DEEPSEEK__APIKEY="$DEEPSEEK_KEY" \
+bash scripts/backend.sh run
+```
+
+Each family additionally honors `Serving__<Family>__MaxSpendUsdPerOperation`
+(default `0.05`); both coordinators enforce that per-operation ceiling on top
+of the monthly monetary admission, deny over-cap dispatches before any
+provider call, and settle them as monetary suspension with zero charge and no
+fallback. The serving chains are primary-only over `DeepSeek-V4.1-Flash`
+(no fallback per DF-004).
 
 With no storage environment variables, `run` applies the migrations and creates a restricted key directory under the sibling `../.linguadesk-development` directory. This data and its verification keys survive restarts and are not committed. Override that location and the listening address when needed:
 
@@ -53,7 +79,7 @@ Operation admission enforces the configured user and global daily character allo
 
 ## Capability and contract commands
 
-`GET /api/capabilities` is public and read-only. It returns JSON with `Cache-Control: no-store` and needs no account, database, frontend, provider, email service, or credential. The response is a catalog and validation contract only. Verified accounts can additionally reserve one logical operation with `POST /api/operations` (UUIDv7 `operationId`, `translation`/`rewriting` family, exact `source`, effective settings) and read it with `GET /api/operations/{operationId}`, and read authoritative current-day usage with `GET /api/usage` (categorical availability, `no-store`); admission is atomic against both daily allowances, duplicates observe, changed payloads conflict, and settled operations report `succeeded` (one admission-day charge, output unavailable) or `failed` (zero charge) metadata with a fresh usage snapshot. Settlement is internal only — there is no public settle/complete endpoint. Translation and rewriting submissions execute synchronously through the configured provider behind the stored deadline and return complete text with `201` or a classified failure; rewriting accepts exactly one catalog mode defaulting to `correctionOnly`. Only deterministic fake providers exist in the test harness and no production serving configuration is introduced, so unconfigured hosts keep submissions as pending reservations. Interrupted/unknown recovery is unchanged. Bearer authentication exists as `POST /api/accounts/bearer-sign-in`, `POST /api/accounts/bearer-refresh` and `GET /api/accounts/me`.
+`GET /api/capabilities` is public and read-only. It returns JSON with `Cache-Control: no-store` and needs no account, database, frontend, provider, email service, or credential. The response is a catalog and validation contract only. Verified accounts can additionally reserve one logical operation with `POST /api/operations` (UUIDv7 `operationId`, `translation`/`rewriting` family, exact `source`, effective settings) and read it with `GET /api/operations/{operationId}`, and read authoritative current-day usage with `GET /api/usage` (categorical availability, `no-store`); admission is atomic against both daily allowances, duplicates observe, changed payloads conflict, and settled operations report `succeeded` (one admission-day charge, output unavailable) or `failed` (zero charge) metadata with a fresh usage snapshot. Settlement is internal only — there is no public settle/complete endpoint. Translation and rewriting submissions execute synchronously through the configured provider behind the stored deadline and return complete text with `201` or a classified failure; rewriting accepts exactly one catalog mode defaulting to `correctionOnly`. The test harness keeps deterministic fake providers and the Smoke-only deterministic adapters; live serving comes from the primary-only `DeepSeek-V4.1-Flash` providers selected only when the `Serving` section validates, so unconfigured hosts keep submissions as pending reservations. Interrupted/unknown recovery is unchanged. Bearer authentication exists as `POST /api/accounts/bearer-sign-in`, `POST /api/accounts/bearer-refresh` and `GET /api/accounts/me`.
 
 The shared `unicode-scalar-v1` fixture drives the pure C# and TypeScript policy tests. The TypeScript helper takes the maximum advertised by the server; no UI imports it yet, and later language-operation handlers remain authoritative for submitted input.
 

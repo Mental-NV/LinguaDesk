@@ -1,3 +1,4 @@
+using LinguaDesk.Api.Infrastructure.Serving;
 using LinguaDesk.Core;
 using LinguaDesk.Infrastructure.Ai;
 using Microsoft.Extensions.AI;
@@ -40,6 +41,7 @@ public sealed partial class RewritingOperationCoordinator(
     MonetaryAdmissionService monetary,
     IRewritingClientProvider clients,
     IOptions<MonetaryAdmissionOptions> monetaryOptions,
+    IOptions<ServingOptions> servingOptions,
     TimeProvider timeProvider,
     ILogger<RewritingOperationCoordinator> logger)
 {
@@ -92,7 +94,7 @@ public sealed partial class RewritingOperationCoordinator(
                 new RewritingInput(source, sourceSelection, effectiveMode),
                 gate.Resolve,
                 policy,
-                budget: null,
+                budget: ServingOperationBudget.ForRewriting(servingOptions),
                 blockedCredentialRefs: null,
                 cancellationToken).ConfigureAwait(false);
         }
@@ -180,6 +182,10 @@ public sealed partial class RewritingOperationCoordinator(
                 return await FailAsync(
                     accountId, source, sourceSelection, effectiveMode, operationId, submission, gate,
                     RewritingExecutionOutcome.DeadlineExceeded, eligibilityReason: null, cancellationToken).ConfigureAwait(false);
+            case ChainDecision.BudgetDenied:
+                return await FailAsync(
+                    accountId, source, sourceSelection, effectiveMode, operationId, submission, gate,
+                    RewritingExecutionOutcome.MonetarySuspended, eligibilityReason: null, cancellationToken).ConfigureAwait(false);
             default:
                 return await FailAsync(
                     accountId, source, sourceSelection, effectiveMode, operationId, submission, gate,

@@ -15,7 +15,59 @@ expected_minimum_core_tests=8
 configuration="Release"
 
 usage() {
-    echo "Usage: bash scripts/backend.sh {setup|check|run|smoke}" >&2
+    echo "Usage: bash scripts/backend.sh {setup|check|run|smoke|e2e-live}" >&2
+}
+
+is_blank_value() {
+    value=$1
+    trimmed=$(printf '%s' "$value" | tr -d '[:space:]')
+    [ -z "$trimmed" ]
+}
+
+credential_variable_for_ref() {
+    credential_ref=$1
+    normalized=$(printf '%s' "$credential_ref" | tr '[:lower:]-' '[:upper:]_')
+    printf 'LINGUADESK_AIEVALUATION__CREDENTIALS__%s__APIKEY' "$normalized"
+}
+
+validate_serving_config() {
+    missing=""
+
+    if is_blank_value "${Serving__Translation__CandidateId:-}"; then
+        missing="$missing Serving__Translation__CandidateId"
+    fi
+    if is_blank_value "${Serving__Translation__CredentialRef:-}"; then
+        missing="$missing Serving__Translation__CredentialRef"
+    fi
+    if is_blank_value "${Serving__Rewriting__CandidateId:-}"; then
+        missing="$missing Serving__Rewriting__CandidateId"
+    fi
+    if is_blank_value "${Serving__Rewriting__CredentialRef:-}"; then
+        missing="$missing Serving__Rewriting__CredentialRef"
+    fi
+
+    seen_keys=""
+    for family in Translation Rewriting; do
+        ref_variable="Serving__${family}__CredentialRef"
+        credential_ref=${!ref_variable:-}
+        if ! is_blank_value "$credential_ref"; then
+            key_variable=$(credential_variable_for_ref "$credential_ref")
+            case " $seen_keys " in
+                *" $key_variable "*) continue ;;
+            esac
+            seen_keys="$seen_keys $key_variable"
+            key_value=${!key_variable:-}
+            if is_blank_value "$key_value"; then
+                missing="$missing $key_variable"
+            fi
+        fi
+    done
+
+    missing=${missing# }
+    if [ -n "$missing" ]; then
+        echo "LinguaDesk serving is not configured; 'run' refuses to start without live translation/rewriting. Missing: $missing." >&2
+        return 1
+    fi
 }
 
 require_command() {
@@ -215,6 +267,7 @@ validate_report() {
 
 run() {
     check_sdk
+    validate_serving_config
     restore_locked
     development_data_directory=${LINGUADESK_DEVELOPMENT_DATA_PATH:-"$repository_root/../.linguadesk-development"}
     case "$development_data_directory" in
@@ -362,6 +415,259 @@ smoke() {
     echo "Backend liveness/readiness smoke passed on an OS-assigned loopback port."
 }
 
+live_uuid7() {
+    python3 -c 'import secrets, time; ms = int(time.time() * 1000); a = secrets.randbits(12); b = secrets.randbits(62); hi = (0x80 | (b >> 56 & 0x3F)); print("%08x-%04x-7%03x-%02x%02x-%012x" % ((ms >> 16) & 0xFFFFFFFF, ms & 0xFFFF, a, hi, (b >> 48) & 0xFF, b & 0xFFFFFFFFFFFF))'
+}
+
+start_live_host() {
+    phase_name=$1
+    phase_key=$2
+    live_directory=$3
+
+    live_database="$live_directory/linguadesk-$phase_name.db"
+    live_keys="$live_directory/keys"
+    live_log="$live_directory/host-$phase_name.log"
+    live_certificate="$live_directory/loopback.crt"
+    live_certificate_key="$live_directory/loopback.key"
+    mkdir -p "$live_keys"
+    if [ ! -f "$live_certificate" ] || [ ! -f "$live_certificate_key" ]; then
+        openssl req -x509 -newkey rsa:2048 -sha256 -nodes \
+            -keyout "$live_certificate_key" \
+            -out "$live_certificate" \
+            -days 1 \
+            -subj "/CN=localhost" \
+            -addext "subjectAltName=DNS:localhost,IP:127.0.0.1" \
+            >/dev/null 2>&1
+        chmod 600 "$live_certificate" "$live_certificate_key"
+    fi
+
+    dotnet ef database update \
+        --project "$api_project" \
+        --startup-project "$api_project" \
+        --configuration "$configuration" \
+        --no-build \
+        -- \
+        --database-path "$live_database" >/dev/null
+
+    live_publish="$live_directory/publish"
+    api_dll="$live_publish/LinguaDesk.Api.dll"
+    # Credential reference plus presence only; key material never enters logs.
+    (cd "$live_publish" && \
+    ASPNETCORE_URLS=https://127.0.0.1:0 \
+    Kestrel__Certificates__Default__Path="$live_certificate" \
+    Kestrel__Certificates__Default__KeyPath="$live_certificate_key" \
+    Serving__Translation__CandidateId="DeepSeek-V4.1-Flash" \
+    Serving__Translation__CredentialRef="deepseek" \
+    Serving__Translation__MaxSpendUsdPerOperation="0.05" \
+    Serving__Rewriting__CandidateId="DeepSeek-V4.1-Flash" \
+    Serving__Rewriting__CredentialRef="deepseek" \
+    Serving__Rewriting__MaxSpendUsdPerOperation="0.05" \
+    LINGUADESK_AIEVALUATION__CREDENTIALS__DEEPSEEK__APIKEY="$phase_key" \
+    MonetaryAdmission__MonthlyCapMinorUnits="1000000" \
+    MonetaryAdmission__Currency="USD" \
+    Storage__DatabasePath="$live_database" \
+    Security__DataProtectionKeysPath="$live_keys" \
+    exec dotnet "$api_dll" >"$live_log" 2>&1) &
+    live_process_id=$!
+
+    live_listen_url=""
+    live_wait_until=$((SECONDS + 60))
+    while [ "$SECONDS" -lt "$live_wait_until" ]; do
+        if ! kill -0 "$live_process_id" >/dev/null 2>&1; then
+            echo "Live $phase_name host exited before it became ready." >&2
+            sed -n '1,60p' "$live_log" >&2
+            return 1
+        fi
+        live_listen_url=$(grep -Eo 'https://127\.0\.0\.1:[0-9]+' "$live_log" | tail -1 || true)
+        if [ -n "$live_listen_url" ]; then
+            break
+        fi
+        sleep 0.5
+    done
+
+    if [ -z "$live_listen_url" ]; then
+        echo "Live $phase_name host did not publish a loopback listening address." >&2
+        sed -n '1,60p' "$live_log" >&2
+        terminate_owned_process "$live_process_id"
+        live_process_id=""
+        return 1
+    fi
+}
+
+stop_live_host() {
+    if [ -n "${live_process_id:-}" ] && kill -0 "$live_process_id" >/dev/null 2>&1; then
+        terminate_owned_process "$live_process_id"
+    fi
+    live_process_id=""
+}
+
+live_register_and_sign_in() {
+    live_base=$1
+    live_email=$2
+    live_password=$3
+    live_token_file=$4
+
+    register_code=$(curl \
+        --silent --insecure --max-time 15 \
+        --output /dev/null --write-out '%{http_code}' \
+        --header 'Content-Type: application/json' \
+        --data "$(printf '{"email":%s,"password":%s}' "$(python3 -c 'import json,sys; print(json.dumps(sys.argv[1]))' "$live_email")" "$(python3 -c 'import json,sys; print(json.dumps(sys.argv[1]))' "$live_password")")" \
+        "$live_base/api/accounts/register" || true)
+    if [ "$register_code" != "202" ]; then
+        echo "Live registration failed with HTTP $register_code for $live_email." >&2
+        return 1
+    fi
+
+    signin_body=$(mktemp "$live_directory/signin.XXXXXX")
+    signin_code=$(curl \
+        --silent --insecure --max-time 15 \
+        --output "$signin_body" --write-out '%{http_code}' \
+        --header 'Content-Type: application/json' \
+        --data "$(printf '{"email":%s,"password":%s}' "$(python3 -c 'import json,sys; print(json.dumps(sys.argv[1]))' "$live_email")" "$(python3 -c 'import json,sys; print(json.dumps(sys.argv[1]))' "$live_password")")" \
+        "$live_base/api/accounts/bearer-sign-in" || true)
+    if [ "$signin_code" != "200" ]; then
+        echo "Live bearer sign-in failed with HTTP $signin_code." >&2
+        rm -f "$signin_body"
+        return 1
+    fi
+    python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["accessToken"])' "$signin_body" >"$live_token_file"
+    rm -f "$signin_body"
+}
+
+e2e_live() {
+    if [ "${LINGUADESK_E2E_LIVE:-}" != "1" ]; then
+        echo "Live serving suites skipped: set LINGUADESK_E2E_LIVE=1 with the DeepSeek key present to run."
+        return 0
+    fi
+
+    check_sdk
+    require_command curl
+    require_command python3
+    require_command openssl
+
+    live_key=${LINGUADESK_AIEVALUATION__CREDENTIALS__DEEPSEEK__APIKEY:-}
+    if is_blank_value "$live_key"; then
+        echo "Live serving suites explicitly requested but LINGUADESK_AIEVALUATION__CREDENTIALS__DEEPSEEK__APIKEY is missing or blank." >&2
+        return 1
+    fi
+
+    live_deadline=$((SECONDS + 600))
+    live_directory=$(mktemp -d "${TMPDIR:-/tmp}/linguadesk-live.XXXXXX")
+    live_process_id=""
+    live_requests=0
+
+    cleanup_live() {
+        exit_code=$?
+        trap - EXIT INT TERM HUP
+        stop_live_host
+        rm -rf "$live_directory"
+        exit "$exit_code"
+    }
+
+    trap cleanup_live EXIT
+    trap 'exit 130' INT
+    trap 'exit 143' TERM
+    trap 'exit 129' HUP
+
+    run_before_deadline "$live_deadline" restore dotnet restore "$solution" --locked-mode
+    run_before_deadline "$live_deadline" build dotnet build "$api_project" --configuration "$configuration" --no-restore
+    if [ ! -f "$repository_root/frontend/dist/index.html" ] || [ ! -f "$repository_root/backend/src/LinguaDesk.Api/wwwroot/index.html" ]; then
+        echo "Live serving suites require the built SPA (frontend/dist and backend wwwroot)." >&2
+        return 1
+    fi
+    run_before_deadline "$live_deadline" publish dotnet publish "$api_project" \
+        --configuration "$configuration" \
+        --no-build \
+        --output "$live_directory/publish"
+
+    # Phase 1 (AC-005 invalid-key case): an invalid key surfaces an honest
+    # provider-access error, never the pending masquerade.
+    start_live_host "invalid-key" "invalid-live-key-for-honest-error-001" "$live_directory"
+    invalid_listen=$live_listen_url
+    live_email="m043-live-invalid-$RANDOM@example.test"
+    live_password="live-serving-proof-pass-01"
+    live_token="$live_directory/token-invalid.txt"
+    live_register_and_sign_in "$invalid_listen" "$live_email" "$live_password" "$live_token"
+    live_token_value=$(cat "$live_token")
+    invalid_operation=$(live_uuid7)
+    invalid_body="$live_directory/invalid-body.txt"
+    invalid_code=$(curl \
+        --silent --insecure --max-time 60 \
+        --output "$invalid_body" --write-out '%{http_code}' \
+        --header 'Content-Type: application/json' \
+        --header "Authorization: Bearer $live_token_value" \
+        --data "{\"operationId\":\"$invalid_operation\",\"family\":\"translation\",\"source\":\"Hello.\",\"target\":\"ru\"}" \
+        "$invalid_listen/api/operations" || true)
+    live_requests=$((live_requests + 1))
+    stop_live_host
+    LINGUADESK_LIVE_BODY="$invalid_body" python3 - "$invalid_code" <<'EOF'
+import json, sys
+code = sys.argv[1]
+body = json.load(open(__import__("os").environ["LINGUADESK_LIVE_BODY"]))
+assert code == "503", f"invalid key must fail honestly with 503, got {code}: {body}"
+assert body.get("category") == "processingFailure", f"invalid key must be processingFailure, got {body}"
+print("Live invalid-key phase passed: honest 503 processingFailure, never 202 pending.")
+EOF
+
+    # Phase 2 (AC-005 happy path): verified Translate en->ru through serving.
+    start_live_host "happy" "$live_key" "$live_directory"
+    happy_listen=$live_listen_url
+    happy_email="m043-live-happy-$RANDOM@example.test"
+    happy_token="$live_directory/token-happy.txt"
+    live_register_and_sign_in "$happy_listen" "$happy_email" "$live_password" "$happy_token"
+    happy_token_value=$(cat "$happy_token")
+    happy_operation=$(live_uuid7)
+    happy_body="$live_directory/happy-body.txt"
+    happy_code=$(curl \
+        --silent --insecure --max-time 90 \
+        --output "$happy_body" --write-out '%{http_code}' \
+        --header 'Content-Type: application/json' \
+        --header "Authorization: Bearer $happy_token_value" \
+        --data "{\"operationId\":\"$happy_operation\",\"family\":\"translation\",\"source\":\"Hello.\",\"target\":\"ru\"}" \
+        "$happy_listen/api/operations" || true)
+    live_requests=$((live_requests + 1))
+    LINGUADESK_LIVE_BODY="$happy_body" python3 - "$happy_code" <<'EOF'
+import json, os, re, sys
+code = sys.argv[1]
+body = json.load(open(os.environ["LINGUADESK_LIVE_BODY"]))
+assert code == "201", f"live translate must return 201, got {code}: {body}"
+text = body.get("translatedText") or ""
+assert text.strip(), "live translate must return a complete non-empty result"
+assert re.search(r"[\u0400-\u04FF]", text), f"live en->ru result must carry Cyrillic text, got {text!r}"
+assert body.get("characterCount") == len("Hello."), f"full submitted length charged exactly once: {body}"
+usage = body.get("usage") or {}
+assert usage.get("consumedCharacters") == len("Hello."), f"recorded charge must equal the full length: {usage}"
+print(f"Live happy phase passed: 201 with Cyrillic result {text!r}, single full-length charge.")
+EOF
+
+    # Phase 3 (AC-006): real login form -> /translate -> visible Result.
+    if [ "${LINGUADESK_E2E_LIVE_BROWSER:-1}" = "1" ]; then
+        if [ -x "$repository_root/frontend/node_modules/.bin/playwright" ]; then
+            browser_email="m043-live-browser-$RANDOM@example.test"
+            browser_token="$live_directory/token-browser.txt"
+            live_register_and_sign_in "$happy_listen" "$browser_email" "$live_password" "$browser_token"
+            (cd "$repository_root/frontend" && \
+                LINGUADESK_E2E_LIVE=1 \
+                LINGUADESK_LIVE_URL="$happy_listen" \
+                LINGUADESK_LIVE_EMAIL="$browser_email" \
+                LINGUADESK_LIVE_PASSWORD="$live_password" \
+                ./node_modules/.bin/playwright test --config playwright.live.config.ts)
+        else
+            echo "Live browser case skipped: frontend Playwright is not installed (run 'bash scripts/frontend.sh setup' first)." >&2
+            return 1
+        fi
+    else
+        echo "Live browser case skipped by LINGUADESK_E2E_LIVE_BROWSER=0."
+    fi
+
+    stop_live_host
+    trap - EXIT INT TERM HUP
+    rm -rf "$live_directory"
+
+    echo "Live serving report: credentialRef=deepseek credentialPresent=true liveRequests=$live_requests phases=invalid-key,happy,browser spendCapUsd=1.00 perOperationCapUsd=0.05"
+    echo "Live serving suites passed without entering default gates."
+}
+
 if [ "$#" -ne 1 ]; then
     usage
     exit 2
@@ -372,6 +678,7 @@ case "$1" in
     check) check ;;
     run) run ;;
     smoke) smoke ;;
+    e2e-live) e2e_live ;;
     *)
         usage
         exit 2

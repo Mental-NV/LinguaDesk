@@ -13,6 +13,7 @@
     "lint": "eslint .",
     "test": "vitest run --reporter=default --reporter=junit --outputFile.junit=../artifacts/test-results/frontend-unit.xml",
     "test:e2e": "playwright test",
+    "test:e2e-live": "playwright test --config playwright.live.config.ts",
     "typecheck": "tsc --noEmit",
     "check": "npm run typecheck && npm run lint && npm run test && npm run build"
   },

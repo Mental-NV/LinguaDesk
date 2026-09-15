@@ -174,19 +174,19 @@
       "path": "backend/src/LinguaDesk.Api/Features/Operations/OperationsRegistrationExtensions.cs",
       "reason": "Provider registration point changed by M043",
       "use": "reference",
-      "sha256": "aee7b634d83b56c58e5cbe442eabf2634484e79553c8ed212b23d44f60eb8e58"
+      "sha256": "1d8494c65c37dc235e0b92f2bf2eb3de05853db3e3c9521325f54bffabda1302"
     },
     {
       "path": "backend/src/LinguaDesk.Api/Features/Operations/TranslationOperationCoordinator.cs",
       "reason": "Coordinator ceiling enforcement point (budget null today)",
       "use": "reference",
-      "sha256": "d2830443f360842f64569a29a2edb8dc61eebd6c6a78c9192c0256845c5d14d7"
+      "sha256": "58008aea15013589c4aa369150a1fac09634dc8e5eacccf9533b19164f4a690c"
     },
     {
       "path": "backend/src/LinguaDesk.Api/Features/Operations/RewritingOperationCoordinator.cs",
       "reason": "Rewriting parity for ceiling enforcement",
       "use": "reference",
-      "sha256": "133bd60628b1539c2afdc2d5dff2f4235777e7b96aa00f9a370b9a23a90cd34b"
+      "sha256": "7aa97e2c04e569bb7358feb467da07c97c4dfb312855924e9adb93a7baef9471"
     },
     {
       "path": "backend/src/LinguaDesk.Api/Features/Operations/TranslationClientProvider.cs",
@@ -198,7 +198,7 @@
       "path": "scripts/backend.sh",
       "reason": "run fail-fast and e2e-live script commands",
       "use": "reference",
-      "sha256": "377c9652f76ace23925039451b1b545eb31c9b24fa7af6fe6c3ffb0d699699fa"
+      "sha256": "e7d3756eef73d060b6e7b293fc342ceda5dfbad0f074be8f806c16c25ba10cea"
     },
     {
       "path": "scripts/contract.sh",
@@ -215,7 +215,7 @@
   ],
   "version": 1,
   "source_map_sha256": "cb9e02d742be54870c615cb65943978a56ddc819fc9e54f8aa997c70348e04c4",
-  "baseline_commit": "f6dcf34cfd9e1fb4102674c75c3acb59026c3c2e",
+  "baseline_commit": "902009613f84e5613d5d9d5bbcd8e9edd7a9f968",
   "locked_files": {
     "docs/00-SDD-Planning-Workflow.md": "5ccca040d0f0d50fac47632643306e7224a8d2e5460df0958e7e7c333146db89",
     "docs/00-workflow/execution.md": "f362a1384cefef24ba204e0723e3190857c8cca9bcd91908136932e19c5caf02",

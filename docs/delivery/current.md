@@ -2,7 +2,7 @@
 
 Mutable #7 status owner. Read for selection/dependency checks and closeout; do not include in the stable execution prefix.
 
-**Most recently completed milestone: [M034 — Unblock local registration without email](../08-backlogs/M034/backlog.md).** State: **Done**. [Package 034](../08-backlogs/M034/spec.md) AC-001–006 passed: newly created accounts are durably verified without delivery or cooldown state, registration returns only `signInRequired` and no credential, duplicate requests cannot alter an existing account, the web flow offers explicit sign-in, generated contracts record the intentional M034 change, and backend/frontend/published-browser regressions pass. Real confirmation/reset email is deferred under DF-008 and email-address ownership is not proven by this temporary substitute. Its [completion record](../08-backlogs/M034/tasks.md#completion-record) owns the exact evidence.
+**Most recently completed milestone: [M043 — Serve live translation/rewriting in the portal with bounded spend](../08-backlogs/M043/backlog.md).** State: **Done**. [Package 043](../08-backlogs/M043/spec.md) AC-001–007 passed: verified Translate/Rewrite serve through primary-only `DeepSeek-V4.1-Flash` chains under the $0.05-per-operation ceiling, `run` refuses to start unconfigured, and the opt-in live API + real-login browser suites prove the portal path end-to-end without entering default gates. Quality/performance qualification stays with M036+/M037 and release gates. Its [completion record](../08-backlogs/M043/tasks.md#completion-record) owns the exact evidence.
 
 ## Selected milestone
 
@@ -52,5 +52,6 @@ M019 completed the independent-track enabler for the explicit live provider path
 | M032 | Done | [Backlog](../08-backlogs/M032/backlog.md), [spec](../08-backlogs/M032/spec.md), [tasks/evidence](../08-backlogs/M032/tasks.md#completion-record) |
 | M033 | Done | [Backlog](../08-backlogs/M033/backlog.md), [spec](../08-backlogs/M033/spec.md), [tasks/evidence](../08-backlogs/M033/tasks.md#completion-record) |
 | M034 | Done | [Backlog](../08-backlogs/M034/backlog.md), [spec](../08-backlogs/M034/spec.md), [tasks/evidence](../08-backlogs/M034/tasks.md#completion-record) |
+| M043 | Done | [Backlog](../08-backlogs/M043/backlog.md), [spec](../08-backlogs/M043/spec.md), [tasks/evidence](../08-backlogs/M043/tasks.md#completion-record) |
 
-All roadmap milestones other than completed M001–M034, done-under-waiver M035 and selected M036 are Candidate with no selected package and evidence pending. Full product and release evidence remains pending in #6 coverage.
+All roadmap milestones other than completed M001–M034 and M043, done-under-waiver M035 and selected M036 are Candidate with no selected package and evidence pending. Full product and release evidence remains pending in #6 coverage.

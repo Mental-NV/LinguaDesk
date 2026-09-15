@@ -1,3 +1,4 @@
+using LinguaDesk.Api.Infrastructure.Serving;
 using LinguaDesk.Infrastructure.Ai;
 using Microsoft.Extensions.AI;
 using Microsoft.Extensions.Options;
@@ -38,6 +39,7 @@ public sealed partial class TranslationOperationCoordinator(
     MonetaryAdmissionService monetary,
     ITranslationClientProvider clients,
     IOptions<MonetaryAdmissionOptions> monetaryOptions,
+    IOptions<ServingOptions> servingOptions,
     TimeProvider timeProvider,
     ILogger<TranslationOperationCoordinator> logger)
 {
@@ -89,7 +91,7 @@ public sealed partial class TranslationOperationCoordinator(
                 new TranslationInput(source, sourceSelection, target),
                 gate.Resolve,
                 policy,
-                budget: null,
+                budget: ServingOperationBudget.ForTranslation(servingOptions),
                 blockedCredentialRefs: null,
                 cancellationToken).ConfigureAwait(false);
         }
@@ -177,6 +179,10 @@ public sealed partial class TranslationOperationCoordinator(
                 return await FailAsync(
                     accountId, source, sourceSelection, target, operationId, submission, gate,
                     TranslationExecutionOutcome.DeadlineExceeded, eligibilityReason: null, cancellationToken).ConfigureAwait(false);
+            case ChainDecision.BudgetDenied:
+                return await FailAsync(
+                    accountId, source, sourceSelection, target, operationId, submission, gate,
+                    TranslationExecutionOutcome.MonetarySuspended, eligibilityReason: null, cancellationToken).ConfigureAwait(false);
             default:
                 return await FailAsync(
                     accountId, source, sourceSelection, target, operationId, submission, gate,

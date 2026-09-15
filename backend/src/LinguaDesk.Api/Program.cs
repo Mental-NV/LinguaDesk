@@ -12,6 +12,7 @@ using LinguaDesk.Api.Features.Identity.Verification;
 using LinguaDesk.Api.Infrastructure.Persistence;
 using LinguaDesk.Api.Infrastructure.Readiness;
 using LinguaDesk.Api.Infrastructure.Security;
+using LinguaDesk.Api.Infrastructure.Serving;
 using LinguaDesk.Api.Infrastructure.Smoke;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -37,7 +38,7 @@ builder.Services.AddLinguaDeskPersistence(
     builder.Environment,
     isContractGeneration);
 builder.Services.AddLinguaDeskAccounts();
-builder.Services.AddLinguaDeskOperations();
+builder.Services.AddLinguaDeskOperations(builder.Configuration);
 builder.Services.AddSmokeDeterministicTranslationProvider(builder.Environment);
 builder.Services.AddSmokeDeterministicRewritingProvider(builder.Environment);
 builder.Services.AddLinguaDeskSecurity(builder.Configuration, isContractGeneration);
@@ -106,6 +107,8 @@ app.Map("/api", ApiNotFound);
 app.Map("/api/{**path}", ApiNotFound);
 
 app.MapFallbackToFile("{**path:nonfile}", "index.html");
+
+ServingStartupGuard.ThrowWhenServingUnconfigured(app.Configuration, app.Environment, isContractGeneration);
 
 app.Run();
 
