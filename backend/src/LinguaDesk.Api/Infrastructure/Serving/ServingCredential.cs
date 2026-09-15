@@ -3,8 +3,9 @@ using LinguaDesk.Infrastructure.Ai;
 namespace LinguaDesk.Api.Infrastructure.Serving;
 
 /// <summary>
-/// Resolves purpose-scoped transport credentials from the owner-exported
-/// environment source. Variable shape mirrors the evaluation composition:
+/// Resolves purpose-scoped transport credentials through <see cref="IConfiguration"/>
+/// so JSON, environment and other providers share one lookup. The value itself
+/// stays env-only: variable shape mirrors the evaluation composition,
 /// <c>LINGUADESK_AIEVALUATION__CREDENTIALS__&lt;REF&gt;__APIKEY</c> with the
 /// reference uppercased and <c>-</c> mapped to <c>_</c>. Blank or absent
 /// material means unconfigured and never yields a default credential. No key
@@ -25,15 +26,25 @@ internal static class ServingCredential
             + Suffix;
     }
 
-    internal static bool TryResolve(string credentialRef, out TransportCredential? credential)
+    internal static string ConfigurationKeyFor(string variable)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(variable);
+        return variable.Replace("__", ":", StringComparison.Ordinal);
+    }
+
+    internal static bool TryResolve(
+        IConfiguration configuration,
+        string credentialRef,
+        out TransportCredential? credential)
     {
         credential = null;
+        ArgumentNullException.ThrowIfNull(configuration);
         if (string.IsNullOrWhiteSpace(credentialRef))
         {
             return false;
         }
 
-        var value = Environment.GetEnvironmentVariable(VariableFor(credentialRef));
+        var value = configuration[ConfigurationKeyFor(VariableFor(credentialRef))];
         if (string.IsNullOrWhiteSpace(value))
         {
             return false;

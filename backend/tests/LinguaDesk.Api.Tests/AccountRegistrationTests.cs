@@ -497,6 +497,13 @@ internal sealed class AccountWebApplicationFactory(
             {
                 ["Storage:DatabasePath"] = databasePath,
                 ["Security:DataProtectionKeysPath"] = keysPath,
+                // Fail-closed serving baseline: the committed appsettings.json
+                // carries a valid Serving section, which must not leak into
+                // test hosts. Explicit per-test overrides below still win.
+                ["Serving:Translation:CandidateId"] = string.Empty,
+                ["Serving:Translation:CredentialRef"] = string.Empty,
+                ["Serving:Rewriting:CandidateId"] = string.Empty,
+                ["Serving:Rewriting:CredentialRef"] = string.Empty,
             };
             if (configurationOverrides is not null)
             {

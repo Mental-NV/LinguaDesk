@@ -34,35 +34,28 @@ credential_variable_for_ref() {
 }
 
 validate_serving_config() {
+    # Non-secret serving policy lives in appsettings.json; only key material
+    # must be env-supplied, so this pre-check covers just the keys (an env
+    # Serving__<Family>__CredentialRef override wins, else the JSON default).
+    # Effective-config validation stays in ServingStartupGuard, which sees the
+    # merged configuration and also covers non-development invocations.
     missing=""
-
-    if is_blank_value "${Serving__Translation__CandidateId:-}"; then
-        missing="$missing Serving__Translation__CandidateId"
-    fi
-    if is_blank_value "${Serving__Translation__CredentialRef:-}"; then
-        missing="$missing Serving__Translation__CredentialRef"
-    fi
-    if is_blank_value "${Serving__Rewriting__CandidateId:-}"; then
-        missing="$missing Serving__Rewriting__CandidateId"
-    fi
-    if is_blank_value "${Serving__Rewriting__CredentialRef:-}"; then
-        missing="$missing Serving__Rewriting__CredentialRef"
-    fi
-
     seen_keys=""
     for family in Translation Rewriting; do
         ref_variable="Serving__${family}__CredentialRef"
-        credential_ref=${!ref_variable:-}
-        if ! is_blank_value "$credential_ref"; then
-            key_variable=$(credential_variable_for_ref "$credential_ref")
-            case " $seen_keys " in
-                *" $key_variable "*) continue ;;
-            esac
-            seen_keys="$seen_keys $key_variable"
-            key_value=${!key_variable:-}
-            if is_blank_value "$key_value"; then
-                missing="$missing $key_variable"
-            fi
+        credential_ref=${!ref_variable:-deepseek}
+        if is_blank_value "$credential_ref"; then
+            missing="$missing $ref_variable"
+            continue
+        fi
+        key_variable=$(credential_variable_for_ref "$credential_ref")
+        case " $seen_keys " in
+            *" $key_variable "*) continue ;;
+        esac
+        seen_keys="$seen_keys $key_variable"
+        key_value=${!key_variable:-}
+        if is_blank_value "$key_value"; then
+            missing="$missing $key_variable"
         fi
     done
 
@@ -654,12 +647,6 @@ start_live_host() {
     ASPNETCORE_URLS=https://127.0.0.1:0 \
     Kestrel__Certificates__Default__Path="$live_certificate" \
     Kestrel__Certificates__Default__KeyPath="$live_certificate_key" \
-    Serving__Translation__CandidateId="DeepSeek-V4.1-Flash" \
-    Serving__Translation__CredentialRef="deepseek" \
-    Serving__Translation__MaxSpendUsdPerOperation="0.05" \
-    Serving__Rewriting__CandidateId="DeepSeek-V4.1-Flash" \
-    Serving__Rewriting__CredentialRef="deepseek" \
-    Serving__Rewriting__MaxSpendUsdPerOperation="0.05" \
     LINGUADESK_AIEVALUATION__CREDENTIALS__DEEPSEEK__APIKEY="$phase_key" \
     MonetaryAdmission__MonthlyCapMinorUnits="1000000" \
     MonetaryAdmission__Currency="USD" \

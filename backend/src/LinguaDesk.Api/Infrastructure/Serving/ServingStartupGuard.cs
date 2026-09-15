@@ -29,7 +29,7 @@ internal static class ServingStartupGuard
         var serving = configuration.GetSection(ServingOptions.SectionName).Get<ServingOptions>();
         var missing = ServingConfiguration.CollectMissingVariables(
             serving,
-            static name => Environment.GetEnvironmentVariable(name));
+            name => configuration[ServingCredential.ConfigurationKeyFor(name)]);
         if (missing.Count > 0)
         {
             throw new InvalidOperationException(

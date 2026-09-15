@@ -9,7 +9,7 @@ LinguaDesk contains a minimal ASP.NET Core host, a published React SPA, explicit
 - Bash, curl, and `pkill` (normally supplied by the operating system or `procps`)
 - Access to the locked NuGet and npm packages; the repository-local EF tool and Chromium are installed explicitly by their setup commands
 
-Backend setup/check/smoke still requires no Node, frontend assets, browser, Docker daemon, credentials, external service, or development certificate. Checks and smoke create uniquely owned temporary dependencies. The development `run` wrapper explicitly prepares persistent local storage outside the repository and additionally requires the live serving configuration plus the DeepSeek key (see below); direct/published application serving still requires an explicitly migrated database and an existing writable Data Protection key directory.
+Backend setup/check/smoke still requires no Node, frontend assets, browser, Docker daemon, credentials, external service, or development certificate. Checks and smoke create uniquely owned temporary dependencies. The development `run` wrapper explicitly prepares persistent local storage outside the repository and additionally requires the DeepSeek key in the environment (serving policy itself ships in `appsettings.json`; see below); direct/published application serving still requires an explicitly migrated database and an existing writable Data Protection key directory.
 
 ## Backend commands
 
@@ -47,23 +47,23 @@ bash scripts/backend.sh benchmark
 LINGUADESK_E2E_LIVE=1 bash scripts/backend.sh e2e-live
 ```
 
-Live serving configuration is env-only. `run` refuses to start when it is
-absent or partial and names the missing variables:
+Live serving policy lives in `backend/src/LinguaDesk.Api/appsettings.json`
+(plus `appsettings.Development.json` for local-only deltas): both families
+serve `DeepSeek-V4.1-Flash` under credential reference `deepseek` with a
+`0.05` per-operation ceiling. Any `Serving__` (or other `Section__Key`)
+environment variable overrides the same JSON path, so env stays available
+for per-run tweaks. Only key material is env-only. `run` refuses to start
+when the key is absent and names the missing variable:
 
 ```sh
-Serving__Translation__CandidateId=DeepSeek-V4.1-Flash \
-Serving__Translation__CredentialRef=deepseek \
-Serving__Rewriting__CandidateId=DeepSeek-V4.1-Flash \
-Serving__Rewriting__CredentialRef=deepseek \
 LINGUADESK_AIEVALUATION__CREDENTIALS__DEEPSEEK__APIKEY="$DEEPSEEK_KEY" \
 bash scripts/backend.sh run
 ```
 
-Each family additionally honors `Serving__<Family>__MaxSpendUsdPerOperation`
-(default `0.05`); both coordinators enforce that per-operation ceiling on top
-of the monthly monetary admission, deny over-cap dispatches before any
-provider call, and settle them as monetary suspension with zero charge and no
-fallback. The serving chains are primary-only over `DeepSeek-V4.1-Flash`
+Both coordinators enforce the per-operation ceiling on top of the monthly
+monetary admission, deny over-cap dispatches before any provider call, and
+settle them as monetary suspension with zero charge and no fallback. The
+serving chains are primary-only over `DeepSeek-V4.1-Flash`
 (no fallback per DF-004).
 
 With no storage environment variables, `run` applies the migrations and creates a restricted key directory under the sibling `../.linguadesk-development` directory. This data and its verification keys survive restarts and are not committed. Override that location and the listening address when needed:

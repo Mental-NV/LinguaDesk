@@ -20,19 +20,22 @@ public sealed class ServingTranslationClientProvider : ITranslationClientProvide
     };
 
     private readonly IOptions<ServingOptions> options;
+    private readonly IConfiguration configuration;
     private readonly HttpClient httpClient;
     private bool disposed;
 
-    public ServingTranslationClientProvider(IOptions<ServingOptions> options)
-        : this(options, SharedHttpClient)
+    public ServingTranslationClientProvider(IOptions<ServingOptions> options, IConfiguration configuration)
+        : this(options, configuration, SharedHttpClient)
     {
     }
 
-    internal ServingTranslationClientProvider(IOptions<ServingOptions> options, HttpClient httpClient)
+    internal ServingTranslationClientProvider(IOptions<ServingOptions> options, IConfiguration configuration, HttpClient httpClient)
     {
         ArgumentNullException.ThrowIfNull(options);
+        ArgumentNullException.ThrowIfNull(configuration);
         ArgumentNullException.ThrowIfNull(httpClient);
         this.options = options;
+        this.configuration = configuration;
         this.httpClient = httpClient;
     }
 
@@ -80,7 +83,7 @@ public sealed class ServingTranslationClientProvider : ITranslationClientProvide
         clients = profile =>
         {
             ArgumentNullException.ThrowIfNull(profile);
-            if (!ServingCredential.TryResolve(profile.CredentialRef, out var credential) || credential is null)
+            if (!ServingCredential.TryResolve(configuration, profile.CredentialRef, out var credential) || credential is null)
             {
                 throw new ChatCompletionsAdapterException(
                     AttemptFailureKind.Blocked,

@@ -4,6 +4,7 @@ using System.Text.Json;
 using LinguaDesk.Api.Infrastructure.Serving;
 using LinguaDesk.Infrastructure.Ai;
 using Microsoft.Extensions.AI;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 
 namespace LinguaDesk.Api.Tests;
@@ -65,12 +66,15 @@ public sealed class ServingProviderTests
             Task.FromResult(respond(request));
     }
 
+    private static IConfiguration TestConfiguration() =>
+        new ConfigurationBuilder().AddEnvironmentVariables().Build();
+
     [TestMethod]
     public void UnconfiguredProvidersStayFailClosed()
     {
         var options = Options.Create(new ServingOptions());
-        using var translation = new ServingTranslationClientProvider(options, new HttpClient(new StubHandler(_ => new HttpResponseMessage(HttpStatusCode.OK))));
-        using var rewriting = new ServingRewritingClientProvider(options, new HttpClient(new StubHandler(_ => new HttpResponseMessage(HttpStatusCode.OK))));
+        using var translation = new ServingTranslationClientProvider(options, TestConfiguration(), new HttpClient(new StubHandler(_ => new HttpResponseMessage(HttpStatusCode.OK))));
+        using var rewriting = new ServingRewritingClientProvider(options, TestConfiguration(), new HttpClient(new StubHandler(_ => new HttpResponseMessage(HttpStatusCode.OK))));
 
         Assert.IsFalse(translation.TryGetClients(out _, out _));
         Assert.IsFalse(rewriting.TryGetClients(out _, out _));
@@ -84,7 +88,7 @@ public sealed class ServingProviderTests
         {
             Content = new StringContent(ChatCompletionsJson(content), Encoding.UTF8, "application/json"),
         }));
-        using var provider = new ServingTranslationClientProvider(Options.Create(ValidOptions()), httpClient);
+        using var provider = new ServingTranslationClientProvider(Options.Create(ValidOptions()), TestConfiguration(), httpClient);
 
         Assert.IsTrue(provider.TryGetClients(out var router, out var chain));
         Assert.AreEqual(ChainFamily.Translation, chain.Family);
@@ -111,7 +115,7 @@ public sealed class ServingProviderTests
         {
             Content = new StringContent(ChatCompletionsJson(content), Encoding.UTF8, "application/json"),
         }));
-        using var provider = new ServingRewritingClientProvider(Options.Create(ValidOptions()), httpClient);
+        using var provider = new ServingRewritingClientProvider(Options.Create(ValidOptions()), TestConfiguration(), httpClient);
 
         Assert.IsTrue(provider.TryGetClients(out var router, out var chain));
         Assert.AreEqual(ChainFamily.Rewriting, chain.Family);
@@ -136,7 +140,7 @@ public sealed class ServingProviderTests
             {
                 Content = new StringContent(ChatCompletionsJson("{}"), Encoding.UTF8, "application/json"),
             }));
-            using var provider = new ServingTranslationClientProvider(Options.Create(ValidOptions()), httpClient);
+            using var provider = new ServingTranslationClientProvider(Options.Create(ValidOptions()), TestConfiguration(), httpClient);
 
             Assert.IsTrue(provider.TryGetClients(out var router, out var chain));
             var exception = Assert.ThrowsExactly<ChatCompletionsAdapterException>(() => router(chain.Primary));
@@ -153,7 +157,7 @@ public sealed class ServingProviderTests
     public async Task InvalidKeySurfacesProviderFailureHonestly()
     {
         var httpClient = new HttpClient(new StubHandler(_ => new HttpResponseMessage(HttpStatusCode.Unauthorized)));
-        using var provider = new ServingTranslationClientProvider(Options.Create(ValidOptions()), httpClient);
+        using var provider = new ServingTranslationClientProvider(Options.Create(ValidOptions()), TestConfiguration(), httpClient);
 
         Assert.IsTrue(provider.TryGetClients(out var router, out var chain));
         using var client = (IDisposable)router(chain.Primary);

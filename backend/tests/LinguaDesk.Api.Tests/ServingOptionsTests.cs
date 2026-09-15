@@ -1,4 +1,5 @@
 using LinguaDesk.Api.Infrastructure.Serving;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 
 namespace LinguaDesk.Api.Tests;
@@ -156,5 +157,46 @@ public sealed class ServingOptionsTests
         Assert.AreEqual(0.05m, rewriting.MaxSpendUsd);
         Assert.AreEqual(4, translation.MaxDispatches);
         Assert.AreEqual(4, rewriting.MaxDispatches);
+    }
+
+    [TestMethod]
+    public void CommittedAppSettingsBindsToValidServingSection()
+    {
+        var configuration = new ConfigurationBuilder()
+            .AddJsonFile(FindAppSettings(), optional: false, reloadOnChange: false)
+            .Build();
+        var options = configuration.GetSection(ServingOptions.SectionName).Get<ServingOptions>();
+
+        Assert.IsNotNull(options);
+        Assert.IsTrue(new ServingOptionsValidator().Validate(null, options).Succeeded);
+        Assert.AreEqual("DeepSeek-V4.1-Flash", options.Translation.CandidateId);
+        Assert.AreEqual("deepseek", options.Translation.CredentialRef);
+        Assert.AreEqual(0.05m, options.Translation.MaxSpendUsdPerOperation);
+        Assert.AreEqual("DeepSeek-V4.1-Flash", options.Rewriting.CandidateId);
+        Assert.AreEqual("deepseek", options.Rewriting.CredentialRef);
+        Assert.AreEqual(0.05m, options.Rewriting.MaxSpendUsdPerOperation);
+    }
+
+    private static string FindAppSettings()
+    {
+        var directory = new DirectoryInfo(AppContext.BaseDirectory);
+        while (directory is not null)
+        {
+            var path = Path.Combine(
+                directory.FullName,
+                "backend",
+                "src",
+                "LinguaDesk.Api",
+                "appsettings.json");
+            if (File.Exists(path))
+            {
+                return path;
+            }
+
+            directory = directory.Parent;
+        }
+
+        Assert.Fail("Could not locate the committed appsettings.json from the test output directory.");
+        return string.Empty;
     }
 }

@@ -11,14 +11,14 @@ internal static class ServingConfiguration
 {
     internal static IReadOnlyList<string> CollectMissingVariables(
         ServingOptions? options,
-        Func<string, string?> readEnvironment)
+        Func<string, string?> readValue)
     {
-        ArgumentNullException.ThrowIfNull(readEnvironment);
+        ArgumentNullException.ThrowIfNull(readValue);
 
         var missing = new List<string>();
         var seenKeys = new HashSet<string>(StringComparer.Ordinal);
-        CollectFamily("Translation", options?.Translation, readEnvironment, missing, seenKeys);
-        CollectFamily("Rewriting", options?.Rewriting, readEnvironment, missing, seenKeys);
+        CollectFamily("Translation", options?.Translation, readValue, missing, seenKeys);
+        CollectFamily("Rewriting", options?.Rewriting, readValue, missing, seenKeys);
         if (missing.Count == 0 && !IsSectionValid(options))
         {
             missing.Add("Serving__Translation__CandidateId");
@@ -34,7 +34,7 @@ internal static class ServingConfiguration
     private static void CollectFamily(
         string family,
         ServingFamilyOptions? selected,
-        Func<string, string?> readEnvironment,
+        Func<string, string?> readValue,
         List<string> missing,
         HashSet<string> seenKeys)
     {
@@ -53,7 +53,7 @@ internal static class ServingConfiguration
         else
         {
             var variable = ServingCredential.VariableFor(selected.CredentialRef);
-            if (seenKeys.Add(variable) && string.IsNullOrWhiteSpace(readEnvironment(variable)))
+            if (seenKeys.Add(variable) && string.IsNullOrWhiteSpace(readValue(variable)))
             {
                 missing.Add(variable);
             }
