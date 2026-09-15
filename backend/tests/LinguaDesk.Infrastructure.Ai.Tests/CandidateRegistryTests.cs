@@ -7,7 +7,7 @@ namespace LinguaDesk.Infrastructure.Ai.Tests;
 public sealed class CandidateRegistryTests
 {
     [TestMethod]
-    public void DefaultRegistryHoldsTwoSelectableNonSecretProfiles()
+    public void DefaultRegistryHoldsSelectableNonSecretProfiles()
     {
         var defaults = CandidateRegistry.Default;
 
@@ -21,7 +21,8 @@ public sealed class CandidateRegistryTests
         Assert.AreEqual(0, deepSeek.Settings.Temperature);
         Assert.IsNull(deepSeek.Settings.TopP);
         Assert.IsFalse(deepSeek.Settings.HasTools);
-        Assert.AreEqual("disabled", deepSeek.Settings.Thinking);
+        Assert.AreEqual(CandidateProfile.DisabledReasoningMode, deepSeek.Settings.Reasoning.Mode);
+        Assert.IsNull(deepSeek.Settings.Reasoning.Effort);
         Assert.IsTrue(deepSeek.Settings.JsonResponseMode);
         Assert.IsGreaterThan(0, deepSeek.Bounds.MaxOutputTokens);
         Assert.IsGreaterThan(0, deepSeek.Bounds.MaxResponseBytes);
@@ -34,6 +35,22 @@ public sealed class CandidateRegistryTests
         Assert.AreNotEqual(deepSeek.CandidateId, second.CandidateId);
         Assert.AreNotEqual(deepSeek.CredentialRef, second.CredentialRef);
         Assert.AreEqual(deepSeek.AdapterId, second.AdapterId);
+        Assert.AreEqual(4096, deepSeek.Bounds.MaxOutputTokens);
+        Assert.AreEqual(4096, second.Bounds.MaxOutputTokens);
+
+        var muse = CandidateRegistry.Select(defaults, "Muse-Spark-1.3-Contributor");
+        Assert.AreEqual("Muse-Spark-1.3-Contributor", muse.CandidateId);
+        Assert.AreEqual("https://openrouter.ai/api/v1", muse.Endpoint);
+        Assert.AreEqual("meta/muse-spark-1.3-contributor", muse.Model);
+        Assert.AreEqual("judgment", muse.CredentialRef);
+        Assert.AreEqual(10000, muse.Bounds.MaxOutputTokens);
+
+        var qwen = CandidateRegistry.Select(defaults, "Qwen-Qwen3.8-Flash");
+        Assert.AreEqual("Qwen-Qwen3.8-Flash", qwen.CandidateId);
+        Assert.AreEqual("https://openrouter.ai/api/v1", qwen.Endpoint);
+        Assert.AreEqual("qwen/qwen3.8-flash", qwen.Model);
+        Assert.AreEqual("judgment", qwen.CredentialRef);
+        Assert.AreEqual(10000, qwen.Bounds.MaxOutputTokens);
 
         var serialized = JsonSerializer.Serialize(defaults);
         Assert.IsFalse(serialized.Contains("apiKey", StringComparison.OrdinalIgnoreCase));
@@ -63,15 +80,90 @@ public sealed class CandidateRegistryTests
     }
 
     [TestMethod]
-    public void EnabledThinkingIsRejected()
+    public void UnknownReasoningModeIsRejected()
     {
         var profile = CandidateRegistry.Default[0] with
         {
-            Settings = CandidateRegistry.Default[0].Settings with { Thinking = "enabled" },
+            Settings = CandidateRegistry.Default[0].Settings with
+            {
+                Reasoning = new ReasoningConfiguration("enabled", null),
+            },
         };
 
         Assert.ThrowsExactly<CandidateProfileException>(
             () => CandidateRegistry.Load([profile]));
+    }
+
+    [TestMethod]
+    public void UnknownReasoningEffortIsRejected()
+    {
+        var muse = CandidateRegistry.Select(CandidateRegistry.Default, "Muse-Spark-1.3-Contributor");
+        var profile = muse with
+        {
+            Settings = muse.Settings with
+            {
+                Reasoning = new ReasoningConfiguration(CandidateProfile.EffortReasoningMode, "extreme"),
+            },
+        };
+
+        Assert.ThrowsExactly<CandidateProfileException>(
+            () => CandidateRegistry.Load([profile]));
+    }
+
+    [TestMethod]
+    public void ProviderReasoningModesAreEnforced()
+    {
+        var deepSeek = CandidateRegistry.Default[0];
+        var deepSeekWithEffort = deepSeek with
+        {
+            Settings = deepSeek.Settings with
+            {
+                Reasoning = new ReasoningConfiguration(CandidateProfile.EffortReasoningMode, "low"),
+            },
+        };
+        var muse = CandidateRegistry.Select(CandidateRegistry.Default, "Muse-Spark-1.3-Contributor");
+        var museWithDisabledReasoning = muse with
+        {
+            Settings = muse.Settings with
+            {
+                Reasoning = new ReasoningConfiguration(CandidateProfile.DisabledReasoningMode, null),
+            },
+        };
+
+        Assert.ThrowsExactly<CandidateProfileException>(() => CandidateRegistry.Load([deepSeekWithEffort]));
+        Assert.ThrowsExactly<CandidateProfileException>(() => CandidateRegistry.Load([museWithDisabledReasoning]));
+    }
+
+    [TestMethod]
+    public void DefaultProfilesStayWithinPerOperationBudgetCapacityAndResponseBounds()
+    {
+        foreach (var profile in CandidateRegistry.Default)
+        {
+            var bound = EvaluationBudget.UpperBoundUsd(
+                profile.Bounds.MaxInputTokens,
+                profile.Bounds.MaxOutputTokens,
+                profile.Billing.PeakInputPerMillionTokens,
+                profile.Billing.PeakOutputPerMillionTokens);
+            var expectedBound = profile.CandidateId switch
+            {
+                "DeepSeek-V4.1-Flash" => 0.007373m,
+                "DeepSeek-V4.1-Flash-SecondaryRef" => 0.007373m,
+                "Muse-Spark-1.3-Contributor" => 0.002820m,
+                "Qwen-Qwen3.8-Flash" => 0.005929m,
+                _ => throw new AssertFailedException($"Missing expected bound for '{profile.CandidateId}'."),
+            };
+
+            Assert.AreEqual(expectedBound, bound, profile.CandidateId);
+            Assert.IsLessThanOrEqualTo(0.20m, bound, profile.CandidateId);
+            Assert.IsLessThanOrEqualTo(
+                profile.Bounds.ContextCapacityTokens,
+                profile.Bounds.MaxInputTokens + profile.Bounds.MaxOutputTokens,
+                profile.CandidateId);
+            Assert.IsLessThan(
+                profile.Bounds.MaxResponseBytes,
+                profile.Bounds.MaxOutputTokens * 4,
+                profile.CandidateId);
+        }
     }
 
     [TestMethod]

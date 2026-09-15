@@ -219,6 +219,22 @@ public sealed class TranslationPipelineTests
     }
 
     [TestMethod]
+    public async Task TransformationLengthRejectionKeepsItsKindCategory()
+    {
+        using var client = new ScriptedTranslationClient(
+            "{\"status\":\"eligible\",\"language\":\"en\"}",
+            new ChatCompletionsAdapterException(AttemptFailureKind.LengthRejected, null, "Synthetic length rejection."));
+
+        var outcome = await TranslationPipeline.TranslateAsync(
+            new TranslationInput(SourceFor("en"), Target: "ru"),
+            client);
+
+        Assert.AreEqual(TranslationDecision.Failed, outcome.Decision);
+        Assert.AreEqual("length-rejected", outcome.Category);
+        Assert.IsNull(outcome.Text);
+    }
+
+    [TestMethod]
     [DataRow("uncertain")]
     [DataRow("unsupported")]
     [DataRow("mixed")]

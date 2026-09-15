@@ -26,7 +26,7 @@
       "path": "docs/delivery/current.md",
       "use": "reference",
       "reason": "Dependency states at planning time (M019/M020/M035 Done, M035 waiver carried forward, train M035→M036→M037)",
-      "sha256": "ab18ec51a3d8a42158c8767f5ba485d9a8a2181192462818aa389c2d9aedcfaf"
+      "sha256": "c0f87d59b41c0fb4c855f63b3b53fa3c3e48a0993993adaf7354d998cd4b335e"
     },
     {
       "path": "docs/01-PRD.md",
@@ -139,27 +139,27 @@
       "path": "backend/tools/LinguaDesk.Ai.Evaluation/Corpus/batch-b1.json",
       "use": "reference",
       "reason": "Frozen B1 input: run must verify byte-identity against the spec-pinned hash before dispatch",
-      "sha256": "aebdc2dc482487d726a55953f9de1a46d66aa09b6693e353696d50e16cb83012"
+      "sha256": "245b8f76df8f2dd10c5d7177d7679cf87d17c817a135950eba0947a72bd7a4cc"
     },
     {
       "path": "backend/tools/LinguaDesk.Ai.Evaluation/README.md",
       "use": "reference",
       "reason": "Runner surface extended by this milestone: budgets, offline/live modes, B1 explicitly not yet a CLI input",
-      "sha256": "2680f0749d9654b15064cfecbd62416bb265ad66d55d87d060eef623c71f8788"
+      "sha256": "8f6d1ff2b2297cb615e8fd574c32559aaf3f01b547a7098614d579464ed251b4"
     },
     {
       "path": "backend/tools/LinguaDesk.Ai.Evaluation/Program.cs",
       "use": "reference",
       "reason": "Command dispatcher the new evaluate-batch command extends; verifies no B1/grading path exists yet",
-      "sha256": "aa4df8e64fed1dc1407bb138fb451c47904e5e15db5ac3bab36ae22fecf1fffd"
+      "sha256": "8a95ac94eaa420ad9334afc7dfeaf3b917088a5e8ea72a9c79fa15c6f90db8ba"
     }
   ],
   "source_map_sha256": "807195a3d62845923ca9bad8f8b6edbaa526883b562ba8bfc35d3b68d3b56fa1",
-  "baseline_commit": "cb321504df94f179e133130d85b1f0d82edb6d99",
+  "baseline_commit": "1a55638219cb14ecdd7db1660df133b77ebe3b21",
   "locked_files": {
     "docs/00-SDD-Planning-Workflow.md": "5ccca040d0f0d50fac47632643306e7224a8d2e5460df0958e7e7c333146db89",
     "docs/00-workflow/execution.md": "f362a1384cefef24ba204e0723e3190857c8cca9bcd91908136932e19c5caf02",
-    "docs/08-backlogs/M036/spec.md": "15fa56d35c9a5cb17cb5ee7347802f2fce9aa3ccbdf1c81deb9c742dfc5b21c8",
+    "docs/08-backlogs/M036/spec.md": "796b95645a59e5fe05acca6690d5f90f9653926878e88a858ce3c42df7e0be3e",
     "docs/08-backlogs/M036/plan.md": "128648166fba89101bf1d7010225019cb9d3fe64b6689341786e0eeed4803e6c"
   }
 }

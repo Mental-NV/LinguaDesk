@@ -119,9 +119,9 @@ public static class TranslationPipeline
         {
             throw;
         }
-        catch (Exception)
+        catch (Exception exception)
         {
-            return FailedOutcome("provider-failure", eligibility, snapshot, input);
+            return FailedOutcome(ChatCompletionsAdapter.FailureCategory(exception), eligibility, snapshot, input);
         }
 
         if (response.FinishReason == ChatFinishReason.Length)

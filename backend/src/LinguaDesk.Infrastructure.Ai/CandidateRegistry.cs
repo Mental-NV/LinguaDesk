@@ -16,12 +16,14 @@ public static class CandidateRegistry
                     Temperature: 0,
                     TopP: null,
                     HasTools: false,
-                    Thinking: CandidateProfile.RequiredThinkingMode,
+                    Reasoning: new ReasoningConfiguration(
+                        Mode: CandidateProfile.DisabledReasoningMode,
+                        Effort: null),
                     JsonResponseMode: true),
                 PromptRevision: "eligibility.v1",
                 ValidatorRevision: "envelope.v1",
                 new ContextBounds(
-                    MaxOutputTokens: 256,
+                    MaxOutputTokens: 4096,
                     MaxResponseBytes: 65536,
                     MaxInputTokens: 8192,
                     ContextCapacityTokens: 1000000,
@@ -42,12 +44,14 @@ public static class CandidateRegistry
                     Temperature: 0,
                     TopP: null,
                     HasTools: false,
-                    Thinking: CandidateProfile.RequiredThinkingMode,
+                    Reasoning: new ReasoningConfiguration(
+                        Mode: CandidateProfile.DisabledReasoningMode,
+                        Effort: null),
                     JsonResponseMode: true),
                 PromptRevision: "eligibility.v1",
                 ValidatorRevision: "envelope.v1",
                 new ContextBounds(
-                    MaxOutputTokens: 256,
+                    MaxOutputTokens: 4096,
                     MaxResponseBytes: 65536,
                     MaxInputTokens: 8192,
                     ContextCapacityTokens: 1000000,
@@ -58,6 +62,62 @@ public static class CandidateRegistry
                     PriceCheckDate: "2026-09-11",
                     PeakInputPerMillionTokens: 0.30m,
                     PeakOutputPerMillionTokens: 1.20m)),
+            new CandidateProfile(
+                "Muse-Spark-1.3-Contributor",
+                ChatCompletionsAdapterId,
+                "https://openrouter.ai/api/v1",
+                "meta/muse-spark-1.3-contributor",
+                "judgment",
+                new EffectiveSettings(
+                    Temperature: 0,
+                    TopP: null,
+                    HasTools: false,
+                    Reasoning: new ReasoningConfiguration(
+                        Mode: CandidateProfile.EffortReasoningMode,
+                        Effort: CandidateProfile.DefaultReasoningEffort),
+                    JsonResponseMode: true),
+                PromptRevision: "eligibility.v1",
+                ValidatorRevision: "envelope.v1",
+                new ContextBounds(
+                    MaxOutputTokens: 10000,
+                    MaxResponseBytes: 65536,
+                    MaxInputTokens: 8192,
+                    ContextCapacityTokens: 1048576,
+                    AttemptTimeoutSeconds: 60),
+                new BillingProfile(
+                    Currency: "USD",
+                    PriceSource: "OpenRouter",
+                    PriceCheckDate: "2026-09-14",
+                    PeakInputPerMillionTokens: 0.10m,
+                    PeakOutputPerMillionTokens: 0.20m)),
+            new CandidateProfile(
+                "Qwen-Qwen3.8-Flash",
+                ChatCompletionsAdapterId,
+                "https://openrouter.ai/api/v1",
+                "qwen/qwen3.8-flash",
+                "judgment",
+                new EffectiveSettings(
+                    Temperature: 0,
+                    TopP: null,
+                    HasTools: false,
+                    Reasoning: new ReasoningConfiguration(
+                        Mode: CandidateProfile.EffortReasoningMode,
+                        Effort: CandidateProfile.DefaultReasoningEffort),
+                    JsonResponseMode: true),
+                PromptRevision: "eligibility.v1",
+                ValidatorRevision: "envelope.v1",
+                new ContextBounds(
+                    MaxOutputTokens: 10000,
+                    MaxResponseBytes: 65536,
+                    MaxInputTokens: 8192,
+                    ContextCapacityTokens: 1000000,
+                    AttemptTimeoutSeconds: 60),
+                new BillingProfile(
+                    Currency: "USD",
+                    PriceSource: "OpenRouter",
+                    PriceCheckDate: "2026-09-14",
+                    PeakInputPerMillionTokens: 0.15m,
+                    PeakOutputPerMillionTokens: 0.47m)),
         ]);
 
     public static IReadOnlyList<CandidateProfile> Load(IEnumerable<CandidateProfile> profiles)

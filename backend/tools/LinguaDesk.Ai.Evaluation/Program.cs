@@ -43,6 +43,8 @@ internal static class Program
             "evaluate-rewriting" => await EvaluateRewriting.RunAsync(args[1..]).ConfigureAwait(false),
             "evaluate-chain-bounds" => await EvaluateChainBounds.RunAsync(args[1..]).ConfigureAwait(false),
             "evaluate-report" => await EvaluateReport.RunAsync(args[1..]).ConfigureAwait(false),
+            "evaluate-batch" => await EvaluateBatch.RunAsync(args[1..]).ConfigureAwait(false),
+            "calibrate-judge" => await CalibrateJudge.RunAsync(args[1..]).ConfigureAwait(false),
             _ => UnknownCommand(),
         };
     }
@@ -303,11 +305,29 @@ internal static class Program
     {
         using var body = JsonDocument.Parse(capture.LastRequestBody!);
         var root = body.RootElement;
+        var hasThinking = root.TryGetProperty("thinking", out var thinking);
+        var hasReasoning = root.TryGetProperty("reasoning", out var reasoning);
+        var reasoningSettingsMatch = string.Equals(
+            profile.Settings.Reasoning.Mode,
+            CandidateProfile.DisabledReasoningMode,
+            StringComparison.Ordinal)
+                ? hasThinking
+                    && !hasReasoning
+                    && string.Equals(
+                        thinking.GetProperty("type").GetString(),
+                        CandidateProfile.DisabledReasoningMode,
+                        StringComparison.Ordinal)
+                : !hasThinking
+                    && hasReasoning
+                    && string.Equals(
+                        reasoning.GetProperty("effort").GetString(),
+                        profile.Settings.Reasoning.Effort,
+                        StringComparison.Ordinal);
         return string.Equals(root.GetProperty("model").GetString(), profile.Model, StringComparison.Ordinal)
             && root.GetProperty("temperature").GetDouble() == 0
             && !root.TryGetProperty("top_p", out _)
             && !root.TryGetProperty("tools", out _)
-            && string.Equals(root.GetProperty("thinking").GetProperty("type").GetString(), "disabled", StringComparison.Ordinal)
+            && reasoningSettingsMatch
             && string.Equals(root.GetProperty("response_format").GetProperty("type").GetString(), "json_object", StringComparison.Ordinal)
             && root.GetProperty("max_tokens").GetInt32() == profile.Bounds.MaxOutputTokens;
     }
@@ -346,7 +366,14 @@ internal static class Program
             "evaluate-translation [--offline|--live] --profile <id> --max-dispatches <n> --max-spend-usd <amount> [--output <path>]|" +
             "evaluate-rewriting [--offline|--live] --profile <id> --max-dispatches <n> --max-spend-usd <amount> [--output <path>]|" +
             "evaluate-chain-bounds [--offline|--live] --profile <id> --max-dispatches <n> --max-spend-usd <amount> [--deadline-ms <n>] [--output <path>]|" +
-            "evaluate-report [--offline|--live] --profile <id> --max-dispatches <n> --max-spend-usd <amount> [--deadline-ms <n>] [--output <path>]}");
+            "evaluate-report [--offline|--live] --profile <id> --max-dispatches <n> --max-spend-usd <amount> [--deadline-ms <n>] [--output <path>]|" +
+            "evaluate-batch [--offline|--live] --corpus <path> --profile <id> --judge-profile <id> " +
+            "(M036 pins Qwen-Qwen3.8-Flash) --max-dispatches <n> --max-spend-usd <amount> " +
+            "[--calibration <path>] [--review-seed <value>] [--serving-scope <quiescent|shared-concurrent>] " +
+            "[--deadline-ms <n>] [--output <path>]|" +
+            "calibrate-judge [--offline|--live] --dev-corpus <path> [--candidate-profile <id>] [--judge-profile <id>] " +
+            "--max-dispatches <n> --max-spend-usd <amount> [--deadline-ms <n>] " +
+            "[--eligibility-timeout-ms <n>] [--transformation-timeout-ms <n>] --output-dir <dir>}");
 
     private sealed record VerifyAccessOptions(string Profile, int MaxDispatches, decimal MaxSpendUsd)
     {

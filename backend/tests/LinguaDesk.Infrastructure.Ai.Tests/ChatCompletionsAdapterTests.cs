@@ -39,12 +39,36 @@ public sealed class ChatCompletionsAdapterTests
         Assert.IsFalse(root.TryGetProperty("top_p", out _));
         Assert.IsFalse(root.TryGetProperty("tools", out _));
         Assert.AreEqual("disabled", root.GetProperty("thinking").GetProperty("type").GetString());
+        Assert.IsFalse(root.TryGetProperty("reasoning", out _));
         Assert.AreEqual("json_object", root.GetProperty("response_format").GetProperty("type").GetString());
         Assert.AreEqual(profile.Bounds.MaxOutputTokens, root.GetProperty("max_tokens").GetInt32());
         Assert.IsFalse(root.GetProperty("stream").GetBoolean());
         Assert.HasCount(2, root.GetProperty("messages").EnumerateArray().ToArray());
         Assert.AreEqual("system", root.GetProperty("messages")[0].GetProperty("role").GetString());
         Assert.AreEqual("user", root.GetProperty("messages")[1].GetProperty("role").GetString());
+    }
+
+    [TestMethod]
+    public async Task OpenRouterRequestsCarryReasoningEffortAndOmitDeepSeekThinkingParameter()
+    {
+        foreach (var profile in CandidateRegistry.Default.Where(candidate =>
+                     candidate.Endpoint.StartsWith("https://openrouter.ai/", StringComparison.Ordinal)))
+        {
+            using var handler = new CapturingHandler(_ => SuccessResponse());
+            var adapter = new ChatCompletionsAdapter(profile, new HttpClient(handler));
+
+            using var credential = new TransportCredential(SyntheticKey);
+            await adapter.SendAsync(FixedMessages(), credential, null);
+
+            Assert.AreEqual("https://openrouter.ai/api/v1/chat/completions", handler.Requests[0].RequestUri!.ToString());
+            using var body = JsonDocument.Parse(handler.LastRequestBody!);
+            var root = body.RootElement;
+            Assert.AreEqual(profile.Model, root.GetProperty("model").GetString());
+            Assert.IsFalse(root.TryGetProperty("thinking", out _));
+            Assert.AreEqual("low", root.GetProperty("reasoning").GetProperty("effort").GetString());
+            Assert.AreEqual("json_object", root.GetProperty("response_format").GetProperty("type").GetString());
+            Assert.AreEqual(profile.Bounds.MaxOutputTokens, root.GetProperty("max_tokens").GetInt32());
+        }
     }
 
     [TestMethod]
@@ -250,6 +274,27 @@ public sealed class ChatCompletionsAdapterTests
 
         Assert.ThrowsExactly<CandidateProfileException>(
             () => new ChatCompletionsAdapter(profile, client));
+    }
+
+    [TestMethod]
+    public async Task CyrillicPromptUsesScriptAwareEstimateBelowTheInputBound()
+    {
+        // ~1500 Cyrillic chars escape to ~9KB of wire bytes; the script-aware
+        // estimate (~1k tokens) must pass the 8192-token input bound.
+        using var handler = new CapturingHandler(_ => SuccessResponse());
+        var adapter = CreateAdapter(handler, out _);
+
+        using var credential = new TransportCredential(SyntheticKey);
+        var observation = await adapter.SendAsync(
+            [
+                new PromptMessageSnapshot("system", "Return JSON only."),
+                new PromptMessageSnapshot("user", new string('Ж', 1500)),
+            ],
+            credential,
+            null);
+
+        Assert.HasCount(1, handler.Requests);
+        Assert.AreEqual("completed", observation.FinishCategory);
     }
 
     [TestMethod]

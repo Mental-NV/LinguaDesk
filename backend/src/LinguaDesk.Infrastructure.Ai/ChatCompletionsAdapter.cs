@@ -107,13 +107,13 @@ public sealed class ChatCompletionsAdapter
         }
 
         var body = BuildRequestBody(messages);
-        long estimatedInputTokens = body.Length;
+        long estimatedInputTokens = EstimateInputTokens(messages);
         if (estimatedInputTokens > profile.Bounds.MaxInputTokens)
         {
             throw new ChatCompletionsAdapterException(
                 AttemptFailureKind.LengthRejected,
                 null,
-                "The serialized prompt exceeds the profile input bound; the byte count is a conservative token upper bound.");
+                "The estimated prompt tokens exceed the profile input bound.");
         }
 
         if (estimatedInputTokens + profile.Bounds.MaxOutputTokens > profile.Bounds.ContextCapacityTokens)
@@ -130,7 +130,7 @@ public sealed class ChatCompletionsAdapter
         {
             using var request = new HttpRequestMessage(
                 HttpMethod.Post,
-                new Uri(new Uri(profile.Endpoint, UriKind.Absolute), "chat/completions"));
+                new Uri(new Uri($"{profile.Endpoint.TrimEnd('/')}/", UriKind.Absolute), "chat/completions"));
             request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue(
                 "Bearer",
                 credential.GetApiKey());
@@ -207,13 +207,73 @@ public sealed class ChatCompletionsAdapter
             ["messages"] = wire,
             ["temperature"] = 0,
             ["response_format"] = new JsonObject { ["type"] = "json_object" },
-            ["thinking"] = new JsonObject { ["type"] = CandidateProfile.RequiredThinkingMode },
+            ["thinking"] = new JsonObject { ["type"] = CandidateProfile.DisabledReasoningMode },
             ["max_tokens"] = profile.Bounds.MaxOutputTokens,
             ["stream"] = false,
         };
 
+        if (string.Equals(profile.Settings.Reasoning.Mode, CandidateProfile.EffortReasoningMode, StringComparison.Ordinal))
+        {
+            payload.Remove("thinking");
+            payload["reasoning"] = new JsonObject { ["effort"] = profile.Settings.Reasoning.Effort };
+        }
+
         return JsonSerializer.SerializeToUtf8Bytes(payload);
     }
+
+    // Heuristic token estimate over message text, in whole tokens rounded up.
+    // Weights approximate subword fertility per script in quarter-token units:
+    // ASCII ~4 chars/token, two-byte scripts (Latin-ext, Cyrillic, Greek,
+    // Hebrew, Arabic) ~2 chars/token, CJK and other three/four-byte
+    // characters ~1 token/char, plus ~4 tokens of per-message framing.
+    // The escaped wire bytes must never be used here: JSON \uXXXX escaping
+    // inflates Cyrillic/CJK ~6x and tripped the input bound on modest
+    // non-ASCII inputs. Budget settlement still uses provider-reported
+    // actuals, so mis-estimation only moves reservations, never charges.
+    private static long EstimateInputTokens(IReadOnlyList<PromptMessageSnapshot> messages)
+    {
+        long quarters = 0;
+        foreach (var message in messages)
+        {
+            foreach (var rune in message.Content.EnumerateRunes())
+            {
+                quarters += RuneQuarterWeight(rune.Value);
+            }
+
+            quarters += 16;
+        }
+
+        return (quarters + 3) / 4;
+    }
+
+    private static int RuneQuarterWeight(int scalar)
+    {
+        if (scalar < 0x80)
+        {
+            return 1;
+        }
+
+        if (scalar < 0x800)
+        {
+            return 2;
+        }
+
+        return 4;
+    }
+
+    public static string FailureCategory(Exception exception) =>
+        exception is ChatCompletionsAdapterException adapterException
+            ? adapterException.Kind switch
+            {
+                AttemptFailureKind.Blocked => "blocked",
+                AttemptFailureKind.BudgetDenied => "budget-denied",
+                AttemptFailureKind.ProviderFailure => "provider-failure",
+                AttemptFailureKind.InvalidEnvelope => "invalid-envelope",
+                AttemptFailureKind.LengthRejected => "length-rejected",
+                AttemptFailureKind.Timeout => "timeout",
+                _ => "provider-failure",
+            }
+            : "provider-failure";
 
     private static BudgetReservation? Reserve(CandidateProfile candidate, EvaluationBudget? budget, long estimatedInputTokens)
     {

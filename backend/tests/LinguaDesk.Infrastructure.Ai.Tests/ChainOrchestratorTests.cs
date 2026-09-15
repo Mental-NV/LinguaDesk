@@ -24,11 +24,15 @@ public sealed class ChainOrchestratorTests
         TimeSpan.FromSeconds(2),
         clock);
 
-    private static decimal PerDispatchReservation() => EvaluationBudget.UpperBoundUsd(
-        8192,
-        256,
-        0.30m,
-        1.20m);
+    private static decimal PerDispatchReservation()
+    {
+        var profile = CandidateRegistry.Select(CandidateRegistry.Default, FamilyChain.EvaluationPrimaryId);
+        return EvaluationBudget.UpperBoundUsd(
+            profile.Bounds.MaxInputTokens,
+            profile.Bounds.MaxOutputTokens,
+            profile.Billing.PeakInputPerMillionTokens,
+            profile.Billing.PeakOutputPerMillionTokens);
+    }
 
     private static Func<CandidateProfile, IChatClient> Router(SequenceClient primary, SequenceClient fallback) =>
         profile => string.Equals(profile.CandidateId, FamilyChain.EvaluationPrimaryId, StringComparison.Ordinal)

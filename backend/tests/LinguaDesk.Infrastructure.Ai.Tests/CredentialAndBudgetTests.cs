@@ -79,9 +79,14 @@ public sealed class CredentialAndBudgetTests
     [TestMethod]
     public void UpperBoundReservationUsesPeakRatesRoundedConservatively()
     {
-        var bound = EvaluationBudget.UpperBoundUsd(8192, 256, 0.30m, 1.20m);
+        var profile = CandidateRegistry.Select(CandidateRegistry.Default, "DeepSeek-V4.1-Flash");
+        var bound = EvaluationBudget.UpperBoundUsd(
+            profile.Bounds.MaxInputTokens,
+            profile.Bounds.MaxOutputTokens,
+            profile.Billing.PeakInputPerMillionTokens,
+            profile.Billing.PeakOutputPerMillionTokens);
 
-        Assert.AreEqual(0.002765m, bound);
+        Assert.AreEqual(0.007373m, bound);
     }
 
     [TestMethod]

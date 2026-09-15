@@ -12,7 +12,7 @@ expected_sdk="10.0.302"
 configuration="Release"
 
 usage() {
-    echo "Usage: bash scripts/ai.sh {setup|check|inspect|probe|conformance|verify-access --profile <id> --max-dispatches <n> --max-spend-usd <amount>|evaluate-eligibility [--live] --profile <id> --max-dispatches <n> --max-spend-usd <amount>|evaluate-translation [--live] --profile <id> --max-dispatches <n> --max-spend-usd <amount>|evaluate-rewriting [--live] --profile <id> --max-dispatches <n> --max-spend-usd <amount>|evaluate-chain-bounds [--live] --profile <id> --max-dispatches <n> --max-spend-usd <amount>|evaluate-report [--live] --profile <id> --max-dispatches <n> --max-spend-usd <amount>}" >&2
+    echo "Usage: bash scripts/ai.sh {setup|check|inspect|probe|conformance|verify-access --profile <id> --max-dispatches <n> --max-spend-usd <amount>|evaluate-eligibility [--live] --profile <id> --max-dispatches <n> --max-spend-usd <amount>|evaluate-translation [--live] --profile <id> --max-dispatches <n> --max-spend-usd <amount>|evaluate-rewriting [--live] --profile <id> --max-dispatches <n> --max-spend-usd <amount>|evaluate-chain-bounds [--live] --profile <id> --max-dispatches <n> --max-spend-usd <amount>|evaluate-report [--live] --profile <id> --max-dispatches <n> --max-spend-usd <amount>|evaluate-batch [--live] --corpus <path> --profile <id> --judge-profile <id> --max-dispatches <n> --max-spend-usd <amount> [--calibration <path>] [--review-seed <value>] [--serving-scope <quiescent|shared-concurrent>] [--deadline-ms <n>]|calibrate-judge [--live] --dev-corpus <path> [--candidate-profile <id>] [--judge-profile <id>] --max-dispatches <n> --max-spend-usd <amount> [--deadline-ms <n>] [--eligibility-timeout-ms <n>] [--transformation-timeout-ms <n>] --output-dir <dir>}" >&2
 }
 
 require_command() {
@@ -45,6 +45,8 @@ run_offline() {
         -u LINGUADESK_AIEVALUATION__CREDENTIALS__DEEPSEEK_SECONDARY__APIKEY \
         -u LINGUADESK_AIEVALUATION__CREDENTIALS__OPENAI__APIKEY \
         -u LINGUADESK_AIEVALUATION__CREDENTIALS__MUSE_SPARK__APIKEY \
+        -u LINGUADESK_AIEVALUATION__CREDENTIALS__MUSE__APIKEY \
+        -u LINGUADESK_AIEVALUATION__CREDENTIALS__JUDGMENT__APIKEY \
         HTTP_PROXY=http://127.0.0.1:1 \
         HTTPS_PROXY=http://127.0.0.1:1 \
         ALL_PROXY=http://127.0.0.1:1 \
@@ -233,6 +235,20 @@ case "$mode" in
             run_live evaluate-report "$@"
         else
             run_offline dotnet "$runner_dll" evaluate-report "$@"
+        fi
+        ;;
+    evaluate-batch)
+        if [ "${1:-}" = "--live" ]; then
+            run_live evaluate-batch "$@"
+        else
+            run_offline dotnet "$runner_dll" evaluate-batch "$@"
+        fi
+        ;;
+    calibrate-judge)
+        if [ "${1:-}" = "--live" ]; then
+            run_live calibrate-judge "$@"
+        else
+            run_offline dotnet "$runner_dll" calibrate-judge "$@"
         fi
         ;;
     *)

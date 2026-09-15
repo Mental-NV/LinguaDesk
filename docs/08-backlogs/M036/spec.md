@@ -6,7 +6,7 @@ Sources: [context manifest](context.json); [backlog](backlog.md).
 
 Included: one budgeted live evaluation of frozen release-corpus batch B1
 (24 cases, schema `corpus-b1.v1`, sha256
-`aebdc2dc482487d726a55953f9de1a46d66aa09b6693e353696d50e16cb83012`)
+`245b8f76df8f2dd10c5d7177d7679cf87d17c817a135950eba0947a72bd7a4cc`)
 through candidate `DeepSeek-V4.1-Flash` (`deepseek-flash`,
 `https://api.deepseek.com`, CredentialRef `deepseek`), primary-only
 (candidate-only evaluation disables fallback rescue per §5.4; no
@@ -45,9 +45,9 @@ thinking-mode, context-limit or price qualification.
 
 | AC | Observable success/failure/boundary | Upstream source/ID |
 | --- | --- | --- |
-| AC-001 | The run consumes exactly the frozen B1 revision: content hash verified equal to `aebdc2dc…` before dispatch; any mismatch blocks the run; any post-freeze case change would require a new reviewed batch revision, never a silent edit | M035 freeze record; verification §5.1/5.4 |
+| AC-001 | The run consumes exactly the frozen B1 revision: content hash verified equal to `245b8f76…` before dispatch; any mismatch blocks the run; any post-freeze case change would require a new reviewed batch revision, never a silent edit | M035 freeze record plus the recorded owner-requested M036 re-pin; verification §5.1/5.4 |
 | AC-002 | All 24 cases execute live through the production pipeline under the admitted budget (dispatches, spend, §6 stage timeouts + finalization reserve); every observation row is labeled `live_qualification` with attempts, stage durations, token usage, reserved/actual/unresolved exposure and deterministic findings; zero fixture/scripted rows; per-run budget never exceeded; serving quiescence (or shared-scope concurrency) recorded | AI §5.2/5.4/6; verification §5.0/7.2; V-008 |
-| AC-003 | Every successful quality output carries an AI grade from the pinned judge configuration and grading prompt with blinded candidate labels and recorded judge identity/limitations; calibration against human-labeled development examples is recorded; a missing/invalid grade stays unresolved and blocks the disposition — it is never silently defaulted or retried unboundedly | Verification §5.2/5.3; V-013 |
+| AC-003 | Every successful quality output carries an AI grade from the pinned judge configuration and grading prompt with blinded candidate labels and recorded judge identity/limitations; calibration against independently labeled development examples (human or frontier-LLM reviewer independent of candidate and judge, identity/competence recorded) is recorded; a missing/invalid grade stays unresolved and blocks the disposition — it is never silently defaulted or retried unboundedly | Verification §5.2/5.3; V-013 |
 | AC-004 | Human review covers a seeded sample recorded before seeing results (12 of 24, stratified across scripts, lengths and fidelity risks, both Chinese scripts included) plus every critical-error flag, unusable output, eligibility mismatch and grader/deterministic disagreement; Translation reviewers understand source and target, Rewriting reviewers are fluent; a second qualified reviewer adjudicates disputes and confirms every suspected critical error; identity/competence, override rationale and unresolved findings are stored; an unresolved critical flag fails the batch | Verification §5.3; PRD Section 8 |
 | AC-005 | One versioned report per §7.2 (case IDs, corpus hash, code/SDK/prompt/validator/settings revisions, candidate/profile/adapter/model/endpoint identity, CredentialRef + presence only, billing snapshot, selection/concurrency/timestamps, per-case outcomes, per-route/language aggregation with mode breakdowns, critical-error tracking, spend/exposure totals); no key, header, env dump, fingerprint, raw provider body, hidden reasoning, cached replay or production text; runner response reuse disabled | Verification §7.2; AI §9.2; V-013 |
 | AC-006 | An explicit review disposition is recorded (bounded-batch evidence accepted / accepted-with-findings / failed with retained failures); failures and reruns are retained, never discarded; no per-direction 90% qualification is claimed at n=1; the gap to full corpus, full human coverage and G1 is stated with successor work identified | Verification §5.4/7.3; V-013 |
@@ -72,5 +72,9 @@ live run); bilingual/fluent reviewers + adjudicator complete T004
 weakened-ground-truth limitation before T002 (M035 waiver carries
 forward: AI-approved references grade AI outputs — reviewers must
 re-validate suspect reference notes rather than assume the model is
-wrong). Unavailable reviewers block T004; only an explicit owner
-decision (as in M035) can waive a gate, never silence.
+wrong). T003 calibration reviewers waived 2026-09-15 by explicit owner
+decision: an independent frontier LLM (independent of candidate and
+judge, identity/competence recorded) may label the development set;
+T004 human review is NOT waived. Unavailable reviewers block T004;
+only an explicit owner decision (as in M035) can waive a gate, never
+silence.

@@ -86,9 +86,9 @@ public static class EligibilityPipeline
         {
             throw;
         }
-        catch (Exception)
+        catch (Exception exception)
         {
-            return FailedOutcome("provider-failure");
+            return FailedOutcome(ChatCompletionsAdapter.FailureCategory(exception));
         }
 
         if (string.IsNullOrWhiteSpace(responseText))

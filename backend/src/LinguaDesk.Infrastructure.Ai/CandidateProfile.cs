@@ -1,11 +1,21 @@
 namespace LinguaDesk.Infrastructure.Ai;
 
+public sealed record ReasoningConfiguration(
+    string Mode,
+    string? Effort);
+
 public sealed record EffectiveSettings(
     double Temperature,
     double? TopP,
     bool HasTools,
-    string Thinking,
-    bool JsonResponseMode);
+    ReasoningConfiguration Reasoning,
+    bool JsonResponseMode)
+{
+    public string Thinking =>
+        string.Equals(Reasoning.Mode, CandidateProfile.DisabledReasoningMode, StringComparison.Ordinal)
+            ? CandidateProfile.DisabledReasoningMode
+            : Reasoning.Effort ?? Reasoning.Mode;
+}
 
 public sealed record ContextBounds(
     int MaxOutputTokens,
@@ -33,7 +43,9 @@ public sealed record CandidateProfile(
     ContextBounds Bounds,
     BillingProfile Billing)
 {
-    public const string RequiredThinkingMode = "disabled";
+    public const string DisabledReasoningMode = "disabled";
+    public const string EffortReasoningMode = "effort";
+    public const string DefaultReasoningEffort = "low";
 
     public void Validate()
     {
@@ -62,7 +74,7 @@ public sealed record CandidateProfile(
 
         if (string.IsNullOrWhiteSpace(CredentialRef))
         {
-            errors.Add("CredentialRef is required and provider-scoped; profiles never carry key material.");
+            errors.Add("CredentialRef is required and purpose-scoped; profiles never carry key material.");
         }
 
         if (Settings is null)
@@ -86,9 +98,39 @@ public sealed record CandidateProfile(
                 errors.Add("Tools must not be requested.");
             }
 
-            if (!string.Equals(Settings.Thinking, RequiredThinkingMode, StringComparison.Ordinal))
+            if (Settings.Reasoning is null)
             {
-                errors.Add("Thinking must be explicitly 'disabled'.");
+                errors.Add("Reasoning configuration is required.");
+            }
+            else if (string.Equals(Settings.Reasoning.Mode, DisabledReasoningMode, StringComparison.Ordinal))
+            {
+                if (Settings.Reasoning.Effort is not null)
+                {
+                    errors.Add("Disabled reasoning must not specify an effort.");
+                }
+
+                if (endpointUri is not null
+                    && string.Equals(endpointUri.Host, "openrouter.ai", StringComparison.OrdinalIgnoreCase))
+                {
+                    errors.Add("OpenRouter profiles must use an explicit reasoning effort.");
+                }
+            }
+            else if (string.Equals(Settings.Reasoning.Mode, EffortReasoningMode, StringComparison.Ordinal))
+            {
+                if (!IsAllowedReasoningEffort(Settings.Reasoning.Effort))
+                {
+                    errors.Add("Reasoning effort must be one of: minimal, low, medium, high, xhigh, max.");
+                }
+
+                if (endpointUri is not null
+                    && string.Equals(endpointUri.Host, "api.deepseek.com", StringComparison.OrdinalIgnoreCase))
+                {
+                    errors.Add("DeepSeek profiles must keep reasoning disabled.");
+                }
+            }
+            else
+            {
+                errors.Add("Reasoning mode must be exactly 'disabled' or 'effort'.");
             }
 
             if (!Settings.JsonResponseMode)
@@ -176,6 +218,9 @@ public sealed record CandidateProfile(
             throw new CandidateProfileException(CandidateId, errors);
         }
     }
+
+    private static bool IsAllowedReasoningEffort(string? effort) =>
+        effort is "minimal" or "low" or "medium" or "high" or "xhigh" or "max";
 }
 
 public sealed class CandidateProfileException : InvalidOperationException

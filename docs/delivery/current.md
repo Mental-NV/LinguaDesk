@@ -8,7 +8,7 @@ Mutable #7 status owner. Read for selection/dependency checks and closeout; do n
 
 | ID | State | Dependency/readiness | Package |
 | --- | --- | --- | --- |
-| M035 | Done under owner waiver (B1 frozen `aebdc2dc…`; 4 human + AI review, 20 independent slots waived) | M020 Done; M036 may consume knowing evidence is weakened | [Package 035](../08-backlogs/M035/spec.md) |
+| M035 | Done under owner waiver (B1 subsequently re-pinned for M036 as `245b8f76…`; 4 human + AI review, 20 independent slots waived) | M020 Done; M036 consumes knowing evidence is weakened | [Package 035](../08-backlogs/M035/spec.md) |
 
 **Next recommended delivery train:** M035 → M036 → M037. M034 removed the account-email access blocker through the explicitly temporary DF-008 substitute; the next uncompleted roadmap work qualifies model quality and then records complete live API performance evidence.
 
@@ -53,4 +53,4 @@ M019 completed the independent-track enabler for the explicit live provider path
 | M033 | Done | [Backlog](../08-backlogs/M033/backlog.md), [spec](../08-backlogs/M033/spec.md), [tasks/evidence](../08-backlogs/M033/tasks.md#completion-record) |
 | M034 | Done | [Backlog](../08-backlogs/M034/backlog.md), [spec](../08-backlogs/M034/spec.md), [tasks/evidence](../08-backlogs/M034/tasks.md#completion-record) |
 
-All roadmap milestones other than completed M001–M034 are Candidate with no selected package and evidence pending. Full product and release evidence remains pending in #6 coverage.
+All roadmap milestones other than completed M001–M034, done-under-waiver M035 and selected M036 are Candidate with no selected package and evidence pending. Full product and release evidence remains pending in #6 coverage.

@@ -140,9 +140,9 @@ public static class RewritingPipeline
         {
             throw;
         }
-        catch (Exception)
+        catch (Exception exception)
         {
-            return FailedOutcome("provider-failure", eligibility, snapshot, mode);
+            return FailedOutcome(ChatCompletionsAdapter.FailureCategory(exception), eligibility, snapshot, mode);
         }
 
         if (response.FinishReason == ChatFinishReason.Length)
