@@ -1,0 +1,140 @@
+{
+  "version": 1,
+  "scope": "M037",
+  "sources": [
+    {
+      "path": "docs/07-roadmap.md",
+      "ids": [
+        "M037"
+      ],
+      "use": "excerpt",
+      "reason": "Selected milestone outcome, exit criterion, prerequisites (M026, M027, M020) and verification basis",
+      "sha256": "6cf00374c086b95907ff7e8a83a9cf8f24e10c76176a54ebea4f528599dccd23"
+    },
+    {
+      "path": "docs/07-roadmap.md",
+      "ids": [
+        "M026",
+        "M027",
+        "M020"
+      ],
+      "use": "reference",
+      "reason": "Dependency rows: real host/accounting pipeline and report conventions reused, not re-proven",
+      "sha256": "b491630338a28694f836ea9b96afb9d16e01cfbcd6beb1f7f856cf8f48d6ebaf"
+    },
+    {
+      "path": "docs/delivery/current.md",
+      "use": "reference",
+      "reason": "Dependency states at planning time (M026/M027/M020 Done; M036 selected on the parallel quality track; G2 needs live workloads)",
+      "sha256": "dff3d10f7824ac606a3299dd3273ca03788278206700ee5637f7a5695b03ed41"
+    },
+    {
+      "path": "docs/01-PRD.md",
+      "heading": "Performance targets",
+      "use": "excerpt",
+      "reason": "NFR-002 percentile targets, overall deadlines and benchmark conditions framing the harness math",
+      "sha256": "70483f429796e772d51abb363e2c1725c3eaaaae811feb441e55212b4d9b9405"
+    },
+    {
+      "path": "docs/01-PRD.md",
+      "ids": [
+        "RG-003",
+        "FR-007"
+      ],
+      "use": "excerpt",
+      "reason": "Performance release gate (failures never timely) and maximum-length bounds scoping the §6.2 successor",
+      "sha256": "0878687c4f93a39858cc2f91b5f747f8ded648410800c0b0933878adf1c662d9"
+    },
+    {
+      "path": "docs/06-verification-plan.md",
+      "heading": "2. Verification layers and check catalog",
+      "use": "excerpt",
+      "reason": "V-014 check-group assertion allocated to M037",
+      "sha256": "21ff32e68c1d2ccb4a9e48f0d6f6ae5b3a2cf56c9d11c522f6ccbe16ccf78aae"
+    },
+    {
+      "path": "docs/verification/llm-evaluation.md",
+      "heading": "6. Performance and workload composition (Q-005)",
+      "use": "excerpt",
+      "reason": "Benchmark execution contract: HTTP/TLS measurement, 360-request composition, timing, denominator, cost/cache cohorts; §6.2 is the explicit successor boundary",
+      "sha256": "e53847d42370c2de93561a62705bf47eee5a43ee50ba61f1ac6919613e7406a3"
+    },
+    {
+      "path": "docs/verification/backend.md",
+      "heading": "3.1 Database, HTTP and published-host harness",
+      "use": "excerpt",
+      "reason": "Owned Kestrel loopback host pattern reused for the rehearsal; TestServer timing is diagnostics only",
+      "sha256": "c493bc0519d9271615893303f036c333d6c38d279a75c1b2863778d944c4e794"
+    },
+    {
+      "path": "docs/verification/readiness.md",
+      "heading": "9. Readiness and remaining dependencies",
+      "use": "reference",
+      "reason": "Q-005 specified-not-measured status and live-successor prerequisites (budgets, capacity) deferred out of the rehearsal",
+      "sha256": "28608d4ed934356e58e932b21948ab948c95ae020d6debe600e35cbf21004e75"
+    },
+    {
+      "path": "docs/product/open-questions.md",
+      "ids": [
+        "Q-005"
+      ],
+      "use": "excerpt",
+      "reason": "Open disposition bounding M037: performance workloads specified, measurements pending",
+      "sha256": "4674418563546e3fc5603df7a63032a9714a062ffd73aa89681d6f28ee46d76b"
+    },
+    {
+      "path": "docs/product/open-questions.md",
+      "ids": [
+        "Q-001",
+        "Q-007"
+      ],
+      "use": "reference",
+      "reason": "Live budget/cap and attempt-policy inputs explicitly untouched by the unpaid rehearsal",
+      "sha256": "4dc61556971d58ac8c0af094159d9c67a2d977507c54b242b54f5d076a912874"
+    },
+    {
+      "path": "docs/08-backlogs/M026/spec.md",
+      "use": "reference",
+      "reason": "Dependency evidence: real host/accounting HTTP boundary with fake provider rehearsed, not re-proven",
+      "sha256": "883ab4c49c18219f9b2bb3426e0dcfc2712df2a2c03811d2f5cecdbecc65a5d7"
+    },
+    {
+      "path": "docs/08-backlogs/M027/spec.md",
+      "use": "reference",
+      "reason": "Dependency evidence: rewrite pipeline boundary the rehearsal workload covers",
+      "sha256": "bf63e38fdb3af0d8047228acbd343dcec5b151915c2322961d2d1e71be4d4d11"
+    },
+    {
+      "path": "docs/08-backlogs/M020/spec.md",
+      "use": "reference",
+      "reason": "Dependency evidence: versioned combined-report conventions reused for the rehearsal report",
+      "sha256": "95d2a0480e07265138a3991adfeab704287c771bbdd427da39f68b674f93799d"
+    },
+    {
+      "path": "backend/tools/LinguaDesk.Ai.Evaluation/README.md",
+      "use": "reference",
+      "reason": "Existing runner surface the benchmark tool complements; verifies no HTTP benchmark path exists yet",
+      "sha256": "8f6d1ff2b2297cb615e8fd574c32559aaf3f01b547a7098614d579464ed251b4"
+    },
+    {
+      "path": "backend/tools/LinguaDesk.Ai.Evaluation/Program.cs",
+      "use": "reference",
+      "reason": "Command dispatcher evidence: pipeline-direct commands only, no real-API timing path",
+      "sha256": "8a95ac94eaa420ad9334afc7dfeaf3b917088a5e8ea72a9c79fa15c6f90db8ba"
+    },
+    {
+      "path": "scripts/backend.sh",
+      "use": "reference",
+      "reason": "Check/smoke surface reused for regression gates and the planned benchmark entry point",
+      "sha256": "e7d3756eef73d060b6e7b293fc342ceda5dfbad0f074be8f806c16c25ba10cea"
+    }
+  ],
+  "source_map_sha256": "1ce3af52aadac6755dcdd6e0bccd13c06a3553495f2716fd5a22ae60d2142d37",
+  "baseline_commit": "13eefe08eff70c289edea0881855ab2125bc4e23",
+  "locked_files": {
+    "docs/00-SDD-Planning-Workflow.md": "5ccca040d0f0d50fac47632643306e7224a8d2e5460df0958e7e7c333146db89",
+    "docs/00-workflow/execution.md": "f362a1384cefef24ba204e0723e3190857c8cca9bcd91908136932e19c5caf02",
+    "docs/08-backlogs/M037/spec.md": "2da1a80be4e6739f2422b1f3cfdb4a17a0da45b64e849b5525ef3b9794f33d17",
+    "docs/08-backlogs/M037/plan.md": "590546dfd352ed02f5f17706716707f92ef421b866ed98d78854bedacd984c97"
+  }
+}
