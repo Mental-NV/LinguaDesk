@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../../src/LinguaDesk.Core/LinguaDesk.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Manifest/m037-rehearsal-24.json" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="Composition/full-360-rules.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+</Project>

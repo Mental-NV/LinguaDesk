@@ -2,7 +2,7 @@
 
 Mutable #7 status owner. Read for selection/dependency checks and closeout; do not include in the stable execution prefix.
 
-**Most recently completed milestone: [M043 — Serve live translation/rewriting in the portal with bounded spend](../08-backlogs/M043/backlog.md).** State: **Done**. [Package 043](../08-backlogs/M043/spec.md) AC-001–007 passed: verified Translate/Rewrite serve through primary-only `DeepSeek-V4.1-Flash` chains under the $0.05-per-operation ceiling, `run` refuses to start unconfigured, and the opt-in live API + real-login browser suites prove the portal path end-to-end without entering default gates. Quality/performance qualification stays with M036+/M037 and release gates. Its [completion record](../08-backlogs/M043/tasks.md#completion-record) owns the exact evidence.
+**Most recently completed milestone: [M037 — Make API performance measurable](../08-backlogs/M037/backlog.md).** State: **Done**. [Package 037](../08-backlogs/M037/spec.md) AC-001–006 passed: the real-API benchmark harness (`LinguaDesk.Api.Benchmark` plus `scripts/backend.sh benchmark`, 34 unit tests) drove the declared 24-request rehearsal through the owned loopback host with real auth and durable settlement, recording submission-to-complete-body timings, full-denominator counts, nearest-rank percentiles, first-seen/repeated plus unknown cache cohorts, and a versioned section 6.1 report with zero paid dispatches. The rehearsal proves recording fidelity only — NFR-002 compliance, the 360-request live workload, section 6.2 evidence, quality qualification and G2 stay pending. Its [completion record](../08-backlogs/M037/tasks.md#completion-record) owns the exact evidence.
 
 ## Selected milestone
 
@@ -53,5 +53,6 @@ M019 completed the independent-track enabler for the explicit live provider path
 | M033 | Done | [Backlog](../08-backlogs/M033/backlog.md), [spec](../08-backlogs/M033/spec.md), [tasks/evidence](../08-backlogs/M033/tasks.md#completion-record) |
 | M034 | Done | [Backlog](../08-backlogs/M034/backlog.md), [spec](../08-backlogs/M034/spec.md), [tasks/evidence](../08-backlogs/M034/tasks.md#completion-record) |
 | M043 | Done | [Backlog](../08-backlogs/M043/backlog.md), [spec](../08-backlogs/M043/spec.md), [tasks/evidence](../08-backlogs/M043/tasks.md#completion-record) |
+| M037 | Done | [Backlog](../08-backlogs/M037/backlog.md), [spec](../08-backlogs/M037/spec.md), [tasks/evidence](../08-backlogs/M037/tasks.md#completion-record) |
 
-All roadmap milestones other than completed M001–M034 and M043, done-under-waiver M035 and selected M036 are Candidate with no selected package and evidence pending. Full product and release evidence remains pending in #6 coverage.
+All roadmap milestones other than completed M001–M034, M037 and M043, done-under-waiver M035 and selected M036 are Candidate with no selected package and evidence pending. Full product and release evidence remains pending in #6 coverage.

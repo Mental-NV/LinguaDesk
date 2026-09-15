@@ -32,6 +32,13 @@ bash scripts/backend.sh run
 # and terminate the process and temporary output it owns within 30 seconds.
 bash scripts/backend.sh smoke
 
+# Unpaid API benchmark rehearsal (M037): start the owned loopback Smoke host
+# on isolated storage, run the 24-request workload at 4 concurrent operations
+# through real auth and settlement, audit composition, and write the versioned
+# section 6.1 report to artifacts/benchmark/. Credential environment is
+# stripped first, so it passes with no provider keys and zero paid dispatches.
+bash scripts/backend.sh benchmark
+
 # Opt-in live serving proof (owner-authorized, bounded spend): with
 # LINGUADESK_E2E_LIVE=1 and the DeepSeek key present, boot the API with
 # serving config on a temp database and prove Translate en->ru against real

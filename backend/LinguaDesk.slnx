@@ -8,8 +8,10 @@
     <Project Path="tests/LinguaDesk.Api.Tests/LinguaDesk.Api.Tests.csproj" />
     <Project Path="tests/LinguaDesk.Core.Tests/LinguaDesk.Core.Tests.csproj" />
     <Project Path="tests/LinguaDesk.Infrastructure.Ai.Tests/LinguaDesk.Infrastructure.Ai.Tests.csproj" />
+    <Project Path="tests/LinguaDesk.Api.Benchmark.Tests/LinguaDesk.Api.Benchmark.Tests.csproj" />
   </Folder>
   <Folder Name="/tools/">
     <Project Path="tools/LinguaDesk.Ai.Evaluation/LinguaDesk.Ai.Evaluation.csproj" />
+    <Project Path="tools/LinguaDesk.Api.Benchmark/LinguaDesk.Api.Benchmark.csproj" />
   </Folder>
 </Solution>

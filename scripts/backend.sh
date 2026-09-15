@@ -9,13 +9,16 @@ api_project="$repository_root/backend/src/LinguaDesk.Api/LinguaDesk.Api.csproj"
 api_test_project="$repository_root/backend/tests/LinguaDesk.Api.Tests/LinguaDesk.Api.Tests.csproj"
 core_test_project="$repository_root/backend/tests/LinguaDesk.Core.Tests/LinguaDesk.Core.Tests.csproj"
 ai_test_project="$repository_root/backend/tests/LinguaDesk.Infrastructure.Ai.Tests/LinguaDesk.Infrastructure.Ai.Tests.csproj"
+benchmark_project="$repository_root/backend/tools/LinguaDesk.Api.Benchmark/LinguaDesk.Api.Benchmark.csproj"
+benchmark_test_project="$repository_root/backend/tests/LinguaDesk.Api.Benchmark.Tests/LinguaDesk.Api.Benchmark.Tests.csproj"
 expected_sdk="10.0.302"
 expected_minimum_api_tests=89
 expected_minimum_core_tests=8
+expected_minimum_benchmark_tests=34
 configuration="Release"
 
 usage() {
-    echo "Usage: bash scripts/backend.sh {setup|check|run|smoke|e2e-live}" >&2
+    echo "Usage: bash scripts/backend.sh {setup|check|run|smoke|benchmark|e2e-live}" >&2
 }
 
 is_blank_value() {
@@ -144,8 +147,9 @@ check() {
     api_report="$results_directory/backend-api.trx"
     core_report="$results_directory/backend-core.trx"
     ai_report="$results_directory/backend-ai.trx"
+    benchmark_report="$results_directory/backend-benchmark.trx"
     mkdir -p "$results_directory"
-    rm -f "$api_report" "$core_report" "$ai_report"
+    rm -f "$api_report" "$core_report" "$ai_report" "$benchmark_report"
 
     dotnet build "$solution" --configuration "$configuration" --no-restore
     dotnet test "$api_test_project" \
@@ -172,6 +176,12 @@ check() {
         --no-restore \
         --logger "trx;LogFileName=backend-ai.trx" \
         --results-directory "$results_directory"
+    dotnet test "$benchmark_test_project" \
+        --configuration "$configuration" \
+        --no-build \
+        --no-restore \
+        --logger "trx;LogFileName=backend-benchmark.trx" \
+        --results-directory "$results_directory"
 
     validate_report "$api_report" "API/storage" "$expected_minimum_api_tests"
     validate_class_count "$api_report" "LinguaDesk.Api.Tests.AccountRegistrationTests" 10 "account registration"
@@ -183,6 +193,7 @@ check() {
     validate_class_count "$api_report" "LinguaDesk.Api.Tests.StorageMigrationTests" 7 "storage migration"
     validate_report "$core_report" "Core input policy" "$expected_minimum_core_tests"
     validate_report "$ai_report" "independent AI" 1
+    validate_report "$benchmark_report" "API benchmark harness" "$expected_minimum_benchmark_tests"
 
     api_total=$(counter_value "$api_report" total)
     api_passed=$(counter_value "$api_report" passed)
@@ -196,16 +207,21 @@ check() {
     ai_passed=$(counter_value "$ai_report" passed)
     ai_failed=$(counter_value "$ai_report" failed)
     ai_skipped=$(counter_value "$ai_report" notExecuted)
+    benchmark_total=$(counter_value "$benchmark_report" total)
+    benchmark_passed=$(counter_value "$benchmark_report" passed)
+    benchmark_failed=$(counter_value "$benchmark_report" failed)
+    benchmark_skipped=$(counter_value "$benchmark_report" notExecuted)
 
-    total=$((api_total + core_total + ai_total))
-    passed=$((api_passed + core_passed + ai_passed))
-    failed=$((api_failed + core_failed + ai_failed))
-    skipped=$((api_skipped + core_skipped + ai_skipped))
+    total=$((api_total + core_total + ai_total + benchmark_total))
+    passed=$((api_passed + core_passed + ai_passed + benchmark_passed))
+    failed=$((api_failed + core_failed + ai_failed + benchmark_failed))
+    skipped=$((api_skipped + core_skipped + ai_skipped + benchmark_skipped))
 
     echo "Backend check passed: $total total, $passed passed, $failed failed, $skipped skipped."
     echo "API/storage report ($api_total tests): $api_report"
     echo "Core input policy report ($core_total tests): $core_report"
     echo "Independent AI report ($ai_total tests): $ai_report"
+    echo "API benchmark harness report ($benchmark_total tests): $benchmark_report"
 }
 
 validate_class_count() {
@@ -413,6 +429,188 @@ smoke() {
     done
 
     echo "Backend liveness/readiness smoke passed on an OS-assigned loopback port."
+}
+
+benchmark() {
+    check_sdk
+    require_command curl
+    require_command pkill
+    require_command python3
+
+    benchmark_deadline=$((SECONDS + 600))
+    benchmark_directory=$(mktemp -d "${TMPDIR:-/tmp}/linguadesk-benchmark.XXXXXX")
+    benchmark_log="$benchmark_directory/host.log"
+    benchmark_process_id=""
+    benchmark_readiness_probes=0
+
+    cleanup_benchmark() {
+        exit_code=$?
+        trap - EXIT INT TERM HUP
+        if [ -n "$benchmark_process_id" ] && kill -0 "$benchmark_process_id" >/dev/null 2>&1; then
+            terminate_owned_process "$benchmark_process_id"
+        fi
+        rm -rf "$benchmark_directory"
+        exit "$exit_code"
+    }
+
+    trap cleanup_benchmark EXIT
+    trap 'exit 130' INT
+    trap 'exit 143' TERM
+    trap 'exit 129' HUP
+
+    run_before_deadline "$benchmark_deadline" restore dotnet restore "$solution" --locked-mode
+    run_before_deadline "$benchmark_deadline" tool-restore dotnet tool restore
+    run_before_deadline "$benchmark_deadline" build dotnet build "$solution" --configuration "$configuration" --no-restore
+
+    benchmark_database="$benchmark_directory/linguadesk.db"
+    benchmark_keys="$benchmark_directory/keys"
+    mkdir -p "$benchmark_keys"
+    run_before_deadline "$benchmark_deadline" migration dotnet ef database update \
+        --project "$api_project" \
+        --startup-project "$api_project" \
+        --configuration "$configuration" \
+        --no-build \
+        -- \
+        --database-path "$benchmark_database"
+    python3 - "$benchmark_database" <<'EOF'
+import sqlite3, sys
+handle = sqlite3.connect(sys.argv[1])
+try:
+    mode = handle.execute("PRAGMA journal_mode=WAL;").fetchone()
+    print(f"Benchmark scratch database journal mode: {mode[0]}")
+finally:
+    handle.close()
+EOF
+
+    api_dll="$repository_root/backend/src/LinguaDesk.Api/bin/$configuration/net10.0/LinguaDesk.Api.dll"
+    benchmark_tool_dll="$repository_root/backend/tools/LinguaDesk.Api.Benchmark/bin/$configuration/net10.0/LinguaDesk.Api.Benchmark.dll"
+    benchmark_instance_id=${LINGUADESK_BENCHMARK_INSTANCE_ID:-linguadesk-benchmark-$$}
+    ASPNETCORE_ENVIRONMENT=Smoke \
+        ASPNETCORE_URLS=http://127.0.0.1:0 \
+        Storage__DatabasePath="$benchmark_database" \
+        Security__DataProtectionKeysPath="$benchmark_keys" \
+        MonetaryAdmission__MonthlyCapMinorUnits="1000000" \
+        MonetaryAdmission__Currency="USD" \
+        dotnet "$api_dll" --LinguaDeskSmokeInstanceId="$benchmark_instance_id" >"$benchmark_log" 2>&1 &
+    benchmark_process_id=$!
+
+    listen_url=""
+    while [ "$SECONDS" -lt "$benchmark_deadline" ]; do
+        if ! kill -0 "$benchmark_process_id" >/dev/null 2>&1; then
+            echo "Benchmark host exited before it became ready." >&2
+            sed -n '1,120p' "$benchmark_log" >&2
+            return 1
+        fi
+
+        listen_url=$(grep -Eo 'http://127\.0\.0\.1:[0-9]+' "$benchmark_log" | tail -1 || true)
+        if [ -n "$listen_url" ]; then
+            break
+        fi
+        sleep 0.1
+    done
+
+    if [ -z "$listen_url" ]; then
+        echo "Benchmark host did not publish a loopback listening address before timeout." >&2
+        sed -n '1,120p' "$benchmark_log" >&2
+        return 1
+    fi
+
+    # Host-readiness probes are predeclared here and reported separately;
+    # they are never counted as measured benchmark requests.
+    for probe_path in /health/live /health/ready; do
+        while [ "$SECONDS" -lt "$benchmark_deadline" ]; do
+            benchmark_readiness_probes=$((benchmark_readiness_probes + 1))
+            probe_code=$(curl \
+                --silent \
+                --show-error \
+                --max-time 2 \
+                --output /dev/null \
+                --write-out '%{http_code}' \
+                "$listen_url$probe_path" || true)
+            if [ "$probe_code" = "200" ]; then
+                break
+            fi
+            if ! kill -0 "$benchmark_process_id" >/dev/null 2>&1; then
+                echo "Benchmark host exited during readiness probing." >&2
+                sed -n '1,120p' "$benchmark_log" >&2
+                return 1
+            fi
+            sleep 0.2
+        done
+        if [ "$probe_code" != "200" ]; then
+            echo "Benchmark readiness probe $probe_path failed before timeout." >&2
+            return 1
+        fi
+    done
+
+    benchmark_stamp=$(date -u +%Y%m%dT%H%M%SZ)
+    benchmark_report_dir="$repository_root/artifacts/benchmark"
+    mkdir -p "$benchmark_report_dir"
+    benchmark_report_path="$benchmark_report_dir/m037-rehearsal-$benchmark_stamp.json"
+    benchmark_email="m037-benchmark-$benchmark_stamp-$RANDOM@example.test"
+    benchmark_password="m037-benchmark-pass-01"
+
+    # Credential environment stripped and proxies dead-ended (loopback
+    # bypassed): the unpaid rehearsal must pass with no provider keys and no
+    # network path to any provider.
+    rehearse_status=0
+    env \
+        -u OPENAI_API_KEY \
+        -u AZURE_OPENAI_API_KEY \
+        -u ANTHROPIC_API_KEY \
+        -u DEEPSEEK_API_KEY \
+        -u GOOGLE_API_KEY \
+        -u GEMINI_API_KEY \
+        -u MISTRAL_API_KEY \
+        -u COHERE_API_KEY \
+        -u LINGUADESK_AIEVALUATION__CREDENTIALS__DEEPSEEK__APIKEY \
+        -u LINGUADESK_AIEVALUATION__CREDENTIALS__DEEPSEEK_SECONDARY__APIKEY \
+        -u LINGUADESK_AIEVALUATION__CREDENTIALS__OPENAI__APIKEY \
+        -u LINGUADESK_AIEVALUATION__CREDENTIALS__MUSE_SPARK__APIKEY \
+        -u LINGUADESK_AIEVALUATION__CREDENTIALS__MUSE__APIKEY \
+        -u LINGUADESK_AIEVALUATION__CREDENTIALS__JUDGMENT__APIKEY \
+        HTTP_PROXY=http://127.0.0.1:1 \
+        HTTPS_PROXY=http://127.0.0.1:1 \
+        ALL_PROXY=http://127.0.0.1:1 \
+        http_proxy=http://127.0.0.1:1 \
+        https_proxy=http://127.0.0.1:1 \
+        all_proxy=http://127.0.0.1:1 \
+        NO_PROXY=127.0.0.1,localhost \
+        no_proxy=127.0.0.1,localhost \
+        dotnet "$benchmark_tool_dll" rehearse \
+            --base-url "$listen_url" \
+            --email "$benchmark_email" \
+            --password "$benchmark_password" \
+            --manifest "$repository_root/backend/tools/LinguaDesk.Api.Benchmark/Manifest/m037-rehearsal-24.json" \
+            --rules "$repository_root/backend/tools/LinguaDesk.Api.Benchmark/Composition/full-360-rules.json" \
+            --output "$benchmark_report_path" \
+            --code-revision "$(git -C "$repository_root" rev-parse HEAD)" \
+            --sdk "$(dotnet --version)" \
+            --readiness-probes "$benchmark_readiness_probes" || rehearse_status=$?
+    if [ "$rehearse_status" -ne 0 ]; then
+        echo "Benchmark rehearsal failed with exit $rehearse_status." >&2
+        sed -n '1,120p' "$benchmark_log" >&2
+        return "$rehearse_status"
+    fi
+
+    LINGUADESK_BENCHMARK_REPORT="$benchmark_report_path" python3 - <<'EOF'
+import json, os
+report = json.load(open(os.environ["LINGUADESK_BENCHMARK_REPORT"]))
+assert report.get("kind") == "benchmark_rehearsal_report", report.get("kind")
+assert report.get("status") == "complete", report.get("auditViolations")
+assert len(report.get("observations", [])) == 24, len(report.get("observations", []))
+assert report.get("deployment", {}).get("credentialPresent") is False
+assert report.get("deployment", {}).get("paidDispatches") == 0
+assert report.get("exposure", {}).get("paidDispatches") == 0
+print("Benchmark rehearsal report holds 24 measured requests with zero paid dispatches.")
+EOF
+
+    terminate_owned_process "$benchmark_process_id"
+    benchmark_process_id=""
+    trap - EXIT INT TERM HUP
+    rm -rf "$benchmark_directory"
+
+    echo "Benchmark rehearsal passed: $benchmark_report_path"
 }
 
 live_uuid7() {
@@ -678,6 +876,7 @@ case "$1" in
     check) check ;;
     run) run ;;
     smoke) smoke ;;
+    benchmark) benchmark ;;
     e2e-live) e2e_live ;;
     *)
         usage

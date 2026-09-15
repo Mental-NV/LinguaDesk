@@ -1,0 +1,19 @@
+{
+  "schemaRevision": "benchmark-rules.v1",
+  "workloadName": "section-6.1-live-percentile-workload",
+  "note": "Normative section 6.1 composition rules the benchmark harness enforces for the successor live workload. The M037 rehearsal manifest maps each rule to its scaled analogue or an explicit successor-only deferral.",
+  "rules": [
+    { "id": "R1", "rule": "Run 360 measured requests for each candidate-family configuration, and for each deployed chain with a distinct configuration." },
+    { "id": "R2", "rule": "Run at ten concurrent operations; keep ten operations in flight while work remains and disclose the final drain." },
+    { "id": "R3", "rule": "Translation has 30 requests per direction; rewriting has ten per language/mode cell." },
+    { "id": "R4", "rule": "Use equal length bands of 1-100, 101-500 and 501-1000 canonical characters across each family (120 requests per band)." },
+    { "id": "R5", "rule": "Use 180 distinct source/settings combinations and repeat each once with a fresh submission identity: 15 distinct per translation direction or five per rewriting language/mode cell. Allocate 60 distinct cases to each length band, rotating the extra case across rewriting cells." },
+    { "id": "R6", "rule": "Balance automatic/manual source selection and Chinese scripts across the run. Interleave requests with a recorded seed; never use replay of an already completed operation as a fast generation sample." },
+    { "id": "R7", "rule": "Observe provider cache usage; first-seen inputs are not proof of cold provider cache. Report first-seen/repeated and observed hit/miss/unknown cohorts, including insufficient evidence for a cache condition. Disable application/runner response reuse; provider-managed caching remains allowed." },
+    { "id": "R8", "rule": "No paid warm-up cases are silently discarded. Establish host readiness before measurements; record any predeclared initialization requests/cost separately. Arrange verified test accounts, sufficient genuine daily/global capacity and a finite paid-run budget before starting; do not disable allowance enforcement. If setup exhausts quota/budget, retain outcomes and label the run incomplete/invalid for qualification rather than dropping those requests." },
+    { "id": "R9", "rule": "Start each duration on API submission and stop when the complete response body arrives; serving must already have committed success. Standalone runner/SDK timing, TestServer timing, mocked API responses and browser rendering time are separate diagnostics." },
+    { "id": "R10", "rule": "Report complete-success counts within the time target, failures/timeouts, p50/p95 using nearest rank, per-route/language/mode distributions, admission/eligibility/transformation/settlement durations, and cost/cache cohorts. For target assessment unsuccessful requests are not timely completions (infinite effective latency or an equivalent full-denominator calculation). Do not claim a pass from successful-only percentiles. Apply the percentile target separately to translation and full rewriting." },
+    { "id": "R11", "rule": "Record deployment hardware/region, configuration, network location and provider identity. Preserve all observations." },
+    { "id": "R12", "rule": "Keep inputs within the benchmark bound (at most 1000 characters). Maximum-length, fallback and controlled-fault deadline evidence belongs to section 6.2, outside the percentile workload." }
+  ]
+}

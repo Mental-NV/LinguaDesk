@@ -1,10 +1,10 @@
 # M037 — Make API performance measurable
-Status: selected
+Status: implemented
 Milestone: [M037 — Make API performance measurable](../../07-roadmap.md#46-bounded-evidence-and-release-preparation)
 
 | Item | Outcome/value | Priority | Dependencies/blockers | State | Selected scope |
 | --- | --- | --- | --- | --- | --- |
-| BI-037 | A bounded workload rehearsal proves the real-API benchmark harness records the required timings, denominators, counts and cost/cache distinctions | Must | M026, M027, M020 (all Done, evidence in delivery/current.md); no blockers | selected | [spec](spec.md) |
+| BI-037 | A bounded workload rehearsal proves the real-API benchmark harness records the required timings, denominators, counts and cost/cache distinctions | Must | M026, M027, M020 (all Done, evidence in delivery/current.md); no blockers | implemented | [spec](spec.md) |
 
 Acceptance summary: a small unpaid rehearsal (24 requests at 4 concurrent
 operations through an owned loopback Kestrel host with real auth, migrated

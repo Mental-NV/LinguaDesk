@@ -26,7 +26,7 @@
       "path": "docs/delivery/current.md",
       "use": "reference",
       "reason": "Dependency states at planning time (M026/M027/M020 Done; M036 selected on the parallel quality track; G2 needs live workloads)",
-      "sha256": "dff3d10f7824ac606a3299dd3273ca03788278206700ee5637f7a5695b03ed41"
+      "sha256": "d11800319aaa10a2a5045dc7862597de832f530f8b220f3420caf74f2493a7f2"
     },
     {
       "path": "docs/01-PRD.md",
@@ -126,11 +126,11 @@
       "path": "scripts/backend.sh",
       "use": "reference",
       "reason": "Check/smoke surface reused for regression gates and the planned benchmark entry point",
-      "sha256": "e7d3756eef73d060b6e7b293fc342ceda5dfbad0f074be8f806c16c25ba10cea"
+      "sha256": "7996c039d13970805df6181bfc879e4acfc9836b1cb98d93a5693fa5ddcc30ab"
     }
   ],
   "source_map_sha256": "1ce3af52aadac6755dcdd6e0bccd13c06a3553495f2716fd5a22ae60d2142d37",
-  "baseline_commit": "13eefe08eff70c289edea0881855ab2125bc4e23",
+  "baseline_commit": "ec1a3e5461181ab2946db1031f930549e1d98bd1",
   "locked_files": {
     "docs/00-SDD-Planning-Workflow.md": "5ccca040d0f0d50fac47632643306e7224a8d2e5460df0958e7e7c333146db89",
     "docs/00-workflow/execution.md": "f362a1384cefef24ba204e0723e3190857c8cca9bcd91908136932e19c5caf02",

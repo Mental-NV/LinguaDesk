@@ -1,0 +1,85 @@
+{
+  "schemaRevision": "benchmark-manifest.v1",
+  "workloadName": "m037-rehearsal-24",
+  "scale": "1/15 of the section 6.1 percentile workload: 24 of 360 measured requests",
+  "concurrency": 4,
+  "interleaveSeed": 37037,
+  "targetMs": 10000,
+  "lengthBands": [
+    { "id": "band-1-100", "minCanonicalChars": 1, "maxCanonicalChars": 100 },
+    { "id": "band-101-500", "minCanonicalChars": 101, "maxCanonicalChars": 500 },
+    { "id": "band-501-1000", "minCanonicalChars": 501, "maxCanonicalChars": 1000 }
+  ],
+  "translation": {
+    "directions": [
+      {
+        "from": "en",
+        "to": "zh",
+        "combos": [
+          { "id": "t-enzh-b1", "band": "band-1-100", "targetLength": 64, "sourceSelection": "auto", "baseId": "en-schedule" },
+          { "id": "t-enzh-b2", "band": "band-101-500", "targetLength": 320, "sourceSelection": "en", "baseId": "en-report" },
+          { "id": "t-enzh-b3", "band": "band-501-1000", "targetLength": 800, "sourceSelection": "auto", "baseId": "en-courier" }
+        ]
+      },
+      {
+        "from": "zh",
+        "to": "ru",
+        "combos": [
+          { "id": "t-zhru-b1", "band": "band-1-100", "targetLength": 60, "sourceSelection": "auto", "baseId": "zh-simp-notice" },
+          { "id": "t-zhru-b2", "band": "band-101-500", "targetLength": 300, "sourceSelection": "auto", "baseId": "zh-trad-notice" },
+          { "id": "t-zhru-b3", "band": "band-501-1000", "targetLength": 768, "sourceSelection": "auto", "baseId": "zh-simp-memo" }
+        ]
+      }
+    ]
+  },
+  "rewriting": {
+    "cells": [
+      {
+        "language": "en",
+        "mode": "correctionOnly",
+        "combos": [
+          { "id": "r-enco-b1", "band": "band-1-100", "targetLength": 72, "sourceSelection": "auto", "baseId": "en-typo-note" },
+          { "id": "r-enco-b2", "band": "band-101-500", "targetLength": 288, "sourceSelection": "en", "baseId": "en-typo-report" },
+          { "id": "r-enco-b3", "band": "band-501-1000", "targetLength": 720, "sourceSelection": "auto", "baseId": "en-typo-memo" }
+        ]
+      },
+      {
+        "language": "en",
+        "mode": "business",
+        "combos": [
+          { "id": "r-enbu-b1", "band": "band-1-100", "targetLength": 68, "sourceSelection": "en", "baseId": "en-plain-note" },
+          { "id": "r-enbu-b2", "band": "band-101-500", "targetLength": 304, "sourceSelection": "auto", "baseId": "en-plain-report" },
+          { "id": "r-enbu-b3", "band": "band-501-1000", "targetLength": 784, "sourceSelection": "en", "baseId": "en-plain-memo" }
+        ]
+      }
+    ]
+  },
+  "bases": {
+    "en-schedule": "The M037 rehearsal schedule lists a dawn courier run. ",
+    "en-report": "The M037 rehearsal report records quarterly deliveries. ",
+    "en-courier": "The M037 rehearsal courier carries the quarterly report at dawn. ",
+    "zh-simp-notice": "M037排练用简体中文记录季度交付通知。",
+    "zh-trad-notice": "M037排練用繁體中文記錄季度交付通知。",
+    "zh-simp-memo": "M037排练备忘录用简体中文记录季度交付事项。",
+    "en-typo-note": "The M037 rehearsal note is ready. We sends it today. ",
+    "en-typo-report": "The M037 rehearsal report are ready. It list the deliveries. ",
+    "en-typo-memo": "The M037 rehearsal memo confirm the dawn run. The couriers leaves early. ",
+    "en-plain-note": "The M037 rehearsal note confirms the dawn schedule. ",
+    "en-plain-report": "The M037 rehearsal summary describes quarterly throughput. ",
+    "en-plain-memo": "The M037 rehearsal memorandum outlines delivery windows. "
+  },
+  "successorMapping": [
+    { "ruleId": "R1", "rehearsedAs": "24 measured requests (12 translation + 12 rewriting) at 1/15 scale of the 360-request workload." },
+    { "ruleId": "R2", "rehearsedAs": "4 concurrent operations with N-in-flight discipline and disclosed final drain (10-way host behavior stays with the successor)." },
+    { "ruleId": "R3", "rehearsedAs": "2 translation directions x 3 bands x 2 per cell; 2 rewriting language/mode cells x 3 bands x 2 per cell." },
+    { "ruleId": "R4", "rehearsedAs": "4 requests per band per family (translation) and 4 per band (rewriting); bands keep the 1-100/101-500/501-1000 canonical bounds." },
+    { "ruleId": "R5", "rehearsedAs": "12 distinct source/settings combinations (6 per family), each repeated once with a fresh submission identity. The 60-per-band rotation rule is successor-only." },
+    { "ruleId": "R6", "rehearsedAs": "Recorded interleave seed 37037; every repeat carries a fresh UUIDv7; the composition auditor fails repeats-by-replay." },
+    { "ruleId": "R7", "rehearsedAs": "First-seen/repeated cohorts distinguished structurally; provider-cache cohorts stay unknown (insufficient evidence, never assumed); application/runner reuse disabled and asserted." },
+    { "ruleId": "R8", "rehearsedAs": "Host-readiness probes are predeclared and reported separately, never counted. Quota/budget exhaustion handling is successor-only: the rehearsal is unpaid with a fresh account far below allowance." },
+    { "ruleId": "R9", "rehearsedAs": "Submission-to-complete-body timing over real HTTP against the owned loopback host. No TestServer, runner, or mocked timing." },
+    { "ruleId": "R10", "rehearsedAs": "Full-denominator success-within-target, nearest-rank p50/p95, and per-route/cell distributions, separately per family; no successful-only percentile." },
+    { "ruleId": "R11", "rehearsedAs": "Versioned report carries every section 6.1 field with rehearsal values; deployment identity describes the loopback rehearsal host (hardware/region recorded as the local machine, network as loopback)." },
+    { "ruleId": "R12", "rehearsedAs": "All rehearsal inputs stay within the percentile bound (longest 800 canonical chars). L-1/L/L+1 cases are successor-only section 6.2 scope." }
+  ]
+}
