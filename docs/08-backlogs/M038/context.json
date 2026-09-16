@@ -19,7 +19,7 @@
       ],
       "use": "excerpt",
       "reason": "Selected accessibility/responsiveness (Must) and visual-direction (Should) constraints",
-      "sha256": "69fb736fb512f9e90f3ff046bac2ab098666928e1c0089db386389e1bf8ef001"
+      "sha256": "8e2e7d77a84d0870401b8b67c6bced3e771493255420c9a9869e219f02269073"
     },
     {
       "path": "docs/06-verification-plan.md",
@@ -47,21 +47,21 @@
       "heading": "4.2 Browser lanes",
       "use": "excerpt",
       "reason": "Desktop lane allocation: automated Chromium-desktop scope vs branded/manual scope",
-      "sha256": "24b0e19b0b330638ecd0d87f0f6f952014faaa60ac4f8e4d404e560029693e04"
+      "sha256": "e72f4af99846e84c8c040502f3b54e9238aac22083484f94f588d5a8dde40bfe"
     },
     {
       "path": "docs/verification/frontend.md",
-      "heading": "4.3 Manual accessibility and device evidence",
+      "heading": "4.3 Manual browser-matrix evidence",
       "use": "excerpt",
       "reason": "Desktop manual-review subset and gap-recording rule",
-      "sha256": "7de710474a0fad6539b06614860f0334fc61de3910824b8d6ef9eea6518193c2"
+      "sha256": "c42e9e3ddb7007d5d2339460b91956244fb5686d8b551174e1be09f3225cdb20"
     },
     {
       "path": "docs/verification/frontend.md",
       "heading": "4.4 Curated visual regression",
       "use": "excerpt",
       "reason": "Desktop baseline selection, pinned capture, thresholds and review procedure",
-      "sha256": "88d7674ae29b443962d2180b808a66881c604bcbf104ede0b22c29a1e2391d33"
+      "sha256": "98e693dcd41525cf22a572e2539d27057bd85ebdd367049841ab7fe48aaa34fe"
     },
     {
       "path": "docs/01-PRD.md",
@@ -84,14 +84,14 @@
       "heading": "10. Accessibility and browser coverage",
       "use": "excerpt",
       "reason": "Normative desktop keyboard/focus/zoom/spacing/motion contracts",
-      "sha256": "9aa1075eb96640363c5c73dad5c894b7235ac7901b02741f4501329c72ec6735"
+      "sha256": "f6483be259be1534659f11886719878482d643479ec20611357df1dc08b158b6"
     },
     {
       "path": "docs/02-ux-specification.md",
       "heading": "4. Visual system and responsive layout",
       "use": "reference",
       "reason": "Open if a desktop baseline dispute needs the normative visual design",
-      "sha256": "aab7394d78aa488fdbcf215c7e5c1f7ae1a1de95f17d2154fc9a6a8163d9dcd3"
+      "sha256": "28cd3e03d64cab552d68e510b93ca8655ea42d18b0238b29d2a06c00544e06f3"
     },
     {
       "path": "docs/ux/acceptance.md",
@@ -107,7 +107,7 @@
       ],
       "use": "excerpt",
       "reason": "Selected desktop composition/keyboard/geometry/visual/scan scenarios",
-      "sha256": "edbbbb0d1f796964889f14a4f88d06c65cef2e1da4a48c4502aa3c103a7d585f"
+      "sha256": "e908e26ab847778566fcd4cb9c3523d475347455751ae63ee2c5b30fc4532fce"
     },
     {
       "path": "docs/product/open-questions.md",
@@ -149,8 +149,8 @@
       "sha256": "fd8749fbda623b7004cf36ed718ab6fd7c5885795c54c1828502a4df71d2d3a9"
     }
   ],
-  "source_map_sha256": "6f675029ea95043d22b38c06b5dab36d9c94cc865634d2895f597bb5414591fe",
-  "baseline_commit": "e4918ab4bc15cc2a675110e37b49cb924e209284",
+  "source_map_sha256": "9fa1d5fa9934339b0bfb7c193e2fefd596f334f655d431b85f05ca4a52bfe515",
+  "baseline_commit": "014fe56cf7a671bb9a606d85df50716f58a60d89",
   "locked_files": {
     "docs/00-SDD-Planning-Workflow.md": "5ccca040d0f0d50fac47632643306e7224a8d2e5460df0958e7e7c333146db89",
     "docs/00-workflow/execution.md": "f362a1384cefef24ba204e0723e3190857c8cca9bcd91908136932e19c5caf02",

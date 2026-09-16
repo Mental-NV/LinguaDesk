@@ -7,14 +7,14 @@
       "heading": "Selected milestone",
       "use": "reference",
       "reason": "Mutable current selection authority; verify M011 remains the planned scope before execution",
-      "sha256": "4b89b222ec4e4b1d4f1326712e753ee51f0f550eff507d616538b02d6179cb39"
+      "sha256": "f47007973ece2706078a6a4f7ff4aae325b208a7da3f3588aa56fee19d8a3321"
     },
     {
       "path": "docs/delivery/current.md",
       "heading": "Completed milestones",
       "use": "reference",
       "reason": "Mutable dependency index confirming M002 and M006 completion",
-      "sha256": "138f2261bbf0626f3d1cee3ce280091c47d40076f6c34c01e6608bab7c7a6f3f"
+      "sha256": "1ee44b001ee4951d628175993da44db709a3c08c3241009032015557bd3fc936"
     },
     {
       "path": "docs/07-roadmap.md",
@@ -48,7 +48,7 @@
       ],
       "use": "excerpt",
       "reason": "Selected local registration requirement and unverified-account boundary",
-      "sha256": "7878cc8bb16c65f9b34fb2d290471fb499236497a30c7e84bd43b93257fc17e3"
+      "sha256": "25fd4cd6fde90d77700c3048c073f77f969780511a51072903cceaf0002d029e"
     },
     {
       "path": "docs/product/open-questions.md",
@@ -59,42 +59,42 @@
       ],
       "use": "excerpt",
       "reason": "Applicable lifecycle, exact auth-contract and browser/presentation dispositions",
-      "sha256": "60a75b92e44331627acaf5ba70f8da976816ae6012238495a98025603a0d8ed5"
+      "sha256": "f628499d931239dc04b519491b0db7d7ce821bcb3c02c76b855ca42d715e7eb0"
     },
     {
       "path": "docs/02-ux-specification.md",
       "heading": "9. Local-account and availability flows",
       "use": "excerpt",
       "reason": "Canonical registration form, validation, failure and password-clearing behavior",
-      "sha256": "e04b0fae9d96f500a8df34adb10beee3bb38491385e1c6a54956fa1311586809"
+      "sha256": "aa5a998f724b49e67f13f96ff28252cb197138cf6f87cd9597933d9bc3279ec0"
     },
     {
       "path": "docs/02-ux-specification.md",
       "heading": "3.1 Routes and account access",
       "use": "excerpt",
       "reason": "Route table and staged-shell handoff replaced by the registration form",
-      "sha256": "3c7ca3b93736cb688c2cd16f1a19902c9149ba495c73a7e14770f12f63aeb836"
+      "sha256": "a5ff70fbaedf6632a7e636f6de8b367579f3a75120190cd9a63cf6fa7f93fff4"
     },
     {
       "path": "docs/ux/processing.md",
       "heading": "6.3 Exact message IDs and disposition",
       "use": "excerpt",
       "reason": "Normative registration message copy MSG-034/038-044 and generic failure text",
-      "sha256": "2dc4106342973b68395dd28ee84f7fb38614a0c308d401c747218c13f671632b"
+      "sha256": "61ce541b6fcc86a0f5d43ebf9783feba12a6e29df823b2c0a059098c442704ac"
     },
     {
       "path": "docs/ux/acceptance.md",
       "heading": "12.2–12.9 Scenario disposition and current acceptance",
       "use": "excerpt",
       "reason": "Selected UX-AC-006/007/101/102 contracts and deferred/retired boundaries",
-      "sha256": "5f4515441ce70253344cc653186a5c7feaabe67c2fe2d3b077a0652f1d023ada"
+      "sha256": "3a3698773cc8c0ed1e46e4ecb8b388c9abd22e0346b68937c34bd42621a83fc5"
     },
     {
       "path": "docs/api/accounts.md",
       "heading": "3.4 M006 registration contract",
       "use": "excerpt",
       "reason": "Exact strict request, policy, non-enumeration and no-credential rules adopted by the form",
-      "sha256": "e1ff62a094c0de0b79716409c3b8346728e0cf2183a4fa38b61608a536abdd4b"
+      "sha256": "2a58c1e4d13fcbbf1cccf415233b194ef829cc5f6c6202ee40f0a146710fd365"
     },
     {
       "path": "docs/03-architecture.md",
@@ -140,40 +140,40 @@
       "heading": "4.1 Shared UI fixtures",
       "use": "excerpt",
       "reason": "Canonical fixtures, password policy shape, request-count and fake-boundary conventions",
-      "sha256": "7b6236fc51c7069628cb2e80b7df5d4f8642279f5a710d0486a1ca2077f0e272"
+      "sha256": "64b4c731cca9e0505cf985d37c7ef7fea10fa96d6681276c1d749ed3b3d835f3"
     },
     {
       "path": "docs/verification/frontend.md",
       "heading": "4.2 Browser lanes",
       "use": "excerpt",
       "reason": "Chromium smoke scope and release-only branded-browser/device evidence boundary",
-      "sha256": "24b0e19b0b330638ecd0d87f0f6f952014faaa60ac4f8e4d404e560029693e04"
+      "sha256": "e72f4af99846e84c8c040502f3b54e9238aac22083484f94f588d5a8dde40bfe"
     },
     {
       "path": "docs/verification/coverage.md",
       "heading": "8.2 Local acceptance allocation",
       "use": "excerpt",
       "reason": "V-group allocation for the selected UX scenarios",
-      "sha256": "688ed34c5706735be3ae35b84fc23265b5b5e5b418a966cb11075283caaba330"
+      "sha256": "62da5f68127f328d7c7816d29a1dc6bd769e1935058fdaf6f00f9295a1197209"
     },
     {
       "path": "docs/verification/readiness.md",
       "heading": "9. Readiness and remaining dependencies",
       "use": "excerpt",
       "reason": "Registration readiness dependencies and remaining lifecycle/live evidence",
-      "sha256": "73a8b0c91d813cbf40f675b50c08b7895f2964eae66b0f802893e6811ba8f70d"
+      "sha256": "28608d4ed934356e58e932b21948ab948c95ae020d6debe600e35cbf21004e75"
     },
     {
       "path": "frontend/src/shell/App.tsx",
       "use": "reference",
       "reason": "Current placeholder routes, heading-focus and shell conventions to extend",
-      "sha256": "a5a7892e0b9f86e0f27441454c498a13f1ed92ffdd4bf0b4e2818ddd6bab1bf5"
+      "sha256": "23db1cd5ac4a5cd71fdee3a1edb35b669902a832de1a4aeff5962845721b74bc"
     },
     {
       "path": "frontend/src/api/generated/linguadesk-api.d.ts",
       "use": "reference",
       "reason": "Generated registerLocalAccount shape adopted without API change",
-      "sha256": "2f13e433b8839496558b6e060ed25c812cc29527bfc4c9e0c0bb801997dc8805"
+      "sha256": "9f499e4e747e9e9173cfd39b798f28d975c459c7d95a363cae3d8d6ac8b518ac"
     },
     {
       "path": "frontend/src/api/inputPolicy.ts",
@@ -185,31 +185,31 @@
       "path": "frontend/tests/unit/App.test.tsx",
       "use": "reference",
       "reason": "Current placeholder assertions whose /register cases change under M011",
-      "sha256": "701eadae301b80befbf6736c90fc338086592c34080656d4fdc72966a25aa0a2"
+      "sha256": "bb952cc3cabde28c2152fa6024a0669e2d79a25825c04b8214c546dbd9e3c6f3"
     },
     {
       "path": "frontend/tests/e2e/published-shell.spec.ts",
       "use": "reference",
       "reason": "Current published-smoke surface extended by the registration trip",
-      "sha256": "045a154dca40ca654486c8d5b0695ad1dba4e366ccde0365736a17eae47d67b6"
+      "sha256": "4b9fab3448870590afb64e1f7a315d3558d641e4139096b7086157d85492ce53"
     },
     {
       "path": "frontend/playwright.config.ts",
       "use": "reference",
       "reason": "Owned-host Chromium lane configuration for the browser trip",
-      "sha256": "f93422d719599d582be3ae302128f4be2964b65d8e787d00babdfe4780367768"
+      "sha256": "f344fc34c3faa0f00e36d3891dd3164da5d2e36c6ce2b83b5d59e4c74b16c18a"
     },
     {
       "path": "frontend/package.json",
       "use": "reference",
       "reason": "Pinned Node/npm and frontend verification scripts",
-      "sha256": "6679b8d86b24c87bded9242d2d5a0caed0fc70d1c30ecedffc2382e381fb1b89"
+      "sha256": "1e080864de83e24a24660998f2a9f3a04ac3ff1528741a01838340a0fa5d5ea9"
     },
     {
       "path": "scripts/frontend.sh",
       "use": "reference",
       "reason": "Frontend type/build and published Chromium verification command",
-      "sha256": "f5977a5161c09985fc5cdc6eee4b9ddd5614b589d4b49e6fed8add6530b12f15"
+      "sha256": "e5c7ead7f029621979ce0fa2317e086a1e4e324b70770f104816bc155d0cd437"
     },
     {
       "path": "scripts/contract.sh",
@@ -219,9 +219,9 @@
     }
   ],
   "source_map_sha256": "3f41b24160dc06d6d5afc539506424fd4c1c4da86b6440be64f473a4051d7432",
-  "baseline_commit": "aa04356c7114b5dba773f896f8497a018608f9ea",
+  "baseline_commit": "014fe56cf7a671bb9a606d85df50716f58a60d89",
   "locked_files": {
-    "docs/00-SDD-Planning-Workflow.md": "183ae93148ff594f9f1e021aa7543baa8878e9cc0bcfd69ebc696c28976e2945",
+    "docs/00-SDD-Planning-Workflow.md": "5ccca040d0f0d50fac47632643306e7224a8d2e5460df0958e7e7c333146db89",
     "docs/00-workflow/execution.md": "f362a1384cefef24ba204e0723e3190857c8cca9bcd91908136932e19c5caf02",
     "docs/08-backlogs/M011/spec.md": "81eb0b03228fdac675a63a50a10d9ce801212601db6c7a2e30796c6a006cc77d",
     "docs/08-backlogs/M011/plan.md": "5d15fbea0cd6ffeac1033495f629079bee353c3f645acddbddb4fbdd3959dec2"

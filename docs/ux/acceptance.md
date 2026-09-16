@@ -92,9 +92,9 @@ Scenarios are layer-independent behavioral contracts. [Verification plan Section
 | UX-AC-076 | Amended | Deliver failure A after a newer workspace/current B success: B text/status/focus/usage remain and no stale A alert/toast appears. No old failure triggers a retry. |
 | UX-AC-077 | Amended | Every active route at 320×640 has no horizontal page overflow/clipped controls; geometry checks use a real browser, not pixel baselines for every state. |
 | UX-AC-078 | Amended | Curated current layouts match Section 4 at desktop/narrow sizes; other breakpoints use geometry; no old rails/sheets/diff baselines. |
-| UX-AC-079 | Amended | Keyboard completes local auth, language/mode selection, explicit Translation/Rewrite, result edit/copy and reset without trap; Chromium subset plus targeted other-engine/manual checks. |
+| UX-AC-079 | Retired | Keyboard-only journey completion is outside MVP requirements; the Chromium keyboard subset persists as non-gating engine evidence. |
 | UX-AC-080 | Deferred | DF-001 keyboard sentence-actions path and sentence shortcut. |
-| UX-AC-081 | Amended | Active forms/editor/availability/dialog states have semantic/contrast coverage and focused browser accessibility scans; no serious/critical violations; manual AT still required. |
+| UX-AC-081 | Amended | Active forms/editor/availability/dialog states have semantic/contrast coverage and focused browser accessibility scans with no serious/critical violations. |
 | UX-AC-082 | Amended | No announcement per key/selector change; one start/completion per activation, one copy, and current errors announced once; no full generated result auto-read. |
 | UX-AC-083 | Amended | Reduced motion/text-spacing overrides preserve status, plain editor, native controls, auth errors and reset dialog without clipping/animation dependence. |
 | UX-AC-084 | Amended | Inline Start new workspace opens exact dialog with initial Cancel focus; Escape/Cancel preserves state and returns trigger focus. |
@@ -105,7 +105,7 @@ Scenarios are layer-independent behavioral contracts. [Verification plan Section
 | UX-AC-089 | Amended | Explicit Rewrite rejects substantially unsupported/mixed input with no transformation/charge, preserves prior result, and cannot be bypassed by manual source choice. |
 | UX-AC-090 | Amended | Explicit Traditional-Chinese rewrite displays Simplified fixture result and clear language label, preserves original script in source, and has no target selector. |
 | UX-AC-091 | Amended | All 12 Translation direction fixtures submit only on explicit activation; same known source/target is invalid and no style controls appear. |
-| UX-AC-092 | Amended | Native language/mode select value/options/accessibility and platform keyboard behavior work; changing selection sends zero transformations. Old custom active-descendant/menu contract is DF-005. |
+| UX-AC-092 | Amended | Native language/mode select value/options/accessibility work; changing selection sends zero transformations. Old custom active-descendant/menu contract is DF-005. |
 | UX-AC-093 | Deferred | DF-005 responsive Writing tools rail/sheet lifecycle; MVP inline mode responsiveness is AC-077/078. |
 | UX-AC-094 | Amended | Native result selection/Shift/drag/paste preserves source/caret and protected text. No sentence affordance opens; affected-sentence metadata assertions are retired. |
 | UX-AC-095 | Amended | Native labels and inline helper text remain readable under forced colors/reduced motion; no custom tooltip required; focus stays visible and no operation is triggered. |

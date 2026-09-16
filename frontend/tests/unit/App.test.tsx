@@ -113,6 +113,12 @@ describe('signed-out shell routes', () => {
     expect(recoveryLink).toHaveAttribute('href', '/forgot-password')
     expect(screen.getByRole('link', { name: 'Translation' })).toHaveAttribute('href', '/translate')
     expect(screen.getByRole('link', { name: 'Rewriting' })).toHaveAttribute('href', '/rewrite')
+    expect(
+      screen.getByRole('link', { name: 'Translation' }).querySelector('svg')?.getAttribute('aria-hidden'),
+    ).toBe('true')
+    expect(
+      screen.getByRole('link', { name: 'Rewriting' }).querySelector('svg')?.getAttribute('aria-hidden'),
+    ).toBe('true')
 
     await user.click(recoveryLink)
     await waitFor(() => expect(screen.getByRole('heading', { name: 'Forgot password' })).toHaveFocus())

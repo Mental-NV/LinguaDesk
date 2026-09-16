@@ -19,7 +19,7 @@ The product provides a focused workflow instead of requiring users to repeatedly
 | Project owner and approximately 10–100 early users | Translate messages; correct grammar and spelling; choose a writing style or tone; manually edit the complete result | Convenient, predictable everyday communication |
 | Prospective hiring clients | Try the web product and assess its API integration experience | Evidence of experienced full-stack engineering through coherent UX, independent API capabilities, reliable failure handling, and controlled LLM usage |
 
-The initial client is a React SPA with separate Translation and Rewriting pages. Desktop and mobile browsers, keyboard operation, and screen-reader access are MVP requirements. Native mobile and browser-extension clients can integrate independently with the API but do not ship in this MVP.
+The initial client is a React SPA with separate Translation and Rewriting pages. Desktop and mobile Firefox/Chrome browsers are MVP requirements. Native mobile and browser-extension clients can integrate independently with the API but do not ship in this MVP.
 
 ## 2. Goals and success criteria
 
@@ -32,7 +32,7 @@ The initial client is a React SPA with separate Translation and Rewriting pages.
 | Enable independent clients | An API consumer can authenticate with a local account, translate, rewrite, and obtain usage information without depending on the SPA |
 | Keep usage bounded | Enforce the per-request limits, shared character allowances, UTC reset, and successful-operation accounting |
 | Deliver usable web workflows | A verified user can translate text and rewrite text in the published SPA, receive a complete editable/copyable result, and retain their work through validation or processing failure |
-| Demonstrate an accessible web product | Core journeys work on desktop/mobile browsers and with keyboard and screen-reader access |
+| Demonstrate an accessible web product | Core journeys work in Firefox and Chrome on desktop and mobile |
 
 “Usable” means acceptable without editing or with only minor edits. The minimum quality standard applies to primary and fallback model configurations. Adoption, weekly activity, revenue, and hiring conversion targets have not been agreed; the audience estimate is not an adoption commitment.
 
@@ -193,7 +193,7 @@ API documentation and integration examples should make the above behavior indepe
 | NFR-002 | Must / C | **Performance:** meet the percentile targets and overall deadlines below. These are acceptance targets requiring measurement, not assumed provider performance. |
 | NFR-003 | Must / C | **Reliability:** controlled failure/concurrency tests show no source loss, stale response replacing a newer source/settings result or manual result edit, duplicate allowance charging, or allowance overruns. User-visible failure is bounded by the overall deadline. No additional numerical uptime SLA has been agreed. |
 | NFR-004 | Must / C | **Privacy:** no saved text history or source/result content in LinguaDesk’s persistent logs. Source and result text may exist only for active-workspace/session processing and are not persisted across its end; only necessary usage/operational metadata is retained afterward. These are LinguaDesk-managed storage/logging rules. Provider retention duration and no-training guarantees are not eligibility requirements (D-18). The exact active-workspace/session boundary and teardown mechanics remain under Q-004; provider-managed caching is permitted and does not change these application rules or add a LinguaDesk completed-response cache. |
-| NFR-005 | Must / C | **Accessibility and responsiveness:** complete the core journeys in desktop/mobile browsers, with keyboard and screen-reader access. This includes native mode/language controls, explicit submission, text editing, copy, validation, and processing/failure status. Deferred tools add no MVP accessibility journey. Exact browser coverage and accessibility test criteria are deferred to UX specification. |
+| NFR-005 | Must / C | **Accessibility and responsiveness:** complete the core journeys in Firefox and Chrome on desktop and mobile. This includes native mode/language controls, explicit submission, text editing, copy, validation, and processing/failure status. Deferred tools add no MVP accessibility journey. Exact browser coverage and test criteria are deferred to UX specification. |
 | NFR-006 | Must / C | **Cost:** enforce character allowances and establish the separate monthly monetary cap before launch. Suspend further paid processing at that ceiling, preserving work and returning a budget-related availability error. Assess provider exposure using the actual serving arrangements, including unsuccessful attempts. Alternative context is evaluated only when DF-001 is selected. The monetary amount remains unset. |
 | NFR-007 | Should / C | **Visual direction:** minimalist, professional, office-like presentation; monochrome icons are preferred. Detailed layout, typography, and component design belong to UX specification. |
 | NFR-008 | Proposed Must / P-005 | **Security and abuse resistance:** treat submitted text as content rather than executable instructions; protect account/workspace isolation and provider credentials; constrain abusive attempt volume independently of successful-character accounting. Specific controls and rates are deferred to security/architecture specification. |
@@ -227,7 +227,7 @@ Apply the same criteria to every model/settings configuration on the routes it m
 | RG-003 — Performance | Benchmark results meet NFR-002; maximum-length cases and fallback scenarios respect overall deadlines. Failed/time-out requests do not count as timely completions. |
 | RG-004 — Accounting and recovery | Verify user/global sharing, UTC reset, full-submission charges, zero charge for rejected oversize input, duplicate/retry protection, configured fallback/failures, stale successes, interruption/status recovery and concurrent requests. |
 | RG-005 — Access and integration | Verify automatic-verification registration followed by explicit local sign-in, meaningful errors, and an independent authenticated API consumer completing Translation and Rewriting with usage information. Real email verification/recovery and Google alternatives are deferred under DF-008/DF-007. |
-| RG-006 — Web access | Verify core journeys on the agreed desktop/mobile browser matrix and through keyboard/screen-reader interaction. |
+| RG-006 — Web access | Verify core journeys in Firefox and Chrome on desktop and mobile. Keyboard, screen-reader, IME and other browser/device coverage is explicitly outside this gate. |
 | RG-007 — Privacy and cost | Verify LinguaDesk’s own text-retention/logging behavior, model quality/performance and supported settings, and a configured monetary ceiling. Provider retention/no-training certification is not a release gate. |
 | RG-008 — Specification readiness | Resolve current-MVP pre-launch questions in Section 11. Deferred-feature dependencies are excluded from this release gate. Review proposed safeguards before making them binding. |
 

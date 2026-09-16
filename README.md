@@ -66,6 +66,18 @@ settle them as monetary suspension with zero charge and no fallback. The
 serving chains are primary-only over `DeepSeek-V4.1-Flash`
 (no fallback per DF-004).
 
+Monthly monetary admission is config-first: `appsettings.json` carries the
+`MonetaryAdmission` default (`MonthlyCapMinorUnits` 1000000, `Currency` USD,
+matching the smoke/benchmark harnesses) and the
+`MonetaryAdmission__MonthlyCapMinorUnits` / `MonetaryAdmission__Currency`
+environment variables override it per run via standard configuration
+layering. `run` and the Development host refuse to start with a
+missing/invalid ceiling; other environments keep fail-closed request-time
+suspension. A request-time `monetarySuspension` 503 reporting no remaining
+capacity means the month ledger is genuinely exhausted — inspect
+`MonetaryCostLedgers` in the development database or reset it — not a
+configuration problem.
+
 With no storage environment variables, `run` applies the migrations and creates a restricted key directory under the sibling `../.linguadesk-development` directory. This data and its verification keys survive restarts and are not committed. Override that location and the listening address when needed:
 
 ```sh

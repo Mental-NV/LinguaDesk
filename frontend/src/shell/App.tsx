@@ -9,6 +9,7 @@ import { ForgotPasswordPage } from '../auth/ForgotPasswordPage'
 import { RewritePage } from '../rewrite/RewritePage'
 import { TranslatePage } from '../translate/TranslatePage'
 import { WorkspaceStoreProvider } from './workspaces'
+import { RewritingIcon, TranslationIcon } from './NavIcons'
 import { useWorkspaceStores } from './workspaceStores'
 import { LoginPage, type SignInCompletionStatus } from '../auth/LoginPage'
 import { RegisterPage } from '../auth/RegisterPage'
@@ -342,8 +343,14 @@ function Shell() {
         <div className="header-inner">
           <Link className="wordmark" to="/" aria-label="LinguaDesk home">LinguaDesk</Link>
           <nav aria-label="Main navigation">
-            <Link to="/translate">Translation</Link>
-            <Link to="/rewrite">Rewriting</Link>
+            <Link to="/translate">
+              <TranslationIcon />
+              Translation
+            </Link>
+            <Link to="/rewrite">
+              <RewritingIcon />
+              Rewriting
+            </Link>
           </nav>
         </div>
       </header>

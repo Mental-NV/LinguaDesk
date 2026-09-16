@@ -88,9 +88,9 @@ See [Frontend and browser verification](verification/frontend.md#41-shared-ui-fi
 
 See [Frontend and browser verification](verification/frontend.md#42-browser-lanes).
 
-### 4.3 Manual accessibility and device evidence
+### 4.3 Manual browser-matrix evidence
 
-See [Frontend and browser verification](verification/frontend.md#43-manual-accessibility-and-device-evidence).
+See [Frontend and browser verification](verification/frontend.md#43-manual-browser-matrix-evidence).
 
 ### 4.4 Curated visual regression
 

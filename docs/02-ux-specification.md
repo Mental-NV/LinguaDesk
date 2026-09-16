@@ -91,7 +91,7 @@ The interface uses system fonts to avoid a font-download layout shift and to ren
 | Control heights | 36 compact, 44 default, 48 touch/form px | Never below 44 px for standalone mobile targets |
 | Radius | 6 controls, 10 panels, 14 dialogs, 999 pills px | Consistent containment |
 | Border | 1 px solid `color-border`; selected 1 px `color-action` | Panels and controls |
-| Focus | 2 px solid `color-focus`, 2 px offset | All keyboard-focusable elements |
+| Focus | 2 px solid `color-focus`, 2 px offset | All focusable elements |
 | Shadow | `0 8px 24px rgba(23,33,43,.12)` | Dialogs only |
 | Motion | 120 ms color/border; 160 ms opacity/transform, ease-out | Removed under `prefers-reduced-motion: reduce` |
 | Icons | 20 px, 1.75 px stroke, rounded monochrome SVG | Always paired with an accessible name; decorative icons hidden |
@@ -121,7 +121,7 @@ Translation / Rewriting       Usage       New workspace / Sign out
 
 At narrow widths the result follows the source/action. Source and result use plain native textareas with visible labels. Long English/Cyrillic/Chinese content and errors wrap without horizontal page overflow. Native select popup rendering is platform-owned; no pixel matching of its open menu is required. Do not implement a rich-text editor, syntax/diff overlay, sentence hit targets, or custom caret mapping.
 
-## 5. Components and keyboard behavior
+## 5. Components and activation behavior
 
 | Component | Current contract |
 | --- | --- |
@@ -136,9 +136,9 @@ At narrow widths the result follows the source/action. Source and result use pla
 | Usage | Inline authoritative user count/allowance/reset and availability messages; no global spend, provider/model/rule controls |
 | Account forms | Visible email/password/confirmation labels, native submit, password reveal, field errors and summary; no custom auth widgets |
 
-Tab order: skip link; wordmark/home; mode links; account actions; source language; target language or Writing mode; Source text; Clear source text; Translate/Rewrite; result; Copy result; actionable recovery links. Usage text is readable in document order and creates no unnecessary tab stops. Disabled controls are skipped. Exactly one visible `main` and `h1`; editor headings are `h2`.
+Exactly one visible `main` and `h1`; editor headings are `h2`.
 
-Use platform keyboard behavior for native selectors, text selection, undo/redo, clipboard and IME. Enter inside a textarea inserts a newline, never submits. Native button activation submits only when not composing; no special processing shortcut is required in MVP. If activation occurs during composition, ignore it without queueing a later submission. Native dropdown Escape/commit behavior is platform-owned, replacing the old bespoke listbox/active-descendant contract.
+Use platform native behavior for selectors, text selection, undo/redo, clipboard and IME. Enter inside a textarea inserts a newline, never submits. Native button activation submits only when not composing; no special processing shortcut is required in MVP. If activation occurs during composition, ignore it without queueing a later submission. Native dropdown Escape/commit behavior is platform-owned, replacing the old bespoke listbox/active-descendant contract.
 
 Keep the submit control focusable while busy using `aria-disabled` and an activation guard; prevent repeat click/Enter from dispatching. Known invalid input disables submission with associated visible helper text. Moving focus after explicit route changes, submit validation, dialog open/close and account continuation is allowed; async completion/usage/background validation never steals focus or moves the source caret.
 
@@ -195,13 +195,13 @@ Usage shows the user's authoritative consumed/remaining allowance and UTC reset;
 
 ## 10. Accessibility and browser coverage
 
-Target [WCAG 2.2 AA](https://www.w3.org/TR/WCAG22/) with native semantics and keyboard access. Keep 44×44 px standalone touch targets where possible (24×24 minimum except valid inline exceptions), 4.5:1 ordinary text / 3:1 large text, and 3:1 focus/control boundaries. Use a 2 px focus ring with 2 px offset. Errors/status use text as well as color. The dialog traps focus, Escape cancels, and close returns to its trigger. All other controls keep native behavior; no custom active-descendant or sheet-focus system is required.
+Target [WCAG 2.2 AA](https://www.w3.org/TR/WCAG22/) with native semantics. Keep 44×44 px standalone touch targets where possible (24×24 minimum except valid inline exceptions), 4.5:1 ordinary text / 3:1 large text, and 3:1 focus/control boundaries. Use a 2 px focus ring with 2 px offset. Errors/status use text as well as color. Close returns to its trigger. All other controls keep native behavior; no custom active-descendant or sheet-focus system is required.
 
 At 200% zoom all actions remain available; at effective 400% / 320 CSS px there is no horizontal page overflow. Text-spacing overrides (1.5 line height, 2× paragraph spacing, .12em letter and .16em word spacing) cause no clipping. Reduced motion removes transitions/shimmer. Native Chinese composition, selection and undo/redo remain intact; explicit activation during composition is ignored without a delayed submission. Do not move focus on completion or scroll a background result into view.
 
 ### 10.1 Supported browsers
 
-Support current and immediately previous stable major releases at each release candidate for Chrome, Edge, Firefox, desktop Safari, iOS Safari and Android Chrome. [Verification plan Section 4](verification/frontend.md#4-frontend-browser-and-manual-verification) owns automated lane allocation, actual-version evidence and manual browser/device/assistive-technology procedures. Bundled engines alone do not establish this support contract.
+Support current and immediately previous stable major releases at each release candidate for Firefox and Chrome on desktop and mobile. [Verification plan Section 4](verification/frontend.md#4-frontend-browser-and-manual-verification) owns automated lane allocation, actual-version evidence and manual browser-matrix procedures. Bundled engines alone do not establish this support contract.
 
 ### 10.2 Verification ownership
 
@@ -226,7 +226,7 @@ The accessibility outcomes above remain UX contracts. Automated checks and requi
 | UX-US-013 | Amended | Protect manual result edits from older responses; targeted metadata preservation retired | FR-018/023 |
 | UX-US-014 | MVP | See authoritative usage and availability | FR-024–028 (FR-025 deferred) |
 | UX-US-015 | Amended | Recover explicitly from failure, offline periods and unknown outcomes | FR-034/037 |
-| UX-US-016 | Amended | Use native controls and current core journeys with keyboard/touch/assistive technology | NFR-005/007 |
+| UX-US-016 | Amended | Use native controls and current core journeys with touch | NFR-005/007 |
 | UX-US-017 | MVP | Reset and tear down the per-tab workspace without restoration | FR-038/NFR-004 |
 
 ## 12. Acceptance contracts and preserved scenario IDs
@@ -280,4 +280,4 @@ Deferred work is selected through PRD Section 3.1 and the existing #8 package wo
 
 This revision replaces the active v1.1 UI contract to remove obsolete branch/timer/sentence obligations instead of hiding them behind an amendment. All original story/scenario/message IDs have an explicit current disposition; additional MSG-045–047 describe current oversize and explicit-action states. No scenario is a claim of a passing test.
 
-Ready for current-MVP scoped planning. Resolve only the selected slice's Section 15 dependencies before implementation. Release evidence, provider evaluation, actual browser/AT behavior and runtime verification remain pending. Deferred/retired rows neither block MVP nor count as passed release checks.
+Ready for current-MVP scoped planning. Resolve only the selected slice's Section 15 dependencies before implementation. Release evidence, provider evaluation, actual browser behavior and runtime verification remain pending. Deferred/retired rows neither block MVP nor count as passed release checks.

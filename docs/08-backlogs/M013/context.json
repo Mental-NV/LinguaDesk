@@ -19,7 +19,7 @@
       "heading": "Completed milestones",
       "use": "reference",
       "reason": "Mutable dependency index confirming M008 and M012 completion",
-      "sha256": "cb81575e02cf0ebb7291cad4561641c876ac06bffb311e4db028135f6bfe99a9"
+      "sha256": "1ee44b001ee4951d628175993da44db709a3c08c3241009032015557bd3fc936"
     },
     {
       "path": "docs/08-backlogs/M008/backlog.md",
@@ -63,14 +63,14 @@
       ],
       "use": "excerpt",
       "reason": "Applicable lifecycle non-claim and exact auth-contract dispositions",
-      "sha256": "f325c39a045f4834a8794a287e932f454dc15a45c53399e0a6e10590dd7fa35c"
+      "sha256": "1aac620648963a8e1bc00a62079d570c9a7d834a093f5662e7d508e935f4cb71"
     },
     {
       "path": "docs/02-ux-specification.md",
       "heading": "3.1 Routes and account access",
       "use": "excerpt",
       "reason": "Route table for /login, safe destination memory and signed-in redirects",
-      "sha256": "3c7ca3b93736cb688c2cd16f1a19902c9149ba495c73a7e14770f12f63aeb836"
+      "sha256": "a5ff70fbaedf6632a7e636f6de8b367579f3a75120190cd9a63cf6fa7f93fff4"
     },
     {
       "path": "docs/02-ux-specification.md",
@@ -84,21 +84,21 @@
       "heading": "9. Local-account and availability flows",
       "use": "excerpt",
       "reason": "Canonical login form, validation, failure and stale-completion behavior",
-      "sha256": "e04b0fae9d96f500a8df34adb10beee3bb38491385e1c6a54956fa1311586809"
+      "sha256": "aa5a998f724b49e67f13f96ff28252cb197138cf6f87cd9597933d9bc3279ec0"
     },
     {
       "path": "docs/ux/processing.md",
       "heading": "6.3 Exact message IDs and disposition",
       "use": "excerpt",
       "reason": "Normative MSG-028/MSG-037 copy and generic failure text",
-      "sha256": "2dc4106342973b68395dd28ee84f7fb38614a0c308d401c747218c13f671632b"
+      "sha256": "61ce541b6fcc86a0f5d43ebf9783feba12a6e29df823b2c0a059098c442704ac"
     },
     {
       "path": "docs/ux/acceptance.md",
       "heading": "12.2–12.9 Scenario disposition and current acceptance",
       "use": "excerpt",
       "reason": "Selected UX-AC-013/014/015/016/101/102/103 contracts and deferred/retired boundaries",
-      "sha256": "5f4515441ce70253344cc653186a5c7feaabe67c2fe2d3b077a0652f1d023ada"
+      "sha256": "3a3698773cc8c0ed1e46e4ecb8b388c9abd22e0346b68937c34bd42621a83fc5"
     },
     {
       "path": "docs/api/accounts.md",
@@ -159,69 +159,69 @@
       "heading": "4.1 Shared UI fixtures",
       "use": "excerpt",
       "reason": "Canonical fixtures, request-count and fake-boundary conventions",
-      "sha256": "7b6236fc51c7069628cb2e80b7df5d4f8642279f5a710d0486a1ca2077f0e272"
+      "sha256": "64b4c731cca9e0505cf985d37c7ef7fea10fa96d6681276c1d749ed3b3d835f3"
     },
     {
       "path": "docs/verification/frontend.md",
       "heading": "4.2 Browser lanes",
       "use": "excerpt",
       "reason": "Chromium smoke scope and release-only branded-browser/device evidence boundary",
-      "sha256": "24b0e19b0b330638ecd0d87f0f6f952014faaa60ac4f8e4d404e560029693e04"
+      "sha256": "e72f4af99846e84c8c040502f3b54e9238aac22083484f94f588d5a8dde40bfe"
     },
     {
       "path": "docs/verification/coverage.md",
       "heading": "8.2 Local acceptance allocation",
       "use": "excerpt",
       "reason": "V-group allocation for the selected UX scenarios",
-      "sha256": "2e9fdafe84c33fdc18294df31500a86dc487fa7590167329cd9a0c1b996988a2"
+      "sha256": "62da5f68127f328d7c7816d29a1dc6bd769e1935058fdaf6f00f9295a1197209"
     },
     {
       "path": "frontend/src/shell/App.tsx",
       "use": "reference",
       "reason": "Current placeholder routes, heading-focus and shell conventions to extend",
-      "sha256": "ee7a32b7c7469a3698456dc7dbe6c6d12cd7164510fe730e8a539df155d5fb07"
+      "sha256": "23db1cd5ac4a5cd71fdee3a1edb35b669902a832de1a4aeff5962845721b74bc"
     },
     {
       "path": "frontend/src/auth/RegisterPage.tsx",
       "use": "reference",
       "reason": "Form, validation-focus and in-memory handoff conventions mirrored by the login page",
-      "sha256": "2602d1d3c80cd2ba72e60abe9d94a3c67cacb47377610195b68200bcf4c3b9c0"
+      "sha256": "c270bae4e9d9fe672e0c1cdce3de8a5be966fba83e5ead64d85743bbf6847926"
     },
     {
       "path": "frontend/src/auth/VerifyEmailEntryPage.tsx",
       "use": "reference",
       "reason": "Continuation variants and single-read session style kept consistent",
-      "sha256": "3c873b211b939bfb6ff46935ab4abeb2663a885aa7dc09338a0e080e6da44270"
+      "sha256": "1b6a3e09043a860fadf41f57dd80904eae3e4b3619764bd4db9f38c23909ffce"
     },
     {
       "path": "frontend/src/api/accounts.ts",
       "use": "reference",
       "reason": "Typed wrapper and result-mapping style extended with antiforgery/sign-in/sign-out calls",
-      "sha256": "78064f20cce5a6591262be0380ea5547feb707fa7c9531a0c1975db957eded77"
+      "sha256": "e168599ee561c18c5688dd08e6e6aaf6d3ec8ebddfc0911da03bfa0d3864143d"
     },
     {
       "path": "frontend/src/api/generated/linguadesk-api.d.ts",
       "use": "reference",
       "reason": "Generated session-operation shapes adopted without API change",
-      "sha256": "2f13e433b8839496558b6e060ed25c812cc29527bfc4c9e0c0bb801997dc8805"
+      "sha256": "9f499e4e747e9e9173cfd39b798f28d975c459c7d95a363cae3d8d6ac8b518ac"
     },
     {
       "path": "frontend/tests/unit/App.test.tsx",
       "use": "reference",
       "reason": "Current guard assertions extended with sign-in routing cases",
-      "sha256": "7bf07f677f03ccb3a489be9563173028ea2151618c198d141ef9fe5f791dcec7"
+      "sha256": "bb952cc3cabde28c2152fa6024a0669e2d79a25825c04b8214c546dbd9e3c6f3"
     },
     {
       "path": "frontend/tests/unit/register.test.tsx",
       "use": "reference",
       "reason": "Focused-suite conventions mirrored by the new login suite",
-      "sha256": "9ab1e39438783d7283e416314183ae5ce9a1b915270b8f813887c10acf3d73af"
+      "sha256": "b6e2ac5e15605451976f2ab3f2b9294611c2b6e828e82492547baacd5d22e239"
     },
     {
       "path": "frontend/tests/e2e/verification.spec.ts",
       "use": "reference",
       "reason": "Current published-smoke surface extended by the sign-in trip",
-      "sha256": "e3e96729ac52393e0c4cbd07c4a9e205351304b4a53f129282191498db3030ed"
+      "sha256": "efce56550d32742e6558944f32e226f4ad2d8b9a8c604c0baa4f85c07a5afc75"
     },
     {
       "path": "frontend/playwright.config.ts",
@@ -233,13 +233,13 @@
       "path": "frontend/package.json",
       "use": "reference",
       "reason": "Pinned Node/npm and frontend verification scripts",
-      "sha256": "8a1d96b866b77c346131b834a6dab77f3a2500d0a882f8a0a837dee4957a0df7"
+      "sha256": "1e080864de83e24a24660998f2a9f3a04ac3ff1528741a01838340a0fa5d5ea9"
     },
     {
       "path": "scripts/frontend.sh",
       "use": "reference",
       "reason": "Frontend type/build and published Chromium verification command",
-      "sha256": "6aedc272146d6fd076f4b92e9d322f49b76b1ae74ee535d28534dc13293d1d97"
+      "sha256": "e5c7ead7f029621979ce0fa2317e086a1e4e324b70770f104816bc155d0cd437"
     },
     {
       "path": "scripts/contract.sh",
@@ -251,13 +251,13 @@
       "path": "scripts/backend.sh",
       "use": "reference",
       "reason": "Aggregate backend regression command for AC-008",
-      "sha256": "377c9652f76ace23925039451b1b545eb31c9b24fa7af6fe6c3ffb0d699699fa"
+      "sha256": "772b87867f0f1d4ae6e74d445349f10ffe22a3c77a8a4f6447b895887603c822"
     },
     {
       "path": "backend/src/LinguaDesk.Api/Program.cs",
       "use": "reference",
       "reason": "Pre-host smoke seed mode and forwarded-header middleware ordering",
-      "sha256": "fd5d2aa4f5ab94999acce9449d8a93e4a6d40eebd582f40dd14dbaf4057cc4e8"
+      "sha256": "00687641f9c1b0e256784a50d71467e967678d2f7df089e82734cadbd1627e3e"
     },
     {
       "path": "backend/src/LinguaDesk.Api/Infrastructure/Security/SecurityRegistrationExtensions.cs",
@@ -269,7 +269,7 @@
       "path": "backend/src/LinguaDesk.Api/Infrastructure/Smoke/SmokeAccountSeeder.cs",
       "use": "reference",
       "reason": "Smoke-only deterministic verified and unverified account setup with no endpoint",
-      "sha256": "9ad13f4c4aeb527211694265432f5fcd56c1481eff7012f20de93367c024fb8c"
+      "sha256": "0875f0954c737027063180936f187844d18f80ebc6d897fa87b926629cc598fd"
     },
     {
       "path": "frontend/vite.config.ts",
@@ -279,9 +279,9 @@
     }
   ],
   "source_map_sha256": "5bca7e41a38254c187a81f2c75b6ac9404ca821d178010e02b5654b65ea7a8ad",
-  "baseline_commit": "3111aeadc11737c951aa2d3fa3afad597e6e7756",
+  "baseline_commit": "014fe56cf7a671bb9a606d85df50716f58a60d89",
   "locked_files": {
-    "docs/00-SDD-Planning-Workflow.md": "183ae93148ff594f9f1e021aa7543baa8878e9cc0bcfd69ebc696c28976e2945",
+    "docs/00-SDD-Planning-Workflow.md": "5ccca040d0f0d50fac47632643306e7224a8d2e5460df0958e7e7c333146db89",
     "docs/00-workflow/execution.md": "f362a1384cefef24ba204e0723e3190857c8cca9bcd91908136932e19c5caf02",
     "docs/08-backlogs/M013/spec.md": "554c82800bf43006a447f163862ff2c06123b77692951ed154e57cc5295a8daa",
     "docs/08-backlogs/M013/plan.md": "dd471760afdaf2711dc439e58730a57b6e38f01e7ab2a8f8b5071c2e0865741b"

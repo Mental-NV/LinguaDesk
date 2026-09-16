@@ -109,6 +109,7 @@ app.Map("/api/{**path}", ApiNotFound);
 app.MapFallbackToFile("{**path:nonfile}", "index.html");
 
 ServingStartupGuard.ThrowWhenServingUnconfigured(app.Configuration, app.Environment, isContractGeneration);
+MonetaryAdmissionStartupGuard.ThrowWhenMonetaryUnconfigured(app.Configuration, app.Environment, isContractGeneration);
 
 app.Run();
 

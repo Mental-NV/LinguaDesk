@@ -137,7 +137,7 @@
       "path": "docs/verification/frontend.md",
       "reason": "Browser lanes for the live portal journey evidence",
       "use": "excerpt",
-      "sha256": "24b0e19b0b330638ecd0d87f0f6f952014faaa60ac4f8e4d404e560029693e04"
+      "sha256": "e72f4af99846e84c8c040502f3b54e9238aac22083484f94f588d5a8dde40bfe"
     },
     {
       "heading": "3.1 Database, HTTP and published-host harness",
@@ -198,7 +198,7 @@
       "path": "scripts/backend.sh",
       "reason": "run fail-fast and e2e-live script commands",
       "use": "reference",
-      "sha256": "e7d3756eef73d060b6e7b293fc342ceda5dfbad0f074be8f806c16c25ba10cea"
+      "sha256": "772b87867f0f1d4ae6e74d445349f10ffe22a3c77a8a4f6447b895887603c822"
     },
     {
       "path": "scripts/contract.sh",
@@ -215,7 +215,7 @@
   ],
   "version": 1,
   "source_map_sha256": "cb9e02d742be54870c615cb65943978a56ddc819fc9e54f8aa997c70348e04c4",
-  "baseline_commit": "902009613f84e5613d5d9d5bbcd8e9edd7a9f968",
+  "baseline_commit": "014fe56cf7a671bb9a606d85df50716f58a60d89",
   "locked_files": {
     "docs/00-SDD-Planning-Workflow.md": "5ccca040d0f0d50fac47632643306e7224a8d2e5460df0958e7e7c333146db89",
     "docs/00-workflow/execution.md": "f362a1384cefef24ba204e0723e3190857c8cca9bcd91908136932e19c5caf02",

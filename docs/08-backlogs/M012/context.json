@@ -7,14 +7,14 @@
       "heading": "Selected milestone",
       "use": "reference",
       "reason": "Mutable current selection authority; M011 done with M012 as the eligible web-access increment",
-      "sha256": "4032c33fd7cc7ed82df06534aec165ae026a4fd7fd34fb8b909cc435276fe031"
+      "sha256": "f47007973ece2706078a6a4f7ff4aae325b208a7da3f3588aa56fee19d8a3321"
     },
     {
       "path": "docs/delivery/current.md",
       "heading": "Completed milestones",
       "use": "reference",
       "reason": "Mutable dependency index confirming M007 and M011 completion",
-      "sha256": "5368367aa71b5620752a2ba81f67ccb863276ec92b581dc725dfafe7835258ad"
+      "sha256": "1ee44b001ee4951d628175993da44db709a3c08c3241009032015557bd3fc936"
     },
     {
       "path": "docs/07-roadmap.md",
@@ -54,7 +54,7 @@
       ],
       "use": "excerpt",
       "reason": "Selected verification requirement and adjacent access boundary",
-      "sha256": "7878cc8bb16c65f9b34fb2d290471fb499236497a30c7e84bd43b93257fc17e3"
+      "sha256": "25fd4cd6fde90d77700c3048c073f77f969780511a51072903cceaf0002d029e"
     },
     {
       "path": "docs/product/open-questions.md",
@@ -65,42 +65,42 @@
       ],
       "use": "excerpt",
       "reason": "Applicable lifecycle, exact auth-contract and browser/presentation dispositions",
-      "sha256": "60a75b92e44331627acaf5ba70f8da976816ae6012238495a98025603a0d8ed5"
+      "sha256": "f628499d931239dc04b519491b0db7d7ce821bcb3c02c76b855ca42d715e7eb0"
     },
     {
       "path": "docs/02-ux-specification.md",
       "heading": "9. Local-account and availability flows",
       "use": "excerpt",
       "reason": "Canonical verification status, resend cooldown, link variants, status check and continuation behavior",
-      "sha256": "e04b0fae9d96f500a8df34adb10beee3bb38491385e1c6a54956fa1311586809"
+      "sha256": "aa5a998f724b49e67f13f96ff28252cb197138cf6f87cd9597933d9bc3279ec0"
     },
     {
       "path": "docs/02-ux-specification.md",
       "heading": "3.1 Routes and account access",
       "use": "excerpt",
       "reason": "Route table for /verify-email, unverified redirects and continuation destinations",
-      "sha256": "3c7ca3b93736cb688c2cd16f1a19902c9149ba495c73a7e14770f12f63aeb836"
+      "sha256": "a5ff70fbaedf6632a7e636f6de8b367579f3a75120190cd9a63cf6fa7f93fff4"
     },
     {
       "path": "docs/ux/processing.md",
       "heading": "6.3 Exact message IDs and disposition",
       "use": "excerpt",
       "reason": "Normative verification message copy MSG-032/034/035 and generic failure text",
-      "sha256": "2dc4106342973b68395dd28ee84f7fb38614a0c308d401c747218c13f671632b"
+      "sha256": "61ce541b6fcc86a0f5d43ebf9783feba12a6e29df823b2c0a059098c442704ac"
     },
     {
       "path": "docs/ux/acceptance.md",
       "heading": "12.2–12.9 Scenario disposition and current acceptance",
       "use": "excerpt",
       "reason": "Selected UX-AC-008/009/010/102/104 contracts and deferred/retired boundaries",
-      "sha256": "5f4515441ce70253344cc653186a5c7feaabe67c2fe2d3b077a0652f1d023ada"
+      "sha256": "3a3698773cc8c0ed1e46e4ecb8b388c9abd22e0346b68937c34bd42621a83fc5"
     },
     {
       "path": "docs/api/accounts.md",
       "heading": "3.3 Verification and recovery",
       "use": "excerpt",
       "reason": "Shared confirmation/resend/session semantics, non-enumeration and link-token redaction rules",
-      "sha256": "a4ed2854bd30f943c4745e9be828ff7e5e581cc6bf9cf2c31299145adaf6de89"
+      "sha256": "20595135c32744cae88b70ed050358f3fc3f8b31d91d7bda62518c2d27cbc93e"
     },
     {
       "path": "docs/03-architecture.md",
@@ -128,7 +128,7 @@
       ],
       "use": "excerpt",
       "reason": "Selected component, account-integration, contract-drift, browser-contract, smoke and privacy check groups",
-      "sha256": "96bf7a4b4c39ba1ef373abd20bee48be2a2818bc71f5077c42d6aeffa6a34bf4"
+      "sha256": "749e33acdaa15e7b81bedfba98ba4cd8d682b30c5db98b825484f6f6260a1bfc"
     },
     {
       "path": "docs/06-verification-plan.md",
@@ -149,94 +149,94 @@
       "heading": "4.1 Shared UI fixtures",
       "use": "excerpt",
       "reason": "Canonical fixtures, request-count and fake-boundary conventions",
-      "sha256": "7b6236fc51c7069628cb2e80b7df5d4f8642279f5a710d0486a1ca2077f0e272"
+      "sha256": "64b4c731cca9e0505cf985d37c7ef7fea10fa96d6681276c1d749ed3b3d835f3"
     },
     {
       "path": "docs/verification/frontend.md",
       "heading": "4.2 Browser lanes",
       "use": "excerpt",
       "reason": "Chromium smoke scope and release-only branded-browser/device evidence boundary",
-      "sha256": "24b0e19b0b330638ecd0d87f0f6f952014faaa60ac4f8e4d404e560029693e04"
+      "sha256": "e72f4af99846e84c8c040502f3b54e9238aac22083484f94f588d5a8dde40bfe"
     },
     {
       "path": "docs/verification/coverage.md",
       "heading": "8.2 Local acceptance allocation",
       "use": "excerpt",
       "reason": "V-group allocation for the selected UX scenarios",
-      "sha256": "0999657002c0fb16f7d4cef68e234e22134a37fadc8790a27a66f95649e793d7"
+      "sha256": "62da5f68127f328d7c7816d29a1dc6bd769e1935058fdaf6f00f9295a1197209"
     },
     {
       "path": "docs/verification/readiness.md",
       "heading": "9. Readiness and remaining dependencies",
       "use": "excerpt",
       "reason": "Verification readiness dependencies and remaining lifecycle/live evidence",
-      "sha256": "73a8b0c91d813cbf40f675b50c08b7895f2964eae66b0f802893e6811ba8f70d"
+      "sha256": "28608d4ed934356e58e932b21948ab948c95ae020d6debe600e35cbf21004e75"
     },
     {
       "path": "frontend/src/shell/App.tsx",
       "use": "reference",
       "reason": "Current placeholder routes, heading-focus and shell conventions to extend",
-      "sha256": "1d276054e0ba666074955b7f18d8b4148aede2b53aff01b8923c4829b96fa565"
+      "sha256": "23db1cd5ac4a5cd71fdee3a1edb35b669902a832de1a4aeff5962845721b74bc"
     },
     {
       "path": "frontend/src/auth/VerifyEmailEntryPage.tsx",
       "use": "reference",
       "reason": "M011 MSG-034 entry state reworked into the full verification page",
-      "sha256": "4c272084cd2c47b82f7292d80af623ae611654f3db6e00dbc64087f14e388938"
+      "sha256": "1b6a3e09043a860fadf41f57dd80904eae3e4b3619764bd4db9f38c23909ffce"
     },
     {
       "path": "frontend/src/auth/RegisterPage.tsx",
       "use": "reference",
       "reason": "In-memory verification-email handoff source kept unchanged",
-      "sha256": "2602d1d3c80cd2ba72e60abe9d94a3c67cacb47377610195b68200bcf4c3b9c0"
+      "sha256": "c270bae4e9d9fe672e0c1cdce3de8a5be966fba83e5ead64d85743bbf6847926"
     },
     {
       "path": "frontend/src/api/accounts.ts",
       "use": "reference",
       "reason": "Typed wrapper and result-mapping style extended with resend/confirm/session calls",
-      "sha256": "021031fee5eb7c0994ecdc19b5f313476a51e86c599259a7919ff362a84f725d"
+      "sha256": "e168599ee561c18c5688dd08e6e6aaf6d3ec8ebddfc0911da03bfa0d3864143d"
     },
     {
       "path": "frontend/src/api/generated/linguadesk-api.d.ts",
       "use": "reference",
       "reason": "Generated confirm/resend/session shapes adopted without API change",
-      "sha256": "2f13e433b8839496558b6e060ed25c812cc29527bfc4c9e0c0bb801997dc8805"
+      "sha256": "9f499e4e747e9e9173cfd39b798f28d975c459c7d95a363cae3d8d6ac8b518ac"
     },
     {
       "path": "frontend/tests/unit/App.test.tsx",
       "use": "reference",
       "reason": "Current redirect assertions extended with verification routing cases",
-      "sha256": "8ce3389eb0c985cbb1eceea2b9b55099ad284eea93275c4633aea2654b86afea"
+      "sha256": "bb952cc3cabde28c2152fa6024a0669e2d79a25825c04b8214c546dbd9e3c6f3"
     },
     {
       "path": "frontend/tests/unit/register.test.tsx",
       "use": "reference",
       "reason": "Focused-suite conventions mirrored by the new verification suite",
-      "sha256": "9ab1e39438783d7283e416314183ae5ce9a1b915270b8f813887c10acf3d73af"
+      "sha256": "b6e2ac5e15605451976f2ab3f2b9294611c2b6e828e82492547baacd5d22e239"
     },
     {
       "path": "frontend/tests/e2e/registration.spec.ts",
       "use": "reference",
       "reason": "Current published-smoke surface extended by the verification trip",
-      "sha256": "da4f22c353bf7d022a1114c7114da465095f7567540346f36c54616fd97d8054"
+      "sha256": "6520b9c5d6bb2a6fb05eb21f2593749ff7aad44537f92d18d3bc776c313ebece"
     },
     {
       "path": "frontend/playwright.config.ts",
       "use": "reference",
       "reason": "Owned-host Chromium lane configuration for the browser trip",
-      "sha256": "f93422d719599d582be3ae302128f4be2964b65d8e787d00babdfe4780367768"
+      "sha256": "f344fc34c3faa0f00e36d3891dd3164da5d2e36c6ce2b83b5d59e4c74b16c18a"
     },
     {
       "path": "frontend/package.json",
       "use": "reference",
       "reason": "Pinned Node/npm and frontend verification scripts",
-      "sha256": "6679b8d86b24c87bded9242d2d5a0caed0fc70d1c30ecedffc2382e381fb1b89"
+      "sha256": "1e080864de83e24a24660998f2a9f3a04ac3ff1528741a01838340a0fa5d5ea9"
     },
     {
       "path": "scripts/frontend.sh",
       "use": "reference",
       "reason": "Frontend type/build and published Chromium verification command",
-      "sha256": "f5977a5161c09985fc5cdc6eee4b9ddd5614b589d4b49e6fed8add6530b12f15"
+      "sha256": "e5c7ead7f029621979ce0fa2317e086a1e4e324b70770f104816bc155d0cd437"
     },
     {
       "path": "scripts/contract.sh",
@@ -246,9 +246,9 @@
     }
   ],
   "source_map_sha256": "c5456facbd4ef1a41f856807b71006921fc1b48cea725bd38a7e04108469e921",
-  "baseline_commit": "304c95ec776f220e14b9a3ae7f9f1ab57065a303",
+  "baseline_commit": "014fe56cf7a671bb9a606d85df50716f58a60d89",
   "locked_files": {
-    "docs/00-SDD-Planning-Workflow.md": "183ae93148ff594f9f1e021aa7543baa8878e9cc0bcfd69ebc696c28976e2945",
+    "docs/00-SDD-Planning-Workflow.md": "5ccca040d0f0d50fac47632643306e7224a8d2e5460df0958e7e7c333146db89",
     "docs/00-workflow/execution.md": "f362a1384cefef24ba204e0723e3190857c8cca9bcd91908136932e19c5caf02",
     "docs/08-backlogs/M012/spec.md": "1b9d8d649857ec92d6b0c925ea3de592a4be0b13720184e2807e5a27d782d70f",
     "docs/08-backlogs/M012/plan.md": "fe524c2078ab4a384573d9d519e08497e3e580a0f3eb101700e42c7c98eb0828"

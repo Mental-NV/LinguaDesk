@@ -22,22 +22,22 @@ Query by semantic role/name. Native selectors are asserted through value/options
 
 ### 4.2 Browser lanes
 
-Support current and immediately previous stable major releases at each release candidate for Chrome, Edge, Firefox, desktop Safari, iOS Safari and Android Chrome. Record actual tested versions in the release evidence. Bundled Playwright Chromium/WebKit represent engines, not branded/browser-version or physical-device proof. Previous-major support requires bounded actual-version smoke or an explicit evidence gap before release support is claimed.
+Support current and immediately previous stable major releases of Firefox and Chrome at each release candidate, on desktop and on mobile. Record actual tested versions in the release evidence. Bundled Playwright Chromium represents the engine, not branded-browser-version or physical-device proof. Previous-major support requires bounded actual-version smoke or an explicit evidence gap before release support is claimed.
 
 | Lane | Automated scope | Release/manual scope |
 | --- | --- | --- |
-| Chromium desktop 1440×900 | Core keyboard/focus/edit/copy/history/privacy subset, curated visuals per Section 4.4, small integrated smoke | Branded Chrome/Edge and keyboard/zoom smoke |
-| Chromium narrow 390×844 | Curated visuals and ordinary reflow/native-control geometry | Android Chrome/TalkBack at 360×800 |
+| Chromium desktop 1440×900 | Core keyboard/focus/edit/copy/history/privacy subset, curated visuals per Section 4.4, small integrated smoke | Branded Chrome versions and zoom smoke |
+| Chromium narrow 390×844 (mobile emulation) | Curated visuals and ordinary reflow/native-control geometry | Chrome on Android at 360×800 |
 | Chromium 320×640 / 1024×768 | Small overflow/breakpoint checks, no extra screenshot matrix | Zoom and text-spacing checks |
-| Firefox desktop 1024×768 | Short native-editor/selector/keyboard/composition-event smoke when affected or at release | NVDA and actual supported Firefox versions |
-| WebKit desktop 1440×900 | Short focus/navigation/editor smoke when affected or at release | Actual macOS Safari/VoiceOver |
-| iOS Safari 390×844 | No separate full automated narrow-engine suite | VoiceOver, editing/copy, native selects and software keyboard |
+| Firefox desktop 1024×768 | Short native-editor/selector/keyboard/composition-event smoke when affected or at release | Actual supported Firefox desktop versions |
+| Firefox/Chrome mobile 390×844 | No separate automated mobile-engine suite | Actual supported mobile versions with journey checks per Section 4.3 |
+| WebKit desktop 1440×900 | Short focus/navigation/editor smoke when affected or at release | Outside RG-006 matrix (engine coverage only) |
 
-### 4.3 Manual accessibility and device evidence
+### 4.3 Manual browser-matrix evidence
 
-Before RG-006, check local registration/login/recovery, Translation, Rewriting mode selection, explicit submission, validation, copy and session expiry with NVDA/Firefox on Windows and VoiceOver/Safari on macOS. Include actual Simplified/Traditional Chinese IME on macOS. Check source/result editing, native selectors, copy and keyboard visibility with iOS Safari/VoiceOver and Android Chrome/TalkBack. Check keyboard-only Windows/macOS at 100%, 200% and effective 400%, forced colors, text spacing, and speech-control labels.
+Before RG-006, check local registration/login/recovery, Translation, Rewriting mode selection, explicit submission, validation, copy and session expiry in both Firefox and Chrome, on desktop and on mobile sizes. Record actual tested versions in the release evidence. Keyboard-only, screen-reader (NVDA/VoiceOver/TalkBack), IME composition, forced-colors and other browser/device checks are explicitly outside RG-006; milestones may still record them as non-gating evidence, and combinations outside the Firefox/Chrome matrix are noted as gaps without blocking the gate.
 
-Automated semantics, focus, contrast/reflow and live-region checks do not prove understandable screen-reader narration or native mobile keyboard behavior. Deferred sentence, comparison and custom-sheet journeys are excluded from current evidence, not reported as passing.
+Automated semantics, focus, contrast/reflow and live-region checks do not replace the manual matrix pass above. Deferred sentence, comparison and custom-sheet journeys are excluded from current evidence, not reported as passing.
 
 ### 4.4 Curated visual regression
 
@@ -45,4 +45,4 @@ Use **seven** initial Chromium baselines: Translation ready and oversize-error l
 
 Pin Noto Sans/Noto Sans SC, Chromium/container, scale factor 1 and deterministic synthetic content/time. Wait for fonts; hide caret; disable motion and control scrollbars. Native select popups are excluded from pixel capture. Start with per-pixel threshold 0.1 and max differing ratio 0.001; record measured reasons for adjustments and never automatically accept changed baselines. DOM emulators cannot prove layout. Keep structural/semantic checks independent of screenshots.
 
-Browser contracts use semantic locators and isolated contexts; prefer explicit readiness and controlled responses over timing sleeps. See [Playwright best practices](https://playwright.dev/docs/best-practices). Native clipboard, composition, selection and restoration require their actual platform evidence; synthetic DOM events or bundled engines cannot stand in for physical-device or assistive-technology review. Unsupported access to a required device/version is an explicit evidence gap, blocking RG-006 until resolved.
+Browser contracts use semantic locators and isolated contexts; prefer explicit readiness and controlled responses over timing sleeps. See [Playwright best practices](https://playwright.dev/docs/best-practices). Native clipboard, composition, selection and restoration require their actual platform evidence; synthetic DOM events or bundled engines cannot stand in for physical-device review. Unsupported access to a required device/version is an explicit evidence gap, blocking RG-006 until resolved.

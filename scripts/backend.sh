@@ -66,6 +66,38 @@ validate_serving_config() {
     fi
 }
 
+validate_monetary_config() {
+    # Monetary admission is config-first: appsettings.json carries the
+    # MonetaryAdmission default and MonetaryAdmission__MonthlyCapMinorUnits /
+    # MonetaryAdmission__Currency env vars override it per run (standard
+    # IConfiguration layering). Fail fast here so 'run' never boots into a
+    # portal where every Translate/Rewrite suspends with monetarySuspension.
+    # MonetaryAdmissionStartupGuard re-validates the merged configuration at
+    # startup, which also covers non-script invocations.
+    require_command python3
+    monetary_defaults=$(python3 - "$repository_root/backend/src/LinguaDesk.Api/appsettings.json" <<'EOF'
+import json, sys
+section = json.load(open(sys.argv[1])).get("MonetaryAdmission", {})
+print(section.get("MonthlyCapMinorUnits", ""))
+print(section.get("Currency", ""))
+EOF
+    )
+    monetary_cap_default=$(printf '%s' "$monetary_defaults" | sed -n '1p')
+    monetary_currency_default=$(printf '%s' "$monetary_defaults" | sed -n '2p')
+    monetary_cap=${MonetaryAdmission__MonthlyCapMinorUnits:-$monetary_cap_default}
+    monetary_currency=${MonetaryAdmission__Currency:-$monetary_currency_default}
+    case "$monetary_cap" in
+        ''|*[!0-9]*|0*)
+            echo "LinguaDesk monetary admission is not configured; 'run' refuses to start without a monthly spend ceiling. Missing or invalid: MonetaryAdmission__MonthlyCapMinorUnits (resolved: '$monetary_cap'). Set appsettings.json MonetaryAdmission.MonthlyCapMinorUnits or export MonetaryAdmission__MonthlyCapMinorUnits (e.g. 1000000)." >&2
+            return 1
+            ;;
+    esac
+    if is_blank_value "$monetary_currency"; then
+        echo "LinguaDesk monetary admission is not configured; 'run' refuses to start without a monthly spend ceiling. Missing or invalid: MonetaryAdmission__Currency (resolved: '$monetary_currency'). Set appsettings.json MonetaryAdmission.Currency or export MonetaryAdmission__Currency (e.g. USD)." >&2
+        return 1
+    fi
+}
+
 require_command() {
     if ! command -v "$1" >/dev/null 2>&1; then
         echo "Required command '$1' was not found on PATH." >&2
@@ -277,6 +309,7 @@ validate_report() {
 run() {
     check_sdk
     validate_serving_config
+    validate_monetary_config
     restore_locked
     development_data_directory=${LINGUADESK_DEVELOPMENT_DATA_PATH:-"$repository_root/../.linguadesk-development"}
     case "$development_data_directory" in
