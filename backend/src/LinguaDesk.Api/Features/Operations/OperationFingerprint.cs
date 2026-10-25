@@ -73,6 +73,25 @@ public static class OperationFingerprint
 
     private const string CanonicalPrefix = "linguadesk-operation-v1";
 
+    public static string ComputeAlternatives(byte[] key, AlternativesRequest request)
+    {
+        // BinaryWriter prefixes UTF-8 strings with their byte length; embedded NUL cannot alter field boundaries.
+        using var stream = new MemoryStream();
+        using (var writer = new BinaryWriter(stream, Encoding.UTF8, leaveOpen: true))
+        {
+            writer.Write("linguadesk-alternatives-v1");
+            writer.Write(OperationKinds.SentenceAlternatives);
+            writer.Write(request.Context);
+            writer.Write(request.Start);
+            writer.Write(request.Length);
+            writer.Write(request.Association.ToString("D"));
+            writer.Write(request.Language);
+            writer.Write(request.Mode ?? LinguaDesk.Core.ProductCatalog.DefaultRewritingMode);
+            writer.Write(LinguaDesk.Core.SentenceBoundaryPolicy.Revision);
+        }
+        return Convert.ToHexString(HMACSHA256.HashData(key, stream.ToArray()));
+    }
+
     public static string Compute(
         byte[] key,
         string family,

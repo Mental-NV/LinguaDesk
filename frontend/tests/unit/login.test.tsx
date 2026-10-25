@@ -1,4 +1,4 @@
-import { act, render, screen, waitFor } from '@testing-library/react'
+import { fireEvent, act, render, screen, waitFor } from '@testing-library/react'
 import { useEffect } from 'react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter, useNavigate } from 'react-router-dom'
@@ -268,7 +268,7 @@ describe('verified sign-in (AC-001)', () => {
     expect(await screen.findByRole('heading', { level: 1, name: 'Sign in' })).toHaveFocus()
     await submitLoginForm(user)
 
-    const destinationHeading = await screen.findByRole('heading', { level: 1, name: 'Translation' })
+    const destinationHeading = await screen.findByRole('heading', { level: 1, name: 'Translator' })
     expect(destinationHeading).toHaveFocus()
     expect(screen.getByLabelText('Source text')).toBeVisible()
     expect(screen.getByLabelText('Translation result')).toHaveValue('')
@@ -312,11 +312,11 @@ describe('verified sign-in (AC-001)', () => {
     expect(await screen.findByRole('form', { name: 'Sign in' })).toBeVisible()
     await submitLoginForm(user)
 
-    const destinationHeading = await screen.findByRole('heading', { level: 1, name: 'Rewriting' })
+    const destinationHeading = await screen.findByRole('heading', { level: 1, name: 'Write' })
     expect(destinationHeading).toHaveFocus()
     expect(await screen.findByLabelText('Writing language')).toBeVisible()
-    expect(screen.getByLabelText('Writing mode')).toHaveValue('correctionOnly')
-    expect(screen.getByLabelText('Improved result')).toHaveValue('')
+    expect(screen.getByRole('button', { name: 'Toolbar' })).toHaveAttribute('aria-expanded', 'false')
+    expect(screen.getByTestId('write-result')).toHaveTextContent('')
   })
 
   it('disables fields during flight and ignores duplicate click and Enter', async () => {
@@ -344,7 +344,7 @@ describe('verified sign-in (AC-001)', () => {
     expect(spy).toHaveBeenCalledTimes(2)
 
     release(verifiedSignInResponse())
-    expect(await screen.findByRole('heading', { level: 1, name: 'Translation' })).toBeVisible()
+    expect(await screen.findByRole('heading', { level: 1, name: 'Translator' })).toBeVisible()
     expect(calls.filter((call) => call.url === '/api/accounts/sign-in')).toHaveLength(1)
   })
 
@@ -362,7 +362,7 @@ describe('verified sign-in (AC-001)', () => {
     await user.type(screen.getByLabelText('Email'), VALID_EMAIL)
     await user.type(screen.getByLabelText('Password'), `${VALID_PASSWORD}[Enter]`)
 
-    expect(await screen.findByRole('heading', { level: 1, name: 'Translation' })).toBeVisible()
+    expect(await screen.findByRole('heading', { level: 1, name: 'Translator' })).toBeVisible()
     await waitFor(() => expect(spy).toHaveBeenCalledTimes(4))
     expect(calls.filter((call) => call.url === '/api/accounts/sign-in')).toHaveLength(1)
     expectNoLanguageRequests(calls)
@@ -391,7 +391,7 @@ describe('invalid and unverified credentials (AC-002)', () => {
       expect(screen.getByLabelText('Email')).toHaveValue(email)
       expect(screen.getByLabelText('Email')).toHaveAttribute('aria-invalid', 'true')
       expect(screen.getByLabelText('Email')).toHaveFocus()
-      expect(screen.queryByRole('heading', { level: 1, name: 'Translation' })).not.toBeInTheDocument()
+      expect(screen.queryByRole('heading', { level: 1, name: 'Translator' })).not.toBeInTheDocument()
       expect(document.body.textContent).not.toContain(password)
       expect(document.body.textContent).not.toContain('absent-visitor')
       await waitFor(() => expect(spy).toHaveBeenCalledTimes(2))
@@ -462,7 +462,7 @@ describe('session expiry teardown (AC-003)', () => {
 
     await submitLoginForm(user)
 
-    const destinationHeading = await screen.findByRole('heading', { level: 1, name: 'Rewriting' })
+    const destinationHeading = await screen.findByRole('heading', { level: 1, name: 'Write' })
     expect(destinationHeading).toHaveFocus()
     expect(
       screen.queryByText('Your session expired. Sign in again to continue.'),
@@ -496,7 +496,7 @@ describe('session expiry teardown (AC-003)', () => {
     await new Promise((resolve) => setTimeout(resolve, 0))
 
     expect(screen.getByRole('heading', { level: 1, name: 'Forgot password' })).toBeVisible()
-    expect(screen.queryByRole('heading', { level: 1, name: 'Translation' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('heading', { level: 1, name: 'Translator' })).not.toBeInTheDocument()
     expect(screen.queryByLabelText('Password')).not.toBeInTheDocument()
   })
 })
@@ -523,9 +523,9 @@ describe('inline sign-out (AC-004)', () => {
     renderApp('/translate')
 
     await waitFor(() =>
-      expect(screen.getByRole('heading', { level: 1, name: 'Translation' })).toHaveFocus(),
+      expect(screen.getByRole('heading', { level: 1, name: 'Translator' })).toHaveFocus(),
     )
-    await user.click(screen.getByRole('button', { name: 'Sign out' }))
+    await user.click(signOutButton())
 
     expect(await screen.findByText('Signing out…')).toBeVisible()
     expect(screen.getByRole('heading', { level: 1, name: 'Sign in' })).toBeVisible()
@@ -557,7 +557,7 @@ describe('inline sign-out (AC-004)', () => {
     expect(spy).toHaveBeenCalled()
     expectNoLanguageRequests(calls)
 
-    await user.click(screen.getByRole('link', { name: 'Translation' }))
+    await user.click(screen.getByRole('link', { name: 'Translator' }))
     await waitFor(() =>
       expect(screen.getByRole('heading', { level: 1, name: 'Sign in' })).toBeVisible(),
     )
@@ -575,8 +575,8 @@ describe('inline sign-out (AC-004)', () => {
     })
     renderApp('/translate')
 
-    expect(await screen.findByRole('button', { name: 'Sign out' })).toBeVisible()
-    await user.click(screen.getByRole('button', { name: 'Sign out' }))
+    expect(await screen.findByRole('button', { name: 'Account' })).toBeVisible()
+    await user.click(signOutButton())
 
     expect(
       await screen.findByText('Workspace cleared. Sign-out could not be confirmed. Try again.'),
@@ -614,8 +614,8 @@ describe('inline sign-out (AC-004)', () => {
     stubSignedInSession(() => gate)
     renderAppWithProbe('/translate')
 
-    expect(await screen.findByRole('button', { name: 'Sign out' })).toBeVisible()
-    await user.click(screen.getByRole('button', { name: 'Sign out' }))
+    expect(await screen.findByRole('button', { name: 'Account' })).toBeVisible()
+    await user.click(signOutButton())
     expect(await screen.findByText('Signing out…')).toBeVisible()
 
     goTo('/translate')
@@ -714,11 +714,11 @@ describe('local validation and ordering (AC-005)', () => {
     renderAppWithProbe('/login')
 
     await submitLoginForm(user)
-    expect(await screen.findByRole('heading', { level: 1, name: 'Translation' })).toBeVisible()
+    expect(await screen.findByRole('heading', { level: 1, name: 'Translator' })).toBeVisible()
 
     goTo('/login')
     await waitFor(() =>
-      expect(screen.getByRole('heading', { level: 1, name: 'Translation' })).toBeVisible(),
+      expect(screen.getByRole('heading', { level: 1, name: 'Translator' })).toBeVisible(),
     )
   })
 })
@@ -744,7 +744,7 @@ describe('account transport failure (AC-006)', () => {
 
     expect(await screen.findByText('We couldn’t complete this request. Try again.')).toBeVisible()
     expect(
-      screen.queryByRole('heading', { level: 1, name: 'Translation' }),
+      screen.queryByRole('heading', { level: 1, name: 'Translator' }),
     ).not.toBeInTheDocument()
     expect(screen.getByLabelText('Password')).toHaveValue('')
     expect(screen.getByLabelText('Email')).toHaveValue(VALID_EMAIL)
@@ -752,7 +752,7 @@ describe('account transport failure (AC-006)', () => {
     await user.type(screen.getByLabelText('Password'), VALID_PASSWORD)
     await user.click(screen.getByRole('button', { name: 'Sign in' }))
 
-    expect(await screen.findByRole('heading', { level: 1, name: 'Translation' })).toBeVisible()
+    expect(await screen.findByRole('heading', { level: 1, name: 'Translator' })).toBeVisible()
     expect(calls.filter((call) => call.url === '/api/accounts/sign-in')).toHaveLength(2)
     expect(calls.filter((call) => call.url === '/api/accounts/antiforgery')).toHaveLength(2)
     expect(spy).toHaveBeenCalledTimes(6)
@@ -814,3 +814,8 @@ describe('safe return guard', () => {
     expect(resolveSafeReturn(path)).toBe(expected)
   })
 })
+
+function signOutButton() {
+  fireEvent.click(screen.getByRole('button', { name: 'Account' }))
+  return screen.getByRole('menuitem', { name: 'Log out' })
+}

@@ -52,6 +52,7 @@ function validateContract(document) {
       '/api/operations',
       '/api/operations/{operationId}',
       '/api/usage',
+      '/api/rewriting/alternatives',
       '/api/accounts/register',
       '/api/accounts/confirm-email',
       '/api/accounts/resend-verification',
@@ -216,7 +217,7 @@ function validateContract(document) {
   )
   sameValues(
     Object.keys(pendingResponse.properties),
-    ['operationId', 'family', 'status', 'characterCount', 'admissionDay', 'deadlineUtc', 'serverTimeUtc', 'usage'],
+    ['operationId', 'family', 'status', 'characterCount', 'admissionDay', 'deadlineUtc', 'serverTimeUtc', 'usage', 'kind'],
     'pending response fields',
   )
   expect(pendingResponse.properties.characterCount.type === 'integer', 'pending character count must be integer-only')
@@ -228,7 +229,7 @@ function validateContract(document) {
   )
   sameValues(
     Object.keys(statusResponse.properties),
-    ['operationId', 'family', 'status', 'characterCount', 'admissionDay', 'deadlineUtc', 'outputAvailable', 'serverTimeUtc', 'usage'],
+    ['operationId', 'family', 'status', 'characterCount', 'admissionDay', 'deadlineUtc', 'outputAvailable', 'serverTimeUtc', 'usage', 'kind'],
     'status response fields',
   )
   expect(statusResponse.properties.characterCount.type === 'integer', 'status character count must be integer-only')
@@ -236,12 +237,12 @@ function validateContract(document) {
   const translationSuccess = document.components.schemas.TranslationSuccessResponse
   sameValues(
     translationSuccess.required,
-    ['operationId', 'family', 'status', 'translatedText', 'characterCount', 'admissionDay', 'deadlineUtc', 'serverTimeUtc', 'usage'],
+    ['operationId', 'family', 'status', 'translatedText', 'characterCount', 'admissionDay', 'deadlineUtc', 'serverTimeUtc', 'usage', 'resolvedSourceLanguage'],
     'translation success required fields',
   )
   sameValues(
     Object.keys(translationSuccess.properties),
-    ['operationId', 'family', 'status', 'translatedText', 'characterCount', 'admissionDay', 'deadlineUtc', 'serverTimeUtc', 'usage'],
+    ['operationId', 'family', 'status', 'translatedText', 'characterCount', 'admissionDay', 'deadlineUtc', 'serverTimeUtc', 'usage', 'kind', 'resolvedSourceLanguage'],
     'translation success fields',
   )
   expect(translationSuccess.properties.characterCount.type === 'integer', 'translation success character count must be integer-only')
@@ -609,7 +610,7 @@ function validateContract(document) {
     'operationIdentity',
   ]
   sameValues(root.required, topLevelFields, 'capability response required fields')
-  sameValues(Object.keys(root.properties), topLevelFields, 'capability response fields')
+  sameValues(Object.keys(root.properties), [...topLevelFields, 'alternatives'], 'capability response fields')
   expect(root.properties.serverTimeUtc.type === 'string', 'serverTimeUtc must be a string')
   expect(root.properties.serverTimeUtc.format === 'date-time', 'serverTimeUtc must use date-time format')
 
@@ -622,6 +623,7 @@ function validateContract(document) {
     LineEndingPolicy: ['preserve'],
     NormalizationPolicy: ['none'],
     OperationFamily: ['translation', 'rewriting'],
+    OperationKind: ['fullText', 'sentenceAlternatives'],
     OperationIdentityFormat: ['uuidV7'],
     OperationStatus: ['pending', 'succeeded', 'failed', 'interrupted'],
     OversizeHandling: ['rejectWhole'],
@@ -655,6 +657,16 @@ function validateContract(document) {
       expect(schema.properties[propertyName].type === 'integer', `${schemaName}.${propertyName} must be integer-only`)
     }
   }
+
+  const alternatives = document.paths['/api/rewriting/alternatives'].post
+  expect(alternatives.operationId === 'submitSentenceAlternatives', 'alternatives operation ID')
+  expect(alternatives.security?.length === 2, 'alternatives must accept cookie and bearer')
+  expect(alternatives.responses['201'].content?.['application/json']?.schema?.$ref === '#/components/schemas/AlternativesSuccessResponse', 'alternatives success schema')
+  const alternativeRequest = document.components.schemas.AlternativesRequest
+  sameValues(alternativeRequest.required, ['operationId', 'context', 'start', 'length', 'association', 'language'], 'alternatives required fields')
+  sameValues(Object.keys(alternativeRequest.properties), ['operationId', 'context', 'start', 'length', 'association', 'language', 'mode'], 'alternatives fields')
+  expect(alternativeRequest.properties.mode.type === 'string' && alternativeRequest.properties.mode.default === 'correctionOnly', 'alternatives mode omission/default/null semantics')
+  expect(alternativeRequest.properties.length.maximum === 2000, 'alternatives sentence bound')
 
   assertPropertyDescriptions(document)
 }

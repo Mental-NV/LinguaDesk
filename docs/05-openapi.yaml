@@ -397,6 +397,191 @@ paths:
       security:
         - bearerAuth: []
         - sessionCookie: []
+  /api/rewriting/alternatives:
+    post:
+      tags:
+        - OperationsEndpoints
+      summary: Generate two contextual alternatives for one complete sentence
+      description: Exact result context and Unicode scalar span; selected sentence charged once on success. Status/replay are metadata-only. Deadline 15 seconds; at most three provider dispatches.
+      operationId: submitSentenceAlternatives
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AlternativesRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+          headers:
+            Cache-Control:
+              description: Always `no-store` for language-operation admission responses.
+              required: true
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OperationStatusResponse"
+        "201":
+          description: Created
+          headers:
+            Cache-Control:
+              description: Always `no-store` for language-operation admission responses.
+              required: true
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AlternativesSuccessResponse"
+        "202":
+          description: Accepted
+          headers:
+            Cache-Control:
+              description: Always `no-store` for language-operation admission responses.
+              required: true
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OperationPendingResponse"
+        "400":
+          description: Bad Request
+          headers:
+            Cache-Control:
+              description: Always `no-store` for language-operation admission responses.
+              required: true
+              schema:
+                type: string
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/OperationProblemDetails"
+        "401":
+          description: Unauthorized
+          headers:
+            Cache-Control:
+              description: Always `no-store` for language-operation admission responses.
+              required: true
+              schema:
+                type: string
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/OperationProblemDetails"
+        "403":
+          description: Forbidden
+          headers:
+            Cache-Control:
+              description: Always `no-store` for language-operation admission responses.
+              required: true
+              schema:
+                type: string
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/OperationProblemDetails"
+        "409":
+          description: Conflict
+          headers:
+            Cache-Control:
+              description: Always `no-store` for language-operation admission responses.
+              required: true
+              schema:
+                type: string
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/OperationProblemDetails"
+        "410":
+          description: Gone
+          headers:
+            Cache-Control:
+              description: Always `no-store` for language-operation admission responses.
+              required: true
+              schema:
+                type: string
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/OperationProblemDetails"
+        "413":
+          description: Payload Too Large
+          headers:
+            Cache-Control:
+              description: Always `no-store` for language-operation admission responses.
+              required: true
+              schema:
+                type: string
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/OperationProblemDetails"
+        "415":
+          description: Unsupported Media Type
+          headers:
+            Cache-Control:
+              description: Always `no-store` for language-operation admission responses.
+              required: true
+              schema:
+                type: string
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/OperationProblemDetails"
+        "422":
+          description: Unprocessable Entity
+          headers:
+            Cache-Control:
+              description: Always `no-store` for language-operation admission responses.
+              required: true
+              schema:
+                type: string
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/OperationProblemDetails"
+        "429":
+          description: Too Many Requests
+          headers:
+            Cache-Control:
+              description: Always `no-store` for language-operation admission responses.
+              required: true
+              schema:
+                type: string
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/OperationProblemDetails"
+        "503":
+          description: Service Unavailable
+          headers:
+            Cache-Control:
+              description: Always `no-store` for language-operation admission responses.
+              required: true
+              schema:
+                type: string
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/OperationProblemDetails"
+        "504":
+          description: Gateway Timeout
+          headers:
+            Cache-Control:
+              description: Always `no-store` for language-operation admission responses.
+              required: true
+              schema:
+                type: string
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/OperationProblemDetails"
+      security:
+        - bearerAuth: []
+        - sessionCookie: []
   /api/accounts/register:
     post:
       tags:
@@ -1234,6 +1419,161 @@ components:
           type: string
           description: UTC expiry of the fixed eight-hour protected server ticket; the cookie itself is nonpersistent.
           format: date-time
+    AlternativesCapability:
+      required:
+        - maximumContextCharacters
+        - maximumSentenceCharacters
+        - maximumRequestBytes
+        - segmentationRevision
+        - optionCount
+        - overallDeadlineSeconds
+        - kind
+      type: object
+      properties:
+        maximumContextCharacters:
+          type: integer
+          description: Maximum exact context in Unicode scalars.
+          format: int32
+        maximumSentenceCharacters:
+          type: integer
+          description: Maximum selected complete sentence in Unicode scalars.
+          format: int32
+        maximumRequestBytes:
+          type: integer
+          description: Maximum UTF-8 request body bytes.
+          format: int32
+        segmentationRevision:
+          type: string
+          description: Versioned deterministic scalar-span segmentation policy.
+        optionCount:
+          type: integer
+          description: Exactly two distinct complete options per successful original response.
+          format: int32
+        overallDeadlineSeconds:
+          type: integer
+          description: Overall server deadline including eligibility, fallback and settlement.
+          format: int32
+        kind:
+          type: string
+          description: "Supported operation kind: sentenceAlternatives."
+      description: Supported sentence alternatives operation, exact input bounds, segmentation and deadline.
+    AlternativesRequest:
+      required:
+        - operationId
+        - context
+        - start
+        - length
+        - association
+        - language
+      type: object
+      properties:
+        operationId:
+          type: string
+          description: Client-generated UUIDv7 identity unique within the account across all kinds.
+          format: uuid
+        context:
+          maxLength: 8000
+          minLength: 1
+          type: string
+          description: Exact current result context, at most 8000 Unicode scalars; never normalized or stored.
+        start:
+          minimum: 0
+          type: integer
+          description: Zero-based Unicode scalar offset of the selected complete sentence.
+          format: int32
+        length:
+          maximum: 2000
+          minimum: 1
+          type: integer
+          description: Selected complete sentence length, from 1 to 2000 Unicode scalars.
+          format: int32
+        association:
+          type: string
+          description: Opaque nonempty UUID correlating the in-memory result revision; never stored.
+          format: uuid
+        language:
+          type: string
+          description: "Explicit supported source language: en, ru, ro or zh."
+        mode:
+          type: string
+          description: One effective rewriting mode; correctionOnly when omitted; explicit null is rejected.
+          default: correctionOnly
+      additionalProperties: false
+    AlternativesSuccessResponse:
+      required:
+        - operationId
+        - family
+        - kind
+        - status
+        - options
+        - association
+        - start
+        - length
+        - resolvedSourceLanguage
+        - mode
+        - characterCount
+        - admissionDay
+        - deadlineUtc
+        - serverTimeUtc
+        - usage
+      type: object
+      properties:
+        operationId:
+          type: string
+          description: Client-generated UUIDv7 identity unique within the account across all kinds.
+          format: uuid
+        family:
+          description: "Existing routing family: rewriting."
+          $ref: "#/components/schemas/OperationFamily"
+        kind:
+          description: "Operation kind: sentenceAlternatives."
+          $ref: "#/components/schemas/OperationKind"
+        status:
+          description: Successful settled outcome.
+          $ref: "#/components/schemas/OperationStatus"
+        options:
+          maxItems: 2
+          minItems: 2
+          type: array
+          items:
+            type: string
+          description: Exactly two distinct complete sentence alternatives in the resolved language.
+        association:
+          type: string
+          description: Opaque nonempty UUID correlating the in-memory result revision; never stored.
+          format: uuid
+        start:
+          type: integer
+          description: Zero-based Unicode scalar offset of the selected complete sentence.
+          format: int32
+        length:
+          type: integer
+          description: Selected complete sentence length, from 1 to 2000 Unicode scalars.
+          format: int32
+        resolvedSourceLanguage:
+          type: string
+          description: Validated source language from eligibility, never inferred from generated output.
+        mode:
+          type: string
+          description: One effective rewriting mode; correctionOnly when omitted; explicit null is rejected.
+        characterCount:
+          type: integer
+          description: Selected-sentence scalar count charged once on success.
+          format: int32
+        admissionDay:
+          type: string
+          description: UTC admission day owning the charge, yyyy-MM-dd.
+        deadlineUtc:
+          type: string
+          description: Original stored absolute server deadline, never reset by recovery.
+          format: date-time
+        serverTimeUtc:
+          type: string
+          description: Current server time in UTC.
+          format: date-time
+        usage:
+          description: Authoritative current-day usage with durable ordering revision.
+          $ref: "#/components/schemas/UsageSnapshot"
     AntiforgeryTokenResponse:
       required:
         - requestToken
@@ -1352,6 +1692,9 @@ components:
         operationIdentity:
           description: UUIDv7 operation-identity recovery bounds.
           $ref: "#/components/schemas/OperationIdentityCapability"
+        alternatives:
+          description: Supported sentence alternatives operation, exact input bounds, segmentation and deadline.
+          $ref: "#/components/schemas/AlternativesCapability"
     ChineseScript:
       enum:
         - simplified
@@ -1556,6 +1899,12 @@ components:
         - uuidV7
       type: string
       description: Client-generated operation identity format.
+    OperationKind:
+      enum:
+        - fullText
+        - sentenceAlternatives
+      type: string
+      description: Operation kind; fullText for existing operations, sentenceAlternatives for selected-sentence requests.
     OperationPendingResponse:
       required:
         - operationId
@@ -1596,6 +1945,9 @@ components:
         usage:
           description: Fresh current-day user usage snapshot.
           $ref: "#/components/schemas/UsageSnapshot"
+        kind:
+          description: Operation kind; fullText for existing operations, sentenceAlternatives for selected-sentence requests.
+          $ref: "#/components/schemas/OperationKind"
     OperationProblemDetails:
       required:
         - title
@@ -1720,6 +2072,9 @@ components:
         usage:
           description: Fresh current-day user usage snapshot.
           $ref: "#/components/schemas/UsageSnapshot"
+        kind:
+          description: Operation kind; fullText for existing operations, sentenceAlternatives for selected-sentence requests.
+          $ref: "#/components/schemas/OperationKind"
     OversizeHandling:
       enum:
         - rejectWhole
@@ -1976,6 +2331,7 @@ components:
         - deadlineUtc
         - serverTimeUtc
         - usage
+        - resolvedSourceLanguage
       type: object
       properties:
         operationId:
@@ -2009,6 +2365,12 @@ components:
         usage:
           description: Fresh current-day user usage snapshot.
           $ref: "#/components/schemas/UsageSnapshot"
+        kind:
+          description: Operation kind; fullText for existing operations, sentenceAlternatives for selected-sentence requests.
+          $ref: "#/components/schemas/OperationKind"
+        resolvedSourceLanguage:
+          type: string
+          description: "Validated source language from eligibility: en, ru, ro or zh; never inferred from output."
     SessionProblemDetails:
       required:
         - title
@@ -2187,6 +2549,7 @@ components:
         - deadlineUtc
         - serverTimeUtc
         - usage
+        - resolvedSourceLanguage
       type: object
       properties:
         operationId:
@@ -2220,6 +2583,12 @@ components:
         usage:
           description: Fresh current-day user usage snapshot.
           $ref: "#/components/schemas/UsageSnapshot"
+        kind:
+          description: Operation kind; fullText for existing operations, sentenceAlternatives for selected-sentence requests.
+          $ref: "#/components/schemas/OperationKind"
+        resolvedSourceLanguage:
+          type: string
+          description: "Validated source language from eligibility: en, ru, ro or zh; never inferred from output."
     UsageAvailability:
       enum:
         - available

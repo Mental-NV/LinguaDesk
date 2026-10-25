@@ -12,5 +12,6 @@
     <EmbeddedResource Include="Prompts/eligibility.v1.txt" />
     <EmbeddedResource Include="Prompts/translation.v1.txt" />
     <EmbeddedResource Include="Prompts/rewriting.v1.txt" />
+    <EmbeddedResource Include="Prompts/alternatives.v9.txt" />
   </ItemGroup>
 </Project>

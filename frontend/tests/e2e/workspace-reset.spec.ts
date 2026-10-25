@@ -1,3 +1,4 @@
+import { logOut } from './workspace-fixture'
 import {
   expect,
   test,
@@ -62,18 +63,18 @@ function trackOperations(page: Page): OperationPost[] {
 
 async function fillBothWorkspaces(page: Page): Promise<void> {
   await page.goto('/translate')
-  await expect(page.getByRole('heading', { name: 'Translation', exact: true })).toBeFocused()
+  await expect(page.getByRole('heading', { name: 'Translator', exact: true })).toBeFocused()
   await page.getByLabel('Source language').selectOption('en')
   await page.getByLabel('Target language').selectOption('ro')
-  await page.getByLabel('Source text').fill(TOK_A)
+  await page.getByLabel('Source text', { exact: true }).fill(TOK_A)
 
-  await page.getByRole('link', { name: 'Rewriting' }).click()
-  await expect(page.getByRole('heading', { name: 'Rewriting' })).toBeFocused()
-  await page.getByLabel('Source text').fill(W_OK)
+  await page.getByRole('link', { name: 'Write' }).click()
+  await expect(page.getByRole('heading', { name: 'Write' })).toBeFocused()
+  await page.getByLabel('Source text', { exact: true }).fill(W_OK)
 
-  await page.getByRole('link', { name: 'Translation' }).click()
-  await expect(page.getByRole('heading', { name: 'Translation', exact: true })).toBeFocused()
-  await expect(page.getByLabel('Source text')).toHaveValue(TOK_A)
+  await page.getByRole('link', { name: 'Translator' }).click()
+  await expect(page.getByRole('heading', { name: 'Translator', exact: true })).toBeFocused()
+  await expect(page.getByLabel('Source text', { exact: true })).toHaveValue(TOK_A)
 }
 
 async function expectCleanClientState(page: Page, sentinel: string): Promise<void> {
@@ -97,8 +98,8 @@ test('reload, full-document navigation and restoration clear private text', asyn
     await expectCleanClientState(page, TOK_A.slice(0, 12))
 
     await page.reload()
-    await expect(page.getByRole('heading', { name: 'Translation', exact: true })).toBeFocused()
-    await expect(page.getByLabel('Source text')).toHaveValue('')
+    await expect(page.getByRole('heading', { name: 'Translator', exact: true })).toBeFocused()
+    await expect(page.getByLabel('Source text', { exact: true })).toHaveValue('')
     await expect(page.getByLabel('Source language')).toHaveValue('auto')
     await expect(page.getByLabel('Target language')).toHaveValue('')
     await expect(page.getByRole('textbox', { name: /Translation result|Improved result/ })).toHaveValue('')
@@ -106,13 +107,13 @@ test('reload, full-document navigation and restoration clear private text', asyn
 
     await fillBothWorkspaces(page)
     await page.goto('/rewrite')
-    await expect(page.getByRole('heading', { name: 'Rewriting' })).toBeFocused()
-    await expect(page.getByLabel('Source text')).toHaveValue('')
-    await expect(page.getByRole('textbox', { name: /Translation result|Improved result/ })).toHaveValue('')
+    await expect(page.getByRole('heading', { name: 'Write' })).toBeFocused()
+    await expect(page.getByLabel('Source text', { exact: true })).toHaveValue('')
+    await expect(page.getByTestId('write-result')).toHaveText('')
 
     await page.goBack()
-    await expect(page.getByRole('heading', { name: 'Translation', exact: true })).toBeFocused()
-    await expect(page.getByLabel('Source text')).toHaveValue('')
+    await expect(page.getByRole('heading', { name: 'Translator', exact: true })).toBeFocused()
+    await expect(page.getByLabel('Source text', { exact: true })).toHaveValue('')
     await expect(page.getByRole('textbox', { name: /Translation result|Improved result/ })).toHaveValue('')
     await expectCleanClientState(page, TOK_A.slice(0, 12))
 
@@ -120,9 +121,9 @@ test('reload, full-document navigation and restoration clear private text', asyn
     try {
       await secondTab.goto('/translate')
       await expect(
-        secondTab.getByRole('heading', { name: 'Translation', exact: true }),
+        secondTab.getByRole('heading', { name: 'Translator', exact: true }),
       ).toBeFocused()
-      await expect(secondTab.getByLabel('Source text')).toHaveValue('')
+      await expect(secondTab.getByLabel('Source text', { exact: true })).toHaveValue('')
     } finally {
       await secondTab.close()
     }
@@ -138,13 +139,13 @@ test('sign-out clears immediately and Back exposes no text', async ({ browser })
     const operations = trackOperations(page)
     await fillBothWorkspaces(page)
 
-    await page.getByRole('button', { name: 'Sign out' }).click()
+    await logOut(page)
     // The transient `Signing out…` copy is proven deterministically with a
     // gated sign-out response in `tests/unit/login.test.tsx` (M013); the
     // published path asserts the immediate clear and the settled form.
     await expect(page).toHaveURL(/\/login$/)
     await expect(page.getByRole('button', { name: 'Sign in' })).toBeVisible()
-    await expect(page.getByLabel('Source text')).toHaveCount(0)
+    await expect(page.getByLabel('Source text', { exact: true })).toHaveCount(0)
     await expectCleanClientState(page, TOK_A.slice(0, 12))
 
     await page.goto('/translate')
@@ -161,8 +162,8 @@ test('an expired session shows MSG-037 with a clean workspace', async ({ browser
   try {
     const operations = trackOperations(page)
     await page.goto('/translate')
-    await expect(page.getByRole('heading', { name: 'Translation', exact: true })).toBeFocused()
-    await page.getByLabel('Source text').fill(TOK_A)
+    await expect(page.getByRole('heading', { name: 'Translator', exact: true })).toBeFocused()
+    await page.getByLabel('Source text', { exact: true }).fill(TOK_A)
 
     await context.clearCookies()
     await page.reload()
@@ -177,7 +178,7 @@ test('an expired session shows MSG-037 with a clean workspace', async ({ browser
     await page.getByLabel('Password').fill(SIGN_IN_PASSWORD)
     await page.getByRole('button', { name: 'Sign in' }).click()
     await expect(page).toHaveURL(/\/translate$/)
-    await expect(page.getByLabel('Source text')).toHaveValue('')
+    await expect(page.getByLabel('Source text', { exact: true })).toHaveValue('')
     expect(operations).toHaveLength(0)
   } finally {
     await context.close()
@@ -192,14 +193,14 @@ test('both pages state the workspace lifetime with no client-side text residue',
     const footer =
       'Text and settings are cleared when this workspace ends, including refresh, sign-out, or session expiry.'
     await page.goto('/translate')
-    await expect(page.getByRole('heading', { name: 'Translation', exact: true })).toBeFocused()
-    await page.getByLabel('Source text').fill(`${TOK_A} ${SENTINEL}`)
+    await expect(page.getByRole('heading', { name: 'Translator', exact: true })).toBeFocused()
+    await page.getByLabel('Source text', { exact: true }).fill(`${TOK_A} ${SENTINEL}`)
     await expect(page.getByText(footer)).toBeVisible()
     await expectCleanClientState(page, SENTINEL)
 
-    await page.getByRole('link', { name: 'Rewriting' }).click()
-    await expect(page.getByRole('heading', { name: 'Rewriting' })).toBeFocused()
-    await page.getByLabel('Source text').fill(`${W_OK} ${SENTINEL}`)
+    await page.getByRole('link', { name: 'Write' }).click()
+    await expect(page.getByRole('heading', { name: 'Write' })).toBeFocused()
+    await page.getByLabel('Source text', { exact: true }).fill(`${W_OK} ${SENTINEL}`)
     await expect(page.getByText(footer)).toBeVisible()
     await expectCleanClientState(page, SENTINEL)
   } finally {

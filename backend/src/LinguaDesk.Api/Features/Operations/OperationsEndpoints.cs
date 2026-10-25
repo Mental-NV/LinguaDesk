@@ -9,7 +9,7 @@ using Microsoft.Extensions.Options;
 
 namespace LinguaDesk.Api.Features.Operations;
 
-public static class OperationsEndpoints
+public static partial class OperationsEndpoints
 {
     public static IEndpointRouteBuilder MapOperations(this IEndpointRouteBuilder endpoints)
     {
@@ -130,6 +130,7 @@ public static class OperationsEndpoints
             return Results.StatusCode(StatusCodes.Status405MethodNotAllowed);
         }).ExcludeFromDescription();
 
+        MapAlternatives(endpoints);
         return endpoints;
     }
 
@@ -308,6 +309,11 @@ public static class OperationsEndpoints
             return MapRewritingExecution(execution, correlationId);
         }
 
+        return MapAdmission(outcome, correlationId);
+    }
+
+    private static IResult MapAdmission(AdmissionResult outcome, string correlationId)
+    {
         return outcome.Outcome switch
         {
             AdmissionOutcome.Admitted => Results.Json(
@@ -568,7 +574,7 @@ public static class OperationsEndpoints
         execution.Submission.AdmissionDay,
         execution.Submission.DeadlineUtc,
         execution.ServerTime,
-        ToUsage(execution.Usage));
+        ToUsage(execution.Usage)) { ResolvedSourceLanguage = execution.ResolvedSourceLanguage! };
 
     internal static IResult MapRewritingExecution(
         RewritingExecutionResult execution,
@@ -618,7 +624,7 @@ public static class OperationsEndpoints
         execution.Submission.AdmissionDay,
         execution.Submission.DeadlineUtc,
         execution.ServerTime,
-        ToUsage(execution.Usage));
+        ToUsage(execution.Usage)) { ResolvedSourceLanguage = execution.ResolvedSourceLanguage! };
 
     internal static IResult ToDuplicate(
         OperationSubmission submission,
@@ -645,7 +651,7 @@ public static class OperationsEndpoints
             submission.AdmissionDay,
             submission.DeadlineUtc,
             serverTime,
-            ToUsage(usage));
+            ToUsage(usage)) { Kind = submission.Kind == OperationKinds.SentenceAlternatives ? OperationKind.SentenceAlternatives : OperationKind.FullText };
 
     internal static OperationStatusResponse ToStatus(
         OperationSubmission submission,
@@ -662,7 +668,7 @@ public static class OperationsEndpoints
             submission.DeadlineUtc,
             false,
             serverTime,
-            ToUsage(usage));
+            ToUsage(usage)) { Kind = submission.Kind == OperationKinds.SentenceAlternatives ? OperationKind.SentenceAlternatives : OperationKind.FullText };
 
     private static OperationStatus ToOperationStatus(OperationSubmission submission)
     {

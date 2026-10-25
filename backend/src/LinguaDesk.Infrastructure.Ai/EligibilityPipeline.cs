@@ -7,6 +7,7 @@ public enum EligibilityOperation
 {
     Translation,
     Rewriting,
+    SentenceAlternatives,
 }
 
 public enum EligibilityDecision
@@ -53,6 +54,7 @@ public static class EligibilityPipeline
     {
         EligibilityOperation.Translation => ProductCatalog.TranslationMaximumSourceCharacters,
         EligibilityOperation.Rewriting => ProductCatalog.RewritingMaximumSourceCharacters,
+        EligibilityOperation.SentenceAlternatives => AlternativesInputPolicy.MaximumContextScalars,
         _ => throw new ArgumentOutOfRangeException(nameof(operation)),
     };
 

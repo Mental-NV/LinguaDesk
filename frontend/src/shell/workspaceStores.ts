@@ -1,3 +1,5 @@
+import { submitAlternatives } from '../api/alternatives'
+import { spanKey, type SentenceSpan } from '../rewrite/sentences'
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type Dispatch } from 'react'
 import * as translation from '../api/translation'
 import * as rewriting from '../api/rewriting'
@@ -5,7 +7,7 @@ import { analyzeInput } from '../api/inputPolicy'
 import {
   createInitialWorkspace, describeReadiness, formatGlobalAllowanceMessage,
   formatResetInstant, formatUserAllowanceMessage, mapSubmitProblem, orderUsage,
-  workspaceReducer, MESSAGE_MONETARY_SUSPENDED,
+  workspaceReducer, MESSAGE_MONETARY_SUSPENDED, currentResult,
   type Feature, type WorkspaceAction, type WorkspaceCapabilities, type WorkspaceState, type WorkspaceUsage,
 } from './workspaceModel'
 import type { TranslationCapabilities } from '../translate/translationWorkspace'
@@ -39,6 +41,7 @@ export interface FeatureStore<C extends WorkspaceCapabilities = WorkspaceCapabil
   readonly state: WorkspaceState<C>
   readonly dispatch: Dispatch<WorkspaceAction<C>>
   readonly loadCapabilities: () => void
+  readonly requestAlternatives?: (span: SentenceSpan) => void
   readonly submit: () => void
   readonly checkStatus: () => void
   readonly refreshUsage: () => void
@@ -67,6 +70,7 @@ function useFeatureInstance(feature: Feature, sharedChannel?: UsageChannel): Fea
   const reads = useRef(new Set<AbortController>())
   const capabilityFlight = useRef<AbortController | null>(null)
   const usageFlight = useRef<Promise<boolean> | null>(null)
+  const statusFlight = useRef<AbortController | null>(null)
   const scroll = useRef(0)
   const actions = useRef({ attempt: () => {}, arm: () => {} })
   const apply = useCallback((action: WorkspaceAction) => {
@@ -202,7 +206,7 @@ function useFeatureInstance(feature: Feature, sharedChannel?: UsageChannel): Fea
           : await rewriting.submitRewritingOperation(payload, { signal: controller.signal })
         if (!isAlive()) return
         if (result.kind === 'succeeded') {
-          apply({ type: 'submitSucceeded', revision, translatedText: 'translatedText' in result ? result.translatedText : undefined, rewrittenText: 'rewrittenText' in result ? result.rewrittenText : undefined, characterCount: result.characterCount, admissionDay: result.admissionDay, usage: result.usage, observedAtMs: Date.now() })
+          apply({ type: 'submitSucceeded', revision, resolvedSourceLanguage: result.resolvedSourceLanguage, association: crypto.randomUUID(), translatedText: 'translatedText' in result ? result.translatedText : undefined, rewrittenText: 'rewrittenText' in result ? result.rewrittenText : undefined, characterCount: result.characterCount, admissionDay: result.admissionDay, usage: result.usage, observedAtMs: Date.now() })
           if (channel.publish(result.usage)) void refreshUsageRead()
         } else if (result.kind === 'network' || result.kind === 'pending') {
           apply({ type: 'submitUnknownOutcome', revision, operationId })
@@ -259,8 +263,9 @@ function useFeatureInstance(feature: Feature, sharedChannel?: UsageChannel): Fea
   const checkStatus = useCallback(() => {
     const current = stateRef.current
     const operationId = current.pendingOperationId
-    if (!operationId || reads.current.size) return
+    if (!operationId || statusFlight.current) return
     const controller = new AbortController()
+    statusFlight.current = controller
     reads.current.add(controller)
     const account = channel.generation
     void (async () => {
@@ -278,9 +283,67 @@ function useFeatureInstance(feature: Feature, sharedChannel?: UsageChannel): Fea
         // permits an explicit new candidate, but does not drain a queued one.
         if (result.kind === 'windowExpired' || result.kind === 'unknownRecord') cancelCandidate()
         else actions.current.arm()
-      } finally { reads.current.delete(controller) }
+      } finally {
+        reads.current.delete(controller)
+        if (statusFlight.current === controller) statusFlight.current = null
+      }
     })()
   }, [apply, cancelCandidate, channel, invalidateSession, refreshUsageRead])
+
+  const requestAlternatives = useCallback((span: SentenceSpan) => {
+    const current = stateRef.current
+    apply({ type: 'sentenceSelected', span })
+    if (feature !== 'rewriting' || !currentResult(current) || !current.association || !current.comparisonSource || current.editingResult
+      || current.alternativeSets[spanKey(span)] || current.phase !== 'idle' || current.pendingOperationId || flight.current || candidate.current
+      || !active.current || !online.current || current.composing || Array.from(current.resultText).length > 8000 || span.length > 2000) return
+    if (!current.usage || current.usageUnavailable || Date.parse(current.usage.resetAtUtc) <= Date.now()) { void refreshUsageRead(); return }
+    if (current.usage.availability !== 'available' || span.length > current.usage.availableCharacters) {
+      apply({ type: 'validationFailed', error: { text: 'Sentence alternatives are unavailable with the remaining allowance. Your text is safe.', canRetry: false, canCheckStatus: false } }); return
+    }
+    const capture = { association: current.association, span, context: current.resultText }
+    const controller = new AbortController()
+    const thisFlight: Flight = { controller, sent: false }
+    flight.current = thisFlight
+    const account = channel.generation
+    const isAlive = () => alive.current && !controller.signal.aborted && current.generation === stateRef.current.generation && account === channel.generation
+    void (async () => {
+      let deadline: ReturnType<typeof setTimeout> | null = null
+      try {
+        const bootstrap = await translation.fetchSubmitAntiforgeryToken({ signal: controller.signal })
+        if (!isAlive() || !active.current || !online.current || stateRef.current.association !== capture.association || stateRef.current.composing || stateRef.current.editingResult) return
+        if (bootstrap.kind !== 'ok') { apply({ type: 'validationFailed', error: mapSubmitProblem({ httpStatus: null }, feature) }); return }
+        const operationId = translation.createOperationId()
+        thisFlight.sent = true
+        apply({ type: 'alternativesRequested', capture })
+        const revision = stateRef.current.requestRevision
+        deadline = setTimeout(() => {
+          controller.abort()
+          if (alive.current && current.generation === stateRef.current.generation) {
+            apply({ type: 'submitUnknownOutcome', revision, operationId })
+            if (flight.current === thisFlight) flight.current = null
+          }
+        }, 15000)
+        const result = await submitAlternatives({ operationId, context: capture.context, start: span.start, length: span.length,
+          association: capture.association, language: current.resolvedSourceLanguage!, mode: current.mode }, bootstrap.requestToken, { signal: controller.signal })
+        if (!isAlive()) return
+        if (result.kind === 'succeeded') {
+          apply({ type: 'alternativesSucceeded', revision, options: result.body.options, association: result.body.association,
+            characterCount: result.body.characterCount, admissionDay: result.body.admissionDay, usage: result.usage, observedAtMs: Date.now() })
+          if (channel.publish(result.usage)) void refreshUsageRead()
+        } else if (result.kind === 'unknown') apply({ type: 'submitUnknownOutcome', revision, operationId })
+        else {
+          if (result.httpStatus === 401 || result.httpStatus === 403) { invalidateSession(result.httpStatus === 403); return }
+          apply({ type: 'alternativesFailed', revision, message: result.category === 'monetarySuspension'
+            ? MESSAGE_MONETARY_SUSPENDED : 'We couldn’t load alternatives. Your text is safe.', canRetry: result.httpStatus !== 429 && result.category !== 'monetarySuspension' })
+          if (result.httpStatus === 429 || result.httpStatus === 503) void refreshUsageRead()
+        }
+      } finally {
+        if (deadline !== null) clearTimeout(deadline)
+        if (flight.current === thisFlight) flight.current = null
+        if (isAlive()) actions.current.arm()
+      }
+    })()
+  }, [apply, channel, feature, invalidateSession, refreshUsageRead])
 
   const submit = useCallback(() => {
     const current = stateRef.current
@@ -305,6 +368,7 @@ function useFeatureInstance(feature: Feature, sharedChannel?: UsageChannel): Fea
     reads.current.forEach(controller => controller.abort())
     reads.current.clear()
     usageFlight.current = null
+    statusFlight.current = null
     scroll.current = 0
     apply({ type: 'workspaceCleared' })
   }, [apply, cancelCandidate])
@@ -338,11 +402,11 @@ function useFeatureInstance(feature: Feature, sharedChannel?: UsageChannel): Fea
     }
   }, [apply, cancelCandidate, channel, refreshUsageRead])
 
-  return useMemo(() => ({ state, dispatch, loadCapabilities, submit, checkStatus, refreshUsage, setActive, saveScroll, readSavedScroll, resetWorkspace }), [state, dispatch, loadCapabilities, submit, checkStatus, refreshUsage, setActive, saveScroll, readSavedScroll, resetWorkspace])
+  return useMemo(() => ({ state, dispatch, loadCapabilities, requestAlternatives, submit, checkStatus, refreshUsage, setActive, saveScroll, readSavedScroll, resetWorkspace }), [state, dispatch, loadCapabilities, requestAlternatives, submit, checkStatus, refreshUsage, setActive, saveScroll, readSavedScroll, resetWorkspace])
 }
 export function useTranslateFeatureInstance(channel?: UsageChannel) { return useFeatureInstance('translation', channel) as TranslateFeatureStore }
 export function useRewriteFeatureInstance(channel?: UsageChannel) { return useFeatureInstance('rewriting', channel) as RewriteFeatureStore }
-export interface WorkspaceStores { readonly translate: TranslateFeatureStore; readonly rewrite: RewriteFeatureStore; readonly resetAll: () => void }
+export interface WorkspaceStores { readonly translate: TranslateFeatureStore; readonly rewrite: RewriteFeatureStore; readonly resetAll: () => void; readonly navigationExpanded?: boolean; readonly toggleNavigation?: () => void }
 export const WorkspaceStoreContext = createContext<WorkspaceStores | null>(null)
 export function useWorkspaceStores() { return useContext(WorkspaceStoreContext) }
 export function useTranslateFeature(): TranslateFeatureStore {

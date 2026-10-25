@@ -2,18 +2,13 @@
 
 Mutable #7 status owner. Read for selection/dependency checks and closeout; do not include in the stable execution prefix.
 
-**Most recently completed milestone: [M039 — Narrow-screen core journey group](../08-backlogs/M039/backlog.md).** State: Done. M044 implemented the then-current D-21 layout/pause-processing contract; M039 adds the dedicated narrow journeys and fixes the discovered safe-return/contrast defects. Final verification: 221 frontend tests, 80 published Chromium cases with seven unchanged reviewed baselines, and 616 backend regressions; [tasks/evidence](../08-backlogs/M039/tasks.md#completion--2026-10-25-1002-utc).
-
+**Most recently completed milestone: [M045 — Screenshot-aligned Translator and Write workspace](../08-backlogs/M045/backlog.md).** State: Done. D-23 shell/toolbar, copy/swap, local change review and contextual sentence alternatives now work through the published authenticated API/accounting path. Final verification: 643 backend tests, 233 frontend unit/policy tests, 99 published Chromium cases, 12 reviewed baselines, independent bearer consumer and 36 reviewed live language/mode cells. [Tasks/evidence](../08-backlogs/M045/tasks.md#completion-record).
 
 ## Selected milestone
 
-**[M045 — Screenshot-aligned Translator and Write workspace](../08-backlogs/M045/backlog.md).** State: Selected; planning complete, implementation not started. [Specification](../08-backlogs/M045/spec.md), [plan](../08-backlogs/M045/plan.md), [tasks/resume](../08-backlogs/M045/tasks.md).
+None. M045 implementation is complete; no next milestone or deployment is selected. Its additive migration and rollback requirements are documented, but no production rollout occurred. Full quality/performance qualification, release assembly and operational gates remain pending; the bounded development batch does not discharge G1/G2 or a product-wide release gate. Earlier M044/M039 evidence remains historical D-21 coverage.
 
-The user requested M045 planning after the D-23 documentation amendment. It selects the shell/toolbar/copy/swap/review/alternatives journey, including the required API/AI/accounting work. Earlier M044/M039 results remain historical D-21 evidence. Technical alternatives bounds/association/segmentation and corpus counts are now specified at their owners; C# contract generation and fixture/corpus implementation are early M045 tasks.
-
-**Next work:** begin M045 T001 when implementation is authorized. Local work needs no paid credentials. Its required live-development evidence later needs recorded profile/credential access, finite whole-run budget and shared-cost scope; no new paid run is authorized or executed by planning. Missing live prerequisites block that AC and milestone Done, not independent local work. G1/G2 and product release remain pending; M036/M037 do not discharge them.
-
-**D-22 policy amendment — 2026-10-25:** required verification may run unattended; optional human/additional-platform observations remain unclaimed. M044/M039 used no paid provider runs and establish no product-wide release pass.
+**D-22 policy:** required checks may run unattended; optional physical-device/native-IME/AT/additional-browser observations remain unclaimed. M045's final live batch passed after preserved failed prompt revisions; total conservative exposure including unresolved calls was USD 0.2716808 under the authorized quiescent scope.
 
 M019 completed the independent-track enabler for the explicit live provider path required by M015–M018. The bounded access check reached `DeepSeek-V4.1-Flash` with one dispatch through the configured shared credential and returned `deepseek-flash` with known usage and no unresolved reservation; no credential value entered diagnostics or evidence. The same actual key may serve every LinguaDesk operation routed to DeepSeek. Quality, performance, context-limit and production-serving qualification remain unverified; D-19's route-specific providers and longer fallback chains remain later DF-004 work.
 
@@ -21,6 +16,7 @@ M019 completed the independent-track enabler for the explicit live provider path
 
 | ID | State | Acceptance and evidence |
 | --- | --- | --- |
+| M045 | Done | [Backlog](../08-backlogs/M045/backlog.md), [spec](../08-backlogs/M045/spec.md), [tasks/evidence](../08-backlogs/M045/tasks.md#completion-record) |
 | M001 | Done | [Backlog](../08-backlogs/M001/backlog.md), [spec](../08-backlogs/M001/spec.md), [tasks/evidence](../08-backlogs/M001/tasks.md#3-completion-record) |
 | M002 | Done | [Backlog](../08-backlogs/M002/backlog.md), [spec](../08-backlogs/M002/spec.md), [tasks/evidence](../08-backlogs/M002/tasks.md#3-completion-record) |
 | M003 | Done | [Backlog](../08-backlogs/M003/backlog.md), [spec](../08-backlogs/M003/spec.md), [tasks/evidence](../08-backlogs/M003/tasks.md#3-completion-record) |

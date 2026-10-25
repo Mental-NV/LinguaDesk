@@ -9,6 +9,7 @@ import { ForgotPasswordPage } from '../auth/ForgotPasswordPage'
 import { RewritePage } from '../rewrite/RewritePage'
 import { TranslatePage } from '../translate/TranslatePage'
 import { WorkspaceStoreProvider } from './workspaces'
+import { Navigation } from './Navigation'
 import { RewritingIcon, TranslationIcon } from './NavIcons'
 import { useWorkspaceStores } from './workspaceStores'
 import { LoginPage, type SignInCompletionStatus } from '../auth/LoginPage'
@@ -344,13 +345,13 @@ function Shell() {
     if (auth === 'verified') {
       if (feature === 'translate') {
         return (
-          <Page heading="Translation" workspace>
+          <Page heading="Translator" workspace>
             <TranslatePage onSignOut={handleSignOut} />
           </Page>
         )
       }
       return (
-        <Page heading="Rewriting" workspace>
+        <Page heading="Write" workspace>
           <RewritePage onSignOut={handleSignOut} />
         </Page>
       )
@@ -373,24 +374,25 @@ function Shell() {
     )
   }
 
+  const workspaceShell = auth === 'verified' && isProtectedPath(location.pathname)
   return (
-    <div className="app-shell">
+    <div className={`app-shell${workspaceShell ? ' workspace-shell' : ''}${workspaceShell && stores?.navigationExpanded ? ' navigation-expanded' : ''}`}>
       <a className="skip-link" href="#main-content">Skip to main content</a>
-      <header className="site-header">
+      {workspaceShell ? <Navigation key={stores?.translate.state.generation} onSignOut={handleSignOut} /> : <header className="site-header">
         <div className="header-inner">
           <Link className="wordmark" to="/" aria-label="LinguaDesk home">LinguaDesk</Link>
           <nav aria-label="Main navigation">
             <NavLink to="/translate">
               <TranslationIcon />
-              Translation
+              Translator
             </NavLink>
             <NavLink to="/rewrite">
               <RewritingIcon />
-              Rewriting
+              Write
             </NavLink>
           </nav>
         </div>
-      </header>
+      </header>}
       <Routes>
         <Route path="/" element={rootEntry} />
         <Route path="/login" element={loginEntry} />

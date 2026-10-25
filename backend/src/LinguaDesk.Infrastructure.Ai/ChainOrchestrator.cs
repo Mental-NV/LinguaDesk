@@ -36,7 +36,8 @@ public sealed record ChainOutcome(
     bool ChargesCharacters,
     long ElapsedMs,
     string PrimaryCandidateId,
-    string? FallbackCandidateId);
+    string? FallbackCandidateId,
+    IReadOnlyList<string>? Options = null);
 
 public interface IChainAttemptReporter
 {
@@ -131,6 +132,28 @@ public static class ChainOrchestrator
             cancellationToken);
     }
 
+    public static Task<ChainOutcome> ExecuteAlternativesAsync(
+        FamilyChain chain, AlternativesInput input, Func<CandidateProfile, IChatClient> clients,
+        ChainPolicy? policy = null, EvaluationBudget? budget = null, CancellationToken cancellationToken = default)
+    {
+        if (chain.Family != ChainFamily.Rewriting) throw new ArgumentException("Alternatives require the Rewriting chain.", nameof(chain));
+        var validation = input.Validate();
+        if (!validation.IsValid) return Task.FromResult(new ChainOutcome(chain.Family, ChainDecision.Ineligible, null,
+            validation.Reason, null, input.Mode, 0, [], false, 0, chain.Primary.CandidateId, chain.Fallback?.CandidateId));
+        var view = new FamilyChain(chain.Family, AlternativesProfile.ForInput(chain.Primary, input),
+            chain.Fallback is null ? null : AlternativesProfile.ForInput(chain.Fallback, input));
+        return ExecuteAsync<EligibilityOutcome, AlternativesOutcome>(view, validation.EffectiveMode, clients,
+            policy ?? new ChainPolicy(TimeSpan.FromSeconds(15), TimeSpan.FromSeconds(3), TimeSpan.FromSeconds(5), TimeSpan.FromSeconds(2), ChainPolicy.Default.Clock),
+            budget, null,
+            (client, token) => EligibilityPipeline.EvaluateAsync(new(input.Context, EligibilityOperation.SentenceAlternatives, input.Language, Mode: validation.EffectiveMode), client, token),
+            NormalizeEligibility,
+            (accepted, client, token) => AlternativesPipeline.TransformAsync(input, accepted, client, token),
+            outcome => new NormalizedStage(outcome.Decision == RewritingDecision.Succeeded,
+                outcome.Decision == RewritingDecision.Ineligible, null, outcome.Category, outcome.ResolvedLanguage, 1,
+                outcome.Category ?? "success", AlternativesPrompt.PromptId, AlternativesPrompt.Create(input).ResourceSha256, outcome.Options),
+            cancellationToken);
+    }
+
     private sealed record NormalizedStage(
         bool Succeeded,
         bool Terminal,
@@ -140,7 +163,8 @@ public static class ChainOrchestrator
         int Dispatches,
         string FinishCategory,
         string PromptId,
-        string PromptResourceSha256);
+        string PromptResourceSha256,
+        IReadOnlyList<string>? Options = null);
 
     private static NormalizedStage NormalizeEligibility(EligibilityOutcome outcome) =>
         outcome.Decision switch
@@ -379,7 +403,8 @@ public static class ChainOrchestrator
                     ChargesCharacters: false,
                     ElapsedMs(),
                     chain.Primary.CandidateId,
-                    chain.Fallback?.CandidateId);
+                    chain.Fallback?.CandidateId,
+                    finished.Options);
             }
 
             lastCategory = finished.Category;

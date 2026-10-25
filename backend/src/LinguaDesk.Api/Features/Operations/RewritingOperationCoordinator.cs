@@ -24,7 +24,8 @@ public sealed record RewritingExecutionResult(
     DateTimeOffset ServerTime,
     string? RewrittenText = null,
     string? EligibilityReason = null,
-    int Dispatches = 0);
+    int Dispatches = 0,
+    string? ResolvedSourceLanguage = null);
 
 /// <summary>
 /// Executes one admitted rewriting operation synchronously: per-dispatch
@@ -163,7 +164,8 @@ public sealed partial class RewritingOperationCoordinator(
                     settled.Usage,
                     settled.ServerTime,
                     RewrittenText: outcome.Text,
-                    Dispatches: gate.Dispatches);
+                    Dispatches: gate.Dispatches,
+                    ResolvedSourceLanguage: outcome.ResolvedLanguage);
             case ChainDecision.Succeeded:
                 return await FailAsync(
                     accountId, source, sourceSelection, effectiveMode, operationId, submission, gate,

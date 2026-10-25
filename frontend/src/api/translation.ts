@@ -105,6 +105,7 @@ async function readProblem(response: Response): Promise<ProblemBody | null> {
 
 export type SubmitTranslationResult =
   | {
+      readonly resolvedSourceLanguage?: string
       readonly kind: 'succeeded'
       readonly translatedText: string
       readonly admissionDay: string
@@ -177,6 +178,7 @@ export async function submitTranslationOperation(
       return {
         kind: 'succeeded',
         translatedText: body.translatedText,
+        resolvedSourceLanguage: body.resolvedSourceLanguage,
         admissionDay: body.admissionDay,
         characterCount: body.characterCount,
         usage: toUsage(body.usage),

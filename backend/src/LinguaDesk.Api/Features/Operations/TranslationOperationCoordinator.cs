@@ -23,7 +23,8 @@ public sealed record TranslationExecutionResult(
     DateTimeOffset ServerTime,
     string? TranslatedText = null,
     string? EligibilityReason = null,
-    int Dispatches = 0);
+    int Dispatches = 0,
+    string? ResolvedSourceLanguage = null);
 
 /// <summary>
 /// Executes one admitted translation operation synchronously: per-dispatch
@@ -160,7 +161,8 @@ public sealed partial class TranslationOperationCoordinator(
                     settled.Usage,
                     settled.ServerTime,
                     TranslatedText: outcome.Text,
-                    Dispatches: gate.Dispatches);
+                    Dispatches: gate.Dispatches,
+                    ResolvedSourceLanguage: outcome.ResolvedLanguage);
             case ChainDecision.Succeeded:
                 return await FailAsync(
                     accountId, source, sourceSelection, target, operationId, submission, gate,

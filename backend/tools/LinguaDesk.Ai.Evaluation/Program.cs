@@ -37,6 +37,7 @@ internal static class Program
             "inspect" when args.Length == 1 => Inspect(),
             "probe" when args.Length == 1 => await ProbeAsync().ConfigureAwait(false),
             "conformance" when args.Length == 1 => await ConformanceAsync().ConfigureAwait(false),
+            "evaluate-alternatives" => await EvaluateAlternatives.RunAsync(args[1..]).ConfigureAwait(false),
             "verify-access" => await VerifyAccessAsync(args[1..]).ConfigureAwait(false),
             "evaluate-eligibility" => await EvaluateEligibility.RunAsync(args[1..]).ConfigureAwait(false),
             "evaluate-translation" => await EvaluateTranslation.RunAsync(args[1..]).ConfigureAwait(false),

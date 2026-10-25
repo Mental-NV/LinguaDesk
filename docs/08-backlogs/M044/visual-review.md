@@ -12,10 +12,10 @@ Environment: macOS 27.0.1, Playwright 1.63.0, Chromium 153.0.8010.12 / revision 
 
 | Reviewed capture | SHA-256 |
 | --- | --- |
-| [registration-long-validation-1440x900-chromium-darwin.png](../../../frontend/tests/e2e/desktop-visual.spec.ts-snapshots/registration-long-validation-1440x900-chromium-darwin.png) | `df022a8eca11b1ecd0a56c9f3bd93b977319145a5d1cc9952c1d141da09e8184` |
-| [rewriting-edited-result-1440x900-chromium-darwin.png](../../../frontend/tests/e2e/desktop-visual.spec.ts-snapshots/rewriting-edited-result-1440x900-chromium-darwin.png) | `6f906f1a8e087a9e78d9c4580f9cc8e7a68ce80cc9c2a11a5e207773b7579117` |
-| [rewriting-edited-result-390x844-chromium-darwin.png](../../../frontend/tests/e2e/desktop-visual.spec.ts-snapshots/rewriting-edited-result-390x844-chromium-darwin.png) | `902227e0e0568b87989b57735f6fb07946a733b08d96cc078f774844ef633e46` |
-| [translation-oversize-error-1440x900-chromium-darwin.png](../../../frontend/tests/e2e/desktop-visual.spec.ts-snapshots/translation-oversize-error-1440x900-chromium-darwin.png) | `7cabf873c8a48038f676e51c28a8d9c88f16a420537f89f0a3bec6ff9bedaba2` |
-| [translation-oversize-error-390x844-chromium-darwin.png](../../../frontend/tests/e2e/desktop-visual.spec.ts-snapshots/translation-oversize-error-390x844-chromium-darwin.png) | `02e7b06acb95e379d50daa48af29887c4b9bc0ce924d9dfe8e2f67004022a5c6` |
-| [translation-result-1440x900-chromium-darwin.png](../../../frontend/tests/e2e/desktop-visual.spec.ts-snapshots/translation-result-1440x900-chromium-darwin.png) | `4ba290abbbc2adb48884042e42794a6ea51586e4980b0968013af168d0c813ca` |
-| [translation-result-390x844-chromium-darwin.png](../../../frontend/tests/e2e/desktop-visual.spec.ts-snapshots/translation-result-390x844-chromium-darwin.png) | `e4d7c050a0ef55197d9f7335cfdfa0835b5c08110b5d0b2d728b11f41c1fd514` |
+| [registration-long-validation-1440x900-chromium-darwin.png](visuals/registration-long-validation-1440x900-chromium-darwin.png) | `df022a8eca11b1ecd0a56c9f3bd93b977319145a5d1cc9952c1d141da09e8184` |
+| [rewriting-edited-result-1440x900-chromium-darwin.png](visuals/rewriting-edited-result-1440x900-chromium-darwin.png) | `6f906f1a8e087a9e78d9c4580f9cc8e7a68ce80cc9c2a11a5e207773b7579117` |
+| [rewriting-edited-result-390x844-chromium-darwin.png](visuals/rewriting-edited-result-390x844-chromium-darwin.png) | `902227e0e0568b87989b57735f6fb07946a733b08d96cc078f774844ef633e46` |
+| [translation-oversize-error-1440x900-chromium-darwin.png](visuals/translation-oversize-error-1440x900-chromium-darwin.png) | `7cabf873c8a48038f676e51c28a8d9c88f16a420537f89f0a3bec6ff9bedaba2` |
+| [translation-oversize-error-390x844-chromium-darwin.png](visuals/translation-oversize-error-390x844-chromium-darwin.png) | `02e7b06acb95e379d50daa48af29887c4b9bc0ce924d9dfe8e2f67004022a5c6` |
+| [translation-result-1440x900-chromium-darwin.png](visuals/translation-result-1440x900-chromium-darwin.png) | `4ba290abbbc2adb48884042e42794a6ea51586e4980b0968013af168d0c813ca` |
+| [translation-result-390x844-chromium-darwin.png](visuals/translation-result-390x844-chromium-darwin.png) | `e4d7c050a0ef55197d9f7335cfdfa0835b5c08110b5d0b2d728b11f41c1fd514` |

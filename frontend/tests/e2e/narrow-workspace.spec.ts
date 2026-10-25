@@ -1,4 +1,4 @@
-import { test, expect, noOverflow, nativeCopy, trackOperations, usage, TRANSLATE_SOURCE, TRANSLATE_RESULT, REWRITE_SOURCE, REWRITE_RESULT, openWorkspace } from './workspace-fixture'
+import { chooseMode, expectResult, test, expect, noOverflow, nativeCopy, trackOperations, usage, TRANSLATE_SOURCE, TRANSLATE_RESULT, REWRITE_SOURCE, REWRITE_RESULT, openWorkspace } from './workspace-fixture'
 import { expectCleanScan } from './accessibility'
 
 const email = process.env.LINGUADESK_SMOKE_VERIFIED_EMAIL
@@ -23,17 +23,17 @@ for (const feature of ['translate', 'rewrite'] as const) {
     expect((await available).status()).toBe(200)
     await page.getByLabel(feature === 'translate' ? 'Source language' : 'Writing language').selectOption('en')
     if (feature === 'translate') await page.getByLabel('Target language').selectOption('ro')
-    else await page.getByLabel('Writing mode').selectOption('friendly')
+    else await chooseMode(page, 'friendly')
     const source = feature === 'translate' ? TRANSLATE_SOURCE : REWRITE_SOURCE
     const resultName = feature === 'translate' ? 'Translation result' : 'Improved result'
     const expected = feature === 'translate' ? TRANSLATE_RESULT : REWRITE_RESULT
     const before = await usage(page)
-    await page.getByLabel('Source text').fill(source)
+    await page.getByLabel('Source text', { exact: true }).fill(source)
     await page.clock.runFor(999)
     expect(posts).toHaveLength(0)
     await page.clock.runFor(1)
-    await expect(page.getByRole('textbox', { name: resultName })).toHaveValue(expected)
-    await expect(page.getByLabel('Source text')).toBeFocused()
+    await expectResult(page, feature, expected)
+    await expect(page.getByLabel('Source text', { exact: true })).toBeFocused()
     expect(posts).toHaveLength(1)
     expect((await usage(page)).consumedCharacters).toBe(before.consumedCharacters + 46)
     await expectCleanScan(page, `narrow ${feature} result`)
@@ -45,7 +45,7 @@ for (const feature of ['translate', 'rewrite'] as const) {
     expect((await usage(page)).consumedCharacters).toBe(before.consumedCharacters + 46)
 
     const failedSource = `${source} ${feature === 'translate' ? 'M028' : 'M029'}-PROCESSING-FAILURE`
-    await page.getByLabel('Source text').fill(failedSource)
+    await page.getByLabel('Source text', { exact: true }).fill(failedSource)
     await page.clock.runFor(1000)
     await expect(page.getByRole('alert')).toContainText('We couldn’t process this text.')
     await expect(page.getByRole('textbox', { name: resultName })).toHaveValue(edited)
@@ -56,7 +56,7 @@ for (const feature of ['translate', 'rewrite'] as const) {
     expect(posts[1].operationId).not.toBe(posts[2].operationId)
     expect((await usage(page)).consumedCharacters).toBe(before.consumedCharacters + 46)
     await context.clearCookies()
-    await page.getByLabel('Source text').fill(`${source} Next revision.`)
+    await page.getByLabel('Source text', { exact: true }).fill(`${source} Next revision.`)
     await page.clock.runFor(1000)
     await expect(page).toHaveURL(/\/login$/)
     await expect(page.getByText('Your session expired. Sign in again to continue.')).toBeVisible()
@@ -98,7 +98,7 @@ for (const feature of ['translate', 'rewrite'] as const) {
       await page.addStyleTag({ content: '* { line-height: 1.5 !important; letter-spacing: .12em !important; word-spacing: .16em !important; } p { margin-bottom: 2em !important; }' })
       await expectCleanScan(page, `${feature} spacing at ${viewport.width}`)
       await noOverflow(page)
-      for (const selector of ['select', 'textarea', 'button']) for (const control of await page.locator(selector).all()) {
+      for (const selector of ['select', 'textarea', 'button']) for (const control of await page.locator(`${selector}:visible`).all()) {
         const box = await control.boundingBox()
         expect(box!.x).toBeGreaterThanOrEqual(0)
         expect(box!.x + box!.width).toBeLessThanOrEqual(viewport.width)
@@ -128,10 +128,10 @@ test('M039 interrupted admitted work exposes original-identity Check status with
   await openWorkspace(page, 'translate')
   await page.getByLabel('Source language').selectOption('en')
   await page.getByLabel('Target language').selectOption('ro')
-  await page.getByLabel('Source text').fill(TRANSLATE_SOURCE)
+  await page.getByLabel('Source text', { exact: true }).fill(TRANSLATE_SOURCE)
   await page.clock.runFor(1000)
   await expect(page.getByRole('textbox', { name: 'Translation result' })).toHaveValue(TRANSLATE_RESULT)
-  await page.getByLabel('Source text').fill(`${TRANSLATE_SOURCE} M039-DELAY`)
+  await page.getByLabel('Source text', { exact: true }).fill(`${TRANSLATE_SOURCE} M039-DELAY`)
   await page.clock.runFor(1000)
   await expect.poll(() => posts.length).toBe(2)
   const originalId = posts[1].operationId

@@ -254,3 +254,13 @@ Start the development API separately with `bash scripts/backend.sh run` after tr
 ## Documentation and milestone context
 
 Start at [document #0](docs/00-SDD-Planning-Workflow.md). Planning and execution use separate reading sets; each milestone keeps `backlog.md`, `spec.md`, `plan.md`, `tasks.md` and its selected source manifest together under `docs/08-backlogs/<ID>/`. See [context commands and rationale](automation/context-guide.md) and [automation usage](automation/README.md).
+
+## Sentence alternatives (M045)
+
+Translator and Write use the shared pause scheduler. Write provides local change review and explicit sentence alternatives; manual editing remains a native textarea. Copy/swap and cached option replacement do not themselves dispatch an alternatives request. Text, snapshots and option caches are tab memory and clear on teardown.
+
+`GET /api/capabilities` advertises `sentenceAlternatives`: exact result context at most 8,000 Unicode scalars, selected complete sentence at most 2,000 scalars, two options, `sentence-boundaries-v1`, and a 15-second deadline. `POST /api/rewriting/alternatives` accepts `operationId`, `context`, scalar `start`/`length`, result `association`, explicit `language` and optional `mode` (omitted means `correctionOnly`; null is invalid). It uses the existing Rewriting provider chain, auth/antiforgery, allowance and monetary ledger, with at most three admitted provider dispatches. Only original 201 responses contain options; duplicate/status reads remain metadata-only. A successful request charges only the selected sentence once. Full-text original successes now also carry the validated `resolvedSourceLanguage`.
+
+Apply `20261025131342_SentenceAlternativesKind` through the explicit existing storage workflow before running the matching application. It adds only operation kind, backfilling old rows as `fullText`; existing full-text fingerprints remain unchanged. For rollback, quiesce admissions, settle/fence pending work and preserve a compatible recovery reader until the 24-hour identity window expires; restore a consistent app/database backup. Do not remove live identities or ledger rows to enable downgrade. The prior-schema copy/restart path is covered by API tests. No deployment is part of this change.
+
+Alternatives use separately bounded prompt/output settings; existing full-text settings are unchanged. Real serving exposure without authoritative ledger reconciliation stays reserved (Smoke alone has explicit no-charge evidence). The per-operation ceiling and configured monthly ledger therefore remain conservative. Full release qualification and performance workloads are separate from the bounded development evidence in [M045 tasks](docs/08-backlogs/M045/tasks.md).

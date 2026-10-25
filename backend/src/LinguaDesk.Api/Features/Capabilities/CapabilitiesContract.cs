@@ -132,7 +132,20 @@ public sealed record CapabilitiesResponse(
     [property: Description("Canonical decoded-input counting and local rejection policy.")] CountingPolicyCapability CountingPolicy,
     [property: Description("Translation directions, whole-input limit, and overall deadline.")] TranslationCapability Translation,
     [property: Description("Exclusive rewriting modes, whole-input limit, and overall deadline.")] RewritingCapability Rewriting,
-    [property: Description("UUIDv7 operation-identity recovery bounds.")] OperationIdentityCapability OperationIdentity);
+    [property: Description("UUIDv7 operation-identity recovery bounds.")] OperationIdentityCapability OperationIdentity)
+{
+    [Description("Supported sentence alternatives operation, exact input bounds, segmentation and deadline.")]
+    public AlternativesCapability Alternatives { get; init; } = new(8000, 2000, 131072, "sentence-boundaries-v1", 2, 15, "sentenceAlternatives");
+}
+
+public sealed record AlternativesCapability(
+    [property: Description("Maximum exact context in Unicode scalars.")] int MaximumContextCharacters,
+    [property: Description("Maximum selected complete sentence in Unicode scalars.")] int MaximumSentenceCharacters,
+    [property: Description("Maximum UTF-8 request body bytes.")] int MaximumRequestBytes,
+    [property: Description("Versioned deterministic scalar-span segmentation policy.")] string SegmentationRevision,
+    [property: Description("Exactly two distinct complete options per successful original response.")] int OptionCount,
+    [property: Description("Overall server deadline including eligibility, fallback and settlement.")] int OverallDeadlineSeconds,
+    [property: Description("Supported operation kind: sentenceAlternatives.")] string Kind);
 
 /// <summary>A supported language identifier and its English display name.</summary>
 public sealed record LanguageCapability(

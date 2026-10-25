@@ -15,4 +15,7 @@
   <ItemGroup>
     <ProjectReference Include="../../tools/LinguaDesk.Ai.Evaluation/LinguaDesk.Ai.Evaluation.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="../../tools/LinguaDesk.Ai.Evaluation/Corpus/alternatives/*.json" Link="Fixtures/alternatives/%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
 </Project>

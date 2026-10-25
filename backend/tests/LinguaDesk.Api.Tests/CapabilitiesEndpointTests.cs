@@ -37,6 +37,7 @@ public sealed class CapabilitiesEndpointTests
     [
         "serverTimeUtc", "languages", "sourceSelection", "chineseScriptPolicy",
         "countingPolicy", "translation", "rewriting", "operationIdentity",
+        "alternatives",
     ];
     private static readonly string[] ExcludedResponseTerms =
         ["provider", "routing", "allowance", "spend", "secret", "account", "usage"];

@@ -231,7 +231,12 @@ smoke() {
         echo "Published smoke output contained synthetic credential material." >&2
         return 1
     fi
-    echo "Published shell smoke passed against $listen_url."
+    LINGUADESK_API_BASE_URL="$listen_url" \
+        LINGUADESK_API_EMAIL="$smoke_verified_email" \
+        LINGUADESK_API_PASSWORD="$smoke_account_password" \
+        NODE_EXTRA_CA_CERTS="$smoke_certificate" \
+        node "$repository_root/samples/api-consumer/consumer.mjs" > "$repository_root/artifacts/test-results/independent-consumer.txt"
+    echo "Published shell smoke and independent bearer consumer passed against $listen_url."
 }
 
 if [ "$#" -ne 1 ]; then

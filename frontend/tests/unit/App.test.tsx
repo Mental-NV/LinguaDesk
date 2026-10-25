@@ -111,13 +111,13 @@ describe('signed-out shell routes', () => {
 
     const recoveryLink = await screen.findByRole('link', { name: 'Forgot password' })
     expect(recoveryLink).toHaveAttribute('href', '/forgot-password')
-    expect(screen.getByRole('link', { name: 'Translation' })).toHaveAttribute('href', '/translate')
-    expect(screen.getByRole('link', { name: 'Rewriting' })).toHaveAttribute('href', '/rewrite')
+    expect(screen.getByRole('link', { name: 'Translator' })).toHaveAttribute('href', '/translate')
+    expect(screen.getByRole('link', { name: 'Write' })).toHaveAttribute('href', '/rewrite')
     expect(
-      screen.getByRole('link', { name: 'Translation' }).querySelector('svg')?.getAttribute('aria-hidden'),
+      screen.getByRole('link', { name: 'Translator' }).querySelector('svg')?.getAttribute('aria-hidden'),
     ).toBe('true')
     expect(
-      screen.getByRole('link', { name: 'Rewriting' }).querySelector('svg')?.getAttribute('aria-hidden'),
+      screen.getByRole('link', { name: 'Write' }).querySelector('svg')?.getAttribute('aria-hidden'),
     ).toBe('true')
 
     await user.click(recoveryLink)
@@ -170,7 +170,7 @@ describe('automatic registration verification', () => {
       await user.type(screen.getByLabelText('Confirm password'), 'Maple!River2026')
       await user.click(screen.getByRole('button', { name: 'Create account' }))
       expect(await screen.findByText('Account registration accepted. Sign in to continue.')).toBeInTheDocument()
-      await user.click(screen.getByRole('link', { name: 'Translation' }))
+      await user.click(screen.getByRole('link', { name: 'Translator' }))
       await waitFor(() => expect(seen.pathname).toBe('/login'))
       expect(screen.getByRole('heading', { level: 1, name: 'Sign in' })).toBeInTheDocument()
     } finally {

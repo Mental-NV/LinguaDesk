@@ -21,6 +21,7 @@ public sealed class StorageHostTests
         "20260911024223_OperationAdmission",
         "20260911030052_OperationSettlement",
         "20260911032126_MonetaryAdmission",
+        "20261025131342_SentenceAlternativesKind",
     ];
 
     [TestMethod]

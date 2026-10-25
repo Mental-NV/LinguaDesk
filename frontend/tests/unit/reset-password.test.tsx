@@ -532,7 +532,7 @@ describe('reset-password shell race (AC-007)', () => {
     })
 
     expect(screen.getByRole('heading', { level: 1, name: 'Reset password' })).toBeVisible()
-    expect(screen.queryByRole('heading', { level: 1, name: 'Translation' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('heading', { level: 1, name: 'Translator' })).not.toBeInTheDocument()
     expect(screen.queryByLabelText('Password')).not.toBeInTheDocument()
   })
 })

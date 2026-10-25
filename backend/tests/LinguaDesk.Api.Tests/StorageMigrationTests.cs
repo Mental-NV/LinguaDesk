@@ -14,6 +14,7 @@ public sealed class StorageMigrationTests
     private const string LocalAccountsMigrationId = "20260909120834_LocalAccounts";
     private const string OperationAdmissionMigrationId = "20260911024223_OperationAdmission";
     private const string OperationSettlementMigrationId = "20260911030052_OperationSettlement";
+    private const string SentenceAlternativesMigrationId = "20261025131342_SentenceAlternativesKind";
     private const string MonetaryAdmissionMigrationId = "20260911032126_MonetaryAdmission";
 
     [TestMethod]
@@ -35,7 +36,7 @@ public sealed class StorageMigrationTests
         await using (var context = database.CreateContext())
         {
             var applied = await context.Database.GetAppliedMigrationsAsync();
-            CollectionAssert.AreEqual(new[] { InitialMigrationId, LocalAccountsMigrationId, OperationAdmissionMigrationId, OperationSettlementMigrationId, MonetaryAdmissionMigrationId }, applied.ToArray());
+            CollectionAssert.AreEqual(new[] { InitialMigrationId, LocalAccountsMigrationId, OperationAdmissionMigrationId, OperationSettlementMigrationId, MonetaryAdmissionMigrationId, SentenceAlternativesMigrationId }, applied.ToArray());
             Assert.AreEqual(
                 4L,
                 await ExecuteScalarAsync<long>(
@@ -56,7 +57,7 @@ public sealed class StorageMigrationTests
 
         await using var verification = database.CreateContext();
         var repeatedHistory = await verification.Database.GetAppliedMigrationsAsync();
-        CollectionAssert.AreEqual(new[] { InitialMigrationId, LocalAccountsMigrationId, OperationAdmissionMigrationId, OperationSettlementMigrationId, MonetaryAdmissionMigrationId }, repeatedHistory.ToArray());
+        CollectionAssert.AreEqual(new[] { InitialMigrationId, LocalAccountsMigrationId, OperationAdmissionMigrationId, OperationSettlementMigrationId, MonetaryAdmissionMigrationId, SentenceAlternativesMigrationId }, repeatedHistory.ToArray());
         Assert.AreEqual("preserved", await ExecuteScalarAsync<string>(verification, "SELECT value FROM test_fixture WHERE id = 1;"));
     }
 
@@ -77,7 +78,7 @@ public sealed class StorageMigrationTests
 
         await using var verification = database.CreateContext();
         CollectionAssert.AreEqual(
-            new[] { InitialMigrationId, LocalAccountsMigrationId, OperationAdmissionMigrationId, OperationSettlementMigrationId, MonetaryAdmissionMigrationId },
+            new[] { InitialMigrationId, LocalAccountsMigrationId, OperationAdmissionMigrationId, OperationSettlementMigrationId, MonetaryAdmissionMigrationId, SentenceAlternativesMigrationId },
             (await verification.Database.GetAppliedMigrationsAsync()).ToArray());
         Assert.AreEqual(
             "preserved",

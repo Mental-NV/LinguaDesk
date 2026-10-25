@@ -36,8 +36,9 @@ public sealed partial class OperationSettlementService(
         string? mode,
         Guid operationId,
         CancellationToken cancellationToken,
-        long? monthlyCapMinorUnits = null) =>
-        SettleAsync(accountId, family, source, sourceSelection, target, mode, operationId, succeed: true, cancellationToken, monthlyCapMinorUnits);
+        long? monthlyCapMinorUnits = null,
+        AlternativesRequest? alternatives = null) =>
+        SettleAsync(accountId, family, source, sourceSelection, target, mode, operationId, succeed: true, cancellationToken, monthlyCapMinorUnits, alternatives);
 
     public Task<SettlementResult> SettleFailureAsync(
         string accountId,
@@ -48,8 +49,9 @@ public sealed partial class OperationSettlementService(
         string? mode,
         Guid operationId,
         CancellationToken cancellationToken,
-        long? monthlyCapMinorUnits = null) =>
-        SettleAsync(accountId, family, source, sourceSelection, target, mode, operationId, succeed: false, cancellationToken, monthlyCapMinorUnits);
+        long? monthlyCapMinorUnits = null,
+        AlternativesRequest? alternatives = null) =>
+        SettleAsync(accountId, family, source, sourceSelection, target, mode, operationId, succeed: false, cancellationToken, monthlyCapMinorUnits, alternatives);
 
     private async Task<SettlementResult> SettleAsync(
         string accountId,
@@ -61,7 +63,8 @@ public sealed partial class OperationSettlementService(
         Guid operationId,
         bool succeed,
         CancellationToken cancellationToken,
-        long? monthlyCapMinorUnits = null)
+        long? monthlyCapMinorUnits = null,
+        AlternativesRequest? alternatives = null)
     {
         ArgumentException.ThrowIfNullOrEmpty(accountId);
         var allowances = options.Value;
@@ -77,7 +80,9 @@ public sealed partial class OperationSettlementService(
         var effectiveMode = string.Equals(family, OperationAdmissionService.FamilyRewriting, StringComparison.Ordinal)
             ? mode ?? ProductCatalog.DefaultRewritingMode
             : null;
-        var fingerprint = OperationFingerprint.Compute(
+        var fingerprint = alternatives is not null
+            ? OperationFingerprint.ComputeAlternatives(await fingerprintKeys.GetKeyAsync(cancellationToken), alternatives)
+            : OperationFingerprint.Compute(
             await fingerprintKeys.GetKeyAsync(cancellationToken),
             family,
             source,
@@ -136,6 +141,11 @@ public sealed partial class OperationSettlementService(
         }
 
         var settledAt = timeProvider.GetUtcNow();
+        if (succeed && alternatives is not null && settledAt >= existing.DeadlineUtc)
+        {
+            succeed = false;
+            targetState = OperationStates.Failed;
+        }
         var claimed = await database.OperationSubmissions
             .Where(submission =>
                 submission.AccountId == accountId

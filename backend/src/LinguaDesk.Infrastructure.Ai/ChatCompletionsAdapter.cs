@@ -107,7 +107,8 @@ public sealed class ChatCompletionsAdapter
         }
 
         var body = BuildRequestBody(messages);
-        long estimatedInputTokens = EstimateInputTokens(messages);
+        long estimatedInputTokens = profile.PromptRevision == AlternativesPrompt.PromptId
+            ? ConservativeInputTokenBound(profile, messages) : EstimateInputTokens(messages);
         if (estimatedInputTokens > profile.Bounds.MaxInputTokens)
         {
             throw new ChatCompletionsAdapterException(
@@ -230,6 +231,16 @@ public sealed class ChatCompletionsAdapter
     // inflates Cyrillic/CJK ~6x and tripped the input bound on modest
     // non-ASCII inputs. Budget settlement still uses provider-reported
     // actuals, so mis-estimation only moves reservations, never charges.
+    public static int ConservativeInputTokenBound(CandidateProfile profile, IReadOnlyList<PromptMessageSnapshot> messages)
+    {
+        // The provider tokenizes decoded message content: count every UTF-8 byte, including
+        // the inner prompt JSON escapes, plus 512 tokens for roles/provider framing. Outer
+        // HTTP JSON escaping is decoded before tokenization and is not additional input.
+        profile.Validate();
+        return checked(messages.Sum(message => System.Text.Encoding.UTF8.GetByteCount(message.Content)
+            + System.Text.Encoding.UTF8.GetByteCount(message.Role)) + 512);
+    }
+
     private static long EstimateInputTokens(IReadOnlyList<PromptMessageSnapshot> messages)
     {
         long quarters = 0;

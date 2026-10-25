@@ -1,0 +1,186 @@
+{
+  "revision": "sentence-boundaries-v1",
+  "cases": [
+    {
+      "id": "paragraphs",
+      "text": "  First.\r\nSecond!  Third? ",
+      "spans": [
+        {
+          "start": 2,
+          "length": 6
+        },
+        {
+          "start": 10,
+          "length": 7
+        },
+        {
+          "start": 19,
+          "length": 6
+        }
+      ]
+    },
+    {
+      "id": "duplicates",
+      "text": "Same. Same.",
+      "spans": [
+        {
+          "start": 0,
+          "length": 5
+        },
+        {
+          "start": 6,
+          "length": 5
+        }
+      ]
+    },
+    {
+      "id": "cjk",
+      "text": "你好。世界！真的？",
+      "spans": [
+        {
+          "start": 0,
+          "length": 3
+        },
+        {
+          "start": 3,
+          "length": 3
+        },
+        {
+          "start": 6,
+          "length": 3
+        }
+      ]
+    },
+    {
+      "id": "abbreviations",
+      "text": "Dr. Smith met Mr. Jones. Next sentence.",
+      "spans": [
+        {
+          "start": 0,
+          "length": 24
+        },
+        {
+          "start": 25,
+          "length": 14
+        }
+      ]
+    },
+    {
+      "id": "decimal",
+      "text": "It costs 3.14 today. Fine.",
+      "spans": [
+        {
+          "start": 0,
+          "length": 20
+        },
+        {
+          "start": 21,
+          "length": 5
+        }
+      ]
+    },
+    {
+      "id": "initials",
+      "text": "A. Smith lives in the U.S. today. Next.",
+      "spans": [
+        {
+          "start": 0,
+          "length": 33
+        },
+        {
+          "start": 34,
+          "length": 5
+        }
+      ]
+    },
+    {
+      "id": "closers",
+      "text": "He said “Go!” Then left.",
+      "spans": [
+        {
+          "start": 0,
+          "length": 13
+        },
+        {
+          "start": 14,
+          "length": 10
+        }
+      ]
+    },
+    {
+      "id": "unicode",
+      "text": "👩🏽‍💻 works. Café stays.",
+      "spans": [
+        {
+          "start": 0,
+          "length": 11
+        },
+        {
+          "start": 12,
+          "length": 12
+        }
+      ]
+    },
+    {
+      "id": "fragment",
+      "text": "Без знака\nFără punctuație",
+      "spans": [
+        {
+          "start": 0,
+          "length": 9
+        },
+        {
+          "start": 10,
+          "length": 15
+        }
+      ]
+    },
+    {
+      "id": "russian",
+      "text": "Живу на ул. Ленина в г. Москве. Хорошо.",
+      "spans": [
+        {
+          "start": 0,
+          "length": 31
+        },
+        {
+          "start": 32,
+          "length": 7
+        }
+      ]
+    },
+    {
+      "id": "tokens",
+      "text": "NotMr. Next.",
+      "spans": [
+        {
+          "start": 0,
+          "length": 6
+        },
+        {
+          "start": 7,
+          "length": 5
+        }
+      ]
+    },
+    {
+      "id": "runs",
+      "text": "Really?! Yes!!!",
+      "spans": [
+        {
+          "start": 0,
+          "length": 8
+        },
+        {
+          "start": 9,
+          "length": 6
+        }
+      ]
+    },
+    {
+      "id": "whitespace",
+      "text": "\r\n \t",
+      "spans": []
+    }
+  ]
+}

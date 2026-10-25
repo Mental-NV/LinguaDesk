@@ -415,86 +415,86 @@
       "use": "reference",
       "reason": "New selected scope/evidence pending, without inheriting old UI passes",
       "heading": "8.1 Product and release coverage",
-      "sha256": "eeb376d14984d7e389735182b2fcce858daf5acf7f957c6da99217b0cf902ba0"
+      "sha256": "b794760cc52fc17760097313d9c7e98bfb5466221287a98f7799d4eff575cf80"
     },
     {
       "path": "docs/verification/readiness.md",
       "use": "reference",
       "reason": "Required live and release constraints remain honest",
       "heading": "9. Readiness and remaining dependencies",
-      "sha256": "773c794036bb210f44100b08dfe463ccc6fee9e626d6d6319d0b799de744d8c8"
+      "sha256": "12e7bd8170eca7e2c6eca1c9118dbb9d467c87b53501e29e7a2beb9e8ca10afa"
     },
     {
       "path": "frontend/src/shell/WorkspaceView.tsx",
       "use": "reference",
       "reason": "Inspected shared presentation boundary",
-      "sha256": "1ef84d551acba6bc920b33cd6da82338bf2e9becc6c6cfa32cf4cf7936ae150b"
+      "sha256": "57195b8fc295637ab048007e063532a09ac00fab2e05bca1c9cdab73d9531021"
     },
     {
       "path": "frontend/src/shell/workspaceModel.ts",
       "use": "reference",
       "reason": "Existing full-text state/revision and readiness semantics",
-      "sha256": "d00675420ecfcc6a9c34d0f7e8349c934405967e357828b4baf9778489e5252e"
+      "sha256": "611bd5b91d1373dca0398934a211fec16981745818a08abe07da8b5e226796de"
     },
     {
       "path": "frontend/src/shell/workspaceStores.ts",
       "use": "reference",
       "reason": "Existing scheduler, status and shared usage to extend",
-      "sha256": "8b315bb129904cd7adfc1ac11aa7aeb3feff93f3bf284e79a7e641e9caf54150"
+      "sha256": "3f2197638e22219a1c3a13e5b6da058e81e782cbe0785bc135e986b04b9b307a"
     },
     {
       "path": "frontend/src/shell/App.tsx",
       "use": "reference",
       "reason": "Account/protected route and navigation shell",
-      "sha256": "6e9bc44669bb913baaba3d673a406897fff8e6600a1831f348ddef40fec010d3"
+      "sha256": "7a558644aa1283d6a778d422ff46d3c9c8d3a51b03f904562825aff4ce64a6ba"
     },
     {
       "path": "frontend/src/shell/workspaces.tsx",
       "use": "reference",
       "reason": "Single shared workspace teardown",
-      "sha256": "31eec8eada76b2b1a56c0428773211e2265031752773067a92565bd331818a29"
+      "sha256": "c09376d0f5315db61a5fcf18c3106585ca89715b21f98d8dd6f50a8633f233cb"
     },
     {
       "path": "frontend/src/api/translation.ts",
       "use": "reference",
       "reason": "Current full-text transport mapping lacks resolved-language state",
-      "sha256": "1fdaad90e1c94cbae177f25ca7ccef04e25504c661f4db55e8da06b30547a7ba"
+      "sha256": "2b4da7722bf05a467d636f16d259535f1b677b40c304b81296fec40f6f8759f6"
     },
     {
       "path": "frontend/src/api/rewriting.ts",
       "use": "reference",
       "reason": "Existing generated client mapping and operation/status shape",
-      "sha256": "e5cf47e5f344b7d58b2634e235595752af8b1c47f11fd88c1eb9c32ddc2e0938"
+      "sha256": "5562c085e0a975867785ddc11bcc6892d1bcbf3b0dcf23bc34cd6a0903e7dde9"
     },
     {
       "path": "backend/src/LinguaDesk.Api/Features/Operations/OperationsContract.cs",
       "use": "reference",
       "reason": "Exact current C# request/result/status source; no alternatives yet",
-      "sha256": "a53497f1224b1d47a8cbadc9f417b5e0c6a72590cdeae249246dfd29707ea02b"
+      "sha256": "e3ec4527edaed5c1a11238dbbbbe903b26bb1573dde9b53cd97c80ff2facf4ee"
     },
     {
       "path": "backend/src/LinguaDesk.Api/Features/Operations/OperationFingerprint.cs",
       "use": "reference",
       "reason": "Preserve existing full-text fingerprint serialization",
-      "sha256": "4623f4405270234295471f4f297718c15ce78cf8b49e6798ee9e6428ea073129"
+      "sha256": "7beca0d363ba7d1a1531eac9abc9ea2c39fafbbbaa08e8f947c7420a26252454"
     },
     {
       "path": "backend/src/LinguaDesk.Api/Features/Operations/OperationEntities.cs",
       "use": "reference",
       "reason": "Metadata-only durable schema and operation identity",
-      "sha256": "72f527cc0c6b85560bba1e9af7a691f9b95a2e7a68de59139ec43ae362bda2c1"
+      "sha256": "46704a0644c31941e6f1f3ad122f90d53e4727b0e5a6b8aae68760fc446af30c"
     },
     {
       "path": "backend/src/LinguaDesk.Api/Features/Operations/OperationAdmissionService.cs",
       "use": "reference",
       "reason": "Admission/count/deadline validation to extend",
-      "sha256": "7a91aebf4e5857199830eefcd52e9bd949c037c959716348889fa92d3f9fd03e"
+      "sha256": "c0f28c99e9053072c163f2f08bfd0c49968f2b42631959aa27cbf99a85b004eb"
     },
     {
       "path": "backend/src/LinguaDesk.Api/Features/Operations/RewritingOperationCoordinator.cs",
       "use": "reference",
       "reason": "Existing pipeline/settlement and ceiling integration",
-      "sha256": "7aa97e2c04e569bb7358feb467da07c97c4dfb312855924e9adb93a7baef9471"
+      "sha256": "cbe7c855b9d5dfdcc5f781f84d7bc8fcb62fa4b45e5082dd1c9155e765807145"
     },
     {
       "path": "backend/src/LinguaDesk.Api/Infrastructure/Persistence/Migrations/20260911024223_OperationAdmission.cs",
@@ -518,7 +518,7 @@
       "path": "backend/src/LinguaDesk.Infrastructure.Ai/ChatCompletionsAdapter.cs",
       "use": "reference",
       "reason": "Serialization/token/cost/response bounds require alternatives maximum fixtures",
-      "sha256": "06ef77c27133f2b87a8efffbfde12940f4090b1eb45747f0d8566f1cd2c51b7d"
+      "sha256": "0309a2b27ed15e047209f15d6a52093d50c7e0168717cc975928b9f560f2d0af"
     },
     {
       "path": "backend/src/LinguaDesk.Api/Infrastructure/Serving/ServingOptions.cs",
@@ -554,13 +554,13 @@
       "path": "scripts/frontend.sh",
       "use": "reference",
       "reason": "Actual published isolated deterministic harness",
-      "sha256": "e5c7ead7f029621979ce0fa2317e086a1e4e324b70770f104816bc155d0cd437"
+      "sha256": "0b8d1767deb50ee66194f8415375da018e968e7bb62e76a4860d9f7ece52b189"
     },
     {
       "path": "scripts/ai.sh",
       "use": "reference",
       "reason": "Actual evaluator commands; evaluate-alternatives must be implemented",
-      "sha256": "227db962c222b89eefea6e04b93561ffca304afd25b69fe75addce90f1f8ae33"
+      "sha256": "3e6e95c63cfe5cd632fd3fae7426d99d151bd6f14dd50c01683958aeae648d3e"
     },
     {
       "path": "docs/05-api-design.md",
@@ -571,7 +571,7 @@
     }
   ],
   "source_map_sha256": "5c849833bc7cb3a9bf245948238dac50ab5c95bade640348c3a40942199e87f3",
-  "baseline_commit": "c1455e77c01b275351403107826596f7ac334d73",
+  "baseline_commit": "ee59d0b88d1380082d1af0407b9e01af868ff567",
   "locked_files": {
     "docs/00-SDD-Planning-Workflow.md": "a601e8ddc461a407cb397e8d39829bb7d630128f9349aae2dd041ae601908c10",
     "docs/00-workflow/execution.md": "106a00f4d7004fbf3fcbbd106502fd61a1be41e5db9fd99ee20c92d8688038a8",

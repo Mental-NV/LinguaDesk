@@ -1,5 +1,5 @@
 import { act, cleanup, fireEvent, screen, within } from '@testing-library/react'
-import { advance, CAPABILITIES, deferred, editSource, flush, FIXED_TIME, installWorkspaceFetch, json, MODES, mountWorkspace, RESULT, resultName, selectValid, SOURCE, USAGE } from '../helpers/workspace'
+import { chooseMode, expectResult, resultEditor, advance, CAPABILITIES, deferred, editSource, flush, FIXED_TIME, installWorkspaceFetch, json, MODES, mountWorkspace, RESULT, resultName, selectValid, SOURCE, USAGE } from '../helpers/workspace'
 import { MESSAGE_UNKNOWN_OUTCOME } from '../../src/shell/workspaceModel'
 
 beforeEach(() => {
@@ -20,13 +20,14 @@ for (const feature of ['translation', 'rewriting'] as const) {
     }
     it('always renders labelled plain editors, native selectors and no retired controls', async () => {
       await ready()
-      expect(screen.getByRole('textbox', { name: resultName(feature) })).toHaveAttribute('readonly')
+      if (feature === 'translation') expect(screen.getByRole('textbox', { name: resultName(feature) })).toHaveAttribute('readonly')
+      else expectResult(feature, '')
       expect(screen.getAllByRole('heading', { level: 2 })).toHaveLength(2)
       for (const name of ['Translate', 'Rewrite', 'Copy result', 'Start new workspace', 'Refresh usage']) expect(screen.queryByRole('button', { name })).not.toBeInTheDocument()
       expect(screen.queryByRole('region', { name: 'Usage' })).not.toBeInTheDocument()
       expect(screen.queryByText(/characters used|characters remaining|Ready to process/)).not.toBeInTheDocument()
       expect(screen.getByLabelText('Source text')).toHaveAttribute('autocomplete', 'off')
-      expect(screen.getByLabelText(resultName(feature))).toHaveAttribute('autocomplete', 'off')
+      if (feature === 'translation') expect(resultEditor(feature)).toHaveAttribute('autocomplete', 'off')
     })
     it('does not dispatch at 999 ms and dispatches once at 1000 ms without repeating', async () => {
       const h = await ready()
@@ -36,8 +37,8 @@ for (const feature of ['translation', 'rewriting'] as const) {
       await advance(1)
       expect(h.operations).toHaveLength(1)
       expect(h.operations[0]).toMatchObject({ family: feature, source: SOURCE, sourceSelection: 'en' })
-      expect(screen.getByLabelText(resultName(feature))).toHaveValue(RESULT)
-      expect(screen.getByLabelText(resultName(feature))).not.toHaveAttribute('readonly')
+      expectResult(feature, RESULT)
+      expect(resultEditor(feature)).not.toHaveAttribute('readonly')
       await advance(5000)
       expect(h.operations).toHaveLength(1)
     })
@@ -47,7 +48,8 @@ for (const feature of ['translation', 'rewriting'] as const) {
       await advance(700)
       editSource('Latest source.')
       await advance(700)
-      fireEvent.change(screen.getByLabelText(feature === 'translation' ? 'Target language' : 'Writing mode'), { target: { value: feature === 'translation' ? 'ru' : 'friendly' } })
+      if (feature === 'translation') fireEvent.change(screen.getByLabelText('Target language'), { target: { value: 'ru' } })
+      else chooseMode('friendly')
       await advance(999)
       expect(h.operations).toHaveLength(0)
       await advance(1)
@@ -96,7 +98,7 @@ for (const feature of ['translation', 'rewriting'] as const) {
       await flush()
       expect(h.operations).toHaveLength(2)
       expect(h.operations[1].source).toBe('Third.')
-      expect(screen.getByLabelText(resultName(feature))).toHaveValue('Latest output')
+      expectResult(feature, 'Latest output')
       expect(screen.getByLabelText('Source text')).toHaveValue('Third.')
     })
     it('rejects a pending result after a source edit even before the new pause expires', async () => {
@@ -107,7 +109,7 @@ for (const feature of ['translation', 'rewriting'] as const) {
       editSource('Updated.')
       await act(async () => pending.resolve(json({ translatedText: 'Old', rewrittenText: 'Old', admissionDay: '2026-10-24', characterCount: 46, usage: { ...USAGE, revision: 2 } })))
       await flush()
-      expect(screen.getByLabelText(resultName(feature))).toHaveValue('')
+      expectResult(feature, '')
       expect(screen.getByText(/46 characters counted toward your usage/)).toHaveTextContent('2026-10-24')
       expect(h.operations).toHaveLength(1)
     })
@@ -118,31 +120,31 @@ for (const feature of ['translation', 'rewriting'] as const) {
       await advance()
       editSource('Update.')
       await advance()
-      expect(screen.getByLabelText(resultName(feature))).toHaveValue(RESULT)
-      expect(screen.getByLabelText(resultName(feature))).toHaveAttribute('aria-busy', 'true')
+      expectResult(feature, RESULT)
+      expect(resultEditor(feature)).toHaveAttribute('aria-busy', 'true')
       editSource('Queued.')
       await advance()
-      fireEvent.change(screen.getByLabelText(resultName(feature)), { target: { value: 'My edit\nSecond line' } })
+      fireEvent.change(resultEditor(feature), { target: { value: 'My edit\nSecond line' } })
       await act(async () => pending.resolve(json({ translatedText: 'Old', rewrittenText: 'Old', admissionDay: USAGE.day, characterCount: 7, usage: { ...USAGE, revision: 3 } })))
       await advance(3000)
       expect(h.operations).toHaveLength(2)
-      expect(screen.getByLabelText(resultName(feature))).toHaveValue('My edit\nSecond line')
+      expectResult(feature, 'My edit\nSecond line')
       editSource('New')
       await advance()
       expect(h.operations).toHaveLength(3)
-      expect(screen.getByLabelText(resultName(feature))).toHaveValue('New result')
+      expectResult(feature, 'New result')
     })
     it('compositionstart protects pending output even when result composition is cancelled', async () => {
       const pending = deferred<Response>()
       const h = await ready({ operation: (body, index) => index === 1 ? json({ translatedText: RESULT, rewrittenText: RESULT, admissionDay: USAGE.day, characterCount: 46, usage: { ...USAGE, revision: 2 } }) : pending.promise })
       editSource(); await advance()
       editSource('Updated'); await advance()
-      fireEvent.compositionStart(screen.getByLabelText(resultName(feature)))
-      fireEvent.compositionEnd(screen.getByLabelText(resultName(feature)))
+      fireEvent.compositionStart(resultEditor(feature))
+      fireEvent.compositionEnd(resultEditor(feature))
       await act(async () => pending.resolve(json({ translatedText: 'Old', rewrittenText: 'Old', admissionDay: USAGE.day, characterCount: 7, usage: { ...USAGE, revision: 3 } })))
       await advance(2000)
       expect(h.operations).toHaveLength(2)
-      expect(screen.getByLabelText(resultName(feature))).toHaveValue(RESULT)
+      expectResult(feature, RESULT)
     })
     it('Clear source text preserves the result and focus and cancels the pause', async () => {
       const h = await ready()
@@ -153,7 +155,7 @@ for (const feature of ['translation', 'rewriting'] as const) {
       expect(h.operations).toHaveLength(1)
       expect(screen.getByLabelText('Source text')).toHaveValue('')
       expect(screen.getByLabelText('Source text')).toHaveFocus()
-      expect(screen.getByLabelText(resultName(feature))).toHaveValue(RESULT)
+      expectResult(feature, RESULT)
     })
     it('cancels a preflight when edited and never posts its obsolete payload', async () => {
       const token = deferred<Response>()
@@ -209,7 +211,7 @@ for (const feature of ['translation', 'rewriting'] as const) {
       expect(screen.getByRole('alert')).toHaveTextContent(MESSAGE_UNKNOWN_OUTCOME)
       expect(screen.getByRole('button', { name: 'Check status' })).toBeVisible()
       await act(async () => pending.resolve(json({ translatedText: 'Late', rewrittenText: 'Late', characterCount: 46, admissionDay: USAGE.day, usage: { ...USAGE, revision: 2 } })))
-      expect(screen.getByLabelText(resultName(feature))).toHaveValue('')
+      expectResult(feature, '')
     })
     it('offline edits and reconnection never dispatch until a new eligible edit', async () => {
       const h = await ready()
@@ -263,7 +265,7 @@ for (const feature of ['translation', 'rewriting'] as const) {
       mountWorkspace(feature, true); await flush(); selectValid(feature)
       editSource(); await advance()
       expect(h.operations).toHaveLength(1)
-      expect(screen.getByLabelText(resultName(feature))).toHaveValue(RESULT)
+      expectResult(feature, RESULT)
     })
   })
 }
@@ -280,7 +282,9 @@ it('Translation retains an invalid target when source changes to the same langua
 it('Rewriting exposes four languages and exactly nine exclusive modes', async () => {
   installWorkspaceFetch(); mountWorkspace('rewriting'); await flush()
   expect(within(screen.getByLabelText('Writing language')).getAllByRole('option')).toHaveLength(5)
-  expect(within(screen.getByLabelText('Writing mode')).getAllByRole('option').map(option => (option as HTMLOptionElement).value)).toEqual(MODES)
+  chooseMode('business')
+  fireEvent.click(screen.getByRole('button', { name: 'Styles/Tones' }))
+  expect(within(screen.getByRole('listbox', { name: 'Styles/Tones' })).getAllByRole('option').map(option => option.textContent?.replace('✓', ''))).toEqual(['None set', 'Simple', 'Business', 'Academic', 'Casual', 'Enthusiastic', 'Friendly', 'Confident', 'Diplomatic'])
   expect(CAPABILITIES.rewriting.defaultMode).toBe('correctionOnly')
 })
 
@@ -301,7 +305,7 @@ it('all four rewriting languages and nine exclusive modes reach the request payl
   const h = installWorkspaceFetch(); mountWorkspace('rewriting'); await flush()
   for (const language of ['en', 'ru', 'ro', 'zh']) for (const mode of MODES) {
     fireEvent.change(screen.getByLabelText('Writing language'), { target: { value: language } })
-    fireEvent.change(screen.getByLabelText('Writing mode'), { target: { value: mode } })
+    chooseMode(mode)
     editSource(`${language} ${mode}`)
     await advance()
     expect(h.operations.at(-1)).toMatchObject({ sourceSelection: language, mode })

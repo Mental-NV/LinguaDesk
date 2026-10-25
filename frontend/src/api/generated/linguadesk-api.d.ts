@@ -84,6 +84,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/rewriting/alternatives": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Generate two contextual alternatives for one complete sentence
+         * @description Exact result context and Unicode scalar span; selected sentence charged once on success. Status/replay are metadata-only. Deadline 15 seconds; at most three provider dispatches.
+         */
+        post: operations["submitSentenceAlternatives"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/accounts/register": {
         parameters: {
             query?: never;
@@ -339,6 +359,122 @@ export interface components {
              */
             expiresAtUtc: string;
         };
+        /** @description Supported sentence alternatives operation, exact input bounds, segmentation and deadline. */
+        AlternativesCapability: {
+            /**
+             * Format: int32
+             * @description Maximum exact context in Unicode scalars.
+             */
+            maximumContextCharacters: number;
+            /**
+             * Format: int32
+             * @description Maximum selected complete sentence in Unicode scalars.
+             */
+            maximumSentenceCharacters: number;
+            /**
+             * Format: int32
+             * @description Maximum UTF-8 request body bytes.
+             */
+            maximumRequestBytes: number;
+            /** @description Versioned deterministic scalar-span segmentation policy. */
+            segmentationRevision: string;
+            /**
+             * Format: int32
+             * @description Exactly two distinct complete options per successful original response.
+             */
+            optionCount: number;
+            /**
+             * Format: int32
+             * @description Overall server deadline including eligibility, fallback and settlement.
+             */
+            overallDeadlineSeconds: number;
+            /** @description Supported operation kind: sentenceAlternatives. */
+            kind: string;
+        };
+        AlternativesRequest: {
+            /**
+             * Format: uuid
+             * @description Client-generated UUIDv7 identity unique within the account across all kinds.
+             */
+            operationId: string;
+            /** @description Exact current result context, at most 8000 Unicode scalars; never normalized or stored. */
+            context: string;
+            /**
+             * Format: int32
+             * @description Zero-based Unicode scalar offset of the selected complete sentence.
+             */
+            start: number;
+            /**
+             * Format: int32
+             * @description Selected complete sentence length, from 1 to 2000 Unicode scalars.
+             */
+            length: number;
+            /**
+             * Format: uuid
+             * @description Opaque nonempty UUID correlating the in-memory result revision; never stored.
+             */
+            association: string;
+            /** @description Explicit supported source language: en, ru, ro or zh. */
+            language: string;
+            /**
+             * @description One effective rewriting mode; correctionOnly when omitted; explicit null is rejected.
+             * @default correctionOnly
+             */
+            mode: string;
+        };
+        AlternativesSuccessResponse: {
+            /**
+             * Format: uuid
+             * @description Client-generated UUIDv7 identity unique within the account across all kinds.
+             */
+            operationId: string;
+            /** @description Existing routing family: rewriting. */
+            family: components["schemas"]["OperationFamily"];
+            /** @description Operation kind: sentenceAlternatives. */
+            kind: components["schemas"]["OperationKind"];
+            /** @description Successful settled outcome. */
+            status: components["schemas"]["OperationStatus"];
+            /** @description Exactly two distinct complete sentence alternatives in the resolved language. */
+            options: string[];
+            /**
+             * Format: uuid
+             * @description Opaque nonempty UUID correlating the in-memory result revision; never stored.
+             */
+            association: string;
+            /**
+             * Format: int32
+             * @description Zero-based Unicode scalar offset of the selected complete sentence.
+             */
+            start: number;
+            /**
+             * Format: int32
+             * @description Selected complete sentence length, from 1 to 2000 Unicode scalars.
+             */
+            length: number;
+            /** @description Validated source language from eligibility, never inferred from generated output. */
+            resolvedSourceLanguage: string;
+            /** @description One effective rewriting mode; correctionOnly when omitted; explicit null is rejected. */
+            mode: string;
+            /**
+             * Format: int32
+             * @description Selected-sentence scalar count charged once on success.
+             */
+            characterCount: number;
+            /** @description UTC admission day owning the charge, yyyy-MM-dd. */
+            admissionDay: string;
+            /**
+             * Format: date-time
+             * @description Original stored absolute server deadline, never reset by recovery.
+             */
+            deadlineUtc: string;
+            /**
+             * Format: date-time
+             * @description Current server time in UTC.
+             */
+            serverTimeUtc: string;
+            /** @description Authoritative current-day usage with durable ordering revision. */
+            usage: components["schemas"]["UsageSnapshot"];
+        };
         AntiforgeryTokenResponse: {
             /** @description Opaque request token. Send it only in the X-LinguaDesk-Antiforgery header with the matching antiforgery cookie. */
             requestToken: string;
@@ -403,6 +539,8 @@ export interface components {
             rewriting: components["schemas"]["RewritingCapability"];
             /** @description UUIDv7 operation-identity recovery bounds. */
             operationIdentity: components["schemas"]["OperationIdentityCapability"];
+            /** @description Supported sentence alternatives operation, exact input bounds, segmentation and deadline. */
+            alternatives?: components["schemas"]["AlternativesCapability"];
         };
         /** @enum {string} */
         ChineseScript: "simplified" | "traditional";
@@ -535,6 +673,11 @@ export interface components {
          * @enum {string}
          */
         OperationIdentityFormat: "uuidV7";
+        /**
+         * @description Operation kind; fullText for existing operations, sentenceAlternatives for selected-sentence requests.
+         * @enum {string}
+         */
+        OperationKind: "fullText" | "sentenceAlternatives";
         OperationPendingResponse: {
             /**
              * Format: uuid
@@ -564,6 +707,8 @@ export interface components {
             serverTimeUtc: string;
             /** @description Fresh current-day user usage snapshot. */
             usage: components["schemas"]["UsageSnapshot"];
+            /** @description Operation kind; fullText for existing operations, sentenceAlternatives for selected-sentence requests. */
+            kind?: components["schemas"]["OperationKind"];
         };
         OperationProblemDetails: {
             /** @description RFC 9457 problem type reference. */
@@ -644,6 +789,8 @@ export interface components {
             serverTimeUtc: string;
             /** @description Fresh current-day user usage snapshot. */
             usage: components["schemas"]["UsageSnapshot"];
+            /** @description Operation kind; fullText for existing operations, sentenceAlternatives for selected-sentence requests. */
+            kind?: components["schemas"]["OperationKind"];
         };
         /**
          * @description Whole-input behavior when the source exceeds the maximum.
@@ -822,6 +969,10 @@ export interface components {
             serverTimeUtc: string;
             /** @description Fresh current-day user usage snapshot. */
             usage: components["schemas"]["UsageSnapshot"];
+            /** @description Operation kind; fullText for existing operations, sentenceAlternatives for selected-sentence requests. */
+            kind?: components["schemas"]["OperationKind"];
+            /** @description Validated source language from eligibility: en, ru, ro or zh; never inferred from output. */
+            resolvedSourceLanguage: string;
         };
         SessionProblemDetails: {
             /** @description RFC 9457 problem type reference. */
@@ -951,6 +1102,10 @@ export interface components {
             serverTimeUtc: string;
             /** @description Fresh current-day user usage snapshot. */
             usage: components["schemas"]["UsageSnapshot"];
+            /** @description Operation kind; fullText for existing operations, sentenceAlternatives for selected-sentence requests. */
+            kind?: components["schemas"]["OperationKind"];
+            /** @description Validated source language from eligibility: en, ru, ro or zh; never inferred from output. */
+            resolvedSourceLanguage: string;
         };
         /**
          * @description Categorical availability: `available`, `user-exhausted`, `service-exhausted`, `monetary-suspended` or `unavailable`.
@@ -1376,6 +1531,175 @@ export interface operations {
             };
             /** @description Service Unavailable */
             503: {
+                headers: {
+                    /** @description Always `no-store` for language-operation admission responses. */
+                    "Cache-Control": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["OperationProblemDetails"];
+                };
+            };
+        };
+    };
+    submitSentenceAlternatives: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AlternativesRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    /** @description Always `no-store` for language-operation admission responses. */
+                    "Cache-Control": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OperationStatusResponse"];
+                };
+            };
+            /** @description Created */
+            201: {
+                headers: {
+                    /** @description Always `no-store` for language-operation admission responses. */
+                    "Cache-Control": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AlternativesSuccessResponse"];
+                };
+            };
+            /** @description Accepted */
+            202: {
+                headers: {
+                    /** @description Always `no-store` for language-operation admission responses. */
+                    "Cache-Control": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OperationPendingResponse"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    /** @description Always `no-store` for language-operation admission responses. */
+                    "Cache-Control": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["OperationProblemDetails"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    /** @description Always `no-store` for language-operation admission responses. */
+                    "Cache-Control": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["OperationProblemDetails"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    /** @description Always `no-store` for language-operation admission responses. */
+                    "Cache-Control": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["OperationProblemDetails"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    /** @description Always `no-store` for language-operation admission responses. */
+                    "Cache-Control": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["OperationProblemDetails"];
+                };
+            };
+            /** @description Gone */
+            410: {
+                headers: {
+                    /** @description Always `no-store` for language-operation admission responses. */
+                    "Cache-Control": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["OperationProblemDetails"];
+                };
+            };
+            /** @description Payload Too Large */
+            413: {
+                headers: {
+                    /** @description Always `no-store` for language-operation admission responses. */
+                    "Cache-Control": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["OperationProblemDetails"];
+                };
+            };
+            /** @description Unsupported Media Type */
+            415: {
+                headers: {
+                    /** @description Always `no-store` for language-operation admission responses. */
+                    "Cache-Control": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["OperationProblemDetails"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    /** @description Always `no-store` for language-operation admission responses. */
+                    "Cache-Control": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["OperationProblemDetails"];
+                };
+            };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    /** @description Always `no-store` for language-operation admission responses. */
+                    "Cache-Control": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["OperationProblemDetails"];
+                };
+            };
+            /** @description Service Unavailable */
+            503: {
+                headers: {
+                    /** @description Always `no-store` for language-operation admission responses. */
+                    "Cache-Control": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["OperationProblemDetails"];
+                };
+            };
+            /** @description Gateway Timeout */
+            504: {
                 headers: {
                     /** @description Always `no-store` for language-operation admission responses. */
                     "Cache-Control": string;

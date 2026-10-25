@@ -13,6 +13,7 @@
     <ProjectReference Include="../../src/LinguaDesk.Core/LinguaDesk.Core.csproj" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="../../../contracts/fixtures/sentences.v1.json" Link="Fixtures/sentences.v1.json" CopyToOutputDirectory="PreserveNewest" />
     <None Include="../../../contracts/fixtures/unicode-scalar-v1.json" Link="Fixtures/unicode-scalar-v1.json" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>

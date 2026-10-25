@@ -109,6 +109,7 @@ async function readProblem(response: Response): Promise<ProblemBody | null> {
 
 export type SubmitRewritingResult =
   | {
+      readonly resolvedSourceLanguage?: string
       readonly kind: 'succeeded'
       readonly rewrittenText: string
       readonly admissionDay: string
@@ -181,6 +182,7 @@ export async function submitRewritingOperation(
       return {
         kind: 'succeeded',
         rewrittenText: body.rewrittenText,
+        resolvedSourceLanguage: body.resolvedSourceLanguage,
         admissionDay: body.admissionDay,
         characterCount: body.characterCount,
         usage: toUsage(body.usage),

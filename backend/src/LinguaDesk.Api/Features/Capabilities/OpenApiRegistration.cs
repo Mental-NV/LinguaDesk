@@ -79,6 +79,8 @@ public static class OpenApiRegistration
                     schema.Type = JsonSchemaType.String;
                 }
 
+                if (context.JsonTypeInfo.Type == typeof(AlternativesRequest)) schema.AdditionalPropertiesAllowed = false;
+
                 if (context.JsonPropertyInfo?.AttributeProvider is PropertyInfo property)
                 {
                     if (property.GetCustomAttribute<DescriptionAttribute>() is { } description)
@@ -90,6 +92,24 @@ public static class OpenApiRegistration
                     {
                         schema.Type = JsonSchemaType.Integer;
                         schema.Pattern = null;
+                    }
+
+                    if (property.DeclaringType == typeof(AlternativesSuccessResponse) && property.Name == nameof(AlternativesSuccessResponse.Options))
+                    {
+                        schema.MinItems = 2;
+                        schema.MaxItems = 2;
+                    }
+
+                    if (property.DeclaringType == typeof(AlternativesRequest))
+                    {
+                        if (property.Name == nameof(AlternativesRequest.Mode))
+                        {
+                            schema.Type = JsonSchemaType.String;
+                            schema.Default = System.Text.Json.Nodes.JsonValue.Create("correctionOnly");
+                        }
+                        if (property.Name == nameof(AlternativesRequest.Context)) { schema.MinLength = 1; schema.MaxLength = 8000; }
+                        if (property.Name == nameof(AlternativesRequest.Start)) schema.Minimum = "0";
+                        if (property.Name == nameof(AlternativesRequest.Length)) { schema.Minimum = "1"; schema.Maximum = "2000"; }
                     }
 
                     if (property.DeclaringType == typeof(RegistrationRequest)
@@ -303,7 +323,7 @@ public static class OpenApiRegistration
                     };
                 }
 
-                if (endpointName is "submitLanguageOperation" or "getLanguageOperationStatus" or "getCurrentUsage")
+                if (endpointName is "submitLanguageOperation" or "submitSentenceAlternatives" or "getLanguageOperationStatus" or "getCurrentUsage")
                 {
                     if (operation.Responses is not null)
                     {

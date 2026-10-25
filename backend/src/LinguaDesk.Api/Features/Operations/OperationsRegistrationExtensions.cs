@@ -26,6 +26,7 @@ public static class OperationsRegistrationExtensions
         RegisterServingOrUnavailableProviders(services, configuration);
         services.AddScoped<TranslationOperationCoordinator>();
         services.AddScoped<RewritingOperationCoordinator>();
+        services.AddScoped<AlternativesOperationCoordinator>();
         services.AddScoped<OperationSettlementService>();
         services.AddScoped<OperationRecoveryService>();
         services.AddHostedService<OperationRecoveryHostedService>();

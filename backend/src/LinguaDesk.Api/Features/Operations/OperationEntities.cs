@@ -10,6 +10,8 @@ public sealed class OperationSubmission
 
     public string Family { get; set; } = string.Empty;
 
+    public string Kind { get; set; } = OperationKinds.FullText;
+
     public string Fingerprint { get; set; } = string.Empty;
 
     public int ScalarCount { get; set; }
@@ -65,4 +67,10 @@ public sealed class LedgerRevision
     public int Id { get; set; }
 
     public long Value { get; set; }
+}
+
+public static class OperationKinds
+{
+    public const string FullText = "fullText";
+    public const string SentenceAlternatives = "sentenceAlternatives";
 }

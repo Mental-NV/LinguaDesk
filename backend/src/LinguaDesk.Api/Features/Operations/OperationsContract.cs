@@ -12,6 +12,63 @@ public enum OperationFamily
     Rewriting,
 }
 
+[JsonConverter(typeof(JsonStringEnumConverter<OperationKind>))]
+public enum OperationKind
+{
+    [JsonStringEnumMemberName("fullText")] FullText,
+    [JsonStringEnumMemberName("sentenceAlternatives")] SentenceAlternatives,
+}
+
+/// <summary>Bounded exact current result and a complete sentence in scalar offsets. No caller-supplied charge.</summary>
+public sealed record AlternativesRequest(
+    [property: Description("Client-generated UUIDv7 identity unique within the account across all kinds.")]
+    Guid OperationId,
+    [property: Description("Exact current result context, at most 8000 Unicode scalars; never normalized or stored.")]
+    string Context,
+    [property: Description("Zero-based Unicode scalar offset of the selected complete sentence.")]
+    int Start,
+    [property: Description("Selected complete sentence length, from 1 to 2000 Unicode scalars.")]
+    int Length,
+    [property: Description("Opaque nonempty UUID correlating the in-memory result revision; never stored.")]
+    Guid Association,
+    [property: Description("Explicit supported source language: en, ru, ro or zh.")]
+    string Language,
+    [property: Description("One effective rewriting mode; correctionOnly when omitted; explicit null is rejected.")]
+    string Mode = "correctionOnly");
+
+/// <summary>Original synchronous delivery only; status/replay never contains options.</summary>
+public sealed record AlternativesSuccessResponse(
+    [property: Description("Client-generated UUIDv7 identity unique within the account across all kinds.")]
+    Guid OperationId,
+    [property: Description("Existing routing family: rewriting.")]
+    OperationFamily Family,
+    [property: Description("Operation kind: sentenceAlternatives.")]
+    OperationKind Kind,
+    [property: Description("Successful settled outcome.")]
+    OperationStatus Status,
+    [property: Description("Exactly two distinct complete sentence alternatives in the resolved language.")]
+    IReadOnlyList<string> Options,
+    [property: Description("Opaque nonempty UUID correlating the in-memory result revision; never stored.")]
+    Guid Association,
+    [property: Description("Zero-based Unicode scalar offset of the selected complete sentence.")]
+    int Start,
+    [property: Description("Selected complete sentence length, from 1 to 2000 Unicode scalars.")]
+    int Length,
+    [property: Description("Validated source language from eligibility, never inferred from generated output.")]
+    string ResolvedSourceLanguage,
+    [property: Description("One effective rewriting mode; correctionOnly when omitted; explicit null is rejected.")]
+    string Mode,
+    [property: Description("Selected-sentence scalar count charged once on success.")]
+    int CharacterCount,
+    [property: Description("UTC admission day owning the charge, yyyy-MM-dd.")]
+    string AdmissionDay,
+    [property: Description("Original stored absolute server deadline, never reset by recovery.")]
+    DateTimeOffset DeadlineUtc,
+    [property: Description("Current server time in UTC.")]
+    DateTimeOffset ServerTimeUtc,
+    [property: Description("Authoritative current-day usage with durable ordering revision.")]
+    UsageSnapshot Usage);
+
 [JsonConverter(typeof(JsonStringEnumConverter<OperationStatus>))]
 public enum OperationStatus
 {
@@ -57,7 +114,11 @@ public sealed record OperationPendingResponse(
     [property: Description("Current server time in UTC.")]
     DateTimeOffset ServerTimeUtc,
     [property: Description("Fresh current-day user usage snapshot.")]
-    UsageSnapshot Usage);
+    UsageSnapshot Usage)
+{
+    [Description("Operation kind; fullText for existing operations, sentenceAlternatives for selected-sentence requests.")]
+    public OperationKind Kind { get; init; } = OperationKind.FullText;
+}
 
 /// <summary>Terminal operation metadata: pending reservation, settled success charge with output unavailable, settled failure with zero charge, or recovered interruption with zero charge, plus a fresh current-day usage snapshot. Reads never dispatch work.</summary>
 public sealed record OperationStatusResponse(
@@ -78,7 +139,11 @@ public sealed record OperationStatusResponse(
     [property: Description("Current server time in UTC.")]
     DateTimeOffset ServerTimeUtc,
     [property: Description("Fresh current-day user usage snapshot.")]
-    UsageSnapshot Usage);
+    UsageSnapshot Usage)
+{
+    [Description("Operation kind; fullText for existing operations, sentenceAlternatives for selected-sentence requests.")]
+    public OperationKind Kind { get; init; } = OperationKind.FullText;
+}
 
 /// <summary>Synchronous translation success: complete validated translated text with its committed charge and a fresh current-day usage snapshot. Text-bearing responses always use `Cache-Control: no-store`.</summary>
 public sealed record TranslationSuccessResponse(
@@ -99,7 +164,13 @@ public sealed record TranslationSuccessResponse(
     [property: Description("Current server time in UTC.")]
     DateTimeOffset ServerTimeUtc,
     [property: Description("Fresh current-day user usage snapshot.")]
-    UsageSnapshot Usage);
+    UsageSnapshot Usage)
+{
+    [Description("Operation kind; fullText for existing operations, sentenceAlternatives for selected-sentence requests.")]
+    public OperationKind Kind { get; init; } = OperationKind.FullText;
+    [Description("Validated source language from eligibility: en, ru, ro or zh; never inferred from output.")]
+    public required string ResolvedSourceLanguage { get; init; }
+}
 
 /// <summary>Synchronous rewriting success: complete validated same-language rewritten text with its committed charge and a fresh current-day usage snapshot. Text-bearing responses always use `Cache-Control: no-store`.</summary>
 public sealed record RewritingSuccessResponse(
@@ -120,7 +191,13 @@ public sealed record RewritingSuccessResponse(
     [property: Description("Current server time in UTC.")]
     DateTimeOffset ServerTimeUtc,
     [property: Description("Fresh current-day user usage snapshot.")]
-    UsageSnapshot Usage);
+    UsageSnapshot Usage)
+{
+    [Description("Operation kind; fullText for existing operations, sentenceAlternatives for selected-sentence requests.")]
+    public OperationKind Kind { get; init; } = OperationKind.FullText;
+    [Description("Validated source language from eligibility: en, ru, ro or zh; never inferred from output.")]
+    public required string ResolvedSourceLanguage { get; init; }
+}
 
 /// <summary>Wire-fixed Problem Details category names for the translation execution path (API §8).</summary>
 public static class TranslationProblemCategories

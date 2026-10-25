@@ -1,3 +1,4 @@
+import { scalarSlice, spanKey, type SentenceSpan } from '../rewrite/sentences'
 import { analyzeInput, validateRewriting, validateTranslation } from '../api/inputPolicy'
 
 export type Feature = 'translation' | 'rewriting'
@@ -25,7 +26,24 @@ export interface WorkspaceError {
   readonly canRetry: boolean
   readonly canCheckStatus: boolean
 }
+export interface AlternativeSet { readonly span: SentenceSpan; readonly choices: readonly string[]; readonly current: string }
+export interface AlternativesCapture { readonly association: string; readonly span: SentenceSpan; readonly context: string }
 export interface WorkspaceState<C extends WorkspaceCapabilities = WorkspaceCapabilities> {
+  readonly resolvedSourceLanguage: string | null
+  readonly submittedSource: string | null
+  readonly comparisonSource: string | null
+  readonly resultVersion: number
+  readonly association: string | null
+  readonly selectedSentence: SentenceSpan | null
+  readonly alternativeSets: Readonly<Record<string, AlternativeSet>>
+  readonly alternativesCapture: AlternativesCapture | null
+  readonly operationKind: 'fullText' | 'sentenceAlternatives'
+  readonly alternativesCanRetry: boolean
+  readonly alternativesError: string | null
+  readonly editingResult: boolean
+  readonly toolbarExpanded: boolean
+  readonly correctionOnly: boolean
+  readonly showChanges: boolean
   readonly source: string
   readonly sourceSelection: string
   readonly target: string
@@ -58,11 +76,18 @@ export type StatusResolution =
   | { readonly outcome: 'noRecord' | 'windowExpired' }
   | { readonly outcome: 'auth'; readonly error: WorkspaceError }
 export type WorkspaceAction<C extends WorkspaceCapabilities = WorkspaceCapabilities> =
+  | { readonly type: 'toolbarToggled' | 'showChangesToggled' | 'correctionOnlyToggled' | 'resultEditingToggled' }
+  | { readonly type: 'swapOrReuse'; readonly feature: Feature }
+  | { readonly type: 'sentenceSelected'; readonly span: SentenceSpan }
+  | { readonly type: 'alternativesRequested'; readonly capture: AlternativesCapture }
+  | { readonly type: 'alternativesSucceeded'; readonly revision: number; readonly options: readonly string[]; readonly association: string; readonly usage: WorkspaceUsage; readonly observedAtMs: number; readonly characterCount: number; readonly admissionDay?: string }
+  | { readonly type: 'alternativesFailed'; readonly revision: number; readonly message: string; readonly canRetry?: boolean }
+  | { readonly type: 'alternativeApplied'; readonly value: string; readonly association: string }
   | { readonly type: 'sourceChanged'; readonly source: string }
   | { readonly type: 'sourceSelectionChanged' | 'targetChanged' | 'modeChanged'; readonly value: string }
   | { readonly type: 'compositionStarted' | 'compositionEnded' | 'resultCompositionStarted' | 'resultCompositionEnded' | 'submitRequested' | 'capabilitiesFailed' | 'capabilitiesRetried' | 'workspaceCleared' | 'usageRefreshFailed' | 'noticeDismissed' }
   | { readonly type: 'capabilitiesLoaded'; readonly capabilities: C }
-  | { readonly type: 'submitSucceeded'; readonly revision: number; readonly translatedText?: string; readonly rewrittenText?: string; readonly characterCount: number; readonly admissionDay?: string; readonly usage: WorkspaceUsage; readonly observedAtMs: number }
+  | { readonly type: 'submitSucceeded'; readonly revision: number; readonly resolvedSourceLanguage?: string; readonly association?: string; readonly translatedText?: string; readonly rewrittenText?: string; readonly characterCount: number; readonly admissionDay?: string; readonly usage: WorkspaceUsage; readonly observedAtMs: number }
   | { readonly type: 'validationFailed'; readonly error: WorkspaceError | null }
   | { readonly type: 'submitFailed'; readonly revision: number; readonly error: WorkspaceError }
   | { readonly type: 'submitUnknownOutcome'; readonly revision: number; readonly operationId: string }
@@ -84,7 +109,7 @@ export const MESSAGE_SIGN_IN = 'Sign in to continue. Your text was not processed
 export const MESSAGE_VERIFY_EMAIL = 'Verify your email to use Translation and Rewriting.'
 
 export function createInitialWorkspace<C extends WorkspaceCapabilities>(): WorkspaceState<C> {
-  return { source: '', sourceSelection: 'auto', target: '', mode: 'correctionOnly', resultText: '', hasResult: false, resultOutdated: false, resultEdited: false, phase: 'idle', composing: false, error: null, notice: null, usage: null, usageObservedAtMs: null, usageUnavailable: false, generation: 0, inputRevision: 0, resultEditRevision: 0, submittedInputRevision: -1, submittedResultEditRevision: -1, requestRevision: 0, appliedRevision: 0, pendingOperationId: null, capabilities: null, capabilitiesFailed: false }
+  return { resolvedSourceLanguage: null, submittedSource: null, comparisonSource: null, resultVersion: 0, association: null, selectedSentence: null, alternativeSets: {}, alternativesCapture: null, operationKind: 'fullText', alternativesError: null, alternativesCanRetry: false, editingResult: false, toolbarExpanded: false, correctionOnly: true, showChanges: false, source: '', sourceSelection: 'auto', target: '', mode: 'correctionOnly', resultText: '', hasResult: false, resultOutdated: false, resultEdited: false, phase: 'idle', composing: false, error: null, notice: null, usage: null, usageObservedAtMs: null, usageUnavailable: false, generation: 0, inputRevision: 0, resultEditRevision: 0, submittedInputRevision: -1, submittedResultEditRevision: -1, requestRevision: 0, appliedRevision: 0, pendingOperationId: null, capabilities: null, capabilitiesFailed: false }
 }
 export function selectorPolicyFor(capabilities: WorkspaceCapabilities) {
   return { sourceDefault: capabilities.sourceDefault, sourceValues: capabilities.sourceValues, targetValues: capabilities.targetValues ?? [], modeDefault: capabilities.modeDefault ?? 'correctionOnly', modeValues: capabilities.modeValues ?? ['correctionOnly'] }
@@ -151,9 +176,55 @@ function withUsage<C extends WorkspaceCapabilities>(state: WorkspaceState<C>, us
   if (order === 'ambiguous') return { ...state, usageUnavailable: true }
   return { ...state, usage, usageObservedAtMs: at, usageUnavailable: false }
 }
+const clearAssistance = { comparisonSource: null, association: null, selectedSentence: null, alternativeSets: {}, alternativesCapture: null, alternativesError: null, alternativesCanRetry: false }
+export function currentResult(state: WorkspaceState) { return state.hasResult && !!state.resultText && !state.resultOutdated && !state.resultEdited && state.resolvedSourceLanguage !== null }
+export function canReuseResult(state: WorkspaceState) { return state.hasResult && !!state.resultText && !state.resultOutdated && state.resolvedSourceLanguage !== null && !state.composing && state.phase === 'idle' && state.pendingOperationId === null }
 function currentText(state: WorkspaceState) { return state.inputRevision === state.submittedInputRevision && state.resultEditRevision === state.submittedResultEditRevision }
 export function workspaceReducer<C extends WorkspaceCapabilities>(state: WorkspaceState<C>, action: WorkspaceAction<C>): WorkspaceState<C> {
   switch (action.type) {
+    case 'toolbarToggled': return { ...state, toolbarExpanded: !state.toolbarExpanded }
+    case 'showChangesToggled': return { ...state, showChanges: !state.showChanges }
+    case 'resultEditingToggled': return { ...state, editingResult: !state.editingResult }
+    case 'correctionOnlyToggled': {
+      const correctionOnly = !state.correctionOnly
+      const next = correctionOnly ? workspaceReducer(state, { type: 'modeChanged', value: 'correctionOnly' }) : state
+      return { ...next, correctionOnly }
+    }
+    case 'swapOrReuse': {
+      if (!canReuseResult(state)) return state
+      const source = state.resultText
+      const sourceSelection = action.feature === 'translation' ? state.target : state.sourceSelection
+      const target = action.feature === 'translation' ? state.resolvedSourceLanguage! : state.target
+      const changed = source !== state.source || sourceSelection !== state.sourceSelection || target !== state.target
+      if (!changed) return state
+      return { ...state, ...clearAssistance, source, sourceSelection, target,
+        resultText: action.feature === 'translation' ? state.source : state.resultText,
+        inputRevision: state.inputRevision + 1, resultOutdated: true, resolvedSourceLanguage: null, error: null, notice: null }
+    }
+    case 'sentenceSelected': return { ...state, selectedSentence: action.span, alternativesError: null }
+    case 'alternativesRequested': return { ...state, phase: 'submitting', operationKind: 'sentenceAlternatives',
+      requestRevision: state.requestRevision + 1, submittedInputRevision: state.inputRevision, submittedResultEditRevision: state.resultEditRevision,
+      alternativesCapture: action.capture, alternativesError: null, error: null }
+    case 'alternativesSucceeded': {
+      if (action.revision !== state.requestRevision) return state
+      const next = withUsage(state, action.usage, action.observedAtMs)
+      const capture = state.alternativesCapture
+      if (!capture || capture.association !== state.association || action.association !== state.association || !currentResult(state) || !currentText(state))
+        return { ...next, phase: 'idle', notice: formatStaleChargeNotice(action.characterCount, action.admissionDay) }
+      const set = { span: capture.span, choices: [scalarSlice(capture.context, capture.span.start, capture.span.length), ...action.options], current: scalarSlice(capture.context, capture.span.start, capture.span.length) }
+      return { ...next, phase: 'idle', alternativesCapture: null, alternativeSets: { ...state.alternativeSets, [spanKey(capture.span)]: set } }
+    }
+    case 'alternativesFailed': return action.revision !== state.requestRevision ? state : { ...state, phase: 'idle', alternativesCapture: null, alternativesError: state.association ? action.message : null, alternativesCanRetry: action.canRetry ?? true }
+    case 'alternativeApplied': {
+      const span = state.selectedSentence
+      if (!span || !currentResult(state) || state.composing || !state.association) return state
+      const set = state.alternativeSets[spanKey(span)]
+      if (!set || !set.choices.includes(action.value) || action.value === set.current) return state
+      const resultText = scalarSlice(state.resultText, 0, span.start) + action.value + scalarSlice(state.resultText, span.start + span.length)
+      const nextSpan = { start: span.start, length: Array.from(action.value).length }
+      return { ...state, resultText, resultVersion: state.resultVersion + 1, association: action.association, selectedSentence: nextSpan,
+        alternativeSets: { [spanKey(nextSpan)]: { ...set, span: nextSpan, current: action.value } }, alternativesCapture: null, alternativesError: null }
+    }
     case 'sourceChanged':
     case 'sourceSelectionChanged':
     case 'targetChanged':
@@ -161,23 +232,23 @@ export function workspaceReducer<C extends WorkspaceCapabilities>(state: Workspa
       const key = action.type === 'sourceChanged' ? 'source' : action.type === 'sourceSelectionChanged' ? 'sourceSelection' : action.type === 'targetChanged' ? 'target' : 'mode'
       const value = action.type === 'sourceChanged' ? action.source : action.value
       if (state[key] === value) return state
-      return { ...state, [key]: value, inputRevision: state.inputRevision + 1, resultOutdated: state.hasResult, error: state.pendingOperationId ? state.error : null, notice: null }
+      return { ...state, ...clearAssistance, resolvedSourceLanguage: null, [key]: value, inputRevision: state.inputRevision + 1, resultOutdated: state.hasResult, error: state.pendingOperationId ? state.error : null, notice: null }
     }
     case 'compositionStarted': return { ...state, composing: true, resultEditRevision: state.resultEditRevision + 1 }
     case 'compositionEnded': return { ...state, composing: false, inputRevision: state.inputRevision + 1 }
-    case 'resultCompositionStarted': return { ...state, composing: true, resultEditRevision: state.resultEditRevision + 1 }
+    case 'resultCompositionStarted': return { ...state, ...clearAssistance, resultEdited: true, composing: true, resultEditRevision: state.resultEditRevision + 1 }
     case 'resultCompositionEnded': return { ...state, composing: false }
     case 'capabilitiesLoaded': return { ...state, capabilities: action.capabilities, capabilitiesFailed: false }
     case 'capabilitiesFailed': return { ...state, capabilitiesFailed: true }
     case 'capabilitiesRetried': return { ...state, capabilitiesFailed: false }
     case 'submitRequested':
       if (state.phase !== 'idle' || state.composing || !state.capabilities || state.pendingOperationId) return state
-      return { ...state, phase: 'submitting', requestRevision: state.requestRevision + 1, submittedInputRevision: state.inputRevision, submittedResultEditRevision: state.resultEditRevision, resultEdited: false, error: null, notice: null }
+      return { ...state, phase: 'submitting', operationKind: 'fullText', submittedSource: state.source, requestRevision: state.requestRevision + 1, submittedInputRevision: state.inputRevision, submittedResultEditRevision: state.resultEditRevision, resultEdited: false, error: null, notice: null }
     case 'submitSucceeded': {
       if (action.revision !== state.requestRevision) return state
       const next = withUsage(state, action.usage, action.observedAtMs)
       if (!currentText(state)) return { ...next, phase: 'idle', notice: formatStaleChargeNotice(action.characterCount, action.admissionDay, new Date(Date.parse(action.usage.resetAtUtc) - 86400000).toISOString().slice(0, 10)) }
-      return { ...next, phase: 'idle', resultText: action.translatedText ?? action.rewrittenText ?? '', hasResult: true, resultOutdated: false, resultEdited: false, appliedRevision: action.revision, error: null, notice: null }
+      return { ...next, ...clearAssistance, resolvedSourceLanguage: action.resolvedSourceLanguage ?? null, comparisonSource: state.submittedSource, association: action.association ?? null, resultVersion: state.resultVersion + 1, phase: 'idle', resultText: action.translatedText ?? action.rewrittenText ?? '', hasResult: true, resultOutdated: false, resultEdited: false, appliedRevision: action.revision, error: null, notice: null }
     }
     case 'validationFailed': return { ...state, error: state.pendingOperationId ? state.error : action.error }
     case 'submitFailed':
@@ -191,15 +262,16 @@ export function workspaceReducer<C extends WorkspaceCapabilities>(state: Workspa
       const result = action.resolution
       if (result.outcome === 'stillPending') return withUsage(state, result.usage, result.observedAtMs)
       if (result.outcome === 'noRecord') return { ...state, error: { text: MESSAGE_STATUS_NO_RECORD, canRetry: false, canCheckStatus: true } }
-      if (result.outcome === 'windowExpired') return { ...state, pendingOperationId: null, error: { text: MESSAGE_STATUS_WINDOW_EXPIRED, canRetry: true, canCheckStatus: false } }
+      if (result.outcome === 'windowExpired') return { ...state, ...(state.operationKind === 'sentenceAlternatives' ? clearAssistance : {}), pendingOperationId: null, error: { text: MESSAGE_STATUS_WINDOW_EXPIRED, canRetry: state.operationKind === 'fullText', canCheckStatus: false } }
       if (result.outcome === 'auth') return { ...state, pendingOperationId: null, error: result.error }
       if (result.outcome === 'succeededLostOutput') return { ...withUsage(state, result.usage, result.observedAtMs), pendingOperationId: null, error: null, notice: formatLostOutputNotice(result.characterCount, result.admissionDay) }
+      if (result.outcome === 'terminalFailure' && state.operationKind === 'sentenceAlternatives') return { ...withUsage(state, result.usage, result.observedAtMs), pendingOperationId: null, alternativesCapture: null, error: null, alternativesError: state.association ? 'We couldn’t load alternatives. Your text is safe.' : null, alternativesCanRetry: true }
       if (result.outcome === 'terminalFailure') return { ...withUsage(state, result.usage, result.observedAtMs), pendingOperationId: null, error: currentText(state) ? { text: MESSAGE_PROCESSING_FAILURE, canRetry: true, canCheckStatus: false } : null }
       return state
     }
     case 'submitAborted': return action.revision === state.requestRevision ? { ...state, phase: 'idle' } : state
     case 'workspaceCleared': return { ...createInitialWorkspace<C>(), capabilities: state.capabilities, generation: state.generation + 1, requestRevision: state.requestRevision + 1 }
-    case 'resultEdited': return { ...state, resultText: action.value, resultEdited: true, resultEditRevision: state.resultEditRevision + 1 }
+    case 'resultEdited': return { ...state, ...clearAssistance, resultText: action.value, resultEdited: true, resultEditRevision: state.resultEditRevision + 1 }
     case 'usageUpdated': return withUsage(state, action.usage, action.observedAtMs)
     case 'usageRefreshFailed': return { ...state, usageUnavailable: true }
     case 'noticeDismissed': return { ...state, notice: null }

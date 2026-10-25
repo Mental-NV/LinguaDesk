@@ -1,5 +1,5 @@
 import { act, cleanup, fireEvent, screen } from '@testing-library/react'
-import { advance, deferred, editSource, flush, FIXED_TIME, installWorkspaceFetch, json, mountWorkspace, RESULT, selectValid, USAGE } from '../helpers/workspace'
+import { expectResult, advance, deferred, editSource, flush, FIXED_TIME, installWorkspaceFetch, json, mountWorkspace, RESULT, selectValid, USAGE } from '../helpers/workspace'
 
 beforeEach(() => { vi.useFakeTimers(); vi.setSystemTime(new Date(FIXED_TIME)); vi.spyOn(navigator, 'onLine', 'get').mockReturnValue(true) })
 afterEach(() => { cleanup(); vi.useRealTimers(); vi.unstubAllGlobals() })
@@ -23,7 +23,7 @@ it('a hidden submitted operation settles in its own page and shares ordered usag
   screen.getByLabelText('Source text').focus()
   await act(async () => pending.resolve(json({ translatedText: RESULT, characterCount: 46, admissionDay: USAGE.day, usage: { ...USAGE, consumedCharacters: 7546, availableCharacters: 12454, revision: 2 } })))
   expect(screen.getByLabelText('Source text')).toHaveFocus()
-  expect(screen.getByLabelText('Improved result')).toHaveValue('')
+  expectResult('rewriting', '')
   expect(view.stores().rewrite.state.usage?.consumedCharacters).toBe(7546)
   view.navigate('translation')
   expect(screen.getByLabelText('Translation result')).toHaveValue(RESULT)

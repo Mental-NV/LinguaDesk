@@ -55,7 +55,8 @@ public sealed partial class OperationAdmissionService(
         string? mode,
         Guid operationId,
         CancellationToken cancellationToken,
-        long? monthlyCapMinorUnits = null)
+        long? monthlyCapMinorUnits = null,
+        AlternativesRequest? alternatives = null)
     {
         ArgumentException.ThrowIfNullOrEmpty(accountId);
         var allowances = options.Value;
@@ -71,7 +72,11 @@ public sealed partial class OperationAdmissionService(
             ? ProductCatalog.RewritingMaximumSourceCharacters
             : ProductCatalog.TranslationMaximumSourceCharacters;
 
-        var ineligible = AssessEligibility(family, source, effectiveSourceSelection, target, mode, maximumSourceCharacters);
+        var alternativeValidation = alternatives is null ? null : AlternativesInputPolicy.Validate(
+            alternatives.Context, alternatives.Start, alternatives.Length, alternatives.Association, alternatives.Language, alternatives.Mode);
+        var ineligible = alternativeValidation is null
+            ? AssessEligibility(family, source, effectiveSourceSelection, target, mode, maximumSourceCharacters)
+            : alternativeValidation.IsValid ? null : ((string Reason, int? CharacterCount)?)(alternativeValidation.Reason!, null);
         if (ineligible is not null)
         {
             return new(
@@ -88,7 +93,9 @@ public sealed partial class OperationAdmissionService(
         var effectiveMode = string.Equals(family, FamilyRewriting, StringComparison.Ordinal)
             ? mode ?? ProductCatalog.DefaultRewritingMode
             : null;
-        var fingerprint = OperationFingerprint.Compute(
+        var fingerprint = alternatives is not null
+            ? OperationFingerprint.ComputeAlternatives(await fingerprintKeys.GetKeyAsync(cancellationToken), alternatives)
+            : OperationFingerprint.Compute(
             await fingerprintKeys.GetKeyAsync(cancellationToken),
             family,
             source,
@@ -118,7 +125,7 @@ public sealed partial class OperationAdmissionService(
         }
 
         var analysis = ScalarInputPolicy.Analyze(source, maximumSourceCharacters);
-        var scalarCount = analysis.ScalarCount ?? 0;
+        var scalarCount = alternativeValidation?.CharacterCount ?? analysis.ScalarCount ?? 0;
 
         await using var transaction = await database.Database.BeginTransactionAsync(cancellationToken);
         try
@@ -170,10 +177,11 @@ public sealed partial class OperationAdmissionService(
                 AccountId = accountId,
                 OperationId = operationKey,
                 Family = family,
+                Kind = alternatives is null ? OperationKinds.FullText : OperationKinds.SentenceAlternatives,
                 Fingerprint = fingerprint,
                 ScalarCount = scalarCount,
                 AdmissionDay = admissionDay,
-                DeadlineUtc = transactionTime.AddSeconds(ProductCatalog.OverallDeadlineSeconds),
+                DeadlineUtc = transactionTime.AddSeconds(alternatives is null ? ProductCatalog.OverallDeadlineSeconds : AlternativesInputPolicy.DeadlineSeconds),
                 State = OperationStates.Pending,
                 CreatedUtc = transactionTime,
             };

@@ -122,11 +122,11 @@ describe('verification status and guarded navigation (AC-001)', () => {
 
     expect(screen.getByLabelText('Email')).toHaveValue('')
 
-    await user.click(screen.getByRole('link', { name: 'Translation' }))
+    await user.click(screen.getByRole('link', { name: 'Translator' }))
     await waitFor(() =>
       expect(screen.getByRole('heading', { level: 1, name: 'Verify your email' })).toBeInTheDocument(),
     )
-    expect(screen.queryByRole('heading', { name: 'Translation' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('heading', { name: 'Translator' })).not.toBeInTheDocument()
     expectAccountCallsOnly(calls)
     expect(spy).toHaveBeenCalledTimes(1)
   })
@@ -361,7 +361,7 @@ describe('verification failure and ordering (AC-005)', () => {
     await waitFor(() => expect(spy).toHaveBeenCalledTimes(1))
     expect(screen.getByText('Confirming your email…')).toBeVisible()
 
-    await user.click(screen.getByRole('link', { name: 'Translation' }))
+    await user.click(screen.getByRole('link', { name: 'Translator' }))
     await waitFor(() => expect(seen.pathname).toBe('/login'))
 
     release(confirmResponse())

@@ -9,4 +9,7 @@
   <ItemGroup>
     <ProjectReference Include="../../src/LinguaDesk.Core/LinguaDesk.Core.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <None Update="Corpus/alternatives/*.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
 </Project>

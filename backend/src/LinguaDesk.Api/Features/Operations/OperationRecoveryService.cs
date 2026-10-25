@@ -38,7 +38,8 @@ public sealed partial class OperationRecoveryService(
         string? mode,
         Guid operationId,
         CancellationToken cancellationToken,
-        long? monthlyCapMinorUnits = null)
+        long? monthlyCapMinorUnits = null,
+        AlternativesRequest? alternatives = null)
     {
         ArgumentException.ThrowIfNullOrEmpty(accountId);
         var allowances = options.Value;
@@ -54,7 +55,9 @@ public sealed partial class OperationRecoveryService(
         var effectiveMode = string.Equals(family, OperationAdmissionService.FamilyRewriting, StringComparison.Ordinal)
             ? mode ?? ProductCatalog.DefaultRewritingMode
             : null;
-        var fingerprint = OperationFingerprint.Compute(
+        var fingerprint = alternatives is not null
+            ? OperationFingerprint.ComputeAlternatives(await fingerprintKeys.GetKeyAsync(cancellationToken), alternatives)
+            : OperationFingerprint.Compute(
             await fingerprintKeys.GetKeyAsync(cancellationToken),
             family,
             source,

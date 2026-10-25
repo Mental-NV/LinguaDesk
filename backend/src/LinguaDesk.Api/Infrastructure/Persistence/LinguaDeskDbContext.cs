@@ -30,6 +30,7 @@ public sealed class LinguaDeskDbContext(DbContextOptions<LinguaDeskDbContext> op
             entity.HasIndex(submission => new { submission.AccountId, submission.OperationId }).IsUnique();
             entity.Property(submission => submission.AccountId).HasMaxLength(450).IsRequired();
             entity.Property(submission => submission.OperationId).HasMaxLength(36).IsRequired();
+            entity.Property(submission => submission.Kind).HasMaxLength(32).HasDefaultValue(OperationKinds.FullText).IsRequired();
             entity.Property(submission => submission.Family).HasMaxLength(32).IsRequired();
             entity.Property(submission => submission.Fingerprint).HasMaxLength(64).IsRequired();
             entity.Property(submission => submission.AdmissionDay).HasMaxLength(10).IsRequired();

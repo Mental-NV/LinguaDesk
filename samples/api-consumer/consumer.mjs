@@ -12,7 +12,7 @@
 // Every step asserts the expected HTTP status and wire shape and exits
 // non-zero on the first unexpected response, so a clean run is the evidence.
 
-import { randomFillSync } from "node:crypto";
+import { randomFillSync, randomUUID } from "node:crypto";
 
 const baseUrl = process.env.LINGUADESK_API_BASE_URL ?? "";
 const email = process.env.LINGUADESK_API_EMAIL ?? "";
@@ -119,6 +119,12 @@ const run = async () => {
   const consumedBaseline = baseline.json.consumedCharacters;
   snapshotLine("baseline usage", baseline.json);
 
+  const capabilities = await call("capabilities", "GET", "/api/capabilities");
+  expect("capabilities", capabilities.status, 200);
+  expect("capabilities", capabilities.json.alternatives.maximumContextCharacters, 8000);
+  expect("capabilities", capabilities.json.alternatives.segmentationRevision, "sentence-boundaries-v1");
+  expect("capabilities", capabilities.json.alternatives.optionCount, 2);
+
   // 2. Translation submit (AC-001).
   const translationId = uuidv7();
   const translationBody = {
@@ -182,6 +188,27 @@ const run = async () => {
   console.log(`  rewrittenText: ${rewrite.json.rewrittenText}`);
   snapshotLine("post-rewrite usage", rewrite.json.usage);
 
+  expect("translation-language", translation.json.resolvedSourceLanguage, "en");
+  expect("rewrite-language", rewrite.json.resolvedSourceLanguage, "en");
+  // Explicit sentence alternatives: scalar offsets, exact current context and an opaque local result association.
+  const alternativeBody = {
+    operationId: uuidv7(), context: rewrite.json.rewrittenText, start: 0, length: scalarCount("The report is ready."),
+    association: randomUUID(), language: rewrite.json.resolvedSourceLanguage, mode: REWRITE_MODE,
+  };
+  const alternatives = await call("alternatives", "POST", "/api/rewriting/alternatives", { token, body: alternativeBody });
+  expect("alternatives", alternatives.status, 201, alternatives.json);
+  expect("alternatives", alternatives.json.kind, "sentenceAlternatives");
+  expect("alternatives", alternatives.json.options.length, 2);
+  expect("alternatives", alternatives.json.association, alternativeBody.association);
+  expect("alternatives", alternatives.json.characterCount, alternativeBody.length);
+  const alternativesReplay = await call("alternatives-replay", "POST", "/api/rewriting/alternatives", { token, body: alternativeBody });
+  expect("alternatives-replay", alternativesReplay.status, 200);
+  expect("alternatives-replay", alternativesReplay.json.outputAvailable, false);
+  expect("alternatives-replay", alternativesReplay.json.options, undefined);
+  const alternativesConflict = await call("alternatives-conflict", "POST", "/api/rewriting/alternatives", { token, body: { ...alternativeBody, association: randomUUID() } });
+  expect("alternatives-conflict", alternativesConflict.status, 409);
+  console.log("[alternatives] two options delivered; selected sentence charged once; replay is metadata only");
+
   // 5. Status re-read for the rewrite.
   const rewriteStatus = await call("rewrite-status", "GET", `/api/operations/${rewriteId}`, {
     token,
@@ -195,11 +222,11 @@ const run = async () => {
   const usage = await call("usage", "GET", "/api/usage", { token });
   expect("usage", usage.status, 200, usage.json);
   const expectedConsumed =
-    consumedBaseline + scalarCount(TRANSLATION_SOURCE) + scalarCount(REWRITE_SOURCE);
+    consumedBaseline + scalarCount(TRANSLATION_SOURCE) + scalarCount(REWRITE_SOURCE) + alternativeBody.length;
   expect("usage", usage.json.consumedCharacters, expectedConsumed, usage.json);
   snapshotLine("settled usage", usage.json);
   console.log(
-    `[6] usage ok: both charges settled (consumed delta=${usage.json.consumedCharacters - consumedBaseline})`
+    `[6] usage ok: all three charges settled (consumed delta=${usage.json.consumedCharacters - consumedBaseline})`
   );
 
   // 7. Duplicate same-identity/same-payload replays the original outcome
@@ -247,7 +274,7 @@ const run = async () => {
   const anonymousCategory = anonymous.json?.category ?? "(no body category)";
   console.log(`[10] unauthenticated ok: status=401 category=${anonymousCategory}`);
 
-  console.log("CONSUMER RUN COMPLETE: translation, rewrite, recovery and classified failures demonstrated.");
+  console.log("CONSUMER RUN COMPLETE: translation, rewrite, alternatives, recovery and classified failures demonstrated.");
 };
 
 await run();

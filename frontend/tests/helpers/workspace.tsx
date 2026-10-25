@@ -23,22 +23,29 @@ export function deferred<T>() { let resolve!: (value: T) => void; const promise 
 export async function flush() { await act(async () => { for (let i = 0; i < 12; i++) await Promise.resolve() }) }
 export async function advance(ms = 1000) { await act(async () => { await vi.advanceTimersByTimeAsync(ms) }) }
 export function installWorkspaceFetch(options: {
+  alternatives?: (body: Record<string, unknown>, index: number) => Response | Promise<Response>
   operation?: (body: Record<string, string>, index: number) => Response | Promise<Response>
   usage?: () => Response | Promise<Response>
   status?: () => Response | Promise<Response>
   bootstrap?: () => Response | Promise<Response>
   capabilities?: () => Response | Promise<Response>
 } = {}) {
+  const alternatives: Record<string, unknown>[] = []
   const operations: Record<string, string>[] = []
   const reads: string[] = []
   let current = { ...USAGE }
   const success = (body: Record<string, string>, text = RESULT) => {
     const count = [...body.source].length
     current = { ...current, consumedCharacters: current.consumedCharacters + count, availableCharacters: current.availableCharacters - count, revision: current.revision + 1 }
-    return json({ translatedText: text, rewrittenText: text, admissionDay: current.day, characterCount: count, usage: current })
+    return json({ resolvedSourceLanguage: body.sourceSelection === 'auto' ? 'en' : body.sourceSelection, translatedText: text, rewrittenText: text, admissionDay: current.day, characterCount: count, usage: current })
   }
   vi.stubGlobal('fetch', vi.fn(async (input: unknown, init?: RequestInit) => {
     const url = String(input)
+    if (url === '/api/rewriting/alternatives' && init?.method === 'POST') {
+      const body = JSON.parse(String(init.body)) as Record<string, unknown>
+      alternatives.push(body)
+      return options.alternatives ? await options.alternatives(body, alternatives.length) : json({}, 503)
+    }
     if (url === '/api/operations' && init?.method === 'POST') {
       const body = JSON.parse(String(init.body)) as Record<string, string>
       operations.push(body)
@@ -51,7 +58,7 @@ export function installWorkspaceFetch(options: {
     if (url.startsWith('/api/operations/')) return options.status ? await options.status() : json({}, 404)
     throw new Error(`Unexpected test request ${url}`)
   }))
-  return { operations, reads, success }
+  return { operations, alternatives, reads, success }
 }
 export function mountWorkspace(feature: Feature, strict = false) {
   let stores: WorkspaceStores | null = null
@@ -69,3 +76,25 @@ export function selectValid(feature: Feature) {
   if (feature === 'translation') fireEvent.change(screen.getByLabelText('Target language'), { target: { value: 'ro' } })
 }
 export const resultName = (feature: Feature) => feature === 'translation' ? 'Translation result' : 'Improved result'
+
+export function resultEditor(feature: Feature) {
+  if (feature === 'rewriting' && !screen.queryByRole('textbox', { name: 'Improved result' })) {
+    const edit = screen.queryByRole('button', { name: 'Edit result' })
+    if (edit) fireEvent.click(edit)
+  }
+  return screen.getByLabelText(resultName(feature))
+}
+export function expectResult(feature: Feature, text: string) {
+  const editor = screen.queryByRole('textbox', { name: resultName(feature) })
+  if (editor) expect(editor).toHaveValue(text)
+  else expect(screen.getByTestId('write-result').textContent).toBe(text)
+}
+export function chooseMode(value: string) {
+  const toolbar = screen.queryByRole('button', { name: 'Toolbar' })
+  if (toolbar) fireEvent.click(toolbar)
+  const correction = screen.getByRole('switch', { name: 'Correction Only' })
+  if (correction.getAttribute('aria-checked') === 'true') fireEvent.click(correction)
+  fireEvent.click(screen.getByRole('button', { name: 'Styles/Tones' }))
+  const names: Record<string, string> = { correctionOnly: 'None set', simple: 'Simple', casual: 'Casual', business: 'Business', academic: 'Academic', enthusiastic: 'Enthusiastic', friendly: 'Friendly', confident: 'Confident', diplomatic: 'Diplomatic' }
+  fireEvent.click(screen.getByRole('option', { name: names[value] }))
+}

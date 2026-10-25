@@ -1,3 +1,4 @@
+import { logOut } from './workspace-fixture'
 import { expect, test, type Page } from '@playwright/test'
 
 const SIGN_IN_PASSWORD = process.env.LINGUADESK_SMOKE_ACCOUNT_PASSWORD
@@ -84,14 +85,14 @@ test('verified sign-in returns to the remembered protected route', async ({ page
   })
 
   await page.goto('/login')
-  await page.getByRole('link', { name: 'Rewriting' }).click()
+  await page.getByRole('link', { name: 'Write' }).click()
   await expect(page).toHaveURL(/\/login$/)
   await page.getByLabel('Email').fill(VERIFIED_EMAIL)
   await page.getByLabel('Password').fill(SIGN_IN_PASSWORD)
   await page.getByRole('button', { name: 'Sign in' }).click()
 
   await expect(page).toHaveURL(/\/rewrite$/)
-  await expect(page.getByRole('heading', { name: 'Rewriting' })).toBeFocused()
+  await expect(page.getByRole('heading', { name: 'Write' })).toBeFocused()
   await expect(page.getByLabel('Password')).toHaveCount(0)
   expect(signInPosts).toEqual([{ email: VERIFIED_EMAIL, password: SIGN_IN_PASSWORD }])
   for (const entry of observed) {
@@ -119,7 +120,7 @@ test('verified session signs out through the real API and Back exposes no authen
   const signOutResponse = page.waitForResponse((response) =>
     response.url().includes('/api/accounts/sign-out') && response.request().method() === 'POST',
   )
-  await page.getByRole('button', { name: 'Sign out' }).click()
+  await logOut(page)
   expect((await signOutResponse).status()).toBe(204)
   await expect(page.getByRole('button', { name: 'Sign in' })).toBeVisible()
   await expect(page).toHaveURL(/\/login$/)

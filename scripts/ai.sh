@@ -12,7 +12,7 @@ expected_sdk="10.0.302"
 configuration="Release"
 
 usage() {
-    echo "Usage: bash scripts/ai.sh {setup|check|inspect|probe|conformance|verify-access --profile <id> --max-dispatches <n> --max-spend-usd <amount>|evaluate-eligibility [--live] --profile <id> --max-dispatches <n> --max-spend-usd <amount>|evaluate-translation [--live] --profile <id> --max-dispatches <n> --max-spend-usd <amount>|evaluate-rewriting [--live] --profile <id> --max-dispatches <n> --max-spend-usd <amount>|evaluate-chain-bounds [--live] --profile <id> --max-dispatches <n> --max-spend-usd <amount>|evaluate-report [--live] --profile <id> --max-dispatches <n> --max-spend-usd <amount>|evaluate-batch [--live] --corpus <path> --profile <id> --judge-profile <id> --max-dispatches <n> --max-spend-usd <amount> [--calibration <path>] [--review-seed <value>] [--serving-scope <quiescent|shared-concurrent>] [--deadline-ms <n>]|calibrate-judge [--live] --dev-corpus <path> [--candidate-profile <id>] [--judge-profile <id>] --max-dispatches <n> --max-spend-usd <amount> [--deadline-ms <n>] [--eligibility-timeout-ms <n>] [--transformation-timeout-ms <n>] --output-dir <dir>}" >&2
+    echo "Usage: bash scripts/ai.sh {setup|check|inspect|probe|conformance|verify-access --profile <id> --max-dispatches <n> --max-spend-usd <amount>|evaluate-eligibility [--live] --profile <id> --max-dispatches <n> --max-spend-usd <amount>|evaluate-translation [--live] --profile <id> --max-dispatches <n> --max-spend-usd <amount>|evaluate-rewriting [--live] --profile <id> --max-dispatches <n> --max-spend-usd <amount>|evaluate-alternatives [--live] --profile <id> --max-dispatches <n> --max-spend-usd <amount> [--output <path>]|evaluate-chain-bounds [--live] --profile <id> --max-dispatches <n> --max-spend-usd <amount>|evaluate-report [--live] --profile <id> --max-dispatches <n> --max-spend-usd <amount>|evaluate-batch [--live] --corpus <path> --profile <id> --judge-profile <id> --max-dispatches <n> --max-spend-usd <amount> [--calibration <path>] [--review-seed <value>] [--serving-scope <quiescent|shared-concurrent>] [--deadline-ms <n>]|calibrate-judge [--live] --dev-corpus <path> [--candidate-profile <id>] [--judge-profile <id>] --max-dispatches <n> --max-spend-usd <amount> [--deadline-ms <n>] [--eligibility-timeout-ms <n>] [--transformation-timeout-ms <n>] --output-dir <dir>}" >&2
 }
 
 require_command() {
@@ -152,6 +152,7 @@ check() {
     fi
     run_offline dotnet "$runner_dll" probe >/dev/null
     run_offline dotnet "$runner_dll" conformance
+    run_offline dotnet "$runner_dll" evaluate-alternatives --offline --profile DeepSeek-V4.1-Flash --max-dispatches 72 --max-spend-usd 1 --output "$repository_root/artifacts/m045/alternatives-offline.json"
     cleanup_inspection_files
     trap - EXIT INT TERM HUP
 
@@ -201,6 +202,13 @@ case "$mode" in
         ;;
     verify-access)
         run_live verify-access "$@"
+        ;;
+    evaluate-alternatives)
+        if [ "${1:-}" = "--live" ]; then
+            run_live evaluate-alternatives "$@"
+        else
+            run_offline dotnet "$runner_dll" evaluate-alternatives "$@"
+        fi
         ;;
     evaluate-eligibility)
         if [ "${1:-}" = "--live" ]; then

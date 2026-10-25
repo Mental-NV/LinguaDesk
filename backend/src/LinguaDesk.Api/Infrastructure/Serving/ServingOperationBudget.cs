@@ -30,6 +30,9 @@ internal static class ServingOperationBudget
         return new EvaluationBudget(MaxStagesPerOperation, CeilingOrDefault(options.Value?.Rewriting?.MaxSpendUsdPerOperation));
     }
 
+    internal static EvaluationBudget ForAlternatives(IOptions<ServingOptions> options) =>
+        new(3, CeilingOrDefault(options.Value?.Rewriting?.MaxSpendUsdPerOperation));
+
     private static decimal CeilingOrDefault(decimal? configured) =>
         configured is decimal value && value > 0 ? value : DefaultMaxSpendUsdPerOperation;
 }

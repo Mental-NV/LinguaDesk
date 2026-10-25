@@ -258,3 +258,17 @@ at least 40 actual reviewed records, including at least 10 for each language):
    fault-injected rows are labeled separately and never counted as successes;
    release-corpus review (M035 `Corpus/batch-b1.json` approvals) is a
    separate human gate — these runner reports do not approve it.
+
+## Sentence alternatives
+
+The frozen 36-cell `Corpus/alternatives/development.v1.json` spans all four languages and nine modes; reference meaning constraints predate candidate output. `evaluate-alternatives` exercises the production prompt, strict parser and Rewriting chain. `ai.sh check` includes the offline scripted shape run, with credentials removed and proxies disabled.
+
+```sh
+bash scripts/ai.sh evaluate-alternatives --offline --profile DeepSeek-V4.1-Flash \
+  --max-dispatches 72 --max-spend-usd 1 --output artifacts/m045/alternatives-offline.json
+# Live only within the authorized execution scope and remaining total budget:
+bash scripts/ai.sh evaluate-alternatives --live --profile DeepSeek-V4.1-Flash \
+  --max-dispatches 72 --max-spend-usd 1 --output artifacts/m045/alternatives-live.json
+```
+
+Live mode resolves the existing credential reference from environment without displaying it. Reports contain synthetic inputs/references, candidate envelopes, both options, usage/models, dispatches, spent plus unresolved exposure, prompt/corpus hashes and pending semantic disposition. Structural success is `awaiting-semantic-review`: separately review both options against reference meaning/negation/numbers/person/register and Chinese Simplified output. Preserve failed reports and revise/version a prompt before another development attempt. The 40-case calibration and 360-case qualification manifests are frozen design inputs, unexecuted by this command; a development pass is not release qualification. See [M045 evidence](../../../docs/08-backlogs/M045/evidence-design.md).

@@ -401,6 +401,6 @@ describe('forgot-password shell presence (AC-007)', () => {
     })
 
     expect(screen.getByRole('heading', { level: 1, name: 'Forgot password' })).toBeVisible()
-    expect(screen.queryByRole('heading', { level: 1, name: 'Translation' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('heading', { level: 1, name: 'Translator' })).not.toBeInTheDocument()
   })
 })

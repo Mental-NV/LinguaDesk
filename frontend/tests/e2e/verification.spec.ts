@@ -100,11 +100,11 @@ test('unverified protected navigation stays on verification without language wor
   const observed = accountRequests(page)
   await signInUnverifiedAndEnterVerifyPage(page)
 
-  await page.getByRole('link', { name: 'Translation' }).click()
+  await page.getByRole('link', { name: 'Translator' }).click()
   await expect(page).toHaveURL(/\/verify-email$/)
   await expect(page.getByRole('heading', { name: 'Verify your email' })).toBeFocused()
 
-  await page.getByRole('link', { name: 'Rewriting' }).click()
+  await page.getByRole('link', { name: 'Write' }).click()
   await expect(page).toHaveURL(/\/verify-email$/)
   for (const entry of observed) {
     expect(entry).not.toContain('/api/translate')

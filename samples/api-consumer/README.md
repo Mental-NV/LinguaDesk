@@ -54,3 +54,9 @@ The run exits non-zero on the first unexpected status, shape, charge delta
 or error category, so a clean exit is the demonstration. Usage assertions
 are deltas over a pre-run baseline read, so the seeded M028 usage baseline
 on the verified account does not affect the result.
+
+M045 extends the same executable sample with capability discovery and `POST /api/rewriting/alternatives`. It sends the exact current rewrite context, a complete sentence in Unicode scalar offsets, an explicit supported language, one existing mode and a fresh opaque UUID association. Omitted mode defaults to `correctionOnly`; explicit null is rejected. The context maximum is 8,000 scalars, selected sentence maximum 2,000, request body maximum 128 KiB and overall deadline 15 seconds. The server derives the selected text/count and charges that sentence once when both complete distinct options succeed.
+
+Original full-text success now includes `resolvedSourceLanguage` from eligibility. Original alternatives success includes exactly two options and the unchanged association/span. Replay and `/api/operations/{operationId}` remain metadata-only and include `kind`; they never return stored context or options. A changed association/span/context/mode under the same account identity conflicts. Associations are correlation, not persisted result handles. Old full-text submission examples remain valid.
+
+The published Smoke harness now executes this sample with its actual seeded account and a trusted isolated loopback certificate after Chromium cases. Its output is `artifacts/test-results/independent-consumer.txt`. This is deterministic API/ledger evidence, not provider language-quality evidence.

@@ -170,6 +170,13 @@ namespace LinguaDesk.Api.Infrastructure.Persistence.Migrations
                         .HasMaxLength(64)
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("Kind")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(32)
+                        .HasColumnType("TEXT")
+                        .HasDefaultValue("fullText");
+
                     b.Property<string>("OperationId")
                         .IsRequired()
                         .HasMaxLength(36)

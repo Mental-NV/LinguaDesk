@@ -46,20 +46,20 @@ test('translate workspace states scan clean at desktop', async ({ browser }) => 
   const { context, page } = await verifiedWorkspace(browser)
   try {
     await page.goto('/translate')
-    await expect(page.getByRole('heading', { name: 'Translation', exact: true })).toBeFocused()
+    await expect(page.getByRole('heading', { name: 'Translator', exact: true })).toBeFocused()
     await page.getByLabel('Source language').selectOption('en')
     await page.getByLabel('Target language').selectOption('ro')
-    await page.getByLabel('Source text').fill('Hello, the meeting starts at 14:30. Please go.')
+    await page.getByLabel('Source text', { exact: true }).fill('Hello, the meeting starts at 14:30. Please go.')
     await expectCleanScan(page, 'translate ready')
 
-    await page.getByLabel('Source text').fill('a'.repeat(5312))
+    await page.getByLabel('Source text', { exact: true }).fill('a'.repeat(5312))
     await expect(
       page.getByText('Translation is limited to 5,000 characters. Shorten the text to continue.'),
     ).toBeVisible()
     await expectCleanScan(page, 'translate oversize error')
 
     // Keyboard focus must remain visible on the native Clear control.
-    await page.getByLabel('Source text').fill('Hello.')
+    await page.getByLabel('Source text', { exact: true }).fill('Hello.')
     await page.getByRole('button', { name: 'Clear source text' }).focus()
     const ring = await page.getByRole('button', { name: 'Clear source text' }).evaluate((element) => {
       const style = getComputedStyle(element)
@@ -78,8 +78,8 @@ test('rewrite workspace scans clean at desktop', async ({ browser }) => {
   const { context, page } = await verifiedWorkspace(browser)
   try {
     await page.goto('/rewrite')
-    await expect(page.getByRole('heading', { name: 'Rewriting' })).toBeFocused()
-    await page.getByLabel('Source text').fill('The report is really ready. We sends it today.')
+    await expect(page.getByRole('heading', { name: 'Write' })).toBeFocused()
+    await page.getByLabel('Source text', { exact: true }).fill('The report is really ready. We sends it today.')
     await expectCleanScan(page, 'rewrite ready')
   } finally {
     await context.close()
