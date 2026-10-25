@@ -17,7 +17,7 @@ Standing live-run authorization records allowed profiles, environments, dispatch
 | # | Owner / entry point | Supporting documents; open selectively |
 | --- | --- | --- |
 | 0 | This workflow | [Planning](00-workflow/planning.md), [execution](00-workflow/execution.md), [package template](00-workflow/package-template.md), [context tooling and research](../automation/context-guide.md) |
-| 1 | [PRD](01-PRD.md) | [Deferred scope](product/deferred-scope.md), [open questions](product/open-questions.md); active FR/NFR/RG and P dispositions remain in the PRD |
+| 1 | [PRD](01-PRD.md) | [Language catalog](product/languages.md), [Deferred scope](product/deferred-scope.md), [open questions](product/open-questions.md); active FR/NFR/RG and P dispositions remain in the PRD |
 | 2 | [UX](02-ux-specification.md) | [Processing and messages](ux/processing.md), [acceptance scenarios](ux/acceptance.md) |
 | 3 | [Architecture](03-architecture.md) | Component, identity, data, accounting and engineering constraints; read selected sections |
 | 4 | [LLM behavior](04-llm-specification.md) | [Dated provider research](research/deepseek-2026-09-08.md); verify before provider selection/paid use |

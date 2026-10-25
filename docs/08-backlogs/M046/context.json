@@ -1,0 +1,464 @@
+{
+  "version": 1,
+  "scope": "M046",
+  "sources": [
+    {
+      "path": "docs/product/languages.md",
+      "use": "excerpt",
+      "reason": "Canonical selected language identities, script policies and coverage scope",
+      "sha256": "0f3d7578c651276990c04571239eb7326510101de07e79d70777eddb19680e3e"
+    },
+    {
+      "path": "docs/01-PRD.md",
+      "use": "reference",
+      "reason": "Selected language behavior, UX/accounting invariants and user evaluation clarification",
+      "ids": [
+        "FR-004",
+        "FR-005",
+        "FR-006",
+        "FR-007",
+        "FR-008",
+        "FR-009",
+        "FR-010",
+        "FR-012",
+        "FR-013",
+        "FR-014",
+        "FR-019",
+        "FR-020",
+        "FR-021",
+        "FR-023",
+        "FR-024",
+        "FR-025",
+        "FR-026",
+        "FR-036",
+        "NFR-001",
+        "NFR-002",
+        "NFR-004",
+        "NFR-005",
+        "NFR-006",
+        "D-22",
+        "D-24"
+      ],
+      "sha256": "139cbd4701b7a617c162a8163e577ee79c7cd8a592f7b9ab4003250d0144f993"
+    },
+    {
+      "path": "docs/01-PRD.md",
+      "use": "reference",
+      "reason": "Quality thresholds and sampled translation evidence claims",
+      "heading": "8. Evaluation and release acceptance",
+      "sha256": "6dc566c5d6a815172e0576581d78fc924d717ab891f74a54f0365396bed9581c"
+    },
+    {
+      "path": "docs/02-ux-specification.md",
+      "use": "excerpt",
+      "reason": "New shared UI and sentence policy",
+      "heading": "5.1 Expanded language controls and text direction (D-24)",
+      "sha256": "c41c40762565b3c8e8114b19b678d55bcc710f9a880ba9bfa794ecded1fd56ec"
+    },
+    {
+      "path": "docs/02-ux-specification.md",
+      "use": "excerpt",
+      "reason": "New shared UI and sentence policy",
+      "heading": "8.5 Expanded sentence boundaries (D-24)",
+      "sha256": "9b9e8de1a353cb09b8cc22ef7825872090bbe07c7491f5ebcfa9b368929950ba"
+    },
+    {
+      "path": "docs/02-ux-specification.md",
+      "use": "reference",
+      "reason": "Preserve existing native editing, alternatives and responsive behavior",
+      "heading": "7. Translation contract",
+      "sha256": "7c3bb20f93df4870e56e39b83bdbb531440a65b77ffad41e28eac044c5803cbf"
+    },
+    {
+      "path": "docs/02-ux-specification.md",
+      "use": "reference",
+      "reason": "Preserve existing native editing, alternatives and responsive behavior",
+      "heading": "8. Rewriting contract",
+      "sha256": "7385bad85ed0db300ff31ccc3a94d6e481f9a0256c2897cef9737fc6601fe651"
+    },
+    {
+      "path": "docs/02-ux-specification.md",
+      "use": "reference",
+      "reason": "Preserve existing native editing, alternatives and responsive behavior",
+      "heading": "10. Accessibility and browser coverage",
+      "sha256": "64faf00bede809f6e7a516f26213a214e1b78baee8087ad1adb5b1446f0e2703"
+    },
+    {
+      "path": "docs/ux/processing.md",
+      "use": "reference",
+      "reason": "Exact updated language validation copy",
+      "ids": [
+        "UX-MSG-008"
+      ],
+      "sha256": "daa37f8f1a35d581181463faf9c5ca60c5e214b50f660e8c274e090fc96d5e28"
+    },
+    {
+      "path": "docs/ux/acceptance.md",
+      "use": "reference",
+      "reason": "Existing stable language/sentence journey contracts",
+      "sha256": "520d67f43210e01fb8396b5bb33465a64063d9948ffc822e1b96248d5cc2be22"
+    },
+    {
+      "path": "docs/03-architecture.md",
+      "use": "excerpt",
+      "reason": "Shared catalog ownership and boundaries",
+      "heading": "3.3 Shared language catalog (D-24)",
+      "sha256": "994808a72227c1b04a5f21efa413625b6d9cc43ed55fd8c3323b3d29836f97df"
+    },
+    {
+      "path": "docs/03-architecture.md",
+      "use": "reference",
+      "reason": "Layer, privacy, accounting and generated-contract constraints",
+      "heading": "4. Component Responsibilities and Representative Slice",
+      "sha256": "25871387dd6053ac7cc5f108a93afafaed52c34fad802e24f99af6933b63902b"
+    },
+    {
+      "path": "docs/03-architecture.md",
+      "use": "reference",
+      "reason": "Layer, privacy, accounting and generated-contract constraints",
+      "heading": "6. Data Classification and Lifecycle",
+      "sha256": "70683a782311bf2bb4313b391c6d044017b8b14e4e2f8f485255af538e0e0953"
+    },
+    {
+      "path": "docs/03-architecture.md",
+      "use": "reference",
+      "reason": "Layer, privacy, accounting and generated-contract constraints",
+      "heading": "7. Operations, Accounting, and Crash Recovery",
+      "sha256": "d2fb65c86d3b80260bcd4649c41b01d445c4d1cdf77dc1217d32b1d2758826ee"
+    },
+    {
+      "path": "docs/03-architecture.md",
+      "use": "reference",
+      "reason": "Layer, privacy, accounting and generated-contract constraints",
+      "heading": "8. Frontend and Agent Development Rules",
+      "sha256": "1c3642acc81d6170d467b4d632937b700da67c841be739a5a1419eeeabaafe4e"
+    },
+    {
+      "path": "docs/04-llm-specification.md",
+      "use": "reference",
+      "reason": "Shared AI behavior, strict output, family qualification and finite dispatch/cost rules",
+      "heading": "3. Input eligibility and operation behavior",
+      "sha256": "e67830d19026920c9ccf436297ab9422a0f041869961b7972c9ccc9e525712af"
+    },
+    {
+      "path": "docs/04-llm-specification.md",
+      "use": "reference",
+      "reason": "Shared AI behavior, strict output, family qualification and finite dispatch/cost rules",
+      "heading": "4. Prompt and output contracts",
+      "sha256": "e3feb02f22cf7caf11120c1eda4e909a07af86839fa4a237360ee282e8302e00"
+    },
+    {
+      "path": "docs/04-llm-specification.md",
+      "use": "reference",
+      "reason": "Shared AI behavior, strict output, family qualification and finite dispatch/cost rules",
+      "heading": "5.4 Context and monetary bounds",
+      "sha256": "5addd6f4fecd65a9bee3700fb9a4204e672ef7f7b70d0dd407c8d497b64ae00a"
+    },
+    {
+      "path": "docs/04-llm-specification.md",
+      "use": "reference",
+      "reason": "Shared AI behavior, strict output, family qualification and finite dispatch/cost rules",
+      "heading": "6. Routing, attempts, and time bounds",
+      "sha256": "baa98d196e4549008323072028dbe1ad47138ac267479e8d8ad125263b5a4cfd"
+    },
+    {
+      "path": "docs/04-llm-specification.md",
+      "use": "reference",
+      "reason": "Shared AI behavior, strict output, family qualification and finite dispatch/cost rules",
+      "heading": "7. Error classification and recovery",
+      "sha256": "ffb52e572de013d56dd45a0ba703fc8ed586c2eb905a31626f3d4fdf78fe06c8"
+    },
+    {
+      "path": "docs/04-llm-specification.md",
+      "use": "reference",
+      "reason": "Shared AI behavior, strict output, family qualification and finite dispatch/cost rules",
+      "heading": "8. Privacy and owner diagnostics",
+      "sha256": "e0b358fa0bf8cc8d895415f818a234086a6462741042a3260004cd6beaeb5f26"
+    },
+    {
+      "path": "docs/04-llm-specification.md",
+      "use": "reference",
+      "reason": "Shared AI behavior, strict output, family qualification and finite dispatch/cost rules",
+      "heading": "9.3 Candidate eligibility",
+      "sha256": "b2655c7e5e41415ead22f35e74b260b869417a6ff759e47cd8838d47e716f855"
+    },
+    {
+      "path": "docs/05-api-design.md",
+      "use": "excerpt",
+      "reason": "Selected capability expansion and generated-contract changes",
+      "heading": "2.3 Expanded language capabilities (D-24)",
+      "sha256": "d843197d170f45961754566221ac6483b4819016639b5eb831f68e2a2fbd588b"
+    },
+    {
+      "path": "docs/05-api-design.md",
+      "use": "reference",
+      "reason": "Existing alternatives transport and exact operation semantics",
+      "heading": "2.2 M045 selected alternatives contract",
+      "sha256": "a04e6230bad3778b8546478c9476a22283501fa07b365bbc048b4d5b16ddba4b"
+    },
+    {
+      "path": "docs/05-api-design.md",
+      "use": "reference",
+      "reason": "Contract generation and compatibility boundaries",
+      "heading": "9. Privacy, compatibility, and contract generation",
+      "sha256": "5ec8007e40b6d488b3fab1a2cedd7b3ad1419a693a7959b76c05b5d511013350"
+    },
+    {
+      "path": "docs/api/operations.md",
+      "use": "reference",
+      "reason": "Scalar offsets, unchanged identity fingerprints, accounting and recovery",
+      "sha256": "d3ef1c5c0311334a38504d2d8d67cfc1a4a64cfe049430bc1036621f4ba964f6"
+    },
+    {
+      "path": "docs/06-verification-plan.md",
+      "use": "reference",
+      "reason": "Stable checks and real-boundary verification requirements",
+      "heading": "2. Verification layers and check catalog",
+      "sha256": "872ebfa915a45a737d6bf4c3117b0cdb3f27798ca3aeb20916d74fe851c5c9a0"
+    },
+    {
+      "path": "docs/verification/llm-evaluation.md",
+      "use": "excerpt",
+      "reason": "User-selected non-Cartesian translation matrix and Write evidence counts",
+      "heading": "5.5 Expanded-language matrix (D-24)",
+      "sha256": "780e9c38da21200b8b736b35499f59aebfad3f20f6e00be7d6c57158949a3505"
+    },
+    {
+      "path": "docs/verification/llm-evaluation.md",
+      "use": "reference",
+      "reason": "Live prerequisites, semantics and independent review requirements",
+      "heading": "5.0 Evidence layers and live-development gate",
+      "sha256": "728b588f0a1916e803b5d05f393a2dc262739aee8840c07bd871753cef19774d"
+    },
+    {
+      "path": "docs/verification/llm-evaluation.md",
+      "use": "reference",
+      "reason": "Live prerequisites, semantics and independent review requirements",
+      "heading": "5.2 Rubric and denominator",
+      "sha256": "da94432734181e11e733c639881f093a5ace755d3d2a5102380f6e22a75c5662"
+    },
+    {
+      "path": "docs/verification/llm-evaluation.md",
+      "use": "reference",
+      "reason": "Live prerequisites, semantics and independent review requirements",
+      "heading": "5.3 AI grading and human review",
+      "sha256": "dee8ae9c6c76a1cdeebe9605ed844b2d16b8f90b9a8dcf484f28041d03ab1b82"
+    },
+    {
+      "path": "docs/verification/frontend.md",
+      "use": "reference",
+      "reason": "Pinned published UI harness, seeded account, visuals and font requirements",
+      "sha256": "267cfc14a3a8c2ccbe24a892cca338a3f93ca1ced7e2d8c5d37fcaeeff724586"
+    },
+    {
+      "path": "docs/verification/backend.md",
+      "use": "reference",
+      "reason": "Real SQLite/API and standalone AI test harness",
+      "sha256": "91b320d26145889c7e4603d31b7f238faf7a2fb4493243c9d5f42df3eb38546a"
+    },
+    {
+      "path": "docs/verification/coverage.md",
+      "use": "reference",
+      "reason": "Expanded scope pending versus historical evidence",
+      "heading": "8. Canonical coverage and acceptance allocation",
+      "sha256": "b37a74626ab48d0dc270349ada8570b981b62a314634f2bbf45ffe277f4c33ac"
+    },
+    {
+      "path": "docs/product/open-questions.md",
+      "use": "reference",
+      "reason": "Existing unresolved provider, budget, quality and scope questions",
+      "sha256": "ff8b23183c2c78b39c52b36489bdcc4143d892031136c5e79ea7725897e4f333"
+    },
+    {
+      "path": "docs/07-roadmap.md",
+      "use": "reference",
+      "reason": "Selected outcome and dependencies",
+      "ids": [
+        "M046"
+      ],
+      "sha256": "7a2b87eb671cdb6f85965b6105e9aa137d2ff8bf782b4efb8102a07d332ceac8"
+    },
+    {
+      "path": "docs/delivery/current.md",
+      "use": "reference",
+      "reason": "Dependency completion evidence only",
+      "ids": [
+        "M045",
+        "M019",
+        "M020",
+        "M043"
+      ],
+      "sha256": "4105129bb4b16bc8cdbc2b39ef7f9081b9e6aaa0007a086ee2aac8ff7b349142"
+    },
+    {
+      "path": "docs/08-backlogs/M045/evidence-design.md",
+      "use": "reference",
+      "reason": "Prior standing live authorization provenance; check applicability before new requests",
+      "sha256": "7043bcc63c3fea760c5d9c28719f45d49152c0e65bbe7ea8eb1913b0930c4a1a"
+    },
+    {
+      "path": "docs/08-backlogs/M045/live-review.md",
+      "use": "reference",
+      "reason": "Historical exposure/quiescent scope is not current available budget",
+      "sha256": "3bc5fd75e7b6e17fb6654e197cb9fe14c33d02a63862550e3a4953039c6d826f"
+    },
+    {
+      "path": "docs/research/language-expansion-2026-10-26.md",
+      "use": "reference",
+      "reason": "Inspected code map, scope tradeoffs and dated primary external references",
+      "sha256": "594fcdba846676edc67feccf3584403b1a6d3a200424115ae2b1003611811fee"
+    },
+    {
+      "path": "docs/decisions/ADR-014.md",
+      "use": "reference",
+      "reason": "Catalog and representative evaluation rationale",
+      "sha256": "28d547353957bbcd1213f5cb1779032352e90167202f4a240bc34035dcc9ef90"
+    },
+    {
+      "path": "backend/src/LinguaDesk.Core/ProductCatalog.cs",
+      "use": "reference",
+      "reason": "Inspected current implementation or executable verification boundary; open when changing this component",
+      "sha256": "60de0c7227b53a871cba618f194bb6190d27e4916e5cb79f7c7bfe1f219d376c"
+    },
+    {
+      "path": "backend/src/LinguaDesk.Core/SentenceBoundaryPolicy.cs",
+      "use": "reference",
+      "reason": "Inspected current implementation or executable verification boundary; open when changing this component",
+      "sha256": "f3e7dc6ce1a14d8954dd3716ce55e8d3fc5db383f7c9acbe5000f54a1ff59d92"
+    },
+    {
+      "path": "backend/src/LinguaDesk.Api/Features/Capabilities/CapabilitiesContract.cs",
+      "use": "reference",
+      "reason": "Inspected current implementation or executable verification boundary; open when changing this component",
+      "sha256": "de5212d87854844900a8d921caf1e0f69b2762722bb192d945f6b09f49788898"
+    },
+    {
+      "path": "backend/src/LinguaDesk.Api/Features/Capabilities/CapabilitiesDocument.cs",
+      "use": "reference",
+      "reason": "Inspected current implementation or executable verification boundary; open when changing this component",
+      "sha256": "b4b6b9ed3339144fd72ad8f0c6ced7cd81ec788cfec3585f4d7c5c644ed5460d"
+    },
+    {
+      "path": "backend/src/LinguaDesk.Api/Features/Operations/OperationsContract.cs",
+      "use": "reference",
+      "reason": "Inspected current implementation or executable verification boundary; open when changing this component",
+      "sha256": "e3ec4527edaed5c1a11238dbbbbe903b26bb1573dde9b53cd97c80ff2facf4ee"
+    },
+    {
+      "path": "backend/src/LinguaDesk.Infrastructure.Ai/EligibilityEnvelopeParser.cs",
+      "use": "reference",
+      "reason": "Inspected current implementation or executable verification boundary; open when changing this component",
+      "sha256": "30e3b224d1bab6e5af5d1e6951d3198a4745014136e442870d0d2acdae8e8dd2"
+    },
+    {
+      "path": "backend/src/LinguaDesk.Infrastructure.Ai/EligibilityPrompt.cs",
+      "use": "reference",
+      "reason": "Inspected current implementation or executable verification boundary; open when changing this component",
+      "sha256": "83989a1f4d69acca78ffe059af0c9ff88fdabcff3edc3a1fd5bd06a43d1c8492"
+    },
+    {
+      "path": "backend/src/LinguaDesk.Infrastructure.Ai/AlternativesPrompt.cs",
+      "use": "reference",
+      "reason": "Inspected current implementation or executable verification boundary; open when changing this component",
+      "sha256": "bb1045d9faa203a7584c7624d6c7a45ee11e6a1caf022a4ce5f05f5670249b2b"
+    },
+    {
+      "path": "backend/src/LinguaDesk.Infrastructure.Ai/AlternativesEnvelopeParser.cs",
+      "use": "reference",
+      "reason": "Inspected current implementation or executable verification boundary; open when changing this component",
+      "sha256": "c96076fb33c866c103b0f1cd70bcfb44d818971ffc9c8e3b53ed7d603c46ac55"
+    },
+    {
+      "path": "backend/src/LinguaDesk.Infrastructure.Ai/Prompts/eligibility.v1.txt",
+      "use": "reference",
+      "reason": "Inspected current implementation or executable verification boundary; open when changing this component",
+      "sha256": "4f61eb19baced2342dd1a4b27f3b08846184f202674e90243ad2a635c37eb380"
+    },
+    {
+      "path": "backend/src/LinguaDesk.Infrastructure.Ai/Prompts/translation.v1.txt",
+      "use": "reference",
+      "reason": "Inspected current implementation or executable verification boundary; open when changing this component",
+      "sha256": "61be39cfa4933352d6cf895b18fb9920796bed3983be26dae8c010b8bf14f7be"
+    },
+    {
+      "path": "backend/src/LinguaDesk.Infrastructure.Ai/Prompts/rewriting.v1.txt",
+      "use": "reference",
+      "reason": "Inspected current implementation or executable verification boundary; open when changing this component",
+      "sha256": "b159cf743d8bbeb135411900fe1f9d9d070fe5332f153aae87c36aab1cd97091"
+    },
+    {
+      "path": "backend/src/LinguaDesk.Infrastructure.Ai/Prompts/alternatives.v9.txt",
+      "use": "reference",
+      "reason": "Inspected current implementation or executable verification boundary; open when changing this component",
+      "sha256": "1650d61dd48067d8e359569d2a5001c9df2543488d57194a1ccdaceab6fe34a9"
+    },
+    {
+      "path": "frontend/src/api/translation.ts",
+      "use": "reference",
+      "reason": "Inspected current implementation or executable verification boundary; open when changing this component",
+      "sha256": "2b4da7722bf05a467d636f16d259535f1b677b40c304b81296fec40f6f8759f6"
+    },
+    {
+      "path": "frontend/src/translate/TranslatePage.tsx",
+      "use": "reference",
+      "reason": "Inspected current implementation or executable verification boundary; open when changing this component",
+      "sha256": "68c9a748ae4ad57cae7a532a5a15a5b513e6cb4f6a88234ac15aea12c5df9ec1"
+    },
+    {
+      "path": "frontend/src/rewrite/RewritePage.tsx",
+      "use": "reference",
+      "reason": "Inspected current implementation or executable verification boundary; open when changing this component",
+      "sha256": "0acde009098ecd65ba88add475e7d9a8b65e11701545de024fbcc761b2345846"
+    },
+    {
+      "path": "frontend/src/rewrite/sentences.ts",
+      "use": "reference",
+      "reason": "Inspected current implementation or executable verification boundary; open when changing this component",
+      "sha256": "99a071f3f1c0229ff065a216a5197a24c34743f103b54b7338d1180f5f14cb0a"
+    },
+    {
+      "path": "frontend/src/rewrite/comparison.ts",
+      "use": "reference",
+      "reason": "Inspected current implementation or executable verification boundary; open when changing this component",
+      "sha256": "164166b2d98aed09aee6b2adc0ce22730c3c1713fb212e8ae387e229af181796"
+    },
+    {
+      "path": "frontend/src/shell/WorkspaceView.tsx",
+      "use": "reference",
+      "reason": "Inspected current implementation or executable verification boundary; open when changing this component",
+      "sha256": "57195b8fc295637ab048007e063532a09ac00fab2e05bca1c9cdab73d9531021"
+    },
+    {
+      "path": "frontend/src/shell/workspaceModel.ts",
+      "use": "reference",
+      "reason": "Inspected current implementation or executable verification boundary; open when changing this component",
+      "sha256": "611bd5b91d1373dca0398934a211fec16981745818a08abe07da8b5e226796de"
+    },
+    {
+      "path": "scripts/ai.sh",
+      "use": "reference",
+      "reason": "Inspected current implementation or executable verification boundary; open when changing this component",
+      "sha256": "3e6e95c63cfe5cd632fd3fae7426d99d151bd6f14dd50c01683958aeae648d3e"
+    },
+    {
+      "path": "scripts/verify-milestone.sh",
+      "use": "reference",
+      "reason": "Inspected current implementation or executable verification boundary; open when changing this component",
+      "sha256": "7401b49f45b2f6c0f07d625130c2c23584de21bfb70357321ac49c7f913665c2"
+    },
+    {
+      "path": "frontend/tests/e2e/fonts/README.md",
+      "use": "reference",
+      "reason": "Inspected current implementation or executable verification boundary; open when changing this component",
+      "sha256": "c8434b0545ceaf709a60cbfd25b587bdc8f395a5bd2e2a5351033f8cec5556fd"
+    }
+  ],
+  "source_map_sha256": "3856c80ab6f49b7403bd375f22a80d87e3a82903f77abb874e82ab72ca16e4af",
+  "baseline_commit": "554493f63625b1ea10736f61206ae2aab2f7d60f",
+  "locked_files": {
+    "docs/00-SDD-Planning-Workflow.md": "7e0f058c2b7ea290598030ab46d71e2c13def0a37e4b5de7cc029d1e6bb6e7ea",
+    "docs/00-workflow/execution.md": "106a00f4d7004fbf3fcbbd106502fd61a1be41e5db9fd99ee20c92d8688038a8",
+    "docs/08-backlogs/M046/spec.md": "f084cc4333ed6dae1449e695cd351df1f0cf892ab23952395a24b63ec07f62f5",
+    "docs/08-backlogs/M046/plan.md": "a5ce4e935e4fa6035a9a9cb5dd47aa15772b2867b08634179714242f6f7016ed"
+  }
+}

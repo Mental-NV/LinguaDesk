@@ -30,7 +30,7 @@ Reports label every observation `offline_fixture`, `transport_fixture`, `live_ac
 
 ### 5.1 Versioned corpus and reference construction
 
-Create a frozen release corpus of **600 eligible quality cases**, separate from development/calibration cases. These counts are the initial verification design; changing them requires a reviewed #6 revision and a recorded reason, never removal of failing cases to obtain a pass.
+For the original four-language baseline (expanded-catalog rules are in §5.5), create a frozen release corpus of **600 eligible quality cases**, separate from development/calibration cases. These counts are the initial verification design; changing them requires a reviewed #6 revision and a recorded reason, never removal of failing cases to obtain a pass.
 
 | Set | Composition | Scoring unit |
 | --- | --- | --- |
@@ -77,6 +77,32 @@ If DF-004 is later selected, qualify each candidate on every directed route or r
 Qualification links adapter capability/settings, finite context/output/cost bounds, runtime checker behavior, quality/automated review and applicable API performance to exact revisions. AI records the qualification disposition from these checks without human sign-off. Startup admission remains #4's responsibility. No qualified fallback means configure none. Record failed runs; after prompt/model/checker changes, create a new candidate revision and rerun the affected family, retaining earlier failures and stable cases. Do not tune on the release set and then claim it is unseen; record exposure and add fresh held-out cases in the next reviewed corpus revision.
 
 Reassess evidence after provider/SDK/model alias, prompt, sampling/settings or checker changes. Returned model/fingerprint observations help identify change but do not prove unchanged behavior. A pricing-only update requires cost/bounds verification; language regrading is needed when behavior may also change. Record the impact decision and its evidence. No new monitoring cadence or uptime SLA is created here.
+
+### 5.5 Expanded-language matrix (D-24)
+
+**2026-10-26 user clarification:** do not enumerate all translation pairs for live evaluation; most languages share a common template and need only light coverage. This section supersedes fixed four-language totals and exhaustive Translation direction obligations in §§5.0–5.4 and §6 for M046 and subsequent expanded-catalog qualification. Historical package results remain unchanged. It preserves deterministic pair completeness and PRD quality thresholds on the directions actually deeply evaluated, while explicitly accepting unmeasured cross-pair risk. This is a scope-specific change under D-24, not a general waiver of live evidence.
+
+Let N be the [catalog](../product/languages.md) size (124), A its additions beyond en/ru/ro/zh (120), and R the representative Translation directions. Freeze **24 R directions** before observing outcomes: the original 12 directions plus both directions for `de↔fr`, `ru↔ar`, `hi↔bn`, `ja↔ko`, `th↔vi`, `am↔he`. This covers same-script, cross-script, RTL/LTR, Indic, CJK, Southeast Asian and Ethiopic behavior through the same direct Translation template. English is only an evaluation anchor; runtime performs one direct transformation, never an English pivot.
+
+| Layer | Translation evidence | Current target / claim |
+| --- | --- | --- |
+| Deterministic | Generate N × (N−1) pairs; assert exact membership, uniqueness, no self-pairs and coverage at Core/capabilities/contract boundaries without a live request per pair | 15,252 pairs; catalog integrity only |
+| Live development | One reviewed case per R direction plus one added-language→English and one English→added-language case for each addition; reuse an identical required observation rather than dispatching twice | 24 + 2A = **264 cases**; template behavior and lightweight language reachability/fidelity |
+| Release template quality | 20 independently reviewed frozen cases per R direction, retaining the existing fidelity/script/length strata | 480 cases; ≥90% usable in each of the 24 measured directions; zero critical errors |
+| Release added-language smoke | One fresh, release-disjoint case in each anchor direction for every added language | 240 cases; every case usable, zero critical errors; **not** a per-language statistical quality estimate |
+| Required additional AI review | Five preselected cases per R direction, both outputs for each added-language anchor smoke, plus all failures/flags/disagreements | 120 deep-sample reviews + 240 smoke reviews before extra flags |
+| API performance | Thirty requests per R direction at concurrency ten; 15 distinct inputs each repeated with fresh identity, balanced across three length bands | 720 measured requests, family p95 and per-sampled-route distributions; unsampled-pair latency unmeasured |
+| Maximum length | L−1/L per R direction; add representative maximum-byte/combining/RTL cases not already covered | 48 natural cases plus explicit risk supplements; L+1 remains offline |
+
+All selected language codes also have offline eligibility/serialization fixtures. Live eligibility positives can reuse the recorded classification stage of anchor translation or Write cases; do not buy a redundant detector-only run. Add bounded negative/ambiguity cases for close-language confusion (Bosnian/Croatian/Serbian, Bokmål/Nynorsk, Indonesian/Malay), wrong manual hints, unsupported scripts and mixed/uncertain input; reference expectations are reviewed before the run.
+
+A failing smoke does not prove language impossibility, and a passing one does not prove all pairs. Retain failures and first check shared prompt, wrong code/script and reference defects. Add **at most five targeted development cases per affected direction per investigation batch**, including one non-English pairing when relevant, under remaining authorized budget. Fix and rerun the affected strata; a shared prompt/checker/model change requires impact review of R and affected smokes. Further batches remain explicitly bounded. Do not automatically expand to all pairs, tune on held-out release cases or hide failures by deleting a language. A need for another model, per-language prompting/routing or repeated unresolved defects is a documented scope/qualification issue.
+
+Write retains its existing per-language/mode standard: **9N = 1,116 development cases each for full rewriting and alternatives**, **90N = 11,160 release cases/sets per operation**, with 18N additional sampled reviews per operation plus all flags. At least 10N disjoint calibration/reference cases per operation replace the old 40-language-pool total; recorded cases may cover overlapping strata without redundant calls. Both Chinese scripts and both Serbian scripts must appear in each operation's per-language evidence. Correction-only includes already-correct and minimal-correction examples; alternatives judge both options. Translation calibration needs at least two disjoint examples per language and one per R direction, with a minimum of 40 overall; these may overlap the development pool but not release cases.
+
+Eligibility/reference pools grow to cover every selected language and the five existing negative/boundary classes; the old 40-per-family count is a floor, not permission to omit a language. Positive live classifications may be shared with transformation runs. Write/alternatives performance remains ten requests per language/mode cell (90N per operation), using five distinct combinations each twice; rotate length-band allocation to keep family totals balanced. Maximum-length Write cases remain two per cell. These Write counts are not an instruction to exhaustively test Translation pairs.
+
+Freeze manifests with catalog/prompt/model/validator/segmentation revisions and reject missing/duplicate planned cells before spending. Development, qualification, performance and deterministic reports remain distinct. Record actual total cost/dispatch ceilings including graders and unresolved exposure; a count is not spending authorization. Reuse prior results only after an impact review, never by treating the four-language reports as evidence for the additions. M046 selects development evidence; release qualification/performance stay successor gates. No external price or new budget is fixed here.
 
 ## 6. Performance and workload composition (Q-005)
 

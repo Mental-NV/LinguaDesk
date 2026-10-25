@@ -34,7 +34,7 @@ Scenarios are layer-independent behavioral contracts. [Verification plan Section
 | UX-AC-018 | MVP | Invalid forgot-password email sends no request and shows an associated error with field focus. |
 | UX-AC-019 | MVP | Valid password reset shows success and explicit Go to sign in; no automatic login or restored workspace. |
 | UX-AC-020 | MVP | Invalid/expired reset link shows recovery action without password fields or reset submission. |
-| UX-AC-021 | Amended | Whitespace remains ineligible regardless of elapsed time; Translation has four targets and no Translate button. |
+| UX-AC-021 | Amended | Whitespace remains ineligible regardless of elapsed time; Translation has the targets advertised by the shared catalog and no Translate button. |
 | UX-AC-022 | Amended | Eligible T-OK-A sends no operation before one second of inactivity, then one complete translation and authoritative accounting 7,546; no unchanged-revision repeat. |
 | UX-AC-023 | Amended | Repeated source/settings edits restart the one-second timer; only the latest eligible settled revision dispatches once. |
 | UX-AC-024 | Amended | Source and target edits preserve the previous result and restart the timer; only the latest eligible values dispatch after the pause. |
@@ -104,7 +104,7 @@ Scenarios are layer-independent behavioral contracts. [Verification plan Section
 | UX-AC-088 | Amended | Rewrite detection uncertainty/failure occurs for a paused candidate; correcting source/language starts a new timer, with no automatic retry of the unchanged failed revision. |
 | UX-AC-089 | Amended | Paused Rewrite rejects substantially unsupported/mixed input with no transformation/charge, preserves prior result, and cannot be bypassed by manual source choice. |
 | UX-AC-090 | Amended | Paused Traditional-Chinese rewrite displays Simplified fixture result and clear language label, preserves original script in source, and has no target selector. |
-| UX-AC-091 | Amended | All 12 Translation directions dispatch after the pause; same-language remains invalid. Toolbar writing settings are disabled and never sent to Translation. |
+| UX-AC-091 | Amended | All selected Translation directions dispatch after the pause; same-language remains invalid. Toolbar writing settings are disabled and never sent to Translation. |
 | UX-AC-092 | Amended | Language selects retain native behavior; Styles/Tones has accessible groups, single selection, arrows/Home/End/typeahead/commit/Escape, checked pale-blue row and bounded scrolling. |
 | UX-AC-093 | Amended | Navigation and Toolbar collapse independently, preserve text/settings and submit nothing. Desktop rail resizing and compact/mobile in-flow disclosures match §4; hidden controls leave focus order and collapse restores trigger focus. |
 | UX-AC-094 | Amended | Native result selection/Shift/drag/paste preserves source and protected text. Drag selection does not open alternatives; Edit result permits native caret/IME behavior. |

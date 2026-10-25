@@ -2,6 +2,8 @@
 
 LinguaDesk contains a minimal ASP.NET Core host, a published React SPA, explicit SQLite persistence, an independent offline AI boundary, local accounts, authenticated Translation/Rewriting workspaces, usage/accounting and bounded provider pipelines. Under M034's temporary MVP substitute, every newly created local account is durably marked verified without sending email, registration issues no credential and offers explicit sign-in. Real email-address verification and email-delivered password recovery are deferred under DF-008; the previously implemented confirmation/recovery contracts remain dormant behind unavailable production senders.
 
+Language expansion is planned in [M046](docs/08-backlogs/M046/plan.md): [124-language target catalog](docs/product/languages.md), shared RTL/segmentation work and explicit evaluation gates. The current executable/generated contract remains the four-language baseline until that milestone is implemented; this documentation update adds no runtime languages.
+
 ## Prerequisites
 
 - .NET SDK `10.0.302` (pinned by `global.json`)

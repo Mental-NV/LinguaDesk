@@ -1,7 +1,7 @@
 # LinguaDesk — UX/UI Specification
 
-**Document:** #2 · **Version:** 3.0 · **Status:** Screenshot-aligned design; implementation and fresh verification pending
-**Updated:** October 25, 2026 (Europe/Moscow)
+**Document:** #2 · **Version:** 3.1 · **Status:** Screenshot-aligned design; implementation and fresh verification pending
+**Updated:** October 26, 2026 (Europe/Moscow)
 
 ## 1. Authority, inputs, and scope
 
@@ -189,7 +189,7 @@ Account's menu contains only Log out. Escape/outside click dismisses it and retu
 | Component | Current contract |
 | --- | --- |
 | Navigation | Translator and Write links with current-page state, Account → Log out, independent collapse control |
-| Language | Native selects named Source language / Writing language / Target language; source visible default Detect language, target Choose target language; four existing languages |
+| Language | Native selects named Source language / Writing language / Target language; source visible default Detect language, target Choose target language; the shared PRD language catalog; English labels sorted by name; Detect language/Choose target language remain first |
 | Swap / reuse | Translator: Swap languages and texts. Write: Use result as source. Conditions in Sections 7–8 |
 | Toolbar | Correction Only, Styles/Tones, Show changes only; Section 4.3 defines layout and behavior |
 | Source | Native textarea named Source text; Clear source text icon at top-right; editable during requests |
@@ -203,6 +203,12 @@ Exactly one visible `main` and one accessible `h1`; visually hidden workspace he
 Copy writes only the current corresponding plain text, including manual edits and line breaks. Successful copy briefly announces MSG-048; failure uses MSG-049 and leaves native selection usable. Do not move editor focus/selection, copy annotations or claim success before the clipboard write completes. Clear source returns focus to the source, preserves the prior result and cancels pending auto-dispatch; late responses cannot apply.
 
 One pending paid operation per page is retained, including alternatives on Write. A new eligible revision waits for its own timer and, if another operation is unsettled, for that operation to resolve. Manual result editing or leaving the feature cancels an undispatched timer/queued candidate, but cannot cancel a provider operation already sent. An unchanged settled revision never runs again. Known invalid input cancels the timer and keeps the source editable; essential blocking/failure feedback uses a page alert rather than dedicated source/result status lines. Route changes and account continuation may move focus; async completion/usage/background validation never steals focus or moves the source caret.
+
+### 5.1 Expanded language controls and text direction (D-24)
+
+Native selects remain the selected low-effort control. Render every advertised catalog entry in stable English-name order, retain keyboard typeahead, and fit long labels at 320 CSS px. No new search service, regional picker or UI localization is introduced. Render labels from capabilities, never a second four-language UI list. Detection, swap/reuse, stale-response guards and the one-second pause work identically for all codes.
+
+The English application shell remains LTR. Source and manually editable result text use `dir="auto"` and logical text alignment; generated result/alternative blocks use the resolved target/source language direction, with isolation for mixed-direction names, numbers, URLs and deletion annotations. Preserve paragraph direction in mixed-direction content without treating incidental foreign phrases as a new language. Native caret, selection and copied logical text order must remain intact. Bind `lang` only when known for the current text revision. Supply script-capable font fallbacks; pinned test fonts must cover representative Arabic/Hebrew, Indic, Southeast Asian, Ethiopic and CJK text. Fonts are rendering dependencies, not a transliteration feature.
 
 ## 6. Processing state and message contract
 
@@ -227,7 +233,7 @@ See [UX processing and message contract](ux/processing.md#64-announcements).
 ## 7. Translation contract
 
 - Initial source is Detect language; target is Choose target language. Chinese is labelled `Chinese (Simplified output)` and accepts both Chinese scripts. Source detection occurs for a current paused candidate; a manual choice does not waive supported-content validation.
-- Target lists the four PRD languages. Disable the known source language as target; if a later source change equals an already selected target, retain the invalid value and block dispatch until corrected. Selecting a valid target with eligible source restarts the timer.
+- Target lists the PRD catalog languages exposed by current capabilities. Disable the known source language as target; if a later source change equals an already selected target, retain the invalid value and block dispatch until corrected. Selecting a valid target with eligible source restarts the timer.
 - Count complete input internally using #5's Unicode contract. At or below the configured limit, the paused candidate submits all entered text. Above it, retain text/caret and previous result, show an essential blocking alert, and cancel dispatch. The backend rejects oversized independent-client requests too. There is no persistent counter, boundary marker, suffix omission, or partial-result state.
 - Native selection and Copy result use the exact current result including manual edits/newlines. Empty source does not erase an existing result; Clear source text preserves that result and cancels any pending timer without dispatch.
 
@@ -239,7 +245,7 @@ Swap is disabled until source language is known and a current, unedited-by-new-s
 
 Correction Only defaults on; Styles/Tones defaults None set and is disabled while the switch is on. Turning Correction Only off enables None set. Turning it on resets the selected style/tone to None set; turning it back off does not restore an old choice. Off + None set and on both map to existing API `correctionOnly`; a chosen style/tone maps to its one existing mode. Never send two modes or UI switch state to the transformation API. A switch change that leaves the effective mode unchanged creates no new processing revision/request. Selecting a different effective mode restarts the one-second pause for eligible source. Grammar/spelling correction applies to every mode.
 
-Language/source edits and effective mode changes use the existing whole-input 2,000-character limit and processing guards. The source remains untouched by successful results. The language catalog has English, Russian, Romanian and Chinese (Simplified output); English (British) in the screenshot does not add a dialect setting.
+Language/source edits and effective mode changes use the existing whole-input 2,000-character limit and processing guards. The source remains untouched by successful results. The language catalog and script/variety rules are owned by [PRD language policy](product/languages.md). English (British) in the screenshot does not add a dialect setting.
 
 Use result as source is disabled for empty/stale results or unsettled paid work. When enabled, it copies the entire current plain result into source, retains that result and language/mode, invalidates assistance and starts a pause only if the source changed and is eligible. It does not swap languages. Result text exceeding the source limit remains editable and blocked rather than truncated.
 
@@ -270,6 +276,12 @@ The selected `sentence-boundaries-v1` implementation is deterministic across fro
 Do not split decimal periods between ASCII digits, dotted initialisms, or the fixed case-insensitive abbreviation tokens `Mr.`, `Mrs.`, `Ms.`, `Dr.`, `Prof.`, `e.g.`, `i.e.`, `etc.`, `dl.`, `dna.`, `dr.`, `г.`, `ул.`, `т.д.`, `т.п.`. Suppress a boundary after a single-letter initial when another word follows on the same line. Match whole abbreviation tokens, not suffixes. This conservative rule set favors a larger sentence over splitting known abbreviations; freeze ambiguous examples and version any later algorithm change. The backend verifies the selected span with the same rule/fixture version; plain client offsets do not waive validation.
 
 Comparison uses grapheme-safe tokens and retains raw source/result strings unchanged. Use deterministic matching with a maximum 200,000 token-pair comparisons; on exhaustion show the unmatched region as deletion plus insertion instead of blocking editing or approximating the copied text. Preserve paragraph gaps and whole deletions. Bounds are an implementation safeguard, not a language-quality claim. All highlights remain disposable local presentation, with no targeted identity reconstruction after manual edits.
+
+### 8.5 Expanded sentence boundaries (D-24)
+
+M046 introduces `sentence-boundaries-v2`; §8.4 documents the implemented v1 baseline, not the expanded-language target. Keep scalar offsets, exact gaps/newlines, bounded comparison and the punctuation-free fragment rule. Add Arabic question mark `؟`, Urdu/Arabic full stop `۔`, danda/double danda `।`/`॥`, Armenian full stop `։`, Ethiopic full stop/question mark `።`/`፧`, Myanmar `။`, and Khmer `។`/`៕`. Treat Greek question mark `;` / `;` as a boundary only with resolved `el`; an ordinary Latin semicolon must not split a sentence. Version the explicit terminal/closer/abbreviation tables and freeze adversarial decimals, initials, quotes and abbreviations across languages. A larger fragment is preferable to splitting inside a grapheme or guessing a dictionary boundary. This remains a documented conservative policy, not complete Unicode linguistic sentence segmentation.
+
+Frontend and backend must use identical language-aware rules for selected spans and generated options. Unsupported segmentation revision disables alternatives with a recoverable refresh notice; full editing/copy remains available. Whitespace-free Thai/Lao/Khmer text may use a complete punctuation-free fragment; spans above 2,000 scalars retain the existing no-alternatives behavior. Native edit and grapheme-safe comparison remain available in all selected languages.
 
 ## 9. Local-account and availability flows
 

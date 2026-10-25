@@ -1,11 +1,11 @@
 # LinguaDesk — Verification Plan
 
-**Document:** #6 · **Version:** 1.17 · **Status:** Current design; unattended AI verification and Chromium release evidence; implementation/evidence status is maintained in delivery/current.md and verification/coverage.md
-**Updated:** 2026-10-25 (Europe/Moscow)
+**Document:** #6 · **Version:** 1.18 · **Status:** Current design; unattended AI verification and Chromium release evidence; implementation/evidence status is maintained in delivery/current.md and verification/coverage.md
+**Updated:** 2026-10-26 (Europe/Moscow)
 
 ## 1. Authority, ownership and scope
 
-This is the canonical verification plan and requirement-to-evidence matrix required by [planning workflow #0](00-SDD-Planning-Workflow.md). It specifies Q-005's corpus, rubric, automated review coverage and workloads. These are engineering verification decisions under #0, not new product thresholds or evidence of a passing release. PRD D-22 permits AI review, grading/adjudication, visual-baseline disposition and release eligibility without human verification/sign-off. Required browser evidence uses pinned Chromium desktop/narrow viewports; additional engines/versions/devices/AT and human checks are optional and nonblocking. Corpus/workload counts and quality/performance thresholds remain unchanged.
+This is the canonical verification plan and requirement-to-evidence matrix required by [planning workflow #0](00-SDD-Planning-Workflow.md). It specifies Q-005's corpus, rubric, automated review coverage and workloads. These are engineering verification decisions under #0, not new product thresholds or evidence of a passing release. PRD D-22 permits AI review, grading/adjudication, visual-baseline disposition and release eligibility without human verification/sign-off. Required browser evidence uses pinned Chromium desktop/narrow viewports; additional engines/versions/devices/AT and human checks are optional and nonblocking. D-22 leaves corpus/workload counts and quality/performance thresholds unchanged. D-24 subsequently adopts the explicit [expanded-language template/smoke matrix](verification/llm-evaluation.md#55-expanded-language-matrix-d-24), avoiding exhaustive Translation pair evaluation.
 
 | Owner | What stays authoritative there | Verification detail owned here |
 | --- | --- | --- |

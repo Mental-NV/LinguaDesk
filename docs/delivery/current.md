@@ -6,7 +6,7 @@ Mutable #7 status owner. Read for selection/dependency checks and closeout; do n
 
 ## Selected milestone
 
-None. M045 implementation is complete; no next milestone or deployment is selected. Its additive migration and rollback requirements are documented, but no production rollout occurred. Full quality/performance qualification, release assembly and operational gates remain pending; the bounded development batch does not discharge G1/G2 or a product-wide release gate. Earlier M044/M039 evidence remains historical D-21 coverage.
+No implementation milestone is selected. [M046 — Expanded Translator and Write languages](../08-backlogs/M046/backlog.md) is planned / ready for selection and local implementation, with the required live-development gate conditional on actual access and finite run capacity. The user requested investigation and planning only; implementation and deployment are not started. M045 implementation is complete. Its additive migration and rollback requirements are documented, but no production rollout occurred. Full quality/performance qualification, release assembly and operational gates remain pending; the bounded development batch does not discharge G1/G2 or a product-wide release gate. Earlier M044/M039 evidence remains historical D-21 coverage.
 
 **D-22 policy:** required checks may run unattended; optional physical-device/native-IME/AT/additional-browser observations remain unclaimed. M045's final live batch passed after preserved failed prompt revisions; total conservative exposure including unresolved calls was USD 0.2716808 under the authorized quiescent scope.
 

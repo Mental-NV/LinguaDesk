@@ -1,7 +1,7 @@
 # LinguaDesk — Architecture and Engineering Principles
 
-**Document:** #3 · **Version:** 1.18 · **Status:** Current design; unattended verification under D-22; implementation/evidence status is maintained in delivery/current.md and verification/coverage.md
-**Updated:** 2026-10-25 (Europe/Moscow)
+**Document:** #3 · **Version:** 1.19 · **Status:** Current design; unattended verification under D-22; implementation/evidence status is maintained in delivery/current.md and verification/coverage.md
+**Updated:** 2026-10-26 (Europe/Moscow)
 
 ## 1. Authority, Inputs, and Scope
 
@@ -81,6 +81,10 @@ LinguaDesk/
 
 This is a planned structure, not a claim that scaffolding or commands already exist. Do not create empty architectural layers to fill the tree.
 
+### 3.3 Shared language catalog (D-24)
+
+[PRD language policy](product/languages.md) owns scope. M046 extends Core `ProductCatalog` with canonical IDs, English labels and direction/script policy metadata; API capabilities, internal validation and prompt catalog rendering derive from it. Generate distinct ordered translation pairs rather than maintaining a manual matrix. API enums/mappings and generated TypeScript must be exhaustively checked against Core; frontend consumes capabilities/generated types. Add no per-language service, database table, new routing family or provider adapter. Script and direction are content properties, independent of the English shell. Sentence boundaries remain a small versioned pure policy mirrored through shared cross-runtime fixtures. Deployment pins catalog/prompt/segmentation revisions together; no dynamic per-language configuration or partial route rollout is selected.
+
 ## 4. Component Responsibilities and Representative Slice
 
 ### 4.1 Boundaries
@@ -124,7 +128,7 @@ M006 also closes M003's database-dependent-serving handoff. Outside contract gen
 
 Bind validated typed options from non-secret configuration and explicitly named environment variables. Provider/email credentials stay exclusively on the backend; #4 owns the evaluation credential name and profile mapping. A provider credential may be shared by the evaluator and all LinguaDesk operations using that provider, so monetary admission and credential-scope failures must not assume evaluation, family or route isolation. Pin supported dependencies; never commit secrets. Fail startup on an invalid operation-family chain, missing required credentials, unwritable durable storage, or missing cost bounds for paid serving. Each current MVP chain requires one primary and permits at most one fallback; reject extra active candidates instead of silently activating DF-004. An explicit local/test configuration supplies fakes without requiring provider credentials.
 
-Translation uses the same configured chain for all 12 directions; Rewriting uses its configured chain for all four languages and nine effective modes in the current MVP. Each configured candidate must qualify for every route/mode it serves. Preserve the PRD default-model preference subject to quality/performance/cost eligibility. Low-cost providers/models and provider-managed caching are allowed; no provider retention/no-training certification is required. D-19 confirms later route-specific provider selection and bounded multi-candidate fallbacks, but those remain deferred as DF-004. The candidate registry and evaluator can test multiple profiles now without implementing a priority rule engine or activating them for serving.
+Translation uses the same configured chain for every distinct catalog direction; Rewriting uses its configured chain for every catalog language and nine effective modes. Each configured candidate must satisfy the expanded-family verification strategy: representative Translation template evaluation plus per-added-language smokes, and language/mode evidence for Write/alternatives. Unmeasured Translation pairs are not claimed individually qualified (D-24; verification §5.5). Preserve the PRD default-model preference subject to quality/performance/cost eligibility. Low-cost providers/models and provider-managed caching are allowed; no provider retention/no-training certification is required. D-19 confirms later route-specific provider selection and bounded multi-candidate fallbacks, but those remain deferred as DF-004. The candidate registry and evaluator can test multiple profiles now without implementing a priority rule engine or activating them for serving.
 
 Use structured logs with an allowlist: opaque operation ID, operation type, duration, classified outcome, attempt number, and numeric usage/cost metadata. Disable request/response body logging and redact cookies, tokens, email-link queries, and provider error bodies. Do not attach submitted text to exceptions or traces. Health checks establish process/storage readiness without paid provider calls. Track failures, DB contention, outstanding monetary exposure, and cap suspension; exact operational alert thresholds remain with #6/#10, not an invented uptime SLA.
 

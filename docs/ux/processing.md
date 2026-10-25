@@ -53,7 +53,7 @@ Current messages below are normative English copy. Deferred/retired IDs retain t
 | UX-MSG-005 | Retired | — | No persistent up-to-date result status line. |
 | UX-MSG-006 | MVP | `Choose the source language to continue.` | Uncertain-detection page alert; a corrected source/settings revision starts a new pause. |
 | UX-MSG-007 | MVP | `Choose a target language different from {language}.` | Target selector error for same-language translation. |
-| UX-MSG-008 | MVP | `This text contains too much unsupported or mixed-language content. Use one main language: English, Russian, Romanian, or Chinese.` | Server eligibility page alert; no successful transformation or charge; preserve fields and wait for a corrected paused candidate. |
+| UX-MSG-008 | MVP | `This text contains too much unsupported or mixed-language content. Use one main language from the language list.` | Server eligibility page alert; no successful transformation or charge; preserve fields and wait for a corrected paused candidate. |
 | UX-MSG-009 | Deferred | — | DF-006 prefix warning; original copy is historical at `54343c3`. |
 | UX-MSG-010 | Deferred | — | DF-006 partial-result warning; original copy is historical at `54343c3`. |
 | UX-MSG-011 | MVP | `Rewriting is limited to 2,000 characters. Shorten the text to continue.` | Essential page alert; no request or persistent counter; source remains editable. |
