@@ -1,7 +1,7 @@
 # LinguaDesk — API Behavioral Design
 
-**Document:** #5 · **Version:** 1.7 · **Status:** Current design; automatic registration verification is temporary and real account email is deferred
-**Updated:** 2026-09-13
+**Document:** #5 · **Version:** 1.8 · **Status:** Current design; automatic registration verification is temporary and real account email is deferred
+**Updated:** 2026-10-25 (Europe/Moscow)
 
 ## 1. Authority, sources, and artifact lifecycle
 
@@ -27,6 +27,7 @@ Document #0 owns this lifecycle. C# owns editable wire structure; generated Open
 | Local accounts | Register an automatically verified account, then sign in/out and read current account state. Existing confirmation/recovery endpoints remain dormant; real email verification and reset delivery are deferred under DF-008 | FR-001/002; UX #2 Section 9; identity design in Section 3 |
 | Translation | Submit one complete source and an explicit target; automatic/manual source choice; return complete validated target text | FR-003–011; #4 eligibility/output contracts |
 | Rewriting | Submit complete source and exactly one current PRD writing mode; default to Correction only when omitted | FR-012–018; no combined translation-and-rewrite operation |
+| Sentence alternatives | Explicitly generate two options for a validated sentence within bounded result context; return the matching association and one selected-sentence charge | FR-020/021/025/035; UX §8.3; same Rewriting chain |
 | Capabilities | Read supported languages/modes, limits, counting policy, operation deadline and retry-identity validity | FR-036; accessible without SPA execution |
 | Usage/availability | Read authenticated user usage and shared-service availability, including pending reservations | FR-027/028/036; Section 7 |
 | Operation status | Read the outcome of a known submission identity with ownership checks; no provider call or saved-text retrieval | FR-026/035/037; Sections 5–6 |
@@ -35,9 +36,17 @@ Capabilities may be public because they contain no account or operational secret
 
 Use same-origin HTTPS under the architecture's `/api` boundary, JSON requests/responses and UTF-8. Text-bearing inputs use request bodies, never URLs. Return one complete result from the original transformation request; no streaming text, background result queue or provisional output becomes editable user output. Normal submission waits for bounded processing and durable settlement. Status reads are a separate recovery capability, not an async job system with persisted text.
 
-Do not expose Google, alternatives, sentence/version identities, comparison, automatic submission, prefix translation, routing administration or file/voice processing. Do not expose all framework-provided account endpoints merely because a helper maps them; select the confirmed account surface. The independent client uses the same validation, identity and allowance rules as the SPA. Backend endpoints never depend on React revisions or client-reported charges.
+D-23 activates sentence alternatives and request-scoped result/sentence association. Comparison, panel state, Show changes, Correction Only and None set are client presentation: resolve the existing single writing mode before submission. Do not expose Google, automatic submission, prefix translation, routing administration or file/voice processing. Do not expose all framework-provided account endpoints merely because a helper maps them; select the confirmed account surface. The independent client uses the same validation, identity and allowance rules as the SPA. Backend endpoints never depend on React revisions or client-reported charges.
 
 Unknown API paths return an API 404, never SPA HTML. Requests with incompatible content types, malformed JSON or invalid text encoding fail before provider work. Request-size bounds must accommodate every legal source, JSON escaping and required metadata; the selected transport slice defines and tests finite body/header limits without creating a smaller hidden text limit.
+
+### 2.1 D-23 alternatives boundary (design; not yet implemented)
+
+An independent client supplies the current result context, a selected sentence span, supported language and effective mode, plus operation identity and an opaque result association. The server validates nonempty exact span boundaries, Unicode, supported language/mode and finite context limits; it derives the selected text/count itself. The association correlates responses and is not a server-stored editor version or authorization credential. Identical sentences at different offsets must remain distinguishable.
+
+Return two complete distinct sentence alternatives, not a full rewrite, along with the association and authoritative selected-sentence charge/usage. Context/options have no character charge; all input/output has monetary exposure. Both options must pass output validation before the set succeeds. Reuse the existing auth, identity, deadline, atomic admission, failure and status-recovery rules. A status replay returns outcome metadata, never stored alternative text. UI cache reuse and option replacement are local and uncharged. Fingerprints include operation kind, exact context/span, language/mode and association so changed payloads cannot reuse an identity.
+
+The selected implementation package fixes finite context/output bounds, scalar-index wire representation, association fields and deterministic segmentation before C# metadata/OpenAPI generation. This documentation update does not claim an alternatives endpoint exists or prescribe a hand-authored schema. Existing full-text requests and mode enums stay compatible.
 
 ## 3. Authentication, verification, and account lifecycle
 
@@ -145,7 +154,7 @@ These shared scenarios guide selected packages; [#6 Section 8](verification/cove
 | API-AC-010 | Cross-month fallback has its own monetary period; unresolved old exposure survives rollover; no double counting on settlement | NFR-006 |
 | API-AC-011 | Snapshot ordering rejects older same-day/global availability states, accepts a new UTC day and survives restart; current usage failure does not erase success | FR-028, NFR-003 |
 | API-AC-012 | Registration duplicates and known/unknown reset/resend acknowledgments reveal no account existence through intentional status/body/header distinctions; no error/log contains source, result or secret | UX #2, NFR-004 |
-| API-AC-013 | Two independent-client operations work without SPA execution; one complete result, correct mode/language, usage and classified errors | FR-003/035–037, RG-005 |
+| API-AC-013 | Translation, Rewriting and alternatives work without SPA execution; one complete result, correct mode/language, usage and classified errors | FR-003/035–037, RG-005 |
 | API-AC-014 | Generated schema/client match actual contract metadata with no live effects; review/tests catch behavior drift despite clean generation | ADR-004, #0 |
 
 | Owner / question | Resolved here | Remaining decision and blocking stage |

@@ -9,7 +9,7 @@ Authoritative continuation of [02-ux-specification.md](../02-ux-specification.md
 | Event/state | Required outcome |
 | --- | --- |
 | Initial / empty source | No operation or timer; target selection remains available |
-| Source, language or mode edit | Recompute local validity, increment revision, mark previous result outdated, and restart a one-second timer only for an eligible candidate |
+| Source, language or effective mode edit | Recompute local validity, increment revision, mark previous result outdated, and restart a one-second timer only for an eligible candidate |
 | Known invalid / oversized input | Cancel timer; preserve all text; show an essential page alert when an attempted candidate is blocked; no provider operation or character charge |
 | Eligible pause expires | Keep the latest source/settings revision; when dispatch is allowed, capture the then-current result-edit revision, validate/detect and dispatch once if still current |
 | Composition active | Cancel timer and suppress dispatch; after `compositionend`, start a new one-second timer for the committed eligible revision |
@@ -22,12 +22,17 @@ Authoritative continuation of [02-ux-specification.md](../02-ux-specification.md
 | Unknown outcome after transport interruption | Stop spinner at overall deadline, preserve work, show Check status. That action reads status only; do not claim zero charge or blindly resubmit. Resolve the earlier outcome before offering retry on this page |
 | Reconnect / usage refresh / midnight reset | Refresh availability if needed; no paid operation starts until a new eligible source/settings edit and pause |
 | Sign-out / expiry / full navigation | Cancel timers, invalidate callbacks and clear text before navigation; subsequent old responses cannot restore it |
+| Presentation-only change | Panel/menu disclosure, Show changes, native/button copy and cached option selection create no paid request and do not restart a timer. Cached replacement may update result/comparison locally under UX §8.3 |
+| Alternative activation | For a current sentence without a valid cached set or unsettled page operation, explicitly request once; capture result/context association and charge only on success |
+| Alternatives versus source/settings/manual edit | Invalidate the set and pending association; stale success settles usage once but cannot alter text or reopen options |
+| Correction Only / None set | Resolve the single effective mode before comparing revisions; equivalent correctionOnly states do not trigger processing |
 
 Resolving detection/eligibility may continue the same paused candidate only while its captured revisions still match. Any intervening edit cancels that continuation and restarts the timer for the new eligible revision. Avoid background remote detection while typing. The API remains authoritative for supported content, counts, allowances and output validity; clients cannot bypass validation with manual source selection.
 
 Starting IME composition in either editor invalidates earlier pending text responses before interim text can be overwritten. Cancelling composition does not revive those responses. Result editing cancels an undispatched timer/queued candidate and never starts one; only a committed eligible source/settings revision can do so. No persistent Edited/result status line is shown.
 
-Manual result edits are local and uncharged in both features. They do not mutate source. A later operation triggered by source/settings changes may replace edits already present at its start, but edits made during its processing remain protected. There is no sentence metadata to preserve or invalidate in MVP.
+Manual result edits are local and uncharged in both features. They do not mutate source. A later operation triggered by source/settings changes may replace edits already present at its start, but edits made during its processing remain protected. Any manual result edit invalidates all comparison, sentence and alternative-cache metadata. Undo cannot restore it; a later current full rewrite can rebuild assistance.
+
 
 ### 6.2 Response ordering and recovery
 
@@ -63,11 +68,11 @@ Current messages below are normative English copy. Deferred/retired IDs retain t
 | UX-MSG-020 | Retired | — | No secondary result status line; stale text remains suppressed. |
 | UX-MSG-021 | MVP | `An earlier update completed but was not applied. {count} characters counted toward your usage.` | Reconciled standalone event alert, with the admission period when different from the current UTC day; no persistent usage summary. |
 | UX-MSG-022 | Retired | — | No edited-result status line; result-edit protection remains required. |
-| UX-MSG-023 | Retired | — | Sentence-specific comparison invalidation is cut; future assistance invalidates whole metadata. |
-| UX-MSG-024 | Retired | — | Sentence-specific alternatives invalidation is cut; future assistance invalidates whole metadata. |
-| UX-MSG-025 | Deferred | — | DF-001 alternatives failure; original copy is historical at `54343c3`. |
-| UX-MSG-026 | Retired | — | No Copy result control or copy-status line; native selection/copy remains. |
-| UX-MSG-027 | Retired | — | No custom clipboard operation or copy-failure line. |
+| UX-MSG-023 | Retired | — | Sentence-specific comparison invalidation is cut; all assistance invalidates as a whole. |
+| UX-MSG-024 | Retired | — | Sentence-specific alternatives invalidation is cut; all assistance invalidates as a whole. |
+| UX-MSG-025 | MVP | `We couldn’t load alternatives. Your text is safe.` | Alternatives area; explicit Try again only after known failure. |
+| UX-MSG-026 | Retired | — | Old copy message retired by D-21; D-23 uses MSG-048. |
+| UX-MSG-027 | Retired | — | Old copy failure message retired by D-21; D-23 uses MSG-049. |
 | UX-MSG-028 | MVP | `Email or password is incorrect.` | Login form alert; focus email field; no account enumeration. |
 | UX-MSG-029 | Deferred | — | DF-007 Google cancellation; original copy is historical at `54343c3`. |
 | UX-MSG-030 | Deferred | — | DF-007 Google failure; original copy is historical at `54343c3`. |
@@ -88,7 +93,9 @@ Current messages below are normative English copy. Deferred/retired IDs retain t
 | UX-MSG-045 | MVP | `Translation is limited to 5,000 characters. Shorten the text to continue.` | Essential page alert; no prefix submission, charge or persistent counter; retain complete source. |
 | UX-MSG-046 | Retired | — | No eligible-idle status line or action button. |
 | UX-MSG-047 | Retired | — | No outdated-result status line; revision protection remains required. |
+| UX-MSG-048 | MVP | `Copied.` | Brief polite status after successful clipboard write; no persistent line. |
+| UX-MSG-049 | MVP | `Couldn’t copy. Select the text and copy it manually.` | Clipboard failure near the initiating control; text stays intact. |
 
 ### 6.4 Announcements
 
-An assistive-only polite `role="status"` announces one processing start and one applied completion (Translation ready / Rewrite ready), plus reconciled stale success. Do not announce the timer, each keystroke, a character count, native copy or stale failure. Essential current errors use one accessible page alert without reading the entire result. Result `aria-busy` applies only during current submitted work; no visible processing/result status line is required. An error never disappears because an older response arrives.
+An assistive-only polite `role="status"` announces one processing start and one applied completion (Translation ready / Rewrite ready), plus reconciled stale success. Do not announce the timer, each keystroke, a character count, native keyboard copy or stale failure. Copy buttons announce MSG-048/049; sentence alternatives announce loading/completion once without reading every option. Essential current errors use one accessible page alert without reading the entire result. Result `aria-busy` applies only during current submitted work; no visible processing/result status line is required. An error never disappears because an older response arrives.

@@ -11,7 +11,7 @@ This document owns prompts, provider settings/adapters, language eligibility, fa
 
 Current implemented boundaries and evidence are indexed in [delivery status](delivery/current.md). [API design #5](05-api-design.md) owns shared semantics; the generated OpenAPI covers only selected implemented routes. [Verification #6](06-verification-plan.md) owns evaluation methods.
 
-Scope is the current Translation and Rewriting MVP: FR-004–014, active FR-016–018/022–024, FR-026–030/032–038 and applicable NFR-001–006. Preserve the PRD's exact language/mode catalog, input limits, allowance values and performance/quality thresholds by reference to Sections 5–8. D-19 records later route-specific providers and bounded multi-candidate fallbacks, but DF-001–DF-007, retired sentence preservation and the duplicate correction toggle create no current MVP work here. P-005/NFR-008 and P-006 remain proposed; this design does not select new abuse rates, content restrictions, API compatibility promises or provider privacy gates.
+Scope is the current Translation and Rewriting MVP: FR-004–014, active FR-016–018/022–024, FR-026–030/032–038 and applicable NFR-001–006. Preserve the PRD's exact language/mode catalog, input limits, allowance values and performance/quality thresholds by reference to Sections 5–8. D-19 records later route-specific providers and bounded multi-candidate fallbacks, but D-23 activates sentence alternatives (FR-020/021/025) on the existing Rewriting chain. Remaining deferred capabilities and targeted sentence preservation create no work here; the UI correction switch resolves to one existing mode. P-005/NFR-008 and P-006 remain proposed; this design does not select new abuse rates, content restrictions, API compatibility promises or provider privacy gates.
 
 ## 2. Shared AI component and abstraction
 
@@ -46,7 +46,7 @@ Reference Abstractions wherever only exchange types are needed; use the full pac
 
 Use the complete-response `GetResponseAsync` path with fresh request messages/options and cancellation on every call. Microsoft also exposes streaming and delegating clients; LinguaDesk does not need streaming or framework-managed routing for these operations. [IChatClient documentation](https://learn.microsoft.com/en-us/dotnet/ai/ichatclient)
 
-Do not register function invocation, embeddings, agents, retrieval, conversation storage, response-cache middleware, prompt reducers or automatic retry/failover middleware. These are not needed to deliver the two operations; several would violate context, accounting or privacy rules. An adapter may use a maintained SDK if transport tests prove every required setting, usage field and single-dispatch behavior. Otherwise implement the narrow Chat Completions transport with typed `HttpClient`; do not create a general LLM SDK. Provider-specific types/settings remain inside the adapter.
+Do not register function invocation, embeddings, agents, retrieval, conversation storage, response-cache middleware, prompt reducers or automatic retry/failover middleware. These are not needed to deliver the language operations; several would violate context, accounting or privacy rules. An adapter may use a maintained SDK if transport tests prove every required setting, usage field and single-dispatch behavior. Otherwise implement the narrow Chat Completions transport with typed `HttpClient`; do not create a general LLM SDK. Provider-specific types/settings remain inside the adapter.
 
 ### 2.2 Host-independent operation contract
 
@@ -98,7 +98,7 @@ Mode instructions refine the PRD catalog without adding choices:
 | confident | Use assured phrasing while preserving factual uncertainty and qualifications |
 | diplomatic | Use tactful phrasing while preserving positions, requests and negation |
 
-Return one complete result, with no commentary, alternatives, Markdown wrapper, change list or reasoning. Source text that contains a question or instruction must be translated/rewritten as text, not answered or executed. No URL is fetched. Prompt separation is a correctness measure, not proof that prompt injection is solved or acceptance of the broader P-005 proposal.
+For Translation/full Rewriting return one complete result, with no commentary, alternatives, Markdown wrapper, change list or reasoning. Source text that contains a question or instruction must be translated/rewritten as text, not answered or executed. No URL is fetched. Prompt separation is a correctness measure, not proof that prompt injection is solved or acceptance of the broader P-005 proposal.
 
 ## 4. Prompt and output contracts
 
@@ -203,7 +203,12 @@ See [DeepSeek candidate documentation snapshot](research/deepseek-2026-09-08.md#
 
 ### 5.4 Context and monetary bounds
 
-Each eligibility or transformation request includes only the current full source, validated task parameters, static instructions and bounded synthetic examples. No conversation, prior result, adjacent sentence context, retrieval, repair transcript or another user's data is included. Alternative context bounds remain deferred with DF-001.
+**D-23 alternatives extension — design pending implementation:** use the existing Rewriting primary/optional fallback with the selected language and one effective mode. Generate exactly two distinct, complete alternatives to the selected sentence, preserving its meaning, facts, numbers, names, negation and surrounding coherence. Both keep mandatory correction and the chosen style/tone. Treat every source/context string as content, never instructions. Return a bounded structured two-option result with no commentary or change markup; parser validation rejects missing/duplicate/empty options, malformed envelopes, refusal and truncated output before settlement. Exact envelope/association wire details belong to the selected API/AI slice. Existing full-result envelopes remain unchanged.
+
+Use only the validated selected sentence plus bounded context from its current result; no conversation/history or other workspace data. Before serving, fix explicit maximum selected/context scalar counts and serialized input/output token/byte bounds for all four languages, including expanded rewrite results. Context cannot silently exceed a candidate window or be truncated to appear supported. Carry the alternatives 15-second overall deadline and existing bounded attempt policy through eligibility/generation/fallback; do not add unbounded repair calls. Reserve monetary exposure for all context and both outputs while charging only selected-sentence characters on success. These are active design prerequisites, not deferred scope or evidence of qualification.
+
+
+For full Translation/Rewriting, each eligibility/transformation request includes only current full source, validated task parameters, static instructions and bounded synthetic examples. No conversation, prior result, retrieval, repair transcript or other user data is included. Alternatives use only the explicit bounded result-context exception above.
 
 Each stage requires a finite `MaxOutputTokens`, `MaxResponseBytes`, input-token upper bound and context check. Compute the bound for the **serialized full prompt**, including escaping, message/template overhead and output envelope; character allowance counts are not token estimates. Use a verified provider tokenizer or a documented conservative upper-bound method. Average characters-per-token estimates are insufficient for monetary admission. If a legal maximum-length source cannot fit, the candidate is ineligible for that family; do not impose a smaller hidden source limit or silently truncate it.
 

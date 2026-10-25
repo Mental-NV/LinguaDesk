@@ -13,7 +13,7 @@
 | [ADR-007: Migration Parity before Feature Completion](decisions/ADR-007.md) | Accepted / amended |
 | [ADR-008: Short Durable Reservations around Provider Calls](decisions/ADR-008.md) | Accepted / amended |
 | [ADR-009: Unit-Heavy Pyramid with Focused Boundary Evidence](decisions/ADR-009.md) | Accepted / amended |
-| [ADR-010: Explicit Whole-Text MVP with Deferred Assistance](decisions/ADR-010.md) | Accepted / amended |
+| [ADR-010: Explicit Whole-Text MVP with Deferred Assistance](decisions/ADR-010.md) | Partially superseded by PRD D-21/D-23; retained as provenance |
 | [ADR-011: Provider Retention and No-Training Are Not Eligibility Gates](decisions/ADR-011.md) | Accepted / amended |
 | [ADR-012: Shared AI Infrastructure Library with IChatClient and Independent Evaluation](decisions/ADR-012.md) | Selected design; see record |
 | [ADR-013: Unattended AI Verification and Release Eligibility](decisions/ADR-013.md) | Accepted 2026-10-25; PRD D-22 |

@@ -2,14 +2,16 @@
 
 Mutable #7 status owner. Read for selection/dependency checks and closeout; do not include in the stable execution prefix.
 
-**Most recently completed milestone: [M039 — Narrow-screen core journey group](../08-backlogs/M039/backlog.md).** State: Done. M044 implemented the current layout/pause-processing contract; M039 adds the dedicated narrow journeys and fixes the discovered safe-return/contrast defects. Final verification: 221 frontend tests, 80 published Chromium cases with seven unchanged reviewed baselines, and 616 backend regressions; [tasks/evidence](../08-backlogs/M039/tasks.md#completion--2026-10-25-1002-utc).
+**Most recently completed milestone: [M039 — Narrow-screen core journey group](../08-backlogs/M039/backlog.md).** State: Done. M044 implemented the then-current D-21 layout/pause-processing contract; M039 adds the dedicated narrow journeys and fixes the discovered safe-return/contrast defects. Final verification: 221 frontend tests, 80 published Chromium cases with seven unchanged reviewed baselines, and 616 backend regressions; [tasks/evidence](../08-backlogs/M039/tasks.md#completion--2026-10-25-1002-utc).
 
 
 ## Selected milestone
 
-None. The user-authorized current UX implementation and narrow verification train (M044 → M039) is complete.
+None. The earlier UX implementation and narrow verification train (M044 → M039) is complete for its recorded D-21 scope.
 
-**Next recommended work:** select the next eligible operational increment (M040) or bounded full-corpus/live-measurement successor as separately authorized and configured. M036's 24-case batch and M037's rehearsal do not close G1 (NFR-001/RG-002) or G2 (NFR-002/RG-003). Full product/release evidence remains pending; completed packages retain historical scope/results.
+**D-23 design amendment — 2026-10-25:** the user requested authoritative-document updates from six desktop screenshots, explicitly excluded document upload and included sentence alternatives. Updated product/UX/API/AI/verification contracts now require the new collapsible shell, toolbar, review, alternatives and copy/swap behavior. Implementation has not been selected or performed by this documentation task; affected M044/M039 visual/control conclusions are historical, with unchanged processing/account evidence retaining narrower value.
+
+**Next recommended work:** select bounded D-23 implementation packages with the unresolved alternatives wire/context/corpus prerequisites, or independently eligible operational/evaluation work as separately authorized. No package is selected by this documentation update. M036's 24-case batch and M037's rehearsal do not close G1 (NFR-001/RG-002) or G2 (NFR-002/RG-003). Full product/release evidence remains pending; completed packages retain historical scope/results.
 
 **D-22 policy amendment — 2026-10-25:** required verification may run unattended; optional human/additional-platform observations remain unclaimed. M044/M039 used no paid provider runs and establish no product-wide release pass.
 
@@ -61,4 +63,4 @@ M019 completed the independent-track enabler for the explicit live provider path
 | M044 | Done (current D-21 workspace and desktop/responsive regression) | [Backlog](../08-backlogs/M044/backlog.md), [spec](../08-backlogs/M044/spec.md), [tasks/evidence](../08-backlogs/M044/tasks.md#completion--2026-10-25-0950-utc) |
 | M038 | Done (historical UI contract; D-21-affected evidence superseded) | [Backlog](../08-backlogs/M038/backlog.md), [spec](../08-backlogs/M038/spec.md), [final evidence](../08-backlogs/M038/tasks.md#completion-record-final--t005-sign-off-2026-09-16-utc) |
 
-M001–M039, M043 and M044 have completed scoped records (M035 under its historical waiver). M040–M042 remain Candidate with no selected package. M044 closes its selected current UI scope; remaining full-corpus/live-measurement work requires fresh selection; full product and release evidence remains pending in #6 coverage.
+M001–M039, M043 and M044 have completed scoped records (M035 under its historical waiver). M040–M042 remain Candidate with no selected package. M044 closes its selected historical D-21 UI scope; remaining full-corpus/live-measurement work requires fresh selection; full product and release evidence remains pending in #6 coverage.

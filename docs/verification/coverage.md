@@ -14,6 +14,8 @@ Roadmap allocation is not evidence: implemented M028 owns the first complete Tra
 
 **D-22 coverage delta (2026-10-25):** required evidence follows unattended AI review/qualification and pinned Chromium desktop/narrow checks. Mandatory human review/sign-off and browser/version/device/AT matrices are superseded for future acceptance; optional observations remain untested/nonblocking unless actually executed. No RG is passed by this policy change. Completed M035/M036/M038 records and locks remain historical; the D-21 delta above still requires fresh automated UI evidence. Full-corpus/workload counts, quality/performance thresholds and integrity/privacy/cost checks are unchanged.
 
+**D-23 coverage delta (2026-10-25): Pending / unselected.** Screenshot-aligned panels, labels, geometry, three toolbar controls, copy/swap, change review and sentence alternatives require fresh implementation and automated evidence. M044/M039 prove their earlier D-21 scope, not these additions. This delta supersedes affected current-pass interpretations for FR-003/014/019–023/025/030/035/038/039, NFR-001/002/005/006, UX-AC-001/016/033/038/040/048–061/066/078/080/082/091–100/105/110–119 and RG-001/002/003/005/006. Existing unaffected auth/limits/pause/ledger evidence retains its narrower value. Alternatives API/AI/accounting, finite context and corpus design, full desktop/mobile interactions and new visual baselines remain pending; no release gate is passed by this edit.
+
 | Requirement / gate | Shared design / acceptance owner | Checks | Backlog/package → evidence/status |
 | --- | --- | --- | --- |
 | FR-001 | UX §9; API §3 | V-004, V-003, V-010 | [M006 / BI-006](../08-backlogs/M006/backlog.md) registration portion, [M008 / BI-008](../08-backlogs/M008/backlog.md) → [AC-001–008](../08-backlogs/M008/spec.md#acceptance) cookie sign-in/session/sign-out portion, [M009 / BI-009](../08-backlogs/M009/backlog.md) → [AC-001–007](../08-backlogs/M009/spec.md#acceptance) bearer sign-in portion and [M010 / BI-010](../08-backlogs/M010/backlog.md) → [AC-001–007](../08-backlogs/M010/spec.md#acceptance) API reset/invalidation portion → Passed; [M011 / BI-011](../08-backlogs/M011/backlog.md) → [AC-001–007](../08-backlogs/M011/spec.md#acceptance) web registration-form portion → Passed; [M012 / BI-012](../08-backlogs/M012/backlog.md) → [AC-001–008](../08-backlogs/M012/spec.md#acceptance) web verification/status/resend/continuation portion → Passed; [M013 / BI-013](../08-backlogs/M013/backlog.md) → [AC-001–008](../08-backlogs/M013/spec.md#acceptance) web sign-in/safe-return/sign-out/expiry portion → Passed; full FR-001 remains pending |
@@ -34,13 +36,13 @@ Roadmap allocation is not evidence: implemented M028 owns the first complete Tra
 | FR-016 | UX §6/8; API §5 | V-002, V-003, V-010, V-012 | [M029 AC-001/002](../08-backlogs/M029/spec.md#acceptance) explicit Rewrite UI portion (one browser activation; typing/pasting/mode changes/elapsed time/IME composition never submit; duplicate suppression; activation captures final values) → Passed (published deterministic-provider evidence) |
 | FR-017 | UX §6/8 | V-002, V-003, V-010 | [M029 AC-001](../08-backlogs/M029/spec.md#acceptance) source-preservation portion (source field untouched by rewriting; source/caret retained while pending) → Passed (published deterministic-provider evidence); [M030 AC-001/003](../08-backlogs/M030/spec.md#acceptance) competing-event portion (per-page text/settings/result kept across navigation; source/caret retained under stale callbacks) → Passed (published deterministic-provider evidence) |
 | FR-018 | UX §6/8; API §6 | V-002, V-003, V-005, V-010 | [M029 AC-002/004](../08-backlogs/M029/spec.md#acceptance) first-result protection portion (previous result retained while pending, stale fenced, manual edits protected) → Passed (published deterministic-provider evidence); [M030 AC-002/003](../08-backlogs/M030/spec.md#acceptance) competing-event portion (hidden settlement fenced to its owning page; in-page edits defeat stale callbacks) → Passed (published deterministic-provider evidence) |
-| FR-019 | PRD DF-002; UX deferred comparison | — | Not applicable — Deferred |
-| FR-020 | PRD DF-001 | — | Not applicable — Deferred |
-| FR-021 | PRD DF-001 | — | Not applicable — Deferred |
+| FR-019 | UX §8.2 | V-002, V-003, V-010, V-011 | D-23 activated; implementation/evidence Pending / unselected |
+| FR-020 | UX §8.3; API §2.1; AI §5.4 | V-002, V-003, V-007, V-009, V-010, V-013 | D-23 activated; implementation/evidence Pending / unselected |
+| FR-021 | UX §8.3 | V-002, V-003, V-010 | D-23 activated; implementation/evidence Pending / unselected |
 | FR-022 | UX §6/8 | V-002, V-003, V-010 | [M029 AC-002/004](../08-backlogs/M029/spec.md#acceptance) first Rewrite replacement portion (outdated marking; later explicit submission replaces preexisting edits) → Passed (published deterministic-provider evidence); [M030 AC-003](../08-backlogs/M030/spec.md#acceptance) competing-event portion (outdated marking holds after the store lift; later explicit submission replaces preexisting edits in the published browser) → Passed (published deterministic-provider evidence) |
 | FR-023 | UX §6/8 | V-002, V-003, V-010 | [M028 AC-004](../08-backlogs/M028/spec.md#acceptance) translation edit/copy portion (manual edits uncharged, exact-value copy, pending-response protection, later-submission replacement) → Passed (published evidence); [M029 AC-004](../08-backlogs/M029/spec.md#acceptance) rewriting edit/copy portion (manual edits uncharged, exact-value copy, pending-response protection, later-submission replacement) → Passed (published evidence); [M030 AC-003](../08-backlogs/M030/spec.md#acceptance) edit-race portion (manual-edit protection MSG-022 and stale-charge disclosure MSG-020/021 hold on both pages after the store lift) → Passed (published deterministic-provider evidence) |
 | FR-024 | API §4/7; architecture §7 | V-001, V-005, V-003 | [M043 AC-001/002/003](../08-backlogs/M043/spec.md#acceptance) live-serving charging portion (live Translate 201 charges the full 6-character submission exactly once with a recorded provider charge; over-cap dispatches denied pre-call with zero charge and no fallback on both families; at-cap bound admitted) → Passed (live + deterministic serving evidence; prefix charging stays deferred under DF-006) |
-| FR-025 | PRD DF-001 | — | Not applicable — Deferred |
+| FR-025 | API operations §4–7; PRD FR-025 | V-001, V-005, V-009, V-010 | D-23 activated; implementation/evidence Pending / unselected |
 | FR-026 | API §5–7; architecture §7; UX §6 | V-005, V-002, V-003 | [M031 AC-001/003/004](../08-backlogs/M031/spec.md#acceptance) UI-recovery portion (definitive failure and unknown/no-record paths add zero usage and retry only with a new operation key in the published browser) → Passed (published deterministic-provider evidence; durable settlement remains with M021–M025) |
 | FR-027 | API §7; architecture §7 | V-005, V-003 | Unselected → Pending |
 | FR-028 | API §7; UX §6/9 | V-005, V-002, V-003, V-009 | [M031 AC-005](../08-backlogs/M031/spec.md#acceptance) UI-recovery portion (result survives a failed usage read with `Usage update unavailable`; read-only `Refresh usage` replaces the counter with zero operation posts) → Passed (published deterministic-provider evidence; authoritative snapshots remain with M025) |
@@ -54,6 +56,7 @@ Roadmap allocation is not evidence: implemented M028 owns the first complete Tra
 | FR-036 | API §2–3/7 | V-004, V-009, V-005 | [BI-005](../08-backlogs/M005/backlog.md) → [AC-001–006](../08-backlogs/M005/spec.md#4-selected-acceptance) public choices/limits and generated-type portion and [M009 / BI-009](../08-backlogs/M009/backlog.md) → [AC-001–007](../08-backlogs/M009/spec.md#acceptance) bearer auth portion → Passed; language/usage independence remains unselected; [M026 AC-001/007](../08-backlogs/M026/spec.md#acceptance) translation-independence portion (a separate verified Bearer [REDACTED] translates and reads usage without SPA execution) → Passed; [M027 AC-001/007](../08-backlogs/M027/spec.md#acceptance) rewriting-independence portion (a separate verified Bearer [REDACTED] rewrites and reads usage without SPA execution) → Passed |
 | FR-037 | API §8; AI §7; UX §6/9 | V-009, V-003, V-004, V-005, V-007 | [M026 AC-002/003/005/007](../08-backlogs/M026/spec.md#acceptance) translation portion (400/422/429/503/504 categories with recovery guidance, distinguished from successful output) → Passed; [M027 AC-002/003/005/007](../08-backlogs/M027/spec.md#acceptance) rewriting portion (400/422/429/503/504 categories with recovery guidance, distinguished from successful output) → Passed; [M031 AC-003/004](../08-backlogs/M031/spec.md#acceptance) unknown-outcome portion (transport interruption shows Check-status-only unknown copy; the status read resolves no-record/window-expired/terminal/pending read-only, distinguished from definitive failure) → Passed (published deterministic-provider evidence) |
 | FR-038 | UX §3/8; architecture §6/8 | V-002, V-003, V-010, V-015 | [M013 / BI-013](../08-backlogs/M013/backlog.md) in-memory auth/safe-return teardown portion → Passed; [M032 / BI-032](../08-backlogs/M032/backlog.md) → [AC-001–009](../08-backlogs/M032/spec.md#acceptance) workspace-text lifecycle portion (explicit reset with dialog/bypass, sign-out/expiry teardown, real reload/navigation/restoration clearing, footer lifetime copy, memory-only text, Correction-only/detection/empty-target defaults) → Passed (published evidence); full requirement remains pending |
+| FR-039 | UX §8.1; PRD D-23 | V-002, V-003, V-010 | Pending / unselected: effective-mode mapping and reset-to-None-set switch |
 | NFR-001 | PRD §8; AI §3–5 | V-013 | Unselected → Pending |
 | NFR-002 | PRD §7; AI §6; API §6 | V-014, V-007, V-005 | [M018 AC-004/006](../08-backlogs/M018/spec.md#acceptance) original-deadline enforcement portion (captured once, no-fit refusal, cancellation fencing, fake-time proof, live per-case timings) → Passed (development evidence; percentile/load measurement stays with V-014); [M026 AC-005/006](../08-backlogs/M026/spec.md#acceptance) API-deadline portion (stored absolute deadline enforced with fake time, 5 s/10 s/2 s stage budgets, deadline-exceeded 504 with zero charge, late success fenced) → Passed (fake-provider evidence); [M027 AC-005/006](../08-backlogs/M027/spec.md#acceptance) rewriting API-deadline portion (same stored-deadline enforcement, stage budgets, fenced late success) → Passed (fake-provider evidence) |
 | NFR-003 | UX §6; architecture §7; API §5–7 | V-002, V-005, V-007, V-010, V-016 | Unselected → Pending |
@@ -89,12 +92,12 @@ Read the complete contracts at [UX Section 12](../ux/acceptance.md#12-acceptance
 
 | UX scenario IDs | Current status | Check allocation |
 | --- | --- | --- |
-| UX-AC-001 | MVP | V-003, V-010, V-012 |
+| UX-AC-001 | Amended | V-003, V-010, V-012 |
 | UX-AC-002 | Amended | V-002, V-003, V-010, V-012 |
 | UX-AC-003 | MVP | V-002, V-003, V-010, V-015 |
 | UX-AC-004 | Amended | V-002, V-003, V-005, V-010 |
 | UX-AC-005 | Amended | V-002, V-003, V-005 |
-| UX-AC-006 | MVP | V-003, V-004 |
+| UX-AC-006 | Amended | V-003, V-004 |
 | UX-AC-007 | MVP | V-003, V-004, V-010 |
 | UX-AC-008 | MVP | V-003, V-004 |
 | UX-AC-009 | MVP | V-003, V-004 |
@@ -136,20 +139,20 @@ Read the complete contracts at [UX Section 12](../ux/acceptance.md#12-acceptance
 | UX-AC-045 | Amended | V-001, V-002, V-003 |
 | UX-AC-046 | Amended | V-002, V-003, V-005 |
 | UX-AC-047 | MVP | V-002, V-003, V-005 |
-| UX-AC-048 | Deferred | Not applicable; owning UX row records disposition |
-| UX-AC-049 | Deferred | Not applicable; owning UX row records disposition |
-| UX-AC-050 | Deferred | Not applicable; owning UX row records disposition |
+| UX-AC-048 | Amended | V-002, V-003, V-010; V-005/V-009 for paid generation/accounting; V-011 for layout |
+| UX-AC-049 | Amended | V-002, V-003, V-010; V-005/V-009 for paid generation/accounting; V-011 for layout |
+| UX-AC-050 | Amended | V-002, V-003, V-010; V-005/V-009 for paid generation/accounting; V-011 for layout |
 | UX-AC-051 | Amended | V-002, V-003, V-010 |
-| UX-AC-052 | Deferred | Not applicable; owning UX row records disposition |
-| UX-AC-053 | Deferred | Not applicable; owning UX row records disposition |
-| UX-AC-054 | Deferred | Not applicable; owning UX row records disposition |
-| UX-AC-055 | Deferred | Not applicable; owning UX row records disposition |
-| UX-AC-056 | Deferred | Not applicable; owning UX row records disposition |
-| UX-AC-057 | Deferred | Not applicable; owning UX row records disposition |
+| UX-AC-052 | Amended | V-002, V-003, V-010; V-005/V-009 for paid generation/accounting; V-011 for layout |
+| UX-AC-053 | Amended | V-002, V-003, V-010; V-005/V-009 for paid generation/accounting; V-011 for layout |
+| UX-AC-054 | Amended | V-002, V-003, V-010; V-005/V-009 for paid generation/accounting; V-011 for layout |
+| UX-AC-055 | Amended | V-002, V-003, V-010; V-005/V-009 for paid generation/accounting; V-011 for layout |
+| UX-AC-056 | Amended | V-002, V-003, V-010; V-005/V-009 for paid generation/accounting; V-011 for layout |
+| UX-AC-057 | Amended | V-002, V-003, V-010; V-005/V-009 for paid generation/accounting; V-011 for layout |
 | UX-AC-058 | Amended | V-002, V-003, V-010 |
 | UX-AC-059 | Amended | V-002, V-003, V-005, V-010 |
 | UX-AC-060 | Amended | V-002, V-003, V-010 |
-| UX-AC-061 | Deferred | Not applicable; owning UX row records disposition |
+| UX-AC-061 | Amended | V-002, V-003, V-010; V-005/V-009 for paid generation/accounting; V-011 for layout |
 | UX-AC-062 | Retired | Not applicable; owning UX row records disposition |
 | UX-AC-063 | Retired | Not applicable; owning UX row records disposition |
 | UX-AC-064 | Retired | Not applicable; owning UX row records disposition |
@@ -168,7 +171,7 @@ Read the complete contracts at [UX Section 12](../ux/acceptance.md#12-acceptance
 | UX-AC-077 | Amended | V-010 |
 | UX-AC-078 | Amended | V-003, V-010, V-011 |
 | UX-AC-079 | Retired | No release requirement; Chromium keyboard subset persists as non-gating engine evidence |
-| UX-AC-080 | Deferred | Not applicable; owning UX row records disposition |
+| UX-AC-080 | Amended | V-002, V-003, V-010; V-005/V-009 for paid generation/accounting; V-011 for layout |
 | UX-AC-081 | Amended | V-003, V-010, V-011 |
 | UX-AC-082 | Amended | V-002, V-003 |
 | UX-AC-083 | Amended | V-003, V-010, V-011 |
@@ -181,13 +184,13 @@ Read the complete contracts at [UX Section 12](../ux/acceptance.md#12-acceptance
 | UX-AC-090 | Amended | V-002, V-003, V-013 |
 | UX-AC-091 | Amended | V-002, V-003, V-013 |
 | UX-AC-092 | Amended | V-003, V-010 |
-| UX-AC-093 | Deferred | Not applicable; owning UX row records disposition |
+| UX-AC-093 | Amended | V-002, V-003, V-010; V-005/V-009 for paid generation/accounting; V-011 for layout |
 | UX-AC-094 | Amended | V-002, V-003, V-010 |
 | UX-AC-095 | Amended | V-003, V-010, V-011 |
 | UX-AC-096 | Amended | V-002, V-003 |
-| UX-AC-097 | Deferred | Not applicable; owning UX row records disposition |
-| UX-AC-098 | Deferred | Not applicable; owning UX row records disposition |
-| UX-AC-099 | Deferred | Not applicable; owning UX row records disposition |
+| UX-AC-097 | Amended | V-002, V-003, V-010; V-005/V-009 for paid generation/accounting; V-011 for layout |
+| UX-AC-098 | Amended | V-002, V-003, V-010; V-005/V-009 for paid generation/accounting; V-011 for layout |
+| UX-AC-099 | Amended | V-002, V-003, V-010; V-005/V-009 for paid generation/accounting; V-011 for layout |
 | UX-AC-100 | Amended | V-002, V-003, V-010 |
 | UX-AC-101 | MVP | V-003, V-004, V-010 |
 | UX-AC-102 | MVP | V-003, V-004 |
@@ -199,8 +202,15 @@ Read the complete contracts at [UX Section 12](../ux/acceptance.md#12-acceptance
 | UX-AC-108 | Amended | V-002, V-003, V-005 |
 | UX-AC-109 | Amended | V-001, V-002, V-003 |
 | UX-AC-110 | Amended | V-002, V-003, V-013 |
-| UX-AC-111 | Deferred | Not applicable; owning UX row records disposition |
+| UX-AC-111 | Amended | V-002, V-003, V-010; V-005/V-009 for paid generation/accounting; V-011 for layout |
 | UX-AC-112 | MVP | V-003, V-010, V-012 |
+| UX-AC-113 | MVP | V-002, V-003, V-010 |
+| UX-AC-114 | MVP | V-002, V-003, V-010 |
+| UX-AC-115 | MVP | V-002, V-003, V-010 |
+| UX-AC-116 | MVP | V-002, V-003, V-010 |
+| UX-AC-117 | MVP | V-002, V-003, V-010, V-011 |
+| UX-AC-118 | MVP | V-002, V-003, V-010, V-011 |
+| UX-AC-119 | MVP | V-002, V-003, V-010, V-011 |
 
 | LLM scenario | Check allocation |
 | --- | --- |
