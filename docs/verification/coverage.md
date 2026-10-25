@@ -10,6 +10,8 @@ This is the sole cross-document product coverage matrix; the source documents re
 
 Roadmap allocation is not evidence: implemented M028 owns the first complete Translation UI outcome and implemented M029 owns the first complete Rewriting UI outcome, with M030–M032 extending cross-feature recovery/lifecycle behavior and M038/M039 extending release browser/accessibility evidence. Their minimum functional proof is defined in [verification plan Section 4.5](../06-verification-plan.md#45-required-user-visible-transformation-evidence): dedicated DB-seeded verified user, at least one real login-form E2E path, a constrained real-auth fixture for other cases, and published in-browser outcome assertions for every UI-facing feature. Rows remain Unselected / Pending until a #8 package is selected and actual evidence is linked.
 
+**D-21 coverage delta (2026-09-20):** M028–M032, M038 and M043 evidence that depends on explicit Translate/Rewrite controls, visible usage/counters/status/copy/reset controls, or their old screenshots is historical and **superseded for the current UI contract**. API, accounting, auth and plain-result evidence in those packages retains its narrower value. Current FR-011/014/016/022/023/028/038, NFR-005, UX-AC-002/021–047/065/071/075/078/084–086/096 and RG-001/RG-006 need fresh pause-processing, removed-control and equal-panel evidence before a current pass can be claimed. Existing package records remain historical; no replacement implementation package has yet been selected.
+
 | Requirement / gate | Shared design / acceptance owner | Checks | Backlog/package → evidence/status |
 | --- | --- | --- | --- |
 | FR-001 | UX §9; API §3 | V-004, V-003, V-010 | [M006 / BI-006](../08-backlogs/M006/backlog.md) registration portion, [M008 / BI-008](../08-backlogs/M008/backlog.md) → [AC-001–008](../08-backlogs/M008/spec.md#acceptance) cookie sign-in/session/sign-out portion, [M009 / BI-009](../08-backlogs/M009/backlog.md) → [AC-001–007](../08-backlogs/M009/spec.md#acceptance) bearer sign-in portion and [M010 / BI-010](../08-backlogs/M010/backlog.md) → [AC-001–007](../08-backlogs/M010/spec.md#acceptance) API reset/invalidation portion → Passed; [M011 / BI-011](../08-backlogs/M011/backlog.md) → [AC-001–007](../08-backlogs/M011/spec.md#acceptance) web registration-form portion → Passed; [M012 / BI-012](../08-backlogs/M012/backlog.md) → [AC-001–008](../08-backlogs/M012/spec.md#acceptance) web verification/status/resend/continuation portion → Passed; [M013 / BI-013](../08-backlogs/M013/backlog.md) → [AC-001–008](../08-backlogs/M013/spec.md#acceptance) web sign-in/safe-return/sign-out/expiry portion → Passed; full FR-001 remains pending |
@@ -86,7 +88,7 @@ Read the complete contracts at [UX Section 12](../ux/acceptance.md#12-acceptance
 | UX scenario IDs | Current status | Check allocation |
 | --- | --- | --- |
 | UX-AC-001 | MVP | V-003, V-010, V-012 |
-| UX-AC-002 | MVP | V-003, V-010, V-012 |
+| UX-AC-002 | Amended | V-002, V-003, V-010, V-012 |
 | UX-AC-003 | MVP | V-002, V-003, V-010, V-015 |
 | UX-AC-004 | Amended | V-002, V-003, V-005, V-010 |
 | UX-AC-005 | Amended | V-002, V-003, V-005 |
@@ -107,7 +109,7 @@ Read the complete contracts at [UX Section 12](../ux/acceptance.md#12-acceptance
 | UX-AC-020 | MVP | V-003, V-004 |
 | UX-AC-021 | Amended | V-001, V-002, V-003 |
 | UX-AC-022 | Amended | V-002, V-003 |
-| UX-AC-023 | Deferred | Not applicable; owning UX row records disposition |
+| UX-AC-023 | Amended | V-002, V-003 |
 | UX-AC-024 | Amended | V-002, V-003 |
 | UX-AC-025 | Amended | V-002, V-003, V-010, V-011 |
 | UX-AC-026 | Amended | V-002, V-003, V-010 |
@@ -117,7 +119,7 @@ Read the complete contracts at [UX Section 12](../ux/acceptance.md#12-acceptance
 | UX-AC-030 | Amended | V-001, V-002, V-003 |
 | UX-AC-031 | Deferred | Not applicable; owning UX row records disposition |
 | UX-AC-032 | Amended | V-002, V-003, V-005 |
-| UX-AC-033 | MVP | V-002, V-003, V-010 |
+| UX-AC-033 | Amended | V-002, V-003, V-010 |
 | UX-AC-034 | Amended | V-002, V-003 |
 | UX-AC-035 | Amended | V-002, V-003, V-005 |
 | UX-AC-036 | Amended | V-002, V-003, V-005 |
@@ -149,7 +151,7 @@ Read the complete contracts at [UX Section 12](../ux/acceptance.md#12-acceptance
 | UX-AC-062 | Retired | Not applicable; owning UX row records disposition |
 | UX-AC-063 | Retired | Not applicable; owning UX row records disposition |
 | UX-AC-064 | Retired | Not applicable; owning UX row records disposition |
-| UX-AC-065 | MVP | V-002, V-003, V-005 |
+| UX-AC-065 | Amended | V-002, V-003, V-005 |
 | UX-AC-066 | Amended | V-002, V-003, V-005 |
 | UX-AC-067 | Amended | V-002, V-003, V-005 |
 | UX-AC-068 | Amended | V-002, V-003, V-005 |
@@ -159,7 +161,7 @@ Read the complete contracts at [UX Section 12](../ux/acceptance.md#12-acceptance
 | UX-AC-072 | MVP | V-002, V-003, V-005 |
 | UX-AC-073 | MVP | V-002, V-003, V-005 |
 | UX-AC-074 | Amended | V-002, V-003 |
-| UX-AC-075 | MVP | V-002, V-003, V-005 |
+| UX-AC-075 | Amended | V-002, V-003, V-005 |
 | UX-AC-076 | Amended | V-002, V-003 |
 | UX-AC-077 | Amended | V-010 |
 | UX-AC-078 | Amended | V-003, V-010, V-011 |
@@ -168,9 +170,9 @@ Read the complete contracts at [UX Section 12](../ux/acceptance.md#12-acceptance
 | UX-AC-081 | Amended | V-003, V-010, V-011 |
 | UX-AC-082 | Amended | V-002, V-003 |
 | UX-AC-083 | Amended | V-003, V-010, V-011 |
-| UX-AC-084 | Amended | V-002, V-003, V-010 |
-| UX-AC-085 | Amended | V-002, V-003, V-005, V-010, V-015 |
-| UX-AC-086 | Amended | V-002, V-003, V-010, V-015 |
+| UX-AC-084 | Retired | Not applicable; owning UX row records disposition |
+| UX-AC-085 | Retired | Not applicable; owning UX row records disposition |
+| UX-AC-086 | Retired | Not applicable; owning UX row records disposition |
 | UX-AC-087 | MVP | V-002, V-003, V-010, V-015 |
 | UX-AC-088 | Amended | V-003, V-007, V-013 |
 | UX-AC-089 | Amended | V-003, V-007, V-013 |
@@ -180,7 +182,7 @@ Read the complete contracts at [UX Section 12](../ux/acceptance.md#12-acceptance
 | UX-AC-093 | Deferred | Not applicable; owning UX row records disposition |
 | UX-AC-094 | Amended | V-002, V-003, V-010 |
 | UX-AC-095 | Amended | V-003, V-010, V-011 |
-| UX-AC-096 | Deferred | Not applicable; owning UX row records disposition |
+| UX-AC-096 | Amended | V-002, V-003 |
 | UX-AC-097 | Deferred | Not applicable; owning UX row records disposition |
 | UX-AC-098 | Deferred | Not applicable; owning UX row records disposition |
 | UX-AC-099 | Deferred | Not applicable; owning UX row records disposition |
@@ -192,7 +194,7 @@ Read the complete contracts at [UX Section 12](../ux/acceptance.md#12-acceptance
 | UX-AC-105 | Amended | V-002, V-003, V-005 |
 | UX-AC-106 | MVP | V-002, V-003, V-005 |
 | UX-AC-107 | Amended | V-002, V-003 |
-| UX-AC-108 | MVP | V-002, V-003, V-005 |
+| UX-AC-108 | Amended | V-002, V-003, V-005 |
 | UX-AC-109 | Amended | V-001, V-002, V-003 |
 | UX-AC-110 | Amended | V-002, V-003, V-013 |
 | UX-AC-111 | Deferred | Not applicable; owning UX row records disposition |

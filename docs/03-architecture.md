@@ -1,15 +1,15 @@
 # LinguaDesk — Architecture and Engineering Principles
 
-**Document:** #3 · **Version:** 1.15 · **Status:** Current design; implementation/evidence status is maintained in delivery/current.md and verification/coverage.md
-**Updated:** 2026-09-11
+**Document:** #3 · **Version:** 1.16 · **Status:** Current design; implementation/evidence status is maintained in delivery/current.md and verification/coverage.md
+**Updated:** 2026-09-20
 
 ## 1. Authority, Inputs, and Scope
 
 Original authoring inputs are in the [archive](archive/03-architecture-inputs.md). Current scope follows the owning documents linked from [#0](00-SDD-Planning-Workflow.md).
 
-PRD D-17–D-19 and Section 3 define current scope and later routing intent. P-001–P-004 retain their **newly amended** dispositions; P-005/NFR-008 and P-006 remain proposed. This document does not claim to close Q-001/Q-004/Q-008 in full. Active UX IDs remain behavioral contracts, not a mandatory browser-test count; Deferred/Retired IDs require no MVP implementation/evidence.
+PRD D-17–D-21 and Section 3 define current scope and later routing intent. P-001–P-004 retain their amended dispositions; P-005/NFR-008 and P-006 remain proposed. This document does not claim to close Q-001/Q-004/Q-008 in full. Active UX IDs remain behavioral contracts, not a mandatory browser-test count; Deferred/Retired IDs require no MVP implementation/evidence.
 
-**Current feature boundary:** two explicit whole-text operations, plain editable/copyable results, one rewriting mode, native/inline UI, local accounts, two simple model chains, and an independent authenticated API. No sentence IDs, correspondence algorithms, assistance caches, rich-text/diff editor, debounce service, Google handler, priority rule engine, prefix processing, or dormant feature flags are required. Deferred features are designed when selected under PRD Section 3.1; do not prebuild their infrastructure.
+**Current feature boundary:** two whole-text API operations, one-second paused dispatch in the SPA, plain editable/natively copyable results, one rewriting mode, native/inline UI, local accounts, two simple model chains, and an independent authenticated API. No sentence IDs, correspondence algorithms, assistance caches, rich-text/diff editor, server-side debounce service, Google handler, priority rule engine, prefix processing, or dormant feature flags are required. The SPA owns its pause timer; independent API clients submit explicitly. Deferred features are designed when selected under PRD Section 3.1; do not prebuild their infrastructure.
 
 ## 2. Architecture Drivers and Stack Selection
 
@@ -94,7 +94,7 @@ This is a planned structure, not a claim that scaffolding or commands already ex
 
 ### 4.2 Representative full rewrite
 
-1. On explicit Rewrite activation (or an independent API call), authenticate a verified local account. Validate complete input length, supported selector values, the single mode and request identity against #5. Reject oversized input; never truncate it. Provider detection/eligibility follows admission within this requested operation, not via a typing-driven frontend pipeline.
+1. On a current paused Rewrite candidate (or an independent API call), authenticate a verified local account. Validate complete input length, supported selector values, the single mode and request identity against #5. Reject oversized input; never truncate it. Provider detection/eligibility follows admission within this requested operation, not through remote calls on every keystroke.
 2. In a short database transaction, claim the account-scoped operation key and reserve user/global character capacity and the next provider attempt's monetary exposure. Commit before any network call.
 3. Execute provider HTTP and output validation outside the transaction, under the overall deadline and #4's bounded attempt policy.
 4. In a second short transaction, conditionally finalize the operation. Valid success converts character reservations into one charge; definitive failure releases character capacity. Settle or conservatively retain monetary exposure separately. Commit before returning success.
@@ -194,11 +194,11 @@ Admission enforces `known spend + unresolved exposure + new attempt upper bound 
 
 ## 8. Frontend and Agent Development Rules
 
-### 8.1 Explicit actions and plain-text state
+### 8.1 Paused dispatch and plain-text state
 
-Use feature reducers and pure helpers for explicit-dispatch guards, request/workspace identity, usage ordering and manual-edit protection. Effects perform transport; reducers do not. Context suffices for auth/usage/shared workspace state. Native textareas/selects and inline settings implement the UI; no broad global state manager or editor framework is needed.
+Use feature reducers and pure helpers for pause/dispatch guards, request/workspace identity, usage ordering and manual-edit protection. Effects perform transport and own the timer; reducers do not. Context suffices for auth/usage/shared workspace state. Native textareas/selects and inline settings implement the UI; no broad global state manager or editor framework is needed.
 
-A valid explicit action captures input/settings/result-edit revision. Typing, pasting, mode/language changes, reconnect, usage reset and elapsed time never dispatch a transformation. Ignore activation while composing; do not queue an automatic post-composition request. Detection/eligibility can complete the same explicit submission only if its captured revisions still match. One unsettled operation per feature page suppresses duplicate UI activation; the backend still enforces concurrent-client integrity. Settings and both source/result text stay editable while processing; any intervening edit or editor compositionstart blocks stale text application, even if composition is later cancelled.
+An eligible source/language/mode edit starts or restarts a one-second timer. On expiry, retain the latest source/settings revision and dispatch once if still current, not composing and allowed by known capacity; capture the result-edit revision at actual dispatch. `compositionend` starts a fresh timer for the committed eligible revision. Result edits or leaving the feature cancel an undispatched timer/queued candidate; reconnect and usage reset do not start paid work. Detection/eligibility can complete the same paused candidate only if its captured revisions still match. Keep one unsettled operation per feature page and at most the latest eligible paused revision queued; dispatch that revision only after the prior operation has a known terminal outcome. The backend still enforces concurrent-client integrity. Settings and both source/result text stay editable while processing; any intervening edit or editor compositionstart blocks stale text application, even if composition is later cancelled. An unchanged settled or failed revision never auto-dispatches again.
 
 Full-result replacement uses request/workspace revisions, not sentence/version associations. Plain result editing needs no segmentation, merge/split matching, cached metadata or comparison state. Targeted metadata preservation is cut, not merely delayed. Future DF-001/DF-002 must invalidate all assistance metadata on any manual edit; design those features only when selected. Share canonical count fixtures across C#/TypeScript; reject over-limit full text consistently on both sides.
 
