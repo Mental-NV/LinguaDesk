@@ -14,7 +14,8 @@ Milestone: <roadmap row/heading link>
 | BI-NNN | <bounded outcome or necessary enablement> | <priority> | <IDs/evidence> | <state> | [spec](spec.md) |
 
 Acceptance summary: <brief outcome>; detailed ACs are in spec.md.
-Human steps: <owner, timing, blocked gate; or None required>.
+External prerequisites: <credentials/configured authorization/budgets, owner, timing, blocked gate; or None required>.
+Optional human checks: <nonblocking observations; or None planned>.
 ```
 
 ## spec.md
@@ -33,7 +34,7 @@ Sources: [context manifest](context.json); [backlog](backlog.md).
 | AC-001 | <testable scenario> | <link/ID> |
 
 ## Constraints and decisions
-<Applicable nonfunctional constraints; clarification status; human gates.>
+<Applicable nonfunctional constraints; clarification status; standing authorization and external prerequisites. Required verification is unattended.>
 ```
 
 ## plan.md
@@ -57,7 +58,7 @@ Behavior: [spec](spec.md). Reviewed sources: [manifest](context.json).
 
 ## Context boundaries and risks
 <Why each omitted domain is irrelevant; when to open on-demand sources.>
-<Dependencies, assumptions, blockers, human action owner/timing/gate.>
+<Dependencies, assumptions, blockers, external prerequisite owner/timing/gate; optional human checks never block completion.>
 ```
 
 ## tasks.md

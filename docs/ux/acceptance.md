@@ -38,7 +38,7 @@ Scenarios are layer-independent behavioral contracts. [Verification plan Section
 | UX-AC-022 | Amended | Eligible T-OK-A sends no operation before one second of inactivity, then one complete translation and authoritative accounting 7,546; no unchanged-revision repeat. |
 | UX-AC-023 | Amended | Repeated source/settings edits restart the one-second timer; only the latest eligible settled revision dispatches once. |
 | UX-AC-024 | Amended | Source and target edits preserve the previous result and restart the timer; only the latest eligible values dispatch after the pause. |
-| UX-AC-025 | Amended | No interim IME text dispatches; compositionend starts a fresh one-second timer for the committed eligible revision. Unit event cases plus native browser/manual IME evidence. |
+| UX-AC-025 | Amended | No interim IME text dispatches; compositionend starts a fresh one-second timer for the committed eligible revision. Unit/event-guard cases and Chromium browser checks establish the automated contract. Native IME/device review is optional and nonblocking under D-22; synthetic events are not reported as native IME evidence. |
 | UX-AC-026 | Amended | Clear source keeps focus and the prior natively copyable result, cancels the timer and causes no operation. |
 | UX-AC-027 | Amended | Paused uncertain-detection candidate shows MSG-006 without transformation/charge; corrected source selection starts a new pause. |
 | UX-AC-028 | Amended | Same known source/target is invalid; choosing a different target with eligible source starts a one-second pause and then dispatches once. |

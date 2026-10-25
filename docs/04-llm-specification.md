@@ -1,7 +1,7 @@
 # LinguaDesk — LLM Behavior and Routing Specification
 
-**Document:** #4 · **Version:** 1.8 · **Status:** Current design; implementation/evidence status is maintained in delivery/current.md and verification/coverage.md
-**Updated:** 2026-09-11
+**Document:** #4 · **Version:** 1.9 · **Status:** Current design; unattended AI evaluation under D-22; implementation/evidence status is maintained in delivery/current.md and verification/coverage.md
+**Updated:** 2026-10-25 (Europe/Moscow)
 
 ## 1. Authority, inputs, and scope
 
@@ -76,7 +76,7 @@ The eligibility stage receives the whole accepted-length source and a manual sou
 4. Return a source-mismatch classification when the manual hint clearly contradicts the main language. The user must correct the source choice and explicitly resubmit; do not silently translate using a different source.
 5. Avoid transforming or correcting text, giving advice, or supplying a prose explanation. Code compares the resolved source with the translation target after a valid classification.
 
-Model self-reported confidence is not a calibrated probability. Versioned examples and human-labeled ambiguity/mixed-language cases in #6 establish whether the classifier meets FR-004/005. Do not invent a percentage of foreign words or a confidence cutoff as a new product policy. Empty or malformed classification is a provider/output failure, not evidence that the user's text is unsupported.
+Model self-reported confidence is not a calibrated probability. Versioned examples and independently AI-reviewed ambiguity/mixed-language reference cases in #6 establish whether the classifier meets FR-004/005 under D-22. Human labeling is optional; record reviewer identities and limitations. Do not invent a percentage of foreign words or a confidence cutoff as a new product policy. Empty or malformed classification is a provider/output failure, not evidence that the user's text is unsupported.
 
 An input-validation outcome is terminal for the operation; do not ask the fallback to overturn it. A provider failure in eligibility may advance the chain as in Section 6. Paid classification costs money even if input is rejected, but it never charges character allowance by itself.
 
@@ -142,7 +142,7 @@ Runtime checks are layered:
 - **Deterministic rejection:** structural/envelope failures above, unexpected message/choice shape, missing requested text, and adapter-confirmed truncation/refusal. Preserve decoded output exactly; do not remove suspicious material and label the remainder successful.
 - **Conservative content checks:** use a versioned local language/script checker to reject confidently wrong-language output or clearly Traditional output where Simplified is required. Short names, URLs, shared Chinese characters and short ambiguous outputs must not be rejected solely because a detector is uncertain. The selected checker and fixtures are a live-qualification prerequisite; no extra LLM judge call is made during production validation.
 - **Fidelity signals:** missing/added URLs, numerical changes, paragraph/list collapse, and implausible omissions feed evaluation. Deterministic rejection rules may be enabled only with fixtures showing they distinguish errors from legitimate number localization, transliteration and grammatical restructuring. Do not equate identical digit strings, sentence counts or output/input length ratios with semantic preservation.
-- **Quality evidence:** meaning, names' identity, factual fidelity, naturalness, minimal correction and appropriate mode are principally evaluated through #6's fixed set and human review. Schema validity and a model's own “result” label cannot prove these properties. A locally passing response can still be a critical quality failure in evaluation.
+- **Quality evidence:** meaning, names' identity, factual fidelity, naturalness, minimal correction and appropriate mode are principally evaluated through #6's fixed set, pinned AI judges and separate reference-review/adjudication passes. D-22 removes mandatory human review. Schema validity and a model's own “result” label cannot prove these properties. A locally passing response can still be a critical quality failure in evaluation.
 
 This resolves what the runtime checks guarantee without pretending to detect every semantic error. A validator improvement that changes acceptance must be evaluated across the same family coverage as the candidate it guards. No automatic “fix this output” call or production back-translation is authorized by this specification.
 
@@ -186,7 +186,7 @@ The DeepSeek API key is supplied to the evaluator through the already configured
 
 Do not put the key in `appsettings*.json`, candidate/profile JSON, `.runsettings`, source, scripts, command defaults, test snapshots or reports, and do not pass it as a runner command-line option. Environment values can be exposed by a compromised process or host; rotate the shared key if exposed. Because this is not an evaluation-isolated billing scope, all LinguaDesk dispatches using it share access, throttling, balance and cost risk. A live evaluation budget protects only admitted LinguaDesk evaluation work unless it participates in the same global admission used by concurrent serving; it cannot control unrelated use of the provider account.
 
-Credential loading is opt-in for explicit live commands. Offline tests, prompt inspection and scripted probes do not read provider credential variables and run with provider networking disabled. A requested live run with a missing/blank credential is a blocked/non-success result and cannot fall back to scripted output. Diagnostics may report `credentialRef` and `credentialPresent`; they never print, list, hash, serialize or echo the value. Configuration binding keeps the API key in the narrow transport credential type rather than the candidate/report model.
+Credential loading is opt-in for explicit live commands. AI may invoke those commands under standing authorization for specified profiles/environments and finite dispatch/spend limits, without per-run human approval. Offline tests, prompt inspection and scripted probes do not read provider credential variables and run with provider networking disabled. A requested live run with a missing/blank credential is a blocked/non-success result and cannot fall back to scripted output. Diagnostics may report `credentialRef` and `credentialPresent`; they never print, list, hash, serialize or echo the value. Configuration binding keeps the API key in the narrow transport credential type rather than the candidate/report model.
 
 The evaluation tool exposes two distinct live workflows after M019/M020 implement them:
 
@@ -293,7 +293,7 @@ M019 is the enabling milestone for the provider-neutral profile/credential resol
 
 ### 9.2 Evaluation ownership and data boundary
 
-[#6 Sections 5–7](verification/llm-evaluation.md#5-llm-quality-and-candidate-qualification-q-005) own Q-005: corpus construction, grading/human review, API workloads, optional evaluation tooling and report requirements. Runner-only grading/report dependencies do not enter the serving library. Production text must never become an evaluation dataset or persistent report; Section 8 and #3 retain application privacy authority. Live evaluation requires bounded monetary admission including graders and unresolved exposure; #6 specifies execution and billing isolation.
+[#6 Sections 5–7](verification/llm-evaluation.md#5-llm-quality-and-candidate-qualification-q-005) own Q-005: corpus construction, automated grading/review/adjudication, API workloads, optional evaluation tooling and report requirements. AI may author/review references and record qualification dispositions under D-22; missing grades and unresolved critical findings still block qualification. #6 also owns impact-based evidence reuse and consolidation of overlapping live assertions. Runner-only grading/report dependencies do not enter the serving library. Production text must never become an evaluation dataset or persistent report; Section 8 and #3 retain application privacy authority. Live evaluation requires bounded monetary admission including graders and unresolved exposure; #6 specifies execution and billing isolation.
 
 ### 9.3 Candidate eligibility
 
@@ -327,6 +327,6 @@ These IDs describe checks for #4, not a duplicate product coverage catalog or im
 | Q-007, #4 with selected AI package | Eligibility/response contracts, error categories, traversal and deadline policy specified here. M004 implements only the executable `eligibility.v1` snapshot and scripted call boundary; parsers/checkers, remaining prompts and selected adapter/token-bound proof remain later deliverables | Live provider orchestration readiness; M004 offline infrastructure is complete |
 | Q-001, #4/#6 with owner configuration | Initial DeepSeek evaluation profile and environment credential source are set and public capability/tariff documentation is checked; live access, token/byte bounds, model/fallback qualification and actual monetary cap remain unset | Paid serving and launch |
 | Q-003/Q-006, #5 with #3 | Shared counting/recovery/auth/error/period semantics specified in #5; selected wire operations/fields and auth details remain | Selected accounting/API handlers and dependent clients; no YAML prerequisite for independent AI development |
-| Q-005, #6 | Corpus/rubric/human coverage and workloads specified in [#6](06-verification-plan.md); actual cases, reviews and execution evidence pending | Candidate acceptance and release gates |
+| Q-005, #6 | Corpus/rubric/automated review coverage and workloads specified in [#6](06-verification-plan.md); complete qualification cases, AI reviews and execution evidence pending; human checks optional | Candidate acceptance and release gates |
 | Q-004, #3/#5/#10 | Operational metadata retention/reconciliation windows, account lifecycle and provider disclosure; source/result storage policy remains unchanged | Related retention/account implementation and launch |
 | Q-008/Q-010, PRD then architecture/operations | P-005/P-006 disposition and any new operational controls | Adoption of proposed controls; not permission to add them here |

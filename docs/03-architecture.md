@@ -1,7 +1,7 @@
 # LinguaDesk — Architecture and Engineering Principles
 
-**Document:** #3 · **Version:** 1.16 · **Status:** Current design; implementation/evidence status is maintained in delivery/current.md and verification/coverage.md
-**Updated:** 2026-09-20
+**Document:** #3 · **Version:** 1.17 · **Status:** Current design; unattended verification under D-22; implementation/evidence status is maintained in delivery/current.md and verification/coverage.md
+**Updated:** 2026-10-25 (Europe/Moscow)
 
 ## 1. Authority, Inputs, and Scope
 
@@ -234,7 +234,7 @@ Use [#6 Section 3](verification/backend.md#3-deterministic-backend-and-independe
 
 ### 9.3 Execution and traceability
 
-[#6 Sections 7–8](06-verification-plan.md#7-execution-gates-and-evidence) own inner-loop/PR/release gates, canonical coverage and evidence status. Current evidence is maintained separately in [delivery status](delivery/current.md).
+[#6 Sections 7–8](06-verification-plan.md#7-execution-gates-and-evidence) own inner-loop/PR/release gates, canonical coverage and evidence status. PRD D-22 / [ADR-013](decisions/ADR-013.md) permit unattended AI review and release eligibility with pinned Chromium desktop/narrow evidence; human/additional-platform checks are optional. Standing live-run authorization remains bounded by configured dispatch/spend limits, and deployment needs an authorized target and rollout/rollback limits. Integrity/privacy/authentication/migration checks and actual live qualification remain required. Current evidence is maintained separately in [delivery status](delivery/current.md).
 
 ## 10. Decision Records and Source Basis
 

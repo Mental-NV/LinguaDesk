@@ -16,3 +16,4 @@
 | [ADR-010: Explicit Whole-Text MVP with Deferred Assistance](decisions/ADR-010.md) | Accepted / amended |
 | [ADR-011: Provider Retention and No-Training Are Not Eligibility Gates](decisions/ADR-011.md) | Accepted / amended |
 | [ADR-012: Shared AI Infrastructure Library with IChatClient and Independent Evaluation](decisions/ADR-012.md) | Selected design; see record |
+| [ADR-013: Unattended AI Verification and Release Eligibility](decisions/ADR-013.md) | Accepted 2026-10-25; PRD D-22 |

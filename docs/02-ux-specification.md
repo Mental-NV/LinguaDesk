@@ -1,11 +1,11 @@
 # LinguaDesk — UX/UI Specification
 
-**Document:** #2 · **Version:** 2.2 · **Status:** Simplified MVP with pause processing and automatic registration verification; real account-email journeys deferred
-**Updated:** September 20, 2026 (UTC)
+**Document:** #2 · **Version:** 2.3 · **Status:** Simplified MVP with unattended Chromium verification; real account-email journeys deferred
+**Updated:** October 25, 2026 (Europe/Moscow)
 
 ## 1. Authority, inputs, and scope
 
-[Document #0](00-SDD-Planning-Workflow.md) owns process; [PRD](01-PRD.md) owns active and deferred product scope and D-17–D-21. Current shared API behavior is in [#5](05-api-design.md). Runtime evidence is tracked separately in [delivery status](delivery/current.md).
+[Document #0](00-SDD-Planning-Workflow.md) owns process; [PRD](01-PRD.md) owns active and deferred product scope and D-17–D-22. Current shared API behavior is in [#5](05-api-design.md). Runtime evidence is tracked separately in [delivery status](delivery/current.md).
 
 This document owns current routes, layout, controls, messages, state transitions and acceptance contracts. `Must` is binding for the **active MVP**; rows marked **Deferred** or **Retired** impose no current implementation/test gate. The 17 UX-US, 112 UX-AC, and original 44 UX-MSG IDs remain traceable; some are amended and some inactive. In compact references, AC/US/MSG mean UX-AC/UX-US/UX-MSG. IDs are never reused for unrelated behavior.
 
@@ -278,11 +278,11 @@ At 200% zoom all controls remain available; at effective 400% / 320 CSS px there
 
 ### 10.1 Supported browsers
 
-Support current and immediately previous stable major releases at each release candidate for Firefox and Chrome on desktop and mobile. [Verification plan Section 4](verification/frontend.md#4-frontend-browser-and-manual-verification) owns automated lane allocation, actual-version evidence and manual browser-matrix procedures. Bundled engines alone do not establish this support contract.
+Under PRD D-22, release assurance covers pinned Playwright Chromium at desktop and narrow responsive viewports. [Verification plan Section 4](verification/frontend.md#4-frontend-browser-and-manual-verification) owns executable checks and version recording. Firefox, WebKit, branded/current/previous versions and physical devices are best-effort compatibility targets; their checks are optional and nonblocking. Viewport emulation establishes responsive layout in the tested engine, not physical-device or additional-browser verification.
 
 ### 10.2 Verification ownership
 
-The accessibility outcomes above remain UX contracts. Automated checks and required manual evidence are consolidated in [verification plan Sections 4.2–4.4](verification/frontend.md#42-browser-lanes); deferred journeys create no MVP evidence requirement.
+The accessibility outcomes above remain implementation targets. Required release evidence consists of executable semantic/contrast/reflow/focus and native interaction checks in [verification plan Sections 4.2–4.4](verification/frontend.md#42-browser-lanes). Human sign-off, screen-reader/native-IME review and physical-device checks are optional and nonblocking. Automated checks do not establish complete WCAG conformance or untested platform behavior; record their limits. Deferred journeys create no MVP evidence requirement.
 
 ## 11. User stories and disposition
 
@@ -324,7 +324,7 @@ See [UX acceptance contracts](ux/acceptance.md#1210-curated-visual-regression).
 
 ## 13. Verification boundaries
 
-[Verification plan Sections 2–4](06-verification-plan.md#2-verification-layers-and-check-catalog) define the lowest sufficient evidence for each assertion and distinguish fixtures, integrated smoke and live/manual checks. The [local acceptance allocation](verification/coverage.md#82-local-acceptance-allocation) preserves every UX-AC ID and its current disposition. No scenario here is a claim of a passing test.
+[Verification plan Sections 2–4](06-verification-plan.md#2-verification-layers-and-check-catalog) define the lowest sufficient evidence for each assertion and distinguish fixtures, integrated smoke, required live evidence and optional manual observations. AI may perform semantic/visual review under D-22. The [local acceptance allocation](verification/coverage.md#82-local-acceptance-allocation) preserves every UX-AC ID and its current disposition. No scenario here is a claim of a passing test.
 
 [Roadmap M028](07-roadmap.md#45-useful-end-to-end-product-increments) owns the first complete Translation UI outcome and [M029](07-roadmap.md#45-useful-end-to-end-product-increments) owns the first complete Rewriting UI outcome. [Verification plan Section 4.5](06-verification-plan.md#45-required-user-visible-transformation-evidence) defines the minimum evidence that prevents API, LLM or mocked-component work from being reported as either end-user outcome.
 
@@ -349,6 +349,7 @@ UX-D-001–UX-D-007 remain stable historical decision IDs. Their current disposi
 | UX-D-007 | Amended: server-authoritative accounting and stale-success disclosure without a persistent usage summary or provider/global/budget amounts |
 | UX-D-008 | Accepted 2026-09-08: PRD D-17 replaces affected prior UX; DF register controls later scope, no dormant MVP widgets/tests |
 | UX-D-009 | Accepted 2026-09-20: PRD D-21 replaces explicit processing and removes the listed workspace controls/status lines; preserve native copy, essential errors and stale-response protection |
+| UX-D-010 | Accepted 2026-10-25: PRD D-22 replaces required manual/browser-matrix evidence with unattended Chromium desktop/narrow checks and AI visual review; other-platform/human checks are optional |
 
 API design #5 now defines canonical scalar counting, operation identity/recovery, ordered usage, cookie/bearer lifecycle, error semantics, cancellation and rollover. Selected slices still fix exact wire operations/fields, auth policy/bootstrap/delivery details and the concrete recovery UI mapping before dependent handlers/clients. OpenAPI is generated and reviewed early in implementation, not hand-authored during planning. #3/#4 own serving capability, cost bounds and the simple family chains' quality/output/deadline checks; provider retention/no-training certification is not a prerequisite. Provider-managed caching changes no current UI, character accounting or application text-lifecycle contract. #6 supplies current-scope evidence mapping. Q-002 targeted matching and Google linking no longer block MVP. Advanced routing and sentence context are deferred dependencies only.
 

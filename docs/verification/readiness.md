@@ -4,7 +4,7 @@ Authoritative continuation of [06-verification-plan.md](../06-verification-plan.
 
 ## 9. Readiness and remaining dependencies
 
-Q-005 is **specified at design level** by Sections 5–6. The corpus, implementation, reviewers and measurements are still pending; specifying counts is not qualifying a candidate. M001–M006's scoped evidence is complete, but it does not qualify language behavior or any release gate. M005 passes only the V-001/V-009/V-012 portions listed above; M006 passes only the V-004/V-009/V-015/V-016 and retained regression portions allocated above. Later work continues through #0's roadmap/backlog/delivery-package process.
+Q-005 is **specified at design level** by Sections 5–6. Full corpus coverage, automated reference/review/adjudication and live measurements remain required; the bounded M035/M036 batch and M037 rehearsal do not qualify a whole family or a release gate. Current implementation/evidence is indexed in [delivery status](../delivery/current.md) and [coverage](coverage.md). Under D-22 all readiness checks permit unattended execution and AI semantic/evidence review; human reviewer/device availability is not a release dependency.
 
 | Dependency | Required before claiming readiness |
 | --- | --- |
@@ -12,6 +12,8 @@ Q-005 is **specified at design level** by Sections 5–6. The corpus, implementa
 | Q-001/Q-007 | Chosen serving/billing arrangement, credentials, verified adapter/settings/context bounds, qualified primary/optional fallback and an actual monetary ceiling before paid serving |
 | Q-003/Q-006 | M005 resolves public capability/count/artifact mechanics; M034 amends registration to automatic verification with a generic sign-in-required acknowledgment and no delivery while retaining the unverified current-state guard. Real confirmation/reset delivery is deferred under DF-008; generated review precedes dependent client adoption |
 | Q-004 | M006 explicitly creates durable account/key records without deletion/retention claims. Remaining deletion, backup/aggregate/unresolved-exposure retention and reconciliation rules block their related features/launch, not selected registration; prove later lifecycle/restart/restore against them |
-| Quality and performance evidence | Frozen approved corpus, qualified reviewers/judge configuration, explicit run budgets and actual candidate/chain/API reports |
-| Browser/AT and operations | Access to supported current/previous actual versions/devices/AT and published-host/restore evidence; real email evidence is excluded until DF-008 is reactivated |
-| Q-008/Q-010 / P-005/P-006 | Product-owner disposition of proposed safeguards/compatibility before making them binding; RG-008 reviews current launch dependencies only |
+| Quality and performance evidence | Frozen AI-reviewed corpus, pinned/calibrated judge and separate AI review/adjudication records, standing authorization with finite run budgets and actual candidate/chain/API reports; missing grades/unresolved critical findings block qualification |
+| Browser and operations | Executable pinned Chromium desktop/narrow checks and automated published-host/restore evidence; human review and additional browsers/versions/devices/AT are optional and nonblocking; real email evidence is excluded until DF-008 is reactivated |
+| Q-008/Q-010 / P-005/P-006 | Record existing proposed/nonbinding dispositions and review current launch dependencies for RG-008 through AI evidence review. New product-owner direction is needed only before adopting new safeguards/compatibility scope; proposed items do not create a human verification gate |
+
+AI may resolve technical questions within delegated authority and assess release eligibility from evidence. Existing authorization suffices for allowed live runs; missing credentials, unset finite monetary limits or unresolved active product choices remain named external prerequisites. Deployment additionally requires a configured authorized target and rollout/rollback limits. An automation-policy amendment does not itself implement a runner, refresh historical evidence or mark any RG passed.

@@ -22,27 +22,25 @@ Query by semantic role/name. Native selectors are asserted through value/options
 
 ### 4.2 Browser lanes
 
-Support current and immediately previous stable major releases of Firefox and Chrome at each release candidate, on desktop and on mobile. Record actual tested versions in the release evidence. Bundled Playwright Chromium represents the engine, not branded-browser-version or physical-device proof. Previous-major support requires bounded actual-version smoke or an explicit evidence gap before release support is claimed.
+PRD D-22 requires only pinned Playwright Chromium at desktop and narrow responsive viewports. Record the engine/runtime version and viewport in evidence. There is no required cross-browser, current/previous-version or physical-device matrix. Additional engines, branded browsers and devices are best-effort compatibility targets; missing access does not block RG-006. Engine/viewport evidence must not be relabeled as actual branded-browser or physical-device proof.
 
-| Lane | Automated scope | Release/manual scope |
+| Lane | Automated scope | Gate status |
 | --- | --- | --- |
-| Chromium desktop 1440×900 | Core keyboard/focus/edit/copy/history/privacy subset, curated visuals per Section 4.4, small integrated smoke | Branded Chrome versions and zoom smoke |
-| Chromium narrow 390×844 (mobile emulation) | Curated visuals and ordinary reflow/native-control geometry | Chrome on Android at 360×800 |
-| Chromium 320×640 / 1024×768 | Small overflow/breakpoint checks, no extra screenshot matrix | Zoom and text-spacing checks |
-| Firefox desktop 1024×768 | Short native-editor/selector/keyboard/composition-event smoke when affected or at release | Actual supported Firefox desktop versions |
-| Firefox/Chrome mobile 390×844 | No separate automated mobile-engine suite | Actual supported mobile versions with journey checks per Section 4.3 |
-| WebKit desktop 1440×900 | Short focus/navigation/editor smoke when affected or at release | Outside RG-006 matrix (engine coverage only) |
+| Chromium desktop 1440×900 | Published core journeys, native editing/copy, focus/history/privacy, semantic/contrast scans and curated visuals per Section 4.4 | Required automated evidence; existing keyboard smoke may remain advisory per UX-AC-079 |
+| Chromium narrow 390×844 (viewport emulation) | Published core journeys, reflow/native-control geometry, semantic scans and curated visuals | Required automated responsive evidence; no physical-device claim |
+| Chromium 320×640 / 1024×768 | Targeted overflow/breakpoint, effective zoom and text-spacing checks; no extra screenshot matrix | Required where allocated by active UX acceptance |
+| Firefox / WebKit / branded current or previous browsers / physical devices / AT | Optional compatibility and exploratory observations | Nonblocking; record tested versions and untested scope honestly |
 
 ### 4.3 Manual browser-matrix evidence
 
-Before RG-006, check local registration/login/recovery, Translation, Rewriting mode selection, one-second paused processing, essential validation alerts, native copy and session expiry in both Firefox and Chrome, on desktop and on mobile sizes. Record actual tested versions in the release evidence. Keyboard-only, screen-reader (NVDA/VoiceOver/TalkBack), IME composition, forced-colors and other browser/device checks are explicitly outside RG-006; milestones may still record them as non-gating evidence, and combinations outside the Firefox/Chrome matrix are noted as gaps without blocking the gate.
+This heading is retained for existing references. D-22 removes the manual browser-matrix release requirement. Before RG-006, unattended Chromium checks cover current automatic-verification registration/sign-in, Translation, Rewriting mode selection, one-second paused processing, essential validation alerts, native copy and session expiry at desktop and narrow viewports. Real email confirmation/recovery evidence is deferred under DF-008.
 
-Automated semantics, focus, contrast/reflow and live-region checks do not replace the manual matrix pass above. Deferred sentence, comparison and custom-sheet journeys are excluded from current evidence, not reported as passing.
+Automated semantics, focus, contrast/reflow and live-region checks satisfy their allocated assertions without human verification. Screen-reader (NVDA/VoiceOver/TalkBack), native IME, forced-colors, physical-device and additional-browser checks are optional and nonblocking. Synthetic composition events prove dispatch guards only; they do not establish a real IME/platform pass. Record untested scope as untested, not as failed required evidence or a passing platform claim. Deferred sentence, comparison and custom-sheet journeys are excluded from current evidence.
 
 ### 4.4 Curated visual regression
 
 Use **seven** initial Chromium baselines: Translation result and oversize-error layouts (each 1440×900 and 390×844), Rewriting with inline mode and a plain edited result (1440×900 and 390×844), and local registration with long validation errors (1440×900). Assert equal desktop editor-panel geometry at both feature desktop baselines. Add a baseline only for an uncovered layout risk. No reset dialog, sentence, comparison, Google, prefix, custom-dropdown or tools-sheet baseline ships now. Remaining combinations use DOM assertions or targeted browser geometry, not screenshots of every scenario.
 
-Pin Noto Sans/Noto Sans SC, Chromium/container, scale factor 1 and deterministic synthetic content/time. Wait for fonts; hide caret; disable motion and control scrollbars. Native select popups are excluded from pixel capture. Start with per-pixel threshold 0.1 and max differing ratio 0.001; record measured reasons for adjustments and never automatically accept changed baselines. DOM emulators cannot prove layout. Keep structural/semantic checks independent of screenshots.
+Pin Noto Sans/Noto Sans SC, Chromium/container, scale factor 1 and deterministic synthetic content/time. Wait for fonts; hide caret; disable motion and control scrollbars. Native select popups are excluded from pixel capture. Start with per-pixel threshold 0.1 and max differing ratio 0.001; record measured reasons for adjustments. AI may inspect before/after images and accept an intentional baseline change with a recorded design rationale and passing independent structural/semantic checks. Unexplained differences remain failures; blanket regeneration or threshold changes solely to obtain green checks are prohibited. No human design approval is required. DOM emulators cannot prove layout.
 
-Browser contracts use semantic locators and isolated contexts; prefer explicit readiness and controlled responses over timing sleeps. See [Playwright best practices](https://playwright.dev/docs/best-practices). Native clipboard, composition, selection and restoration require their actual platform evidence; synthetic DOM events or bundled engines cannot stand in for physical-device review. Unsupported access to a required device/version is an explicit evidence gap, blocking RG-006 until resolved.
+Browser contracts use semantic locators and isolated contexts; prefer explicit readiness and controlled responses over timing sleeps. See [Playwright best practices](https://playwright.dev/docs/best-practices). Native clipboard, selection and restoration assertions use the actual pinned browser, not DOM emulation. Native IME/physical-device observations remain optional; lack of such access does not block RG-006. Missing required Chromium evidence still blocks its allocated gate.
