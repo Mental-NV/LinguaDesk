@@ -1,0 +1,581 @@
+{
+  "version": 1,
+  "scope": "M045",
+  "sources": [
+    {
+      "path": "docs/07-roadmap.md",
+      "use": "excerpt",
+      "reason": "Selected M045 outcome, dependencies and bounded delivery claim",
+      "ids": [
+        "M045"
+      ],
+      "sha256": "5118ef1ee796625ee097b5c8ddc5262e4f1b2f0ee329e308e09c8ab6a416b419"
+    },
+    {
+      "path": "docs/delivery/current.md",
+      "use": "reference",
+      "reason": "Completed transitive foundations; current mutable selection is not copied into the stable prefix",
+      "ids": [
+        "M019",
+        "M020",
+        "M021",
+        "M022",
+        "M023",
+        "M024",
+        "M025",
+        "M027",
+        "M039",
+        "M043",
+        "M044"
+      ],
+      "sha256": "1b03a046688629b6fbd634904fa11131fb5b78ca96885bc397332e76f49e9993"
+    },
+    {
+      "path": "docs/08-backlogs/M039/tasks.md",
+      "use": "reference",
+      "reason": "Reviewed latest narrow/frontend/backend foundation evidence",
+      "heading": "Completion — 2026-10-25 10:02 UTC",
+      "sha256": "0a3d528e14d2813094a6a604e3423e3d8e455a51cb1a65d6745d8c2b6f51862c"
+    },
+    {
+      "path": "docs/08-backlogs/M044/tasks.md",
+      "use": "reference",
+      "reason": "Reviewed prior layout/pause evidence; screenshot-dependent assertions are historical",
+      "heading": "Completion — 2026-10-25 09:50 UTC",
+      "sha256": "21012e3b6809d630f028e94c8462024c7bc99919f8f2ffe7f2d532574639bd83"
+    },
+    {
+      "path": "docs/08-backlogs/M043/tasks.md",
+      "use": "reference",
+      "reason": "Dated live authorization is not reused as an M045 spending grant",
+      "sha256": "a585730756aeaf6d989cefaa1a5a1975792ec94c72eb0f7801e9ce84ffc99aeb"
+    },
+    {
+      "path": "docs/01-PRD.md",
+      "use": "excerpt",
+      "reason": "User-authorized scope, controls, assistance, privacy and accounting",
+      "ids": [
+        "D-21",
+        "D-22",
+        "D-23",
+        "FR-014",
+        "FR-019",
+        "FR-020",
+        "FR-021",
+        "FR-023",
+        "FR-025",
+        "FR-030",
+        "FR-035",
+        "FR-038",
+        "FR-039",
+        "NFR-004",
+        "NFR-006"
+      ],
+      "sha256": "2265a30cb6a6bd2d1cc36da0f6844c7a8ddd8642cec6b630b10c2ad523c6fd1a"
+    },
+    {
+      "path": "docs/01-PRD.md",
+      "use": "reference",
+      "reason": "Language support, full input limits, fidelity and unchanged pause/response semantics",
+      "heading": "5. Functional requirements",
+      "sha256": "194273c562e52cc1f17a9585acfd50d1e8b3ec786d5a93ba40eaa6c577db5a38"
+    },
+    {
+      "path": "docs/01-PRD.md",
+      "use": "reference",
+      "reason": "Independent-client API and excluded proposal scope",
+      "heading": "6. API-facing product requirements",
+      "sha256": "d65390e24f7d1466a17f51e47516fb784336bef1eda8dcb390849b99861bc6bb"
+    },
+    {
+      "path": "docs/01-PRD.md",
+      "use": "reference",
+      "reason": "Original quality/performance and accessibility constraints",
+      "heading": "7. Nonfunctional requirements",
+      "sha256": "27a5abe1952ad87dd6503d0fcfdbbfc4ad6c0a822b309bc720b573b4a85e7b73"
+    },
+    {
+      "path": "docs/01-PRD.md",
+      "use": "reference",
+      "reason": "Full release gates remain separate from scoped implementation evidence",
+      "heading": "8. Evaluation and release acceptance",
+      "sha256": "67451e21bdc6e4b59f42bbc8f9ecd3144365f1f63660c290c9c9081db0f759c5"
+    },
+    {
+      "path": "docs/01-PRD.md",
+      "use": "reference",
+      "reason": "Explicit product exclusions",
+      "heading": "Confirmed exclusions",
+      "sha256": "d9a4548b763d3dbf53ee7461f661e3fe91815aac714fd541656bfd60aedcd617"
+    },
+    {
+      "path": "docs/product/deferred-scope.md",
+      "use": "reference",
+      "reason": "Only D-23 activated scope ships; remaining bespoke selectors/email/routing stay deferred",
+      "sha256": "b2d0d8a623b31a4e08268ddcbbc7fb5995f8668fbef5b47c07634d40d3b61d17"
+    },
+    {
+      "path": "docs/product/open-questions.md",
+      "use": "reference",
+      "reason": "Selected resolved decisions and live/external boundaries",
+      "ids": [
+        "Q-001",
+        "Q-002",
+        "Q-004",
+        "Q-005",
+        "Q-006",
+        "Q-007",
+        "Q-009",
+        "Q-010"
+      ],
+      "sha256": "c13ce4b98c28ee23afda434a2211c45846f3c3bf3d5f4c2ec9156f7c748269f9"
+    },
+    {
+      "path": "docs/02-ux-specification.md",
+      "use": "reference",
+      "reason": "Authoritative screenshot/interaction or selected assistance design",
+      "heading": "2. Screenshot reference and interpretation",
+      "sha256": "4707a10bf3fab7f7ee55d8d640aa10669dba250469b9032c62871c728171d2e2"
+    },
+    {
+      "path": "docs/02-ux-specification.md",
+      "use": "excerpt",
+      "reason": "Authoritative screenshot/interaction or selected assistance design",
+      "heading": "4. Visual system and responsive layout",
+      "sha256": "2ef290ba651bcc72e85c31d8ec6daa7f8e2e91e7c041866a4598e4e39a03a157"
+    },
+    {
+      "path": "docs/02-ux-specification.md",
+      "use": "excerpt",
+      "reason": "Authoritative screenshot/interaction or selected assistance design",
+      "heading": "8. Rewriting contract",
+      "sha256": "baca995b4b724d974e692f549ccd81856beafcc3e29a128c4835ef5098c08e43"
+    },
+    {
+      "path": "docs/02-ux-specification.md",
+      "use": "reference",
+      "reason": "Required workspace/action/account/accessibility contract; open for the relevant task",
+      "heading": "3. Information architecture and workspace lifecycle",
+      "sha256": "1017c7407bc0e2237f414c3b59624b830efc2eeff73c0f408cd22a71748366a1"
+    },
+    {
+      "path": "docs/02-ux-specification.md",
+      "use": "reference",
+      "reason": "Required workspace/action/account/accessibility contract; open for the relevant task",
+      "heading": "5. Components and processing behavior",
+      "sha256": "ace184b3ac2e9806365667b53dc104cf51267256270f65695f6cff748ef592c4"
+    },
+    {
+      "path": "docs/02-ux-specification.md",
+      "use": "reference",
+      "reason": "Required workspace/action/account/accessibility contract; open for the relevant task",
+      "heading": "7. Translation contract",
+      "sha256": "a4ed068c32c788d33af2f62ac5dc789f7e5be611b221a989a6337d717f0cc84c"
+    },
+    {
+      "path": "docs/02-ux-specification.md",
+      "use": "reference",
+      "reason": "Required workspace/action/account/accessibility contract; open for the relevant task",
+      "heading": "9. Local-account and availability flows",
+      "sha256": "75bc13af24f83679cb8a97eaef3879e61db9b4eac8e22d80029555c101cb611b"
+    },
+    {
+      "path": "docs/02-ux-specification.md",
+      "use": "reference",
+      "reason": "Required workspace/action/account/accessibility contract; open for the relevant task",
+      "heading": "10. Accessibility and browser coverage",
+      "sha256": "64faf00bede809f6e7a516f26213a214e1b78baee8087ad1adb5b1446f0e2703"
+    },
+    {
+      "path": "docs/ux/processing.md",
+      "use": "reference",
+      "reason": "Timer, errors, clipboard and assistance competing events",
+      "heading": "6. Processing state and message contract",
+      "sha256": "022c5df6f772462bc10116c626b4929ca48446eee778d738f2713375e1a27d72"
+    },
+    {
+      "path": "docs/ux/acceptance.md",
+      "use": "reference",
+      "reason": "Upstream scenario allocations selected by local ACs",
+      "heading": "12.2–12.9 Scenario disposition and current acceptance",
+      "sha256": "d3cc262df3d4482ea385de7648c131944a57393f32c1fd8641ae555b7f736777"
+    },
+    {
+      "path": "docs/03-architecture.md",
+      "use": "reference",
+      "reason": "Boundaries, data/privacy, integrity and generation rules for the changed implementation",
+      "heading": "4. Component Responsibilities and Representative Slice",
+      "sha256": "25871387dd6053ac7cc5f108a93afafaed52c34fad802e24f99af6933b63902b"
+    },
+    {
+      "path": "docs/03-architecture.md",
+      "use": "reference",
+      "reason": "Boundaries, data/privacy, integrity and generation rules for the changed implementation",
+      "heading": "5. Identity, API Boundaries, and Configuration",
+      "sha256": "fcf821cd097bce5f862d86e6b69098a8f0f305bcf435a31f4e48ca3460df4e60"
+    },
+    {
+      "path": "docs/03-architecture.md",
+      "use": "reference",
+      "reason": "Boundaries, data/privacy, integrity and generation rules for the changed implementation",
+      "heading": "6. Data Classification and Lifecycle",
+      "sha256": "70683a782311bf2bb4313b391c6d044017b8b14e4e2f8f485255af538e0e0953"
+    },
+    {
+      "path": "docs/03-architecture.md",
+      "use": "reference",
+      "reason": "Boundaries, data/privacy, integrity and generation rules for the changed implementation",
+      "heading": "7. Operations, Accounting, and Crash Recovery",
+      "sha256": "d2fb65c86d3b80260bcd4649c41b01d445c4d1cdf77dc1217d32b1d2758826ee"
+    },
+    {
+      "path": "docs/03-architecture.md",
+      "use": "reference",
+      "reason": "Boundaries, data/privacy, integrity and generation rules for the changed implementation",
+      "heading": "8. Frontend and Agent Development Rules",
+      "sha256": "1c3642acc81d6170d467b4d632937b700da67c841be739a5a1419eeeabaafe4e"
+    },
+    {
+      "path": "docs/05-api-design.md",
+      "use": "reference",
+      "reason": "Shared operation semantics, validated context, kind and resolved-language contracts",
+      "heading": "2. Capability and transport boundaries",
+      "sha256": "933c7901804afbeaae8662af17c6c24c5871fa4027fc5c1f7fc727388f92edef"
+    },
+    {
+      "path": "docs/05-api-design.md",
+      "use": "reference",
+      "reason": "Actual C# metadata precedes generated client adoption; no handwritten schema",
+      "heading": "1. Authority, sources, and artifact lifecycle",
+      "sha256": "49d97efb2fd4afe47841d3f3f913e8576625f9a8475c30190e45d56873823fd1"
+    },
+    {
+      "path": "docs/05-api-design.md",
+      "use": "reference",
+      "reason": "No stored text/status replay leakage; generation review",
+      "heading": "9. Privacy, compatibility, and contract generation",
+      "sha256": "5ec8007e40b6d488b3fab1a2cedd7b3ad1419a693a7959b76c05b5d511013350"
+    },
+    {
+      "path": "docs/api/operations.md",
+      "use": "reference",
+      "reason": "API scalar/accounting/idempotency/recovery invariants extended to alternatives",
+      "heading": "4. Complete input and canonical counting",
+      "sha256": "b4a5f31d4a0d781374b73f5caa19daeea8c0dd41c33f32612ef0509a10b3279a"
+    },
+    {
+      "path": "docs/api/operations.md",
+      "use": "reference",
+      "reason": "API scalar/accounting/idempotency/recovery invariants extended to alternatives",
+      "heading": "5. Submission identity, duplicates, and replay",
+      "sha256": "29277f871b9306ed10726968044f7ebaa3627c0738022ddc4b7a76f11691b9c0"
+    },
+    {
+      "path": "docs/api/operations.md",
+      "use": "reference",
+      "reason": "API scalar/accounting/idempotency/recovery invariants extended to alternatives",
+      "heading": "6. Completion, cancellation, and lost-response recovery",
+      "sha256": "6919cba89a3aa450d4f8fbde9af8ec41f55774c064c478af50fc305d03a72575"
+    },
+    {
+      "path": "docs/api/operations.md",
+      "use": "reference",
+      "reason": "API scalar/accounting/idempotency/recovery invariants extended to alternatives",
+      "heading": "7. Allowances, UTC boundaries, and usage ordering",
+      "sha256": "5611d7c258834e1c9a132d28ab68051575e63f001d94b898ea128d9583d300a8"
+    },
+    {
+      "path": "docs/api/operations.md",
+      "use": "reference",
+      "reason": "API scalar/accounting/idempotency/recovery invariants extended to alternatives",
+      "heading": "8. Error semantics and client recovery",
+      "sha256": "787b03e3f41e00492446ebe0f4b677a6c229562212f13a604897ae0197fecd8a"
+    },
+    {
+      "path": "docs/api/accounts.md",
+      "use": "reference",
+      "reason": "Preserve cookie/antiforgery and independent bearer ownership behavior",
+      "heading": "3.1 Cookie and bearer access",
+      "sha256": "e31c884dbbf28b4fcd488b7914468e79857ee468e6303528ec1b787155bdcae6"
+    },
+    {
+      "path": "docs/04-llm-specification.md",
+      "use": "reference",
+      "reason": "Active bounded AI/serving contract; only alternatives profile view changes",
+      "heading": "2. Shared AI component and abstraction",
+      "sha256": "40c845142900ea5c6c7773aae2a944222052a7195126a754c06b7a5c9b7db875"
+    },
+    {
+      "path": "docs/04-llm-specification.md",
+      "use": "reference",
+      "reason": "Active bounded AI/serving contract; only alternatives profile view changes",
+      "heading": "3. Input eligibility and operation behavior",
+      "sha256": "224d535c4f5c031024355c334a712d3f9b4cad3bd93d985ab0b36c46d6497397"
+    },
+    {
+      "path": "docs/04-llm-specification.md",
+      "use": "reference",
+      "reason": "Active bounded AI/serving contract; only alternatives profile view changes",
+      "heading": "4. Prompt and output contracts",
+      "sha256": "e3feb02f22cf7caf11120c1eda4e909a07af86839fa4a237360ee282e8302e00"
+    },
+    {
+      "path": "docs/04-llm-specification.md",
+      "use": "reference",
+      "reason": "Active bounded AI/serving contract; only alternatives profile view changes",
+      "heading": "5.1 Active chains and candidate registry",
+      "sha256": "964db0e40d4e93592f2d7f9108cf3b17ad3791a79d4a453c3a6f843d9fbeb34e"
+    },
+    {
+      "path": "docs/04-llm-specification.md",
+      "use": "reference",
+      "reason": "Active bounded AI/serving contract; only alternatives profile view changes",
+      "heading": "5.2 Evaluation profiles and credentials",
+      "sha256": "97b9c58f39228f0baa3fa9ea769c4e4e1f0fe7e9d7572b714cfbff833d7fc783"
+    },
+    {
+      "path": "docs/04-llm-specification.md",
+      "use": "reference",
+      "reason": "Active bounded AI/serving contract; only alternatives profile view changes",
+      "heading": "5.4 Context and monetary bounds",
+      "sha256": "096102c8e6e33da69c860d00a3d60ffbda854a7478f1b4036cc462498ad30328"
+    },
+    {
+      "path": "docs/04-llm-specification.md",
+      "use": "reference",
+      "reason": "Active bounded AI/serving contract; only alternatives profile view changes",
+      "heading": "6. Routing, attempts, and time bounds",
+      "sha256": "baa98d196e4549008323072028dbe1ad47138ac267479e8d8ad125263b5a4cfd"
+    },
+    {
+      "path": "docs/04-llm-specification.md",
+      "use": "reference",
+      "reason": "Active bounded AI/serving contract; only alternatives profile view changes",
+      "heading": "7. Error classification and recovery",
+      "sha256": "ffb52e572de013d56dd45a0ba703fc8ed586c2eb905a31626f3d4fdf78fe06c8"
+    },
+    {
+      "path": "docs/04-llm-specification.md",
+      "use": "reference",
+      "reason": "Active bounded AI/serving contract; only alternatives profile view changes",
+      "heading": "8. Privacy and owner diagnostics",
+      "sha256": "e0b358fa0bf8cc8d895415f818a234086a6462741042a3260004cd6beaeb5f26"
+    },
+    {
+      "path": "docs/06-verification-plan.md",
+      "use": "reference",
+      "reason": "V-check meanings and lowest sufficient layers",
+      "heading": "2. Verification layers and check catalog",
+      "sha256": "872ebfa915a45a737d6bf4c3117b0cdb3f27798ca3aeb20916d74fe851c5c9a0"
+    },
+    {
+      "path": "docs/06-verification-plan.md",
+      "use": "reference",
+      "reason": "Real-user visible outcome, not API-only proof",
+      "heading": "4.5 Required user-visible transformation evidence",
+      "sha256": "ce23c50b379ef6f911251f40471924bbf422800ffdc6926fcda4deac2eaf22cc"
+    },
+    {
+      "path": "docs/verification/frontend.md",
+      "use": "reference",
+      "reason": "Real account/host fixture, browser lanes and exact 12-baseline set",
+      "heading": "4. Frontend, browser and manual verification",
+      "sha256": "8661f84e8608fdc3c23e2e1bfe7743d8d1ed449057b9000b0087b532f976bb5d"
+    },
+    {
+      "path": "docs/verification/backend.md",
+      "use": "reference",
+      "reason": "Real SQLite integrity and independent AI offline/transport tests",
+      "heading": "3. Deterministic backend and independent AI verification",
+      "sha256": "ffc775cd0a162053316b9b8c624868370de553543b7e59e30dc87e5a022eb172"
+    },
+    {
+      "path": "docs/verification/llm-evaluation.md",
+      "use": "reference",
+      "reason": "Required live development and finite authorized budgets",
+      "heading": "5.0 Evidence layers and live-development gate",
+      "sha256": "728b588f0a1916e803b5d05f393a2dc262739aee8840c07bd871753cef19774d"
+    },
+    {
+      "path": "docs/verification/llm-evaluation.md",
+      "use": "reference",
+      "reason": "Selected development/qualification corpus counts and evidence boundary",
+      "heading": "D-23 sentence-alternatives evidence extension",
+      "sha256": "2bcfad8e165aa9655c7f4b833fd9eb0ff19368c6f9a31d1bd01f61422ed729b3"
+    },
+    {
+      "path": "docs/verification/llm-evaluation.md",
+      "use": "reference",
+      "reason": "Quality reference review, calibration and qualification rules",
+      "heading": "5. LLM quality and candidate qualification (Q-005)",
+      "sha256": "eecd65c2ea97fc284ae56906e73f0927c6b4e047995e228bdb62adca206d9b93"
+    },
+    {
+      "path": "docs/verification/coverage.md",
+      "use": "reference",
+      "reason": "New selected scope/evidence pending, without inheriting old UI passes",
+      "heading": "8.1 Product and release coverage",
+      "sha256": "eeb376d14984d7e389735182b2fcce858daf5acf7f957c6da99217b0cf902ba0"
+    },
+    {
+      "path": "docs/verification/readiness.md",
+      "use": "reference",
+      "reason": "Required live and release constraints remain honest",
+      "heading": "9. Readiness and remaining dependencies",
+      "sha256": "773c794036bb210f44100b08dfe463ccc6fee9e626d6d6319d0b799de744d8c8"
+    },
+    {
+      "path": "frontend/src/shell/WorkspaceView.tsx",
+      "use": "reference",
+      "reason": "Inspected shared presentation boundary",
+      "sha256": "1ef84d551acba6bc920b33cd6da82338bf2e9becc6c6cfa32cf4cf7936ae150b"
+    },
+    {
+      "path": "frontend/src/shell/workspaceModel.ts",
+      "use": "reference",
+      "reason": "Existing full-text state/revision and readiness semantics",
+      "sha256": "d00675420ecfcc6a9c34d0f7e8349c934405967e357828b4baf9778489e5252e"
+    },
+    {
+      "path": "frontend/src/shell/workspaceStores.ts",
+      "use": "reference",
+      "reason": "Existing scheduler, status and shared usage to extend",
+      "sha256": "8b315bb129904cd7adfc1ac11aa7aeb3feff93f3bf284e79a7e641e9caf54150"
+    },
+    {
+      "path": "frontend/src/shell/App.tsx",
+      "use": "reference",
+      "reason": "Account/protected route and navigation shell",
+      "sha256": "6e9bc44669bb913baaba3d673a406897fff8e6600a1831f348ddef40fec010d3"
+    },
+    {
+      "path": "frontend/src/shell/workspaces.tsx",
+      "use": "reference",
+      "reason": "Single shared workspace teardown",
+      "sha256": "31eec8eada76b2b1a56c0428773211e2265031752773067a92565bd331818a29"
+    },
+    {
+      "path": "frontend/src/api/translation.ts",
+      "use": "reference",
+      "reason": "Current full-text transport mapping lacks resolved-language state",
+      "sha256": "1fdaad90e1c94cbae177f25ca7ccef04e25504c661f4db55e8da06b30547a7ba"
+    },
+    {
+      "path": "frontend/src/api/rewriting.ts",
+      "use": "reference",
+      "reason": "Existing generated client mapping and operation/status shape",
+      "sha256": "e5cf47e5f344b7d58b2634e235595752af8b1c47f11fd88c1eb9c32ddc2e0938"
+    },
+    {
+      "path": "backend/src/LinguaDesk.Api/Features/Operations/OperationsContract.cs",
+      "use": "reference",
+      "reason": "Exact current C# request/result/status source; no alternatives yet",
+      "sha256": "a53497f1224b1d47a8cbadc9f417b5e0c6a72590cdeae249246dfd29707ea02b"
+    },
+    {
+      "path": "backend/src/LinguaDesk.Api/Features/Operations/OperationFingerprint.cs",
+      "use": "reference",
+      "reason": "Preserve existing full-text fingerprint serialization",
+      "sha256": "4623f4405270234295471f4f297718c15ce78cf8b49e6798ee9e6428ea073129"
+    },
+    {
+      "path": "backend/src/LinguaDesk.Api/Features/Operations/OperationEntities.cs",
+      "use": "reference",
+      "reason": "Metadata-only durable schema and operation identity",
+      "sha256": "72f527cc0c6b85560bba1e9af7a691f9b95a2e7a68de59139ec43ae362bda2c1"
+    },
+    {
+      "path": "backend/src/LinguaDesk.Api/Features/Operations/OperationAdmissionService.cs",
+      "use": "reference",
+      "reason": "Admission/count/deadline validation to extend",
+      "sha256": "7a91aebf4e5857199830eefcd52e9bd949c037c959716348889fa92d3f9fd03e"
+    },
+    {
+      "path": "backend/src/LinguaDesk.Api/Features/Operations/RewritingOperationCoordinator.cs",
+      "use": "reference",
+      "reason": "Existing pipeline/settlement and ceiling integration",
+      "sha256": "7aa97e2c04e569bb7358feb467da07c97c4dfb312855924e9adb93a7baef9471"
+    },
+    {
+      "path": "backend/src/LinguaDesk.Api/Infrastructure/Persistence/Migrations/20260911024223_OperationAdmission.cs",
+      "use": "reference",
+      "reason": "Existing shared migration is immutable; add discriminator separately",
+      "sha256": "939c00ee5e7b4b8e441d461367bee615a7cef47ea73ed4399191dcea8669a272"
+    },
+    {
+      "path": "backend/src/LinguaDesk.Infrastructure.Ai/RewritingPipeline.cs",
+      "use": "reference",
+      "reason": "Production-like shared pipeline and eligibility/output boundaries",
+      "sha256": "6c31d61b43414244e5835667017edcaa995df5df573b9d27e0d0da944aa78020"
+    },
+    {
+      "path": "backend/src/LinguaDesk.Infrastructure.Ai/CandidateRegistry.cs",
+      "use": "reference",
+      "reason": "Existing bounded candidates; not contemporary tariff/capability qualification",
+      "sha256": "e8857555b72a9774003fa0940c4faaf87353048a29b8e806d3689b50a7fe33f5"
+    },
+    {
+      "path": "backend/src/LinguaDesk.Infrastructure.Ai/ChatCompletionsAdapter.cs",
+      "use": "reference",
+      "reason": "Serialization/token/cost/response bounds require alternatives maximum fixtures",
+      "sha256": "06ef77c27133f2b87a8efffbfde12940f4090b1eb45747f0d8566f1cd2c51b7d"
+    },
+    {
+      "path": "backend/src/LinguaDesk.Api/Infrastructure/Serving/ServingOptions.cs",
+      "use": "reference",
+      "reason": "Existing per-operation ceiling is not run authorization",
+      "sha256": "72344370650c0557a630a67e47385e094a774f28351da4b438a9a7e4551e636d"
+    },
+    {
+      "path": "backend/src/LinguaDesk.Core/ProductCatalog.cs",
+      "use": "reference",
+      "reason": "Preserve existing languages/mode IDs; add alternatives capability constants",
+      "sha256": "60de0c7227b53a871cba618f194bb6190d27e4916e5cb79f7c7bfe1f219d376c"
+    },
+    {
+      "path": "frontend/playwright.config.ts",
+      "use": "reference",
+      "reason": "Verified baseline opt-in and pinned browser configuration",
+      "sha256": "1c8e9f526a835c5ed39ae3e0899d3428b576bd0cb98d81c07506ae514a2a894c"
+    },
+    {
+      "path": "scripts/verify-milestone.sh",
+      "use": "reference",
+      "reason": "Actual standard regression gate",
+      "sha256": "7401b49f45b2f6c0f07d625130c2c23584de21bfb70357321ac49c7f913665c2"
+    },
+    {
+      "path": "scripts/contract.sh",
+      "use": "reference",
+      "reason": "Actual generate/check operations",
+      "sha256": "d514721c6a6beca458a884f9af172cda279fbaf36529dc1e1709e76dfb4471b9"
+    },
+    {
+      "path": "scripts/frontend.sh",
+      "use": "reference",
+      "reason": "Actual published isolated deterministic harness",
+      "sha256": "e5c7ead7f029621979ce0fa2317e086a1e4e324b70770f104816bc155d0cd437"
+    },
+    {
+      "path": "scripts/ai.sh",
+      "use": "reference",
+      "reason": "Actual evaluator commands; evaluate-alternatives must be implemented",
+      "sha256": "227db962c222b89eefea6e04b93561ffca304afd25b69fe75addce90f1f8ae33"
+    },
+    {
+      "path": "docs/05-api-design.md",
+      "heading": "2.2 M045 selected alternatives contract",
+      "use": "excerpt",
+      "reason": "Selected bounded contract, kind, association and resolved-language design needed by API/client tasks",
+      "sha256": "70fa2b866ceb4ea8c2aaf3b373fb2b40ba25768c848869ca09d379437c651572"
+    }
+  ],
+  "source_map_sha256": "5c849833bc7cb3a9bf245948238dac50ab5c95bade640348c3a40942199e87f3",
+  "baseline_commit": "c1455e77c01b275351403107826596f7ac334d73",
+  "locked_files": {
+    "docs/00-SDD-Planning-Workflow.md": "a601e8ddc461a407cb397e8d39829bb7d630128f9349aae2dd041ae601908c10",
+    "docs/00-workflow/execution.md": "106a00f4d7004fbf3fcbbd106502fd61a1be41e5db9fd99ee20c92d8688038a8",
+    "docs/08-backlogs/M045/spec.md": "f7f94a213617ae205eac195f89b3be035910ffca32b3000eb0f74742a22ab2c6",
+    "docs/08-backlogs/M045/plan.md": "720292899d16d281529fbc32a3c6d0e092f58da78056a7e6d19e40de39ff8798"
+  }
+}

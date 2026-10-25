@@ -4,7 +4,7 @@ Authoritative continuation of [06-verification-plan.md](../06-verification-plan.
 
 ## 9. Readiness and remaining dependencies
 
-Q-005 for full Translation/Rewriting is **specified at design level** by Sections 5–6. D-23 alternatives additionally require the corpus/context/budget design in the [evaluation extension](llm-evaluation.md#d-23-sentence-alternatives-evidence-extension) before qualification; new UI evidence is pending. Full corpus coverage, automated reference/review/adjudication and live measurements remain required; the bounded M035/M036 batch and M037 rehearsal do not qualify a whole family or a release gate. Current implementation/evidence is indexed in [delivery status](../delivery/current.md) and [coverage](coverage.md). Under D-22 all readiness checks permit unattended execution and AI semantic/evidence review; human reviewer/device availability is not a release dependency.
+Q-005 for full Translation/Rewriting is **specified at design level** by Sections 5–6. M045 specifies D-23 alternatives corpus/context design in the [evaluation extension](llm-evaluation.md#d-23-sentence-alternatives-evidence-extension); implementation, fixture freezing, authorized live evidence and new UI evidence remain pending. Full corpus coverage, automated reference/review/adjudication and live measurements remain required; the bounded M035/M036 batch and M037 rehearsal do not qualify a whole family or a release gate. Current implementation/evidence is indexed in [delivery status](../delivery/current.md) and [coverage](coverage.md). Under D-22 all readiness checks permit unattended execution and AI semantic/evidence review; human reviewer/device availability is not a release dependency.
 
 | Dependency | Required before claiming readiness |
 | --- | --- |

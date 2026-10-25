@@ -7,11 +7,11 @@ Mutable #7 status owner. Read for selection/dependency checks and closeout; do n
 
 ## Selected milestone
 
-None. The earlier UX implementation and narrow verification train (M044 → M039) is complete for its recorded D-21 scope.
+**[M045 — Screenshot-aligned Translator and Write workspace](../08-backlogs/M045/backlog.md).** State: Selected; planning complete, implementation not started. [Specification](../08-backlogs/M045/spec.md), [plan](../08-backlogs/M045/plan.md), [tasks/resume](../08-backlogs/M045/tasks.md).
 
-**D-23 design amendment — 2026-10-25:** the user requested authoritative-document updates from six desktop screenshots, explicitly excluded document upload and included sentence alternatives. Updated product/UX/API/AI/verification contracts now require the new collapsible shell, toolbar, review, alternatives and copy/swap behavior. Implementation has not been selected or performed by this documentation task; affected M044/M039 visual/control conclusions are historical, with unchanged processing/account evidence retaining narrower value.
+The user requested M045 planning after the D-23 documentation amendment. It selects the shell/toolbar/copy/swap/review/alternatives journey, including the required API/AI/accounting work. Earlier M044/M039 results remain historical D-21 evidence. Technical alternatives bounds/association/segmentation and corpus counts are now specified at their owners; C# contract generation and fixture/corpus implementation are early M045 tasks.
 
-**Next recommended work:** select bounded D-23 implementation packages with the unresolved alternatives wire/context/corpus prerequisites, or independently eligible operational/evaluation work as separately authorized. No package is selected by this documentation update. M036's 24-case batch and M037's rehearsal do not close G1 (NFR-001/RG-002) or G2 (NFR-002/RG-003). Full product/release evidence remains pending; completed packages retain historical scope/results.
+**Next work:** begin M045 T001 when implementation is authorized. Local work needs no paid credentials. Its required live-development evidence later needs recorded profile/credential access, finite whole-run budget and shared-cost scope; no new paid run is authorized or executed by planning. Missing live prerequisites block that AC and milestone Done, not independent local work. G1/G2 and product release remain pending; M036/M037 do not discharge them.
 
 **D-22 policy amendment — 2026-10-25:** required verification may run unattended; optional human/additional-platform observations remain unclaimed. M044/M039 used no paid provider runs and establish no product-wide release pass.
 
