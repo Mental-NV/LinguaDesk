@@ -30,6 +30,7 @@ export function toCapabilities(body: CapabilitiesBody): RewritingCapabilities {
   }
   return {
     maximumSourceCharacters: body.rewriting.maximumSourceCharacters,
+    overallDeadlineSeconds: body.rewriting.overallDeadlineSeconds,
     sourceDefault: body.sourceSelection.default,
     sourceValues: [...body.sourceSelection.values],
     languages,
@@ -110,6 +111,7 @@ export type SubmitRewritingResult =
   | {
       readonly kind: 'succeeded'
       readonly rewrittenText: string
+      readonly admissionDay: string
       readonly characterCount: number
       readonly usage: RewritingUsage
     }
@@ -179,6 +181,7 @@ export async function submitRewritingOperation(
       return {
         kind: 'succeeded',
         rewrittenText: body.rewrittenText,
+        admissionDay: body.admissionDay,
         characterCount: body.characterCount,
         usage: toUsage(body.usage),
       }

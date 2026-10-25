@@ -28,6 +28,7 @@ export function toCapabilities(body: CapabilitiesBody): TranslationCapabilities 
   }
   return {
     maximumSourceCharacters: body.translation.maximumSourceCharacters,
+    overallDeadlineSeconds: body.translation.overallDeadlineSeconds,
     sourceDefault: body.sourceSelection.default,
     sourceValues: [...body.sourceSelection.values],
     languages,
@@ -106,6 +107,7 @@ export type SubmitTranslationResult =
   | {
       readonly kind: 'succeeded'
       readonly translatedText: string
+      readonly admissionDay: string
       readonly characterCount: number
       readonly usage: TranslationUsage
     }
@@ -175,6 +177,7 @@ export async function submitTranslationOperation(
       return {
         kind: 'succeeded',
         translatedText: body.translatedText,
+        admissionDay: body.admissionDay,
         characterCount: body.characterCount,
         usage: toUsage(body.usage),
       }

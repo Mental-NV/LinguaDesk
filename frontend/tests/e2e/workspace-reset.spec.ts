@@ -8,7 +8,7 @@ import {
 import { verifiedAccountStorageState } from './translate-auth'
 
 /**
- * M032 published reset/teardown journey (AC-001-007): the predefined verified
+ * M044 published lifetime teardown regression: the predefined verified
  * E2E user ends the workspace safely through the published SPA, real cookie
  * auth, real API, migrated Smoke SQLite and durable accounting with the Smoke
  * deterministic provider adapter. Every case asserts its browser-visible
@@ -26,7 +26,7 @@ const SIGN_IN_PASSWORD = process.env.LINGUADESK_SMOKE_ACCOUNT_PASSWORD
 const VERIFIED_EMAIL = process.env.LINGUADESK_SMOKE_VERIFIED_EMAIL
 
 if (!SIGN_IN_PASSWORD || !VERIFIED_EMAIL) {
-  throw new Error('The published workspace-reset smoke account configuration is required.')
+  throw new Error('The published workspace-lifetime smoke account configuration is required.')
 }
 
 let authenticatedState: Awaited<ReturnType<typeof verifiedAccountStorageState>> | null = null
@@ -62,7 +62,7 @@ function trackOperations(page: Page): OperationPost[] {
 
 async function fillBothWorkspaces(page: Page): Promise<void> {
   await page.goto('/translate')
-  await expect(page.getByRole('heading', { name: 'Translation' })).toBeFocused()
+  await expect(page.getByRole('heading', { name: 'Translation', exact: true })).toBeFocused()
   await page.getByLabel('Source language').selectOption('en')
   await page.getByLabel('Target language').selectOption('ro')
   await page.getByLabel('Source text').fill(TOK_A)
@@ -72,7 +72,7 @@ async function fillBothWorkspaces(page: Page): Promise<void> {
   await page.getByLabel('Source text').fill(W_OK)
 
   await page.getByRole('link', { name: 'Translation' }).click()
-  await expect(page.getByRole('heading', { name: 'Translation' })).toBeFocused()
+  await expect(page.getByRole('heading', { name: 'Translation', exact: true })).toBeFocused()
   await expect(page.getByLabel('Source text')).toHaveValue(TOK_A)
 }
 
@@ -87,84 +87,6 @@ async function expectCleanClientState(page: Page, sentinel: string): Promise<voi
   expect(state.url).not.toContain(sentinel)
 }
 
-test('the login form signs in, then reset preserves on Escape and clears both workspaces on confirm', async ({
-  page,
-}) => {
-  const operations = trackOperations(page)
-  await page.goto('/login')
-  await expect(page.getByRole('heading', { name: 'Sign in' })).toBeFocused()
-  await page.getByLabel('Email').fill(VERIFIED_EMAIL)
-  await page.getByLabel('Password').fill(SIGN_IN_PASSWORD)
-  await page.getByRole('button', { name: 'Sign in' }).click()
-  await expect(page).toHaveURL(/\/translate$/)
-  await expect(page.getByRole('heading', { name: 'Translation' })).toBeFocused()
-
-  await page.getByLabel('Source language').selectOption('en')
-  await page.getByLabel('Target language').selectOption('ro')
-  await page.getByLabel('Source text').fill(TOK_A)
-  await page.getByRole('link', { name: 'Rewriting' }).click()
-  await expect(page.getByRole('heading', { name: 'Rewriting' })).toBeFocused()
-  await page.getByLabel('Source text').fill(W_OK)
-  await page.getByRole('link', { name: 'Translation' }).click()
-  await expect(page.getByLabel('Source text')).toHaveValue(TOK_A)
-
-  await page.getByRole('button', { name: 'Start new workspace' }).click()
-  const dialog = page.getByRole('dialog')
-  await expect(dialog).toBeVisible()
-  await expect(
-    dialog.getByRole('heading', { name: 'Start a new workspace?' }),
-  ).toBeVisible()
-  await expect(
-    dialog.getByText(
-      'Source text, results, and workspace settings in this tab will be cleared. This cannot be undone.',
-    ),
-  ).toBeVisible()
-  await expect(dialog.getByRole('button', { name: 'Cancel' })).toBeFocused()
-
-  await page.keyboard.press('Escape')
-  await expect(dialog).toHaveCount(0)
-  await expect(page.getByLabel('Source text')).toHaveValue(TOK_A)
-  await expect(page.getByRole('button', { name: 'Start new workspace' })).toBeFocused()
-
-  await page.getByRole('button', { name: 'Start new workspace' }).click()
-  await expect(page.getByRole('dialog')).toBeVisible()
-  await page
-    .getByRole('dialog')
-    .getByRole('button', { name: 'Start new workspace' })
-    .click()
-
-  await expect(page).toHaveURL(/\/translate$/)
-  await expect(page.getByLabel('Source text')).toHaveValue('')
-  await expect(page.getByLabel('Source text')).toBeFocused()
-  await expect(page.getByLabel('Source language')).toHaveValue('auto')
-  await expect(page.getByLabel('Target language')).toHaveValue('')
-  expect(operations).toHaveLength(0)
-
-  await page.getByRole('link', { name: 'Rewriting' }).click()
-  await expect(page.getByRole('heading', { name: 'Rewriting' })).toBeFocused()
-  await expect(page.getByLabel('Source text')).toHaveValue('')
-  await expect(page.getByLabel('Writing mode')).toHaveValue('correctionOnly')
-  expect(operations).toHaveLength(0)
-})
-
-test('empty workspaces reset immediately with no dialog', async ({ browser }) => {
-  const { context, page } = await verifiedWorkspace(browser)
-  try {
-    const operations = trackOperations(page)
-    await page.goto('/translate')
-    await expect(page.getByRole('heading', { name: 'Translation' })).toBeFocused()
-
-    await page.getByRole('button', { name: 'Start new workspace' }).click()
-    await expect(page.getByRole('dialog')).toHaveCount(0)
-    await expect(page).toHaveURL(/\/translate$/)
-    await expect(page.getByLabel('Source text')).toHaveValue('')
-    await expect(page.getByLabel('Source text')).toBeFocused()
-    expect(operations).toHaveLength(0)
-  } finally {
-    await context.close()
-  }
-})
-
 test('reload, full-document navigation and restoration clear private text', async ({
   browser,
 }) => {
@@ -175,30 +97,30 @@ test('reload, full-document navigation and restoration clear private text', asyn
     await expectCleanClientState(page, TOK_A.slice(0, 12))
 
     await page.reload()
-    await expect(page.getByRole('heading', { name: 'Translation' })).toBeFocused()
+    await expect(page.getByRole('heading', { name: 'Translation', exact: true })).toBeFocused()
     await expect(page.getByLabel('Source text')).toHaveValue('')
     await expect(page.getByLabel('Source language')).toHaveValue('auto')
     await expect(page.getByLabel('Target language')).toHaveValue('')
-    await expect(page.getByLabel('Result')).toHaveCount(0)
+    await expect(page.getByRole('textbox', { name: /Translation result|Improved result/ })).toHaveValue('')
     await expectCleanClientState(page, TOK_A.slice(0, 12))
 
     await fillBothWorkspaces(page)
     await page.goto('/rewrite')
     await expect(page.getByRole('heading', { name: 'Rewriting' })).toBeFocused()
     await expect(page.getByLabel('Source text')).toHaveValue('')
-    await expect(page.getByLabel('Result')).toHaveCount(0)
+    await expect(page.getByRole('textbox', { name: /Translation result|Improved result/ })).toHaveValue('')
 
     await page.goBack()
-    await expect(page.getByRole('heading', { name: 'Translation' })).toBeFocused()
+    await expect(page.getByRole('heading', { name: 'Translation', exact: true })).toBeFocused()
     await expect(page.getByLabel('Source text')).toHaveValue('')
-    await expect(page.getByLabel('Result')).toHaveCount(0)
+    await expect(page.getByRole('textbox', { name: /Translation result|Improved result/ })).toHaveValue('')
     await expectCleanClientState(page, TOK_A.slice(0, 12))
 
     const secondTab = await context.newPage()
     try {
       await secondTab.goto('/translate')
       await expect(
-        secondTab.getByRole('heading', { name: 'Translation' }),
+        secondTab.getByRole('heading', { name: 'Translation', exact: true }),
       ).toBeFocused()
       await expect(secondTab.getByLabel('Source text')).toHaveValue('')
     } finally {
@@ -239,7 +161,7 @@ test('an expired session shows MSG-037 with a clean workspace', async ({ browser
   try {
     const operations = trackOperations(page)
     await page.goto('/translate')
-    await expect(page.getByRole('heading', { name: 'Translation' })).toBeFocused()
+    await expect(page.getByRole('heading', { name: 'Translation', exact: true })).toBeFocused()
     await page.getByLabel('Source text').fill(TOK_A)
 
     await context.clearCookies()
@@ -270,7 +192,7 @@ test('both pages state the workspace lifetime with no client-side text residue',
     const footer =
       'Text and settings are cleared when this workspace ends, including refresh, sign-out, or session expiry.'
     await page.goto('/translate')
-    await expect(page.getByRole('heading', { name: 'Translation' })).toBeFocused()
+    await expect(page.getByRole('heading', { name: 'Translation', exact: true })).toBeFocused()
     await page.getByLabel('Source text').fill(`${TOK_A} ${SENTINEL}`)
     await expect(page.getByText(footer)).toBeVisible()
     await expectCleanClientState(page, SENTINEL)

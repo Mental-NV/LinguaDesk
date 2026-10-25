@@ -2,15 +2,16 @@
 
 Mutable #7 status owner. Read for selection/dependency checks and closeout; do not include in the stable execution prefix.
 
-**Most recently completed milestone: [M038 — Desktop Translation/Rewriting verification](../08-backlogs/M038/backlog.md).** State: **Done under its recorded 2026-09-16 scope/sign-off**. The [final completion record](../08-backlogs/M038/tasks.md#completion-record-final--t005-sign-off-2026-09-16-utc) records automated desktop checks, baselines and the accepted manual subset/gaps. D-21 subsequently superseded its button/removed-control/screenshot-dependent UI evidence; no current UI or release pass is inferred.
+**Most recently completed milestone: [M039 — Narrow-screen core journey group](../08-backlogs/M039/backlog.md).** State: Done. M044 implemented the current layout/pause-processing contract; M039 adds the dedicated narrow journeys and fixes the discovered safe-return/contrast defects. Final verification: 221 frontend tests, 80 published Chromium cases with seven unchanged reviewed baselines, and 616 backend regressions; [tasks/evidence](../08-backlogs/M039/tasks.md#completion--2026-10-25-1002-utc).
+
 
 ## Selected milestone
 
-None. M035 completed under its recorded owner waiver; M036's dated T001–T005 completion entries and M037/M038 completion records establish their historical scoped results. Older pending prose in those packages remains historical and is superseded for selection by the later dated completion entries; their records and locks are preserved.
+None. The user-authorized current UX implementation and narrow verification train (M044 → M039) is complete.
 
-**Next recommended work:** select a new stable successor for the unimplemented/unverified D-21 current UI contract (one-second pause processing and removed controls), then the eligible M039 narrow-viewport work. Continue full-corpus quality qualification and live API measurements through bounded successors to M035–M037 as dependencies and standing budgets permit. M036's 24-case batch and M037's rehearsal do not close G1 (NFR-001/RG-002) or G2 (NFR-002/RG-003). Do not reselect completed M035/M036/M037 solely because the previous delivery train was stale.
+**Next recommended work:** select the next eligible operational increment (M040) or bounded full-corpus/live-measurement successor as separately authorized and configured. M036's 24-case batch and M037's rehearsal do not close G1 (NFR-001/RG-002) or G2 (NFR-002/RG-003). Full product/release evidence remains pending; completed packages retain historical scope/results.
 
-**D-22 policy amendment — 2026-10-25:** required verification and review may run unattended, including AI reference/quality/visual review and release eligibility. Human sign-off and additional-browser/version/device/AT observations are optional and nonblocking. AI may advance within an authorized roadmap train and invoke live runs within configured standing budgets. This documentation change executes no application suites or paid runs and marks no release gate passed. Future packages follow current owners; completed packages retain historical scope/results and are not re-locked. Runtime tooling may require successor work before all review steps are unattended.
+**D-22 policy amendment — 2026-10-25:** required verification may run unattended; optional human/additional-platform observations remain unclaimed. M044/M039 used no paid provider runs and establish no product-wide release pass.
 
 M019 completed the independent-track enabler for the explicit live provider path required by M015–M018. The bounded access check reached `DeepSeek-V4.1-Flash` with one dispatch through the configured shared credential and returned `deepseek-flash` with known usage and no unresolved reservation; no credential value entered diagnostics or evidence. The same actual key may serve every LinguaDesk operation routed to DeepSeek. Quality, performance, context-limit and production-serving qualification remain unverified; D-19's route-specific providers and longer fallback chains remain later DF-004 work.
 
@@ -56,6 +57,8 @@ M019 completed the independent-track enabler for the explicit live provider path
 | M037 | Done | [Backlog](../08-backlogs/M037/backlog.md), [spec](../08-backlogs/M037/spec.md), [tasks/evidence](../08-backlogs/M037/tasks.md#completion-record) |
 | M035 | Done under historical owner waiver | [Backlog](../08-backlogs/M035/backlog.md), [spec](../08-backlogs/M035/spec.md), [tasks/evidence](../08-backlogs/M035/tasks.md) |
 | M036 | Done (bounded batch only) | [Backlog](../08-backlogs/M036/backlog.md), [spec](../08-backlogs/M036/spec.md), [dated task completion entries](../08-backlogs/M036/tasks.md#ordered-tasks) |
+| M039 | Done (bounded current Chromium narrow group) | [Backlog](../08-backlogs/M039/backlog.md), [spec](../08-backlogs/M039/spec.md), [tasks/evidence](../08-backlogs/M039/tasks.md#completion--2026-10-25-1002-utc) |
+| M044 | Done (current D-21 workspace and desktop/responsive regression) | [Backlog](../08-backlogs/M044/backlog.md), [spec](../08-backlogs/M044/spec.md), [tasks/evidence](../08-backlogs/M044/tasks.md#completion--2026-10-25-0950-utc) |
 | M038 | Done (historical UI contract; D-21-affected evidence superseded) | [Backlog](../08-backlogs/M038/backlog.md), [spec](../08-backlogs/M038/spec.md), [final evidence](../08-backlogs/M038/tasks.md#completion-record-final--t005-sign-off-2026-09-16-utc) |
 
-M001–M038 and M043 have completed scoped records (M035 under its historical waiver). M039–M042 remain Candidate with no selected package. New D-21 successors and remaining full-corpus/live-measurement work require fresh selection; full product and release evidence remains pending in #6 coverage.
+M001–M039, M043 and M044 have completed scoped records (M035 under its historical waiver). M040–M042 remain Candidate with no selected package. M044 closes its selected current UI scope; remaining full-corpus/live-measurement work requires fresh selection; full product and release evidence remains pending in #6 coverage.

@@ -82,14 +82,21 @@ public sealed class DeterministicSmokeTranslationClient : IChatClient
     {
     }
 
-    public Task<ChatResponse> GetResponseAsync(
+    public async Task<ChatResponse> GetResponseAsync(
         IEnumerable<ChatMessage> messages,
         ChatOptions? options = null,
         CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
         var userText = messages.LastOrDefault()?.Text ?? string.Empty;
-        return Task.FromResult(new ChatResponse(new ChatMessage(ChatRole.Assistant, Respond(userText))));
+        if (userText.Contains("M039-DELAY", StringComparison.Ordinal))
+        {
+            // A bounded external-adapter fixture lets published browser tests
+            // interrupt real admitted work without intercepting application APIs.
+            await Task.Delay(TimeSpan.FromMilliseconds(750), cancellationToken);
+        }
+
+        return new ChatResponse(new ChatMessage(ChatRole.Assistant, Respond(userText)));
     }
 
     public IAsyncEnumerable<ChatResponseUpdate> GetStreamingResponseAsync(

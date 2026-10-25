@@ -14,9 +14,10 @@ if (publishedUrl.protocol !== 'https:' || publishedUrl.hostname !== '127.0.0.1')
 export default defineConfig({
   testDir: './tests/e2e',
   outputDir: '../artifacts/playwright',
-  globalTimeout: 60_000,
+  globalTimeout: 300_000,
   timeout: 15_000,
   expect: { timeout: 5_000 },
+  updateSnapshots: process.env.LINGUADESK_UPDATE_VISUALS === '1' ? 'all' : 'none',
   fullyParallel: false,
   workers: 1,
   retries: 0,

@@ -19,7 +19,7 @@ Scenarios are layer-independent behavioral contracts. [Verification plan Section
 | UX-AC-003 | MVP | Reload retains the route/auth as applicable but clears source/result/settings to current defaults; storage contains no text. |
 | UX-AC-004 | Amended | Let paused Translation A dispatch, navigate to Rewrite, resolve A: only matching Translation state/accounting changes; visible focus is untouched. |
 | UX-AC-005 | Amended | Let paused A dispatch, edit its source/settings through navigation, resolve A: it never replaces newer input/result; successful accounting reconciles once. |
-| UX-AC-006 | MVP | Valid local registration submits once, enters unverified verification page and never opens a protected workspace before verification. |
+| UX-AC-006 | Amended | Valid local registration submits once, replaces the form with MSG-034 and explicit Go to sign in, retains no credentials, and never signs in or starts processing; DF-008 temporarily creates verified accounts. |
 | UX-AC-007 | MVP | Missing/invalid email or mismatched registration passwords sends no request, shows linked errors and focuses first invalid field. |
 | UX-AC-008 | MVP | Unverified protected navigation redirects to verification; no editor or transformation request. |
 | UX-AC-009 | MVP | Resend submits once, reports success, disables for server cooldown, then reenables without language work. |
@@ -113,7 +113,7 @@ Scenarios are layer-independent behavioral contracts. [Verification plan Section
 | UX-AC-097 | Deferred | DF-001 alternative loading/cache reuse across panel close/reopen. |
 | UX-AC-098 | Deferred | DF-001 alternative selection versus pending response race; later design must respect whole-metadata invalidation, not targeted preservation. |
 | UX-AC-099 | Deferred | DF-001/DF-002 outdated assistance/comparison behavior. |
-| UX-AC-100 | Amended | Native result edit/undo/select-all/delete preserves source, creates no request, and disables Copy when empty; sentence metadata/undo restoration is not implemented. |
+| UX-AC-100 | Amended | Native result edit/undo/select-all/delete preserves source, creates no request, and keeps native copy behavior; sentence metadata/undo restoration is not implemented. |
 | UX-AC-101 | MVP | Local form reveal/selection, missing/mismatched/policy validation, duplicate Enter guard, rejection, password clearing and first-error focus follow Section 9. |
 | UX-AC-102 | MVP | Email/auth network failures show the proper current error without false success; explicit retry sends one account request and no language operation. |
 | UX-AC-103 | MVP | Navigate to Forgot password while local login is pending: old completion cannot redirect/replace newer route, and passwords are not retained. |

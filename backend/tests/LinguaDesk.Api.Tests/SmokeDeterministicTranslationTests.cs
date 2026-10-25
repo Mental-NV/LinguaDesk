@@ -83,6 +83,18 @@ public sealed class SmokeDeterministicTranslationTests
     }
 
     [TestMethod]
+    public async Task InterruptedBrowserFixtureDelayHonorsCancellation()
+    {
+        using var stop = new CancellationTokenSource();
+        var pending = DeterministicSmokeTranslationClient.Instance.GetResponseAsync(
+            [UserPrompt("""{"source":"M039-DELAY fixture","sourceHint":null}""")],
+            cancellationToken: stop.Token);
+        Assert.IsFalse(pending.IsCompleted);
+        stop.Cancel();
+        await Assert.ThrowsExactlyAsync<TaskCanceledException>(() => pending);
+    }
+
+    [TestMethod]
     public void RegistrationKeepsUnavailableProviderOutsideSmoke()
     {
         var services = new ServiceCollection();

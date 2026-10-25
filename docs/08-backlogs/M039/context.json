@@ -1,0 +1,147 @@
+{
+  "version": 1,
+  "scope": "M039",
+  "sources": [
+    {
+      "path": "docs/07-roadmap.md",
+      "reason": "Selected bounded narrow outcome",
+      "use": "excerpt",
+      "ids": [
+        "M039"
+      ],
+      "sha256": "2fe0520cd84db9f352eb4a1d04c048cd9fdd0e6cf1b8a0d631e2c7335aa1fc73"
+    },
+    {
+      "path": "docs/08-backlogs/M044/tasks.md",
+      "reason": "Current implementation and regression dependency evidence",
+      "use": "reference",
+      "heading": "Completion record",
+      "sha256": "6c10d95350c8f11b0424aa7c32b6f9913d3d564c50f49135a8c5f311ae2cbd1e"
+    },
+    {
+      "path": "docs/08-backlogs/M044/visual-review.md",
+      "reason": "Reviewed seven images and pinned environment",
+      "use": "reference",
+      "sha256": "5d4753ff7615b54381ddbd9060cad4b03db6a678c705036198abfc34744c9741"
+    },
+    {
+      "path": "docs/01-PRD.md",
+      "reason": "Current unattended responsive requirements",
+      "use": "excerpt",
+      "ids": [
+        "NFR-005",
+        "NFR-007",
+        "D-21",
+        "D-22"
+      ],
+      "sha256": "84a529b0e67df51e7f41e6faaf77a21af1ba1bb862b71353489a026305f10a96"
+    },
+    {
+      "path": "docs/02-ux-specification.md",
+      "reason": "Selected native narrow journey/reflow contract",
+      "use": "excerpt",
+      "heading": "3. Information architecture and workspace lifecycle",
+      "sha256": "fdd9b10080748e93f0e494a017930cefb04058c7e3986a7ed62da313c69e7ce5"
+    },
+    {
+      "path": "docs/02-ux-specification.md",
+      "reason": "Selected native narrow journey/reflow contract",
+      "use": "excerpt",
+      "heading": "4. Visual system and responsive layout",
+      "sha256": "1d61349b357f7480dda399cd17613042d9946abce6a879fdba6b3e1da66af497"
+    },
+    {
+      "path": "docs/02-ux-specification.md",
+      "reason": "Selected native narrow journey/reflow contract",
+      "use": "excerpt",
+      "heading": "5. Components and processing behavior",
+      "sha256": "0f5d757876e443dd214eb1bf1adc8e2eba331fa61117cdec5140543ec8547517"
+    },
+    {
+      "path": "docs/02-ux-specification.md",
+      "reason": "Selected native narrow journey/reflow contract",
+      "use": "excerpt",
+      "heading": "7. Translation contract",
+      "sha256": "fd84fea894ad0e54afeb6832bf0171c55e46963bdc6c2f3e1460c633e68f780f"
+    },
+    {
+      "path": "docs/02-ux-specification.md",
+      "reason": "Selected native narrow journey/reflow contract",
+      "use": "excerpt",
+      "heading": "8. Rewriting contract",
+      "sha256": "ecd9819346bd90e8ee915b86de7b3f628a55e92168d370d23e38c518ee7f27e6"
+    },
+    {
+      "path": "docs/02-ux-specification.md",
+      "reason": "Selected native narrow journey/reflow contract",
+      "use": "excerpt",
+      "heading": "9. Local-account and availability flows",
+      "sha256": "75bc13af24f83679cb8a97eaef3879e61db9b4eac8e22d80029555c101cb611b"
+    },
+    {
+      "path": "docs/02-ux-specification.md",
+      "reason": "Selected native narrow journey/reflow contract",
+      "use": "excerpt",
+      "heading": "10. Accessibility and browser coverage",
+      "sha256": "283a8f1551e49045ce802d8f5f4de0ad30c6a1e65bc20e2dae098cd4d718530a"
+    },
+    {
+      "path": "docs/ux/processing.md",
+      "reason": "Exact current alerts and pause contract",
+      "use": "excerpt",
+      "heading": "6. Processing state and message contract",
+      "sha256": "f45b51e069f4adf87e1990cbab455b5cd3fd09ccac4960ce943d658572cddcd4"
+    },
+    {
+      "path": "docs/verification/frontend.md",
+      "reason": "Required published account/fixture/browser/visual rules",
+      "use": "excerpt",
+      "heading": "4. Frontend, browser and manual verification",
+      "sha256": "aefadc06b7a63a9bd47d5961f8fb01fa7a1e114a93c376753b53f36ad10b11b2"
+    },
+    {
+      "path": "docs/06-verification-plan.md",
+      "reason": "Meaning of selected V-groups",
+      "use": "excerpt",
+      "heading": "2.2 Stable check groups",
+      "sha256": "0d6ddf1f9fd22f2909b15d728ff97f1973db5719dafc40e2cb2a87e80f39dbc9"
+    },
+    {
+      "path": "docs/ux/acceptance.md",
+      "reason": "Stable selected scenario definitions",
+      "use": "excerpt",
+      "ids": [
+        "UX-AC-006",
+        "UX-AC-007",
+        "UX-AC-013",
+        "UX-AC-015",
+        "UX-AC-033",
+        "UX-AC-036",
+        "UX-AC-039",
+        "UX-AC-044",
+        "UX-AC-051",
+        "UX-AC-077",
+        "UX-AC-081",
+        "UX-AC-083",
+        "UX-AC-095",
+        "UX-AC-101"
+      ],
+      "sha256": "79ee3808347b9c746b68b5ffc71e677b10dc7cbda97bb4f7ac04b54da4de43db"
+    },
+    {
+      "path": "docs/verification/backend.md",
+      "heading": "3.1 Database, HTTP and published-host harness",
+      "use": "excerpt",
+      "reason": "Reviewed Smoke-only external-adapter extension rules for real network interruption without API interception",
+      "sha256": "c493bc0519d9271615893303f036c333d6c38d279a75c1b2863778d944c4e794"
+    }
+  ],
+  "source_map_sha256": "6a5465d6e594f94243129812d59c8724d44309b80ce04e65d613ff9a073d448f",
+  "baseline_commit": "deb0da78243fc482d936f149512fb24ea75a8556",
+  "locked_files": {
+    "docs/00-SDD-Planning-Workflow.md": "a601e8ddc461a407cb397e8d39829bb7d630128f9349aae2dd041ae601908c10",
+    "docs/00-workflow/execution.md": "106a00f4d7004fbf3fcbbd106502fd61a1be41e5db9fd99ee20c92d8688038a8",
+    "docs/08-backlogs/M039/spec.md": "579dc8ec9f424027b46a4004361438969710ec97e308307527957fcb5d65e28f",
+    "docs/08-backlogs/M039/plan.md": "99635cf6b5c12e52932053cb4e35925a4ea2ba59e1794a05c3947d96587eae05"
+  }
+}

@@ -1,0 +1,44 @@
+[
+  {
+    "family": "Noto Sans",
+    "weight": "400",
+    "file": "noto-sans-400.ttf",
+    "sha256": "8c6f73cfe8ec0440bc625830b0bd0f0b985332bace36f71636e609a63a6da18a",
+    "source": "https://fonts.gstatic.com/l/font?kit=o-0mIpQlx3QUlC5A4PNB6Ryti20_6n1iPHjcz6L1SoM-jCpoiyD9A99d-6Tw7UJ77ZeL0Ly9RTxIxKnGNIGXwq2z30tKXrdlq5Xx7fWBjJJjZPIhgIfCgUDVcUoB8lZnkwbmxFP1rtd7bptBQNSEskW4kOtUzGVifmXsuV7nUuQrSnfwwiPNc1Rx59WBzc2MJEIFAbXneFq35VnN3reHcEpt-QuNljzyE6LOO_bZoWNJzxjloklryzUxSkRXwJK5YYXPHZHCDSP4IX7KIAnOaRte2qbcxql2TVPAJO_ntT0erMWyd_lTsB7T2WLufn8gXo4rI_YOQTwdvq0dMov0JziQ8nGXDrlp7YWIwXw9_ykqGkc0G-OTOUjGv8seQqCaWh9KavoYWS29EXy9J3fWn4UnehV6gIzW8y0noiZHiGYYaI9kXmcsB9_k3fRTWr0QB7ZPU4TinFMgUeMSUYIssLM7KsSJcFyTAGm84WqgcMwis4OMuNqw-WV7b7_I1dEgyba1NqUBedfDFxlR0WFslR_k_p7WqEjWG1IRh0-QlPk&skey=2b960fe17823056f&v=v42"
+  },
+  {
+    "family": "Noto Sans",
+    "weight": "600",
+    "file": "noto-sans-600.ttf",
+    "sha256": "c7bce5ac897d61bf9e0a4c74c8b0c9d1920279a9f0a80a9dd05453f030a68043",
+    "source": "https://fonts.gstatic.com/l/font?kit=o-0mIpQlx3QUlC5A4PNB6Ryti20_6n1iPHjcz6L1SoM-jCpoiyAjBN9d-6Tw7UJ77ZeL0Ly9RTxIxKnGNIGXwq2z30tKXrdlq5Xx7fWBjJJjZPIhgIfCgUDVcUoB8lZnkwbmxFP1rtd7bptBQNSEskW4kOtUzGVifmXsuV7nUuQrSnfwwiPNc1Rx59WBzc2MJEIFAbXneFq35VnN3reHcEpt-QuNljzyE6LOO_bZoWNJzxjloklryzUxSkRXwJK5YYXPHZHCDSP4IX7KIAnOaRte2qbcxql2TVPAJO_ntT0erMWyd_lTsB7T2WLufn8gXo4rI_YOQTwdvq0dMov0JziQ8nGXDrlp7YWIwXw9_ykqGkc0G-OTOUjGv8seQqCaWh9KavoYWS29EXy9J3fWn4UnehV6gIzW8y0noiZHiGYYaI9kXmcsB9_k3fRTWr0QB7ZPU4TinFMgUeMSUYIssLM7KsSJcFyTAGm84WqgcMwis4OMuNqw-WV7b7_I1dEgyba1NqUBedfDFxlR0WFslR_k_p7WqEjWG1IRh0-QlPk&skey=2b960fe17823056f&v=v42"
+  },
+  {
+    "family": "Noto Sans",
+    "weight": "700",
+    "file": "noto-sans-700.ttf",
+    "sha256": "dbefdef7e75103cf827c38bd164bd874da546f7be4514cf6d3578aff7332a6c4",
+    "source": "https://fonts.gstatic.com/l/font?kit=o-0mIpQlx3QUlC5A4PNB6Ryti20_6n1iPHjcz6L1SoM-jCpoiyAaBN9d-6Tw7UJ77ZeL0Ly9RTxIxKnGNIGXwq2z30tKXrdlq5Xx7fWBjJJjZPIhgIfCgUDVcUoB8lZnkwbmxFP1rtd7bptBQNSEskW4kOtUzGVifmXsuV7nUuQrSnfwwiPNc1Rx59WBzc2MJEIFAbXneFq35VnN3reHcEpt-QuNljzyE6LOO_bZoWNJzxjloklryzUxSkRXwJK5YYXPHZHCDSP4IX7KIAnOaRte2qbcxql2TVPAJO_ntT0erMWyd_lTsB7T2WLufn8gXo4rI_YOQTwdvq0dMov0JziQ8nGXDrlp7YWIwXw9_ykqGkc0G-OTOUjGv8seQqCaWh9KavoYWS29EXy9J3fWn4UnehV6gIzW8y0noiZHiGYYaI9kXmcsB9_k3fRTWr0QB7ZPU4TinFMgUeMSUYIssLM7KsSJcFyTAGm84WqgcMwis4OMuNqw-WV7b7_I1dEgyba1NqUBedfDFxlR0WFslR_k_p7WqEjWG1IRh0-QlPk&skey=2b960fe17823056f&v=v42"
+  },
+  {
+    "family": "Noto Sans SC",
+    "weight": "400",
+    "file": "noto-sans-sc-400.ttf",
+    "sha256": "2b25c0f0deff7c060782cddc1abb474962c752c070cc9dd6915f7ebe6c03c654",
+    "source": "https://fonts.gstatic.com/l/font?kit=k3kCo84MPvpLmixcA63oeAL7Iqp5IZJF9bmaG9_FnYxVm_bz3VJq1BJKCGLDfu99DUE6im0C5FsnOZCxYKJ750lvvVJemN5t8hqbpmzMYmJPqbkvzKTKiuBACIkYPkeZ4dQSW2vmhrQ-XDilbWCdoTRXd4UBVt_2QGv9my6xh848sT-yoy1dBdOXxSsnuWalfzxTol6yFn7nFJ2Jui2UBGX07_hm9_VJ4po48C7g-s_dmOlAWVmqV241kaAasofYGY3euzYWPJKCc57jshzB1gOV2C63jcutpqE5BJvsvQdtv9DqQqrpsy9GQQj5WUQXDNt8tOTtCAA1nf4pjbY6ywyemki8TfomsFlj02CFfsT_738jVIeA1a92PdCY1ZubG3-Bj2f-UAeuYXYkrU0oH-YUody9TG7c9jbdSgkVqQKkPL86nkqTO6f5EcHWhWImYyi96KdxGjsLYAqSw-poJvP9i5vJL8iOlP-jv4pww6y-d65EQ3incz0UNS5Wr7BSYx5-uOpu_D7sx9tl2eTnHb36rcwL_Q&skey=cf0bb10b5602fdc3&v=v41"
+  },
+  {
+    "family": "Noto Sans SC",
+    "weight": "600",
+    "file": "noto-sans-sc-600.ttf",
+    "sha256": "95c2a45463a383f106b613a6d7b2d26b02995d03b2796fc2ad9c04b60fa5652c",
+    "source": "https://fonts.gstatic.com/l/font?kit=k3kCo84MPvpLmixcA63oeAL7Iqp5IZJF9bmaGwHCnYxVm_bz3VJq1BJKCGLDfu99DUE6im0C5FsnOZCxYKJ750lvvVJemN5t8hqbpmzMYmJPqbkvzKTKiuBACIkYPkeZ4dQSW2vmhrQ-XDilbWCdoTRXd4UBVt_2QGv9my6xh848sT-yoy1dBdOXxSsnuWalfzxTol6yFn7nFJ2Jui2UBGX07_hm9_VJ4po48C7g-s_dmOlAWVmqV241kaAasofYGY3euzYWPJKCc57jshzB1gOV2C63jcutpqE5BJvsvQdtv9DqQqrpsy9GQQj5WUQXDNt8tOTtCAA1nf4pjbY6ywyemki8TfomsFlj02CFfsT_738jVIeA1a92PdCY1ZubG3-Bj2f-UAeuYXYkrU0oH-YUody9TG7c9jbdSgkVqQKkPL86nkqTO6f5EcHWhWImYyi96KdxGjsLYAqSw-poJvP9i5vJL8iOlP-jv4pww6y-d65EQ3incz0UNS5Wr7BSYx5-uOpu_D7sx9tl2eTnHb36rcwL_Q&skey=cf0bb10b5602fdc3&v=v41"
+  },
+  {
+    "family": "Noto Sans SC",
+    "weight": "700",
+    "file": "noto-sans-sc-700.ttf",
+    "sha256": "66597b400f104a3ed3e104e5bf117b8f2e27081068a46746461a8335b9a13c15",
+    "source": "https://fonts.gstatic.com/l/font?kit=k3kCo84MPvpLmixcA63oeAL7Iqp5IZJF9bmaGzjCnYxVm_bz3VJq1BJKCGLDfu99DUE6im0C5FsnOZCxYKJ750lvvVJemN5t8hqbpmzMYmJPqbkvzKTKiuBACIkYPkeZ4dQSW2vmhrQ-XDilbWCdoTRXd4UBVt_2QGv9my6xh848sT-yoy1dBdOXxSsnuWalfzxTol6yFn7nFJ2Jui2UBGX07_hm9_VJ4po48C7g-s_dmOlAWVmqV241kaAasofYGY3euzYWPJKCc57jshzB1gOV2C63jcutpqE5BJvsvQdtv9DqQqrpsy9GQQj5WUQXDNt8tOTtCAA1nf4pjbY6ywyemki8TfomsFlj02CFfsT_738jVIeA1a92PdCY1ZubG3-Bj2f-UAeuYXYkrU0oH-YUody9TG7c9jbdSgkVqQKkPL86nkqTO6f5EcHWhWImYyi96KdxGjsLYAqSw-poJvP9i5vJL8iOlP-jv4pww6y-d65EQ3incz0UNS5Wr7BSYx5-uOpu_D7sx9tl2eTnHb36rcwL_Q&skey=cf0bb10b5602fdc3&v=v41"
+  }
+]

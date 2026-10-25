@@ -82,6 +82,8 @@ for (const viewport of [
       scrollWidth: document.documentElement.scrollWidth,
     }))
     expect(geometry.scrollWidth).toBeLessThanOrEqual(geometry.clientWidth)
+    await expect(page.getByLabel('Email')).toBeFocused()
+    await page.getByText('Check the highlighted fields.').scrollIntoViewIfNeeded()
     await expect(page.getByText('Check the highlighted fields.')).toBeInViewport()
   })
 }

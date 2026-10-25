@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
-import { Link, Navigate, Route, Routes, useLocation } from 'react-router-dom'
+import { Link, NavLink, Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import {
   getAccountAntiforgeryToken,
   getLocalAccountSession,
@@ -20,19 +20,20 @@ import { isProtectedPath, resolveSafeReturn } from '../auth/safeReturn'
 type PageProps = {
   children: ReactNode
   heading: string
+  workspace?: boolean
 }
 
-function Page({ children, heading }: PageProps) {
+function Page({ children, heading, workspace = false }: PageProps) {
   const location = useLocation()
   const headingRef = useRef<HTMLHeadingElement>(null)
 
   useEffect(() => {
     headingRef.current?.focus()
-  }, [location.key, location.pathname])
+  }, [location.key, location.pathname, heading])
 
   return (
-    <main id="main-content" className="page-content" tabIndex={-1}>
-      <div className="page-card">
+    <main id="main-content" className={workspace ? "workspace-frame" : "page-content"} tabIndex={-1}>
+      <div className={workspace ? "workspace-content" : "page-card"}>
         <h1 ref={headingRef} tabIndex={-1}>{heading}</h1>
         {children}
       </div>
@@ -123,6 +124,8 @@ function Shell() {
 
   const mountedRef = useRef(true)
   const signOutFlightRef = useRef(0)
+  const authEpoch = useRef(0)
+  const checkedSessionRoute = useRef<string | null>(initialProtected ? location.pathname : null)
   const storesRef = useRef(stores)
   useEffect(() => {
     storesRef.current = stores
@@ -138,6 +141,8 @@ function Shell() {
   useEffect(() => {
     if (!initialProtected) return
     let cancelled = false
+    const epoch = authEpoch.current
+    const destination = checkedSessionRoute.current ?? '/translate'
     void (async () => {
       let result: Awaited<ReturnType<typeof getLocalAccountSession>>
       try {
@@ -145,7 +150,7 @@ function Shell() {
       } catch {
         result = { kind: 'retry', status: null }
       }
-      if (cancelled || !mountedRef.current) return
+      if (cancelled || !mountedRef.current || epoch !== authEpoch.current) return
       if (result.kind === 'verified') {
         setAuth('verified')
       } else if (result.kind === 'unverified') {
@@ -156,7 +161,7 @@ function Shell() {
         storesRef.current?.resetAll()
         setAuth('signedOut')
         setPendingVerificationEmail(null)
-        setSafeReturn('/translate')
+        setSafeReturn(resolveSafeReturn(destination))
         setExpiryNotice(true)
       } else {
         setAuth('signedOut')
@@ -167,20 +172,51 @@ function Shell() {
     }
   }, [initialProtected])
 
+  useEffect(() => {
+    const expire = (event: Event) => {
+      authEpoch.current += 1
+      const unverified = (event as CustomEvent).detail === 'unverified'
+      storesRef.current?.resetAll()
+      setAuth(unverified ? 'unverified' : 'signedOut')
+      setPendingVerificationEmail(null)
+      setSafeReturn('/translate')
+      setExpiryNotice(!unverified)
+    }
+    window.addEventListener('linguadesk:session-invalid', expire)
+    return () => window.removeEventListener('linguadesk:session-invalid', expire)
+  }, [])
+
+  // Reconcile the real account when entering a different protected route.
+  // A late read from a route/session that has been left cannot clear a new one.
+  useEffect(() => {
+    if (auth !== 'verified' || !isProtectedPath(location.pathname) || checkedSessionRoute.current === location.pathname) return
+    checkedSessionRoute.current = location.pathname
+    const controller = new AbortController()
+    void getLocalAccountSession({ signal: controller.signal }).then(result => {
+      if (controller.signal.aborted) return
+      if (result.kind === 'signedOut' || result.kind === 'unverified') {
+        window.dispatchEvent(new CustomEvent('linguadesk:session-invalid', { detail: result.kind === 'unverified' ? 'unverified' : 'expired' }))
+      }
+    })
+    return () => controller.abort()
+  }, [auth, location.pathname])
+
   const handleRememberReturn = useCallback((path: string) => {
     setSafeReturn(resolveSafeReturn(path))
   }, [])
 
   const handleSignedIn = useCallback((status: SignInCompletionStatus, email: string) => {
+    authEpoch.current += 1
     setExpiryNotice(false)
     if (status === 'verified') {
+      checkedSessionRoute.current = safeReturn
       setPendingVerificationEmail(null)
       setAuth('verified')
     } else {
       setPendingVerificationEmail(email)
       setAuth('unverified')
     }
-  }, [])
+  }, [safeReturn])
 
   const handleExpiryShown = useCallback(() => {
     setExpiryNotice(false)
@@ -188,6 +224,7 @@ function Shell() {
 
   const handleSignOut = useCallback(() => {
     if (signOutFlightRef.current > 0) return
+    authEpoch.current += 1
     const flight = signOutFlightRef.current + 1
     signOutFlightRef.current = flight
     // Sign-out keeps the M013 teardown guarantee through the single M032
@@ -307,13 +344,13 @@ function Shell() {
     if (auth === 'verified') {
       if (feature === 'translate') {
         return (
-          <Page heading="Translation">
+          <Page heading="Translation" workspace>
             <TranslatePage onSignOut={handleSignOut} />
           </Page>
         )
       }
       return (
-        <Page heading="Rewriting">
+        <Page heading="Rewriting" workspace>
           <RewritePage onSignOut={handleSignOut} />
         </Page>
       )
@@ -343,14 +380,14 @@ function Shell() {
         <div className="header-inner">
           <Link className="wordmark" to="/" aria-label="LinguaDesk home">LinguaDesk</Link>
           <nav aria-label="Main navigation">
-            <Link to="/translate">
+            <NavLink to="/translate">
               <TranslationIcon />
               Translation
-            </Link>
-            <Link to="/rewrite">
+            </NavLink>
+            <NavLink to="/rewrite">
               <RewritingIcon />
               Rewriting
-            </Link>
+            </NavLink>
           </nav>
         </div>
       </header>

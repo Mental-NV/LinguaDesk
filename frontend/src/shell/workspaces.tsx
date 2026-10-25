@@ -1,21 +1,24 @@
-import { useCallback, useMemo, type ReactNode } from 'react'
-import { WorkspaceStoreContext } from './workspaceStores'
+import { WorkspaceSessionTeardown } from './WorkspaceReset'
+import { useCallback, useMemo, useState, type ReactNode } from 'react'
+import { UsageChannel, WorkspaceStoreContext } from './workspaceStores'
 import { useTranslateFeatureInstance, useRewriteFeatureInstance } from './workspaceStores'
 import type { WorkspaceStores } from './workspaceStores'
 
 export function WorkspaceStoreProvider({ children }: { readonly children: ReactNode }) {
-  const translate = useTranslateFeatureInstance()
-  const rewrite = useRewriteFeatureInstance()
-  // M032 safe reset: every teardown (explicit reset, sign-out/expiry and
+  const [usage] = useState(() => new UsageChannel())
+  const translate = useTranslateFeatureInstance(usage)
+  const rewrite = useRewriteFeatureInstance(usage)
+  // Every teardown (sign-out/expiry and
   // navigation restoration) funnels through this single path so lifted text
   // cannot survive. Each feature aborts its own flights before clearing.
   const resetAll = useCallback(() => {
+    usage.reset()
     translate.resetWorkspace()
     rewrite.resetWorkspace()
-  }, [translate, rewrite])
+  }, [translate, rewrite, usage])
   const value = useMemo<WorkspaceStores>(
     () => ({ translate, rewrite, resetAll }),
     [translate, rewrite, resetAll],
   )
-  return <WorkspaceStoreContext.Provider value={value}>{children}</WorkspaceStoreContext.Provider>
+  return <WorkspaceStoreContext.Provider value={value}><WorkspaceSessionTeardown />{children}</WorkspaceStoreContext.Provider>
 }

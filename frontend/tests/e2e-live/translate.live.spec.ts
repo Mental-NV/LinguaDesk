@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test'
 
 /**
  * M043 live browser case (AC-006): drives /translate exactly as a user does —
- * real login form, verified account, explicit Translate activation — and
+ * real login form, verified account, pause-triggered Translation — and
  * asserts a visible Result. Opt-in only: runs under LINGUADESK_E2E_LIVE=1 with
  * LINGUADESK_LIVE_URL plus a verified account created by
  * `scripts/backend.sh e2e-live`. Skipped otherwise; never part of the default
@@ -28,15 +28,15 @@ test('live translate through the serving chain shows a visible Result', async ({
   await expect(page).not.toHaveURL(/\/login$/)
 
   await page.goto('/translate')
-  await expect(page.getByRole('heading', { name: 'Translation' })).toBeFocused()
+  await expect(page.getByRole('heading', { name: 'Translation', exact: true })).toBeFocused()
 
   await page.getByLabel('Source language').selectOption('en')
   await page.getByLabel('Target language').selectOption('ru')
   await page.getByLabel('Source text').fill('Hello.')
 
-  await page.getByRole('button', { name: 'Translate' }).click()
+  // The eligible source/settings revision starts the one-second pause.
 
-  const result = page.getByLabel('Result')
+  const result = page.getByRole('textbox', { name: 'Translation result' })
   await expect
     .poll(async () => (await result.inputValue()).trim(), { timeout: 60_000 })
     .not.toBe('')

@@ -92,7 +92,8 @@ function renderApp(path: string) {
 
 async function enterVerifyPageForUnverifiedSession() {
   renderApp('/translate')
-  expect(await screen.findByRole('heading', { level: 1, name: 'Verify your email' })).toHaveFocus()
+  await screen.findByRole('heading', { level: 1, name: 'Verify your email' })
+  await waitFor(() => expect(screen.getByRole('heading', { level: 1, name: 'Verify your email' })).toHaveFocus())
 }
 
 function expectAccountCallsOnly(calls: { url: string }[]) {

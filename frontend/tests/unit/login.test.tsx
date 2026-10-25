@@ -271,8 +271,8 @@ describe('verified sign-in (AC-001)', () => {
     const destinationHeading = await screen.findByRole('heading', { level: 1, name: 'Translation' })
     expect(destinationHeading).toHaveFocus()
     expect(screen.getByLabelText('Source text')).toBeVisible()
-    expect(screen.getByRole('button', { name: 'Translate' })).toBeVisible()
-    expect(await screen.findByText(/0 of 20,000 characters used/)).toBeVisible()
+    expect(screen.getByLabelText('Translation result')).toHaveValue('')
+    expect(screen.queryByRole('region', { name: 'Usage' })).not.toBeInTheDocument()
 
     await waitFor(() => expect(spy).toHaveBeenCalledTimes(4))
     expect(calls[0].url).toBe('/api/accounts/antiforgery')
@@ -316,7 +316,7 @@ describe('verified sign-in (AC-001)', () => {
     expect(destinationHeading).toHaveFocus()
     expect(await screen.findByLabelText('Writing language')).toBeVisible()
     expect(screen.getByLabelText('Writing mode')).toHaveValue('correctionOnly')
-    expect(screen.getByRole('button', { name: 'Rewrite' })).toBeVisible()
+    expect(screen.getByLabelText('Improved result')).toHaveValue('')
   })
 
   it('disables fields during flight and ignores duplicate click and Enter', async () => {
@@ -444,7 +444,7 @@ describe('invalid and unverified credentials (AC-002)', () => {
 })
 
 describe('session expiry teardown (AC-003)', () => {
-  it('clears state on an observed 401, shows MSG-037 and resets the safe return to default', async () => {
+  it('clears an initial signed-out workspace and retains the safe deep-link destination', async () => {
     const user = userEvent.setup()
     const { spy, calls } = stubFetch(async (url) => {
       if (url === '/api/accounts/session') return sessionUnauthorizedResponse()
@@ -462,7 +462,7 @@ describe('session expiry teardown (AC-003)', () => {
 
     await submitLoginForm(user)
 
-    const destinationHeading = await screen.findByRole('heading', { level: 1, name: 'Translation' })
+    const destinationHeading = await screen.findByRole('heading', { level: 1, name: 'Rewriting' })
     expect(destinationHeading).toHaveFocus()
     expect(
       screen.queryByText('Your session expired. Sign in again to continue.'),
