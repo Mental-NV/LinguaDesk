@@ -5,6 +5,12 @@ import process from 'node:process'
 const require = createRequire(import.meta.url)
 const YAML = require('../frontend/node_modules/yaml')
 
+// Retain the four existing enum ordinals, then append additions in catalog order.
+const legacyLanguageIds = ['en', 'ru', 'ro', 'zh']
+const catalogLanguageIds = JSON.parse(await readFile(new URL('../contracts/fixtures/languages.v1.json', import.meta.url), 'utf8')).languages.map(language => language.id)
+const languageIds = [...legacyLanguageIds, ...catalogLanguageIds.filter(id => !legacyLanguageIds.includes(id))]
+
+
 function fail(message) {
   throw new Error(`OpenAPI contract check failed: ${message}`)
 }
@@ -616,10 +622,11 @@ function validateContract(document) {
 
   const expectedEnums = {
     ChineseScript: ['simplified', 'traditional'],
+    ContentDirection: ['ltr', 'rtl'],
     CountingUnit: ['unicodeScalar'],
     EmptyOrWhitespacePolicy: ['reject'],
     InvalidUnicodePolicy: ['reject'],
-    LanguageId: ['en', 'ru', 'ro', 'zh'],
+    LanguageId: languageIds,
     LineEndingPolicy: ['preserve'],
     NormalizationPolicy: ['none'],
     OperationFamily: ['translation', 'rewriting'],
@@ -639,7 +646,7 @@ function validateContract(document) {
       'diplomatic',
     ],
     RewritingModeKind: ['correction', 'style', 'tone'],
-    SourceSelectionValue: ['auto', 'en', 'ru', 'ro', 'zh'],
+    SourceSelectionValue: ['auto', ...languageIds],
   }
   for (const [schemaName, values] of Object.entries(expectedEnums)) {
     const schema = document.components?.schemas?.[schemaName]

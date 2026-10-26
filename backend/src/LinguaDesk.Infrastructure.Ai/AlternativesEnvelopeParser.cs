@@ -8,7 +8,7 @@ public sealed record AlternativesEnvelope(bool Refused, IReadOnlyList<string>? O
 
 public static class AlternativesEnvelopeParser
 {
-    public static bool TryParse(string? text, string selected, out AlternativesEnvelope? envelope)
+    public static bool TryParse(string? text, string selected, out AlternativesEnvelope? envelope, string? language = null)
     {
         envelope = null;
         if (text is null || Encoding.UTF8.GetByteCount(text) > AlternativesProfile.MaxResponseBytes) return false;
@@ -35,7 +35,7 @@ public static class AlternativesEnvelopeParser
                 if (option.ValueKind != JsonValueKind.String) return false;
                 var value = option.GetString()!;
                 var analysis = ScalarInputPolicy.Analyze(value, AlternativesInputPolicy.MaximumSentenceScalars);
-                var spans = SentenceBoundaryPolicy.Segment(value);
+                var spans = SentenceBoundaryPolicy.Segment(value, language);
                 if (!analysis.IsValid || value.Contains('\0', StringComparison.Ordinal)
                     || spans.Count != 1 || spans[0].Start != 0 || spans[0].Length != analysis.ScalarCount
                     || string.Equals(value, selected, StringComparison.Ordinal)) return false;

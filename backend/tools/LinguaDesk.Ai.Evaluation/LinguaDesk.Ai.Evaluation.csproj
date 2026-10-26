@@ -10,6 +10,8 @@
     <ProjectReference Include="../../src/LinguaDesk.Core/LinguaDesk.Core.csproj" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="../../../contracts/fixtures/languages.v1.json" Link="Corpus/m046/languages.v1.json" CopyToOutputDirectory="PreserveNewest" />
+    <None Update="Corpus/m046/*.json" CopyToOutputDirectory="PreserveNewest" />
     <None Update="Corpus/alternatives/*.json" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>

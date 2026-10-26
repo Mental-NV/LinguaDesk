@@ -6,7 +6,7 @@ Selected item: BI-001. Status: Ready for local implementation; live prerequisite
 
 Implement D-24 and [PRD language policy](../../product/languages.md): 124 languages (120 new), all distinct direct Translation routes, nine Write modes, change review and sentence alternatives. Preserve FR-004–014/019–026/036, existing IDs and Chinese output, one-second pause, scalar limits, two provider chains, privacy, account boundaries and accounting. M045/M019/M020/M043 are recorded Done and current code was inspected.
 
-No UI localization, new dialect/script selector, arbitrary locale aliases, vertical text editor, new input method, transliteration, third provider family, language-specific routing, English pivot, production deployment or full release qualification. This request produces a plan; these behaviors are not implemented by the documentation change.
+No UI localization, new dialect/script selector, arbitrary locale aliases, vertical text editor, new input method, transliteration, third provider family, language-specific routing, English pivot, production deployment or full release qualification. The implementation request now selects this package; completion still requires all acceptance evidence, including the bounded live-development matrix.
 
 ## Acceptance
 

@@ -1493,7 +1493,7 @@ components:
           format: uuid
         language:
           type: string
-          description: "Explicit supported source language: en, ru, ro or zh."
+          description: Explicit canonical source language from capabilities.
         mode:
           type: string
           description: One effective rewriting mode; correctionOnly when omitted; explicit null is rejected.
@@ -1551,8 +1551,8 @@ components:
           description: Selected complete sentence length, from 1 to 2000 Unicode scalars.
           format: int32
         resolvedSourceLanguage:
-          type: string
           description: Validated source language from eligibility, never inferred from generated output.
+          $ref: "#/components/schemas/LanguageId"
         mode:
           type: string
           description: One effective rewriting mode; correctionOnly when omitted; explicit null is rejected.
@@ -1745,6 +1745,12 @@ components:
           type: string
           description: Unpadded base64url encoding of the delivered email-confirmation token. Maximum 4096 characters.
           writeOnly: true
+    ContentDirection:
+      enum:
+        - ltr
+        - rtl
+      type: string
+      description: "Content direction: ltr or rtl; application controls remain LTR."
     CountingPolicyCapability:
       required:
         - id
@@ -1843,6 +1849,9 @@ components:
       required:
         - id
         - name
+        - direction
+        - script
+        - policy
       type: object
       properties:
         id:
@@ -1851,12 +1860,141 @@ components:
         name:
           type: string
           description: English display name.
+        direction:
+          description: "Content direction: ltr or rtl; application controls remain LTR."
+          $ref: "#/components/schemas/ContentDirection"
+        script:
+          type: string
+          description: Selected writing system.
+        policy:
+          type: string
+          description: Selected script and variety constraints.
     LanguageId:
       enum:
         - en
         - ru
         - ro
         - zh
+        - af
+        - ak
+        - sq
+        - am
+        - ar
+        - hy
+        - as
+        - az
+        - bm
+        - eu
+        - be
+        - bn
+        - bs
+        - br
+        - bg
+        - my
+        - ca
+        - ceb
+        - ny
+        - co
+        - hr
+        - cs
+        - da
+        - nl
+        - eo
+        - et
+        - ee
+        - fil
+        - fi
+        - fr
+        - gl
+        - ka
+        - de
+        - el
+        - gu
+        - ht
+        - ha
+        - haw
+        - he
+        - hi
+        - hu
+        - is
+        - ig
+        - id
+        - ga
+        - it
+        - ja
+        - jv
+        - kn
+        - kk
+        - km
+        - rw
+        - ko
+        - ku
+        - ckb
+        - ky
+        - lo
+        - la
+        - lv
+        - ln
+        - lt
+        - lg
+        - lb
+        - mk
+        - mg
+        - ms
+        - ml
+        - mt
+        - mi
+        - mr
+        - mn
+        - ne
+        - nb
+        - nn
+        - oc
+        - or
+        - om
+        - ps
+        - fa
+        - pl
+        - pt
+        - pa
+        - qu
+        - sm
+        - sa
+        - gd
+        - sr
+        - st
+        - sn
+        - sd
+        - si
+        - sk
+        - sl
+        - so
+        - es
+        - su
+        - sw
+        - sv
+        - tg
+        - ta
+        - tt
+        - te
+        - th
+        - ti
+        - ts
+        - tn
+        - tr
+        - tk
+        - uk
+        - ur
+        - ug
+        - uz
+        - vi
+        - cy
+        - fy
+        - wo
+        - xh
+        - yi
+        - yo
+        - zu
       type: string
       description: Stable language identifier.
     LineEndingPolicy:
@@ -2369,8 +2507,8 @@ components:
           description: Operation kind; fullText for existing operations, sentenceAlternatives for selected-sentence requests.
           $ref: "#/components/schemas/OperationKind"
         resolvedSourceLanguage:
-          type: string
-          description: "Validated source language from eligibility: en, ru, ro or zh; never inferred from output."
+          description: Validated canonical source language from capabilities; never inferred from output.
+          $ref: "#/components/schemas/LanguageId"
     SessionProblemDetails:
       required:
         - title
@@ -2461,6 +2599,126 @@ components:
         - ru
         - ro
         - zh
+        - af
+        - ak
+        - sq
+        - am
+        - ar
+        - hy
+        - as
+        - az
+        - bm
+        - eu
+        - be
+        - bn
+        - bs
+        - br
+        - bg
+        - my
+        - ca
+        - ceb
+        - ny
+        - co
+        - hr
+        - cs
+        - da
+        - nl
+        - eo
+        - et
+        - ee
+        - fil
+        - fi
+        - fr
+        - gl
+        - ka
+        - de
+        - el
+        - gu
+        - ht
+        - ha
+        - haw
+        - he
+        - hi
+        - hu
+        - is
+        - ig
+        - id
+        - ga
+        - it
+        - ja
+        - jv
+        - kn
+        - kk
+        - km
+        - rw
+        - ko
+        - ku
+        - ckb
+        - ky
+        - lo
+        - la
+        - lv
+        - ln
+        - lt
+        - lg
+        - lb
+        - mk
+        - mg
+        - ms
+        - ml
+        - mt
+        - mi
+        - mr
+        - mn
+        - ne
+        - nb
+        - nn
+        - oc
+        - or
+        - om
+        - ps
+        - fa
+        - pl
+        - pt
+        - pa
+        - qu
+        - sm
+        - sa
+        - gd
+        - sr
+        - st
+        - sn
+        - sd
+        - si
+        - sk
+        - sl
+        - so
+        - es
+        - su
+        - sw
+        - sv
+        - tg
+        - ta
+        - tt
+        - te
+        - th
+        - ti
+        - ts
+        - tn
+        - tr
+        - tk
+        - uk
+        - ur
+        - ug
+        - uz
+        - vi
+        - cy
+        - fy
+        - wo
+        - xh
+        - yi
+        - yo
+        - zu
       type: string
       description: Source selection used when a client omits the setting.
     SubmitOperationRequest:
@@ -2587,8 +2845,8 @@ components:
           description: Operation kind; fullText for existing operations, sentenceAlternatives for selected-sentence requests.
           $ref: "#/components/schemas/OperationKind"
         resolvedSourceLanguage:
-          type: string
-          description: "Validated source language from eligibility: en, ru, ro or zh; never inferred from output."
+          description: Validated canonical source language from capabilities; never inferred from output.
+          $ref: "#/components/schemas/LanguageId"
     UsageAvailability:
       enum:
         - available

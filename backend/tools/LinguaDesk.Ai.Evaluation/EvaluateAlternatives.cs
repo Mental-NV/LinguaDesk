@@ -14,6 +14,7 @@ internal static class EvaluateAlternatives
     private static readonly JsonSerializerOptions Json = new() { PropertyNameCaseInsensitive = true, PropertyNamingPolicy = JsonNamingPolicy.CamelCase, WriteIndented = true, Converters = { new JsonStringEnumConverter() } };
     internal static async Task<int> RunAsync(string[] args)
     {
+        if (args.Contains("--suite", StringComparer.Ordinal)) return await M046Suite.RunAsync("alternatives", args).ConfigureAwait(false);
         var live = false;
         var offline = false;
         string? profileId = null, output = null;

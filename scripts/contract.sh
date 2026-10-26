@@ -74,7 +74,8 @@ generate_into() {
         --configuration Release \
         --no-restore \
         --no-incremental \
-        --disable-build-servers
+        --disable-build-servers \
+        -m:1
     dotnet build-server shutdown
 
     global_packages=$(dotnet nuget locals global-packages --list)

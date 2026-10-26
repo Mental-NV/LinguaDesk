@@ -135,7 +135,7 @@ public sealed class EligibilityPipelineTests
         Assert.IsFalse(outcome.IsTerminalRejection);
         Assert.AreEqual(1, outcome.ClassificationDispatches);
         Assert.AreEqual(1, client.CallCount);
-        Assert.AreEqual("eligibility.v1", outcome.PromptId);
+        Assert.AreEqual("eligibility.v2", outcome.PromptId);
     }
 
     [TestMethod]
@@ -216,7 +216,7 @@ public sealed class EligibilityPipelineTests
         using var client = new ScriptedEligibilityClient("{\"status\":\"eligible\",\"language\":\"en\"}");
 
         var badTarget = await EligibilityPipeline.EvaluateAsync(
-            new EligibilityInput("Hello.", EligibilityOperation.Translation, Target: "de"),
+            new EligibilityInput("Hello.", EligibilityOperation.Translation, Target: "de-DE"),
             client);
         var badMode = await EligibilityPipeline.EvaluateAsync(
             new EligibilityInput("Hello.", EligibilityOperation.Rewriting, Mode: "shouty"),

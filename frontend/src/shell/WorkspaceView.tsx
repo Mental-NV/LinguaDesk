@@ -2,7 +2,7 @@ import { useEffect, useLayoutEffect, useId, useRef, useState, type ReactNode } f
 import { EditingTools } from './EditingTools'
 import { ActionIcon } from './ActionIcon'
 import { WritePresentation } from '../rewrite/WritePresentation'
-import { canReuseResult } from './workspaceModel'
+import { canReuseResult, currentResult } from './workspaceModel'
 import { WorkspaceLifetimeFooter } from './WorkspaceReset'
 import { MESSAGE_OFFLINE, selectInlineValidation, type Feature, type WorkspaceCapabilities } from './workspaceModel'
 import type { FeatureStore } from './workspaceStores'
@@ -42,6 +42,9 @@ export function WorkspaceView<C extends WorkspaceCapabilities>({ feature, store,
   }, [state.toolbarExpanded])
   const source = useRef<HTMLTextAreaElement>(null)
   const result = useRef<HTMLTextAreaElement>(null)
+  const sourceLanguage = state.resolvedSourceLanguage ?? undefined
+  const resultLanguage = currentResult(state) ? (feature === 'translation' ? state.target : state.resolvedSourceLanguage ?? undefined) : undefined
+  const resultDirection = resultLanguage ? state.capabilities?.languageDirections?.[resultLanguage] ?? 'auto' : 'auto'
   const resultName = feature === 'translation' ? 'Translation result' : 'Improved result'
   const [offline, setOffline] = useState(() => !navigator.onLine)
   const validation = selectInlineValidation(state, feature)
@@ -81,7 +84,7 @@ export function WorkspaceView<C extends WorkspaceCapabilities>({ feature, store,
         <div className="workspace-grid">
           <section className="editor-panel source-panel">
             <h2 className="visually-hidden" id={`${id}-source-heading`}><label htmlFor={`${id}-source`}>Source text</label></h2>
-            <textarea ref={source} id={`${id}-source`} value={state.source} autoComplete="off"
+            <textarea dir="auto" lang={sourceLanguage ?? undefined} ref={source} id={`${id}-source`} value={state.source} autoComplete="off"
               placeholder={feature === 'translation' ? 'Type to translate.' : 'Type or paste text to see ideas for improvement.'}
               data-workspace-source={feature === 'translation' ? 'translation' : 'rewrite'}
               aria-invalid={validation !== null} aria-describedby={validation ? `${id}-alerts` : undefined}
@@ -96,7 +99,7 @@ export function WorkspaceView<C extends WorkspaceCapabilities>({ feature, store,
             <h2 className="visually-hidden" id={`${id}-result-heading`}><label htmlFor={`${id}-result`}>{resultName}</label></h2>
             {feature === 'rewriting' && !state.editingResult
               ? <WritePresentation state={state} dispatch={dispatch} requestAlternatives={requestAlternatives} />
-              : <textarea ref={result} id={`${id}-result`} value={state.resultText} autoComplete="off"
+              : <textarea dir={state.resultEdited ? "auto" : resultDirection} lang={state.resultEdited ? undefined : resultLanguage} ref={result} id={`${id}-result`} value={state.resultText} autoComplete="off"
                 readOnly={!state.hasResult}
                 aria-busy={state.phase === 'submitting' && state.inputRevision === state.submittedInputRevision && state.resultEditRevision === state.submittedResultEditRevision}
                 onChange={event => dispatch({ type: 'resultEdited', value: event.target.value })}

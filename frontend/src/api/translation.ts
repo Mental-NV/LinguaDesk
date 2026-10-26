@@ -1,3 +1,4 @@
+import { languageCapabilities } from './languages'
 import type { components, operations } from './generated/linguadesk-api.d'
 import { getAccountAntiforgeryToken, ANTIFORGERY_HEADER } from './accounts'
 import type { TranslationCapabilities, TranslationUsage } from '../translate/translationWorkspace'
@@ -14,25 +15,19 @@ export const OPERATIONS_PATH = '/api/operations' as const
 export const USAGE_PATH = '/api/usage' as const
 export const CAPABILITIES_PATH = '/api/capabilities' as const
 
-export type TranslationTarget = 'en' | 'ru' | 'ro' | 'zh'
-
-function languageName(language: components['schemas']['LanguageCapability']): [string, string] {
-  return [language.id, language.id === 'zh' ? 'Chinese (Simplified output)' : language.name]
-}
+export type TranslationTarget = components['schemas']['LanguageId']
 
 export function toCapabilities(body: CapabilitiesBody): TranslationCapabilities {
-  const languages: Record<string, string> = {}
-  for (const language of body.languages) {
-    const [id, name] = languageName(language)
-    languages[id] = name
-  }
+  const { languages, languageDirections, languageValues } = languageCapabilities(body.languages)
   return {
     maximumSourceCharacters: body.translation.maximumSourceCharacters,
     overallDeadlineSeconds: body.translation.overallDeadlineSeconds,
     sourceDefault: body.sourceSelection.default,
-    sourceValues: [...body.sourceSelection.values],
+    sourceValues: [body.sourceSelection.default, ...languageValues],
+    languageDirections,
+    segmentationRevision: body.alternatives?.segmentationRevision,
     languages,
-    targetValues: body.languages.map((language) => language.id),
+    targetValues: languageValues,
   }
 }
 
@@ -105,7 +100,7 @@ async function readProblem(response: Response): Promise<ProblemBody | null> {
 
 export type SubmitTranslationResult =
   | {
-      readonly resolvedSourceLanguage?: string
+      readonly resolvedSourceLanguage?: SuccessBody['resolvedSourceLanguage']
       readonly kind: 'succeeded'
       readonly translatedText: string
       readonly admissionDay: string

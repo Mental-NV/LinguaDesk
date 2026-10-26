@@ -91,6 +91,7 @@ internal static class EvaluateTranslation
 
     internal static async Task<int> RunAsync(string[] options)
     {
+        if (options.Contains("--suite", StringComparer.Ordinal)) return await M046Suite.RunAsync("translation", options).ConfigureAwait(false);
         if (!EvaluateTranslationOptions.TryParse(options, out var selected, out var error))
         {
             Console.Error.WriteLine(error);

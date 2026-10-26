@@ -153,6 +153,13 @@ check() {
     run_offline dotnet "$runner_dll" probe >/dev/null
     run_offline dotnet "$runner_dll" conformance
     run_offline dotnet "$runner_dll" evaluate-alternatives --offline --profile DeepSeek-V4.1-Flash --max-dispatches 72 --max-spend-usd 1 --output "$repository_root/artifacts/m045/alternatives-offline.json"
+    mkdir -p "$repository_root/artifacts/m046"
+    m046_report_directory=$(mktemp -d "$repository_root/artifacts/m046/offline-check.XXXXXX")
+    run_offline dotnet "$runner_dll" evaluate-translation --suite m046 --offline --profile DeepSeek-V4.1-Flash --max-dispatches 528 --max-spend-usd 0.75 --output "$m046_report_directory/translation.json"
+    run_offline dotnet "$runner_dll" evaluate-rewriting --suite m046 --offline --profile DeepSeek-V4.1-Flash --max-dispatches 2232 --max-spend-usd 1.25 --output "$m046_report_directory/rewriting.json"
+    run_offline dotnet "$runner_dll" evaluate-alternatives --suite m046 --offline --profile DeepSeek-V4.1-Flash --max-dispatches 2232 --max-spend-usd 1.50 --output "$m046_report_directory/alternatives.json"
+    run_offline dotnet "$runner_dll" evaluate-eligibility --suite m046 --offline --profile DeepSeek-V4.1-Flash --max-dispatches 12 --max-spend-usd 0.05 --output "$m046_report_directory/eligibility.json"
+    echo "M046 frozen offline matrix reports: $m046_report_directory"
     cleanup_inspection_files
     trap - EXIT INT TERM HUP
 
@@ -204,56 +211,56 @@ case "$mode" in
         run_live verify-access "$@"
         ;;
     evaluate-alternatives)
-        if [ "${1:-}" = "--live" ]; then
+        if [[ " $* " == *" --live "* ]]; then
             run_live evaluate-alternatives "$@"
         else
             run_offline dotnet "$runner_dll" evaluate-alternatives "$@"
         fi
         ;;
     evaluate-eligibility)
-        if [ "${1:-}" = "--live" ]; then
+        if [[ " $* " == *" --live "* ]]; then
             run_live evaluate-eligibility "$@"
         else
             run_offline dotnet "$runner_dll" evaluate-eligibility "$@"
         fi
         ;;
     evaluate-translation)
-        if [ "${1:-}" = "--live" ]; then
+        if [[ " $* " == *" --live "* ]]; then
             run_live evaluate-translation "$@"
         else
             run_offline dotnet "$runner_dll" evaluate-translation "$@"
         fi
         ;;
     evaluate-rewriting)
-        if [ "${1:-}" = "--live" ]; then
+        if [[ " $* " == *" --live "* ]]; then
             run_live evaluate-rewriting "$@"
         else
             run_offline dotnet "$runner_dll" evaluate-rewriting "$@"
         fi
         ;;
     evaluate-chain-bounds)
-        if [ "${1:-}" = "--live" ]; then
+        if [[ " $* " == *" --live "* ]]; then
             run_live evaluate-chain-bounds "$@"
         else
             run_offline dotnet "$runner_dll" evaluate-chain-bounds "$@"
         fi
         ;;
     evaluate-report)
-        if [ "${1:-}" = "--live" ]; then
+        if [[ " $* " == *" --live "* ]]; then
             run_live evaluate-report "$@"
         else
             run_offline dotnet "$runner_dll" evaluate-report "$@"
         fi
         ;;
     evaluate-batch)
-        if [ "${1:-}" = "--live" ]; then
+        if [[ " $* " == *" --live "* ]]; then
             run_live evaluate-batch "$@"
         else
             run_offline dotnet "$runner_dll" evaluate-batch "$@"
         fi
         ;;
     calibrate-judge)
-        if [ "${1:-}" = "--live" ]; then
+        if [[ " $* " == *" --live "* ]]; then
             run_live calibrate-judge "$@"
         else
             run_offline dotnet "$runner_dll" calibrate-judge "$@"

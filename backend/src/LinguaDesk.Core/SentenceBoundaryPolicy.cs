@@ -1,5 +1,5 @@
 using System.Text;
-using System.Text.RegularExpressions;
+using System.Globalization;
 
 namespace LinguaDesk.Core;
 
@@ -8,16 +8,20 @@ public sealed record SentenceSpan(int Start, int Length);
 /// <summary>Versioned scalar spans; gaps and source text are never normalized.</summary>
 public static class SentenceBoundaryPolicy
 {
-    public const string Revision = "sentence-boundaries-v1";
+    public const string Revision = "sentence-boundaries-v2";
     private static readonly HashSet<string> Abbreviations = new(StringComparer.OrdinalIgnoreCase)
     { "mr.", "mrs.", "ms.", "dr.", "prof.", "e.g.", "i.e.", "etc.", "dl.", "dna.", "г.", "ул.", "т.д.", "т.п." };
     private const string Closers = "\"'”’»)]}」』】）";
 
-    public static IReadOnlyList<SentenceSpan> Segment(string text)
+    private const string Terminals = ".!?。！？؟۔।॥։።፧။។៕";
+    private static string TerminalsFor(string? language) => language == "el" ? Terminals + ";;" : Terminals;
+
+    public static IReadOnlyList<SentenceSpan> Segment(string text, string? language = null)
     {
         if (!ScalarInputPolicy.Analyze(text, int.MaxValue).IsUnicodeValid) return [];
         var scalars = text.EnumerateRunes().Select(r => r.ToString()).ToArray();
         var spans = new List<SentenceSpan>();
+        var terminals = TerminalsFor(language);
         var start = 0;
         void Emit(int end)
         {
@@ -35,19 +39,27 @@ public static class SentenceBoundaryPolicy
                 start = i + 1;
                 continue;
             }
-            if (!".!?。！？".Contains(ch, StringComparison.Ordinal)) continue;
+            if (!terminals.Contains(ch, StringComparison.Ordinal)) continue;
             var end = i + 1;
-            while (end < scalars.Length && "!?。！？".Contains(scalars[end], StringComparison.Ordinal)) end++;
+            while (end < scalars.Length && terminals.TrimStart('.').Contains(scalars[end], StringComparison.Ordinal)) end++;
             while (end < scalars.Length && Closers.Contains(scalars[end], StringComparison.Ordinal)) end++;
+            // A terminal followed by a combining mark/joiner belongs to the larger fragment.
+            if (end < scalars.Length && (Rune.GetUnicodeCategory(Rune.GetRuneAt(scalars[end], 0)) is UnicodeCategory.NonSpacingMark or UnicodeCategory.SpacingCombiningMark or UnicodeCategory.EnclosingMark
+                || scalars[end] is "\u200c" or "\u200d")) continue;
             if (ch == ".")
             {
                 if (end < scalars.Length && !White(scalars[end])) continue;
-                var prefix = string.Concat(scalars.Take(i + 1));
-                var token = Regex.Match(prefix, @"[\p{L}.]+\.$", RegexOptions.CultureInvariant).Value;
-                var hasNextWord = end < scalars.Length && Regex.IsMatch(string.Concat(scalars.Skip(end)), @"^[^\S\r\n]*[\p{L}\p{N}]", RegexOptions.CultureInvariant);
-                if (Abbreviations.Contains(token)
-                    || Regex.IsMatch(token, @"^(?:\p{L}\.){2,}$", RegexOptions.CultureInvariant)
-                    || (Regex.IsMatch(token, @"^\p{L}\.$", RegexOptions.CultureInvariant) && hasNextWord)) continue;
+                var tokenStart = i;
+                while (tokenStart > 0 && (scalars[tokenStart - 1] == "." || Rune.IsLetter(Rune.GetRuneAt(scalars[tokenStart - 1], 0)))) tokenStart--;
+                var token = string.Concat(scalars.Skip(tokenStart).Take(i + 1 - tokenStart));
+                var initialParts = token.Split('.');
+                var initials = initialParts.Length >= 2 && initialParts[^1].Length == 0
+                    && initialParts.SkipLast(1).All(part => part.EnumerateRunes().Count() == 1 && Rune.IsLetter(Rune.GetRuneAt(part, 0)));
+                var nextWord = end;
+                while (nextWord < scalars.Length && scalars[nextWord] is not ("\r" or "\n") && White(scalars[nextWord])) nextWord++;
+                var hasNextWord = nextWord < scalars.Length && (Rune.IsLetter(Rune.GetRuneAt(scalars[nextWord], 0))
+                    || Rune.GetUnicodeCategory(Rune.GetRuneAt(scalars[nextWord], 0)) is UnicodeCategory.DecimalDigitNumber or UnicodeCategory.LetterNumber or UnicodeCategory.OtherNumber);
+                if (Abbreviations.Contains(token) || initials && (initialParts.Length > 2 || hasNextWord)) continue;
             }
             Emit(end);
             start = end;
@@ -85,7 +97,7 @@ public static class AlternativesInputPolicy
             : !ProductCatalog.IsRewritingMode(effectiveMode) ? "invalidMode"
             : association == Guid.Empty ? "invalidAssociation"
             : start < 0 || length <= 0 || length > MaximumSentenceScalars || (long)start + length > input.ScalarCount ? "invalidSpan"
-            : !SentenceBoundaryPolicy.Segment(context).Contains(new SentenceSpan(start, length)) ? "invalidSentence"
+            : !SentenceBoundaryPolicy.Segment(context, language).Contains(new SentenceSpan(start, length)) ? "invalidSentence"
             : null;
         return new(reason is null, reason, reason is null ? SentenceBoundaryPolicy.Slice(context, start, length) : null, reason is null ? length : 0, effectiveMode);
     }

@@ -156,7 +156,7 @@ run_before_deadline() {
 }
 
 restore_locked() {
-    dotnet restore "$solution" --locked-mode
+    dotnet restore "$solution" --locked-mode --disable-build-servers --disable-parallel -m:1
 }
 
 setup() {
@@ -176,7 +176,7 @@ check() {
     mkdir -p "$results_directory"
     rm -f "$api_report" "$core_report" "$ai_report" "$benchmark_report"
 
-    dotnet build "$solution" --configuration "$configuration" --no-restore
+    dotnet build "$solution" --configuration "$configuration" --no-restore --disable-build-servers -m:1
     dotnet test "$api_test_project" \
         --configuration "$configuration" \
         --no-build \
@@ -330,7 +330,7 @@ run() {
         mkdir -p "$development_data_directory"
         chmod 700 "$development_data_directory"
         dotnet tool restore
-        dotnet build "$api_project" --configuration "$configuration" --no-restore
+        dotnet build "$api_project" --configuration "$configuration" --no-restore --disable-build-servers -m:1
         dotnet ef database update \
             --project "$api_project" \
             --startup-project "$api_project" \
@@ -393,9 +393,9 @@ smoke() {
     trap 'exit 143' TERM
     trap 'exit 129' HUP
 
-    run_before_deadline "$smoke_deadline" restore dotnet restore "$solution" --locked-mode
+    run_before_deadline "$smoke_deadline" restore dotnet restore "$solution" --locked-mode --disable-build-servers --disable-parallel -m:1
     run_before_deadline "$smoke_deadline" tool-restore dotnet tool restore
-    run_before_deadline "$smoke_deadline" build dotnet build "$api_project" --configuration "$configuration" --no-restore
+    run_before_deadline "$smoke_deadline" build dotnet build "$api_project" --configuration "$configuration" --no-restore --disable-build-servers -m:1
 
     smoke_database="$smoke_directory/linguadesk.db"
     smoke_keys="$smoke_directory/keys"
@@ -484,9 +484,9 @@ benchmark() {
     trap 'exit 143' TERM
     trap 'exit 129' HUP
 
-    run_before_deadline "$benchmark_deadline" restore dotnet restore "$solution" --locked-mode
+    run_before_deadline "$benchmark_deadline" restore dotnet restore "$solution" --locked-mode --disable-build-servers --disable-parallel -m:1
     run_before_deadline "$benchmark_deadline" tool-restore dotnet tool restore
-    run_before_deadline "$benchmark_deadline" build dotnet build "$solution" --configuration "$configuration" --no-restore
+    run_before_deadline "$benchmark_deadline" build dotnet build "$solution" --configuration "$configuration" --no-restore --disable-build-servers -m:1
 
     benchmark_database="$benchmark_directory/linguadesk.db"
     benchmark_keys="$benchmark_directory/keys"
@@ -787,8 +787,8 @@ e2e_live() {
     trap 'exit 143' TERM
     trap 'exit 129' HUP
 
-    run_before_deadline "$live_deadline" restore dotnet restore "$solution" --locked-mode
-    run_before_deadline "$live_deadline" build dotnet build "$api_project" --configuration "$configuration" --no-restore
+    run_before_deadline "$live_deadline" restore dotnet restore "$solution" --locked-mode --disable-build-servers --disable-parallel -m:1
+    run_before_deadline "$live_deadline" build dotnet build "$api_project" --configuration "$configuration" --no-restore --disable-build-servers -m:1
     if [ ! -f "$repository_root/frontend/dist/index.html" ] || [ ! -f "$repository_root/backend/src/LinguaDesk.Api/wwwroot/index.html" ]; then
         echo "Live serving suites require the built SPA (frontend/dist and backend wwwroot)." >&2
         return 1

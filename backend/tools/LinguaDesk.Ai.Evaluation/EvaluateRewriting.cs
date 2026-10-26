@@ -129,6 +129,7 @@ internal static class EvaluateRewriting
 
     internal static async Task<int> RunAsync(string[] options)
     {
+        if (options.Contains("--suite", StringComparer.Ordinal)) return await M046Suite.RunAsync("rewriting", options).ConfigureAwait(false);
         if (!EvaluateRewritingOptions.TryParse(options, out var selected, out var error))
         {
             Console.Error.WriteLine(error);

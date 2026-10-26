@@ -1,0 +1,494 @@
+{
+  "revision": "sentence-boundaries-v2",
+  "cases": [
+    {
+      "id": "paragraphs",
+      "text": "  First.\r\nSecond!  Third? ",
+      "spans": [
+        {
+          "start": 2,
+          "length": 6
+        },
+        {
+          "start": 10,
+          "length": 7
+        },
+        {
+          "start": 19,
+          "length": 6
+        }
+      ]
+    },
+    {
+      "id": "duplicates",
+      "text": "Same. Same.",
+      "spans": [
+        {
+          "start": 0,
+          "length": 5
+        },
+        {
+          "start": 6,
+          "length": 5
+        }
+      ]
+    },
+    {
+      "id": "cjk",
+      "text": "你好。世界！真的？",
+      "spans": [
+        {
+          "start": 0,
+          "length": 3
+        },
+        {
+          "start": 3,
+          "length": 3
+        },
+        {
+          "start": 6,
+          "length": 3
+        }
+      ]
+    },
+    {
+      "id": "abbreviations",
+      "text": "Dr. Smith met Mr. Jones. Next sentence.",
+      "spans": [
+        {
+          "start": 0,
+          "length": 24
+        },
+        {
+          "start": 25,
+          "length": 14
+        }
+      ]
+    },
+    {
+      "id": "decimal",
+      "text": "It costs 3.14 today. Fine.",
+      "spans": [
+        {
+          "start": 0,
+          "length": 20
+        },
+        {
+          "start": 21,
+          "length": 5
+        }
+      ]
+    },
+    {
+      "id": "initials",
+      "text": "A. Smith lives in the U.S. today. Next.",
+      "spans": [
+        {
+          "start": 0,
+          "length": 33
+        },
+        {
+          "start": 34,
+          "length": 5
+        }
+      ]
+    },
+    {
+      "id": "closers",
+      "text": "He said “Go!” Then left.",
+      "spans": [
+        {
+          "start": 0,
+          "length": 13
+        },
+        {
+          "start": 14,
+          "length": 10
+        }
+      ]
+    },
+    {
+      "id": "unicode",
+      "text": "👩🏽‍💻 works. Café stays.",
+      "spans": [
+        {
+          "start": 0,
+          "length": 11
+        },
+        {
+          "start": 12,
+          "length": 12
+        }
+      ]
+    },
+    {
+      "id": "fragment",
+      "text": "Без знака\nFără punctuație",
+      "spans": [
+        {
+          "start": 0,
+          "length": 9
+        },
+        {
+          "start": 10,
+          "length": 15
+        }
+      ]
+    },
+    {
+      "id": "russian",
+      "text": "Живу на ул. Ленина в г. Москве. Хорошо.",
+      "spans": [
+        {
+          "start": 0,
+          "length": 31
+        },
+        {
+          "start": 32,
+          "length": 7
+        }
+      ]
+    },
+    {
+      "id": "tokens",
+      "text": "NotMr. Next.",
+      "spans": [
+        {
+          "start": 0,
+          "length": 6
+        },
+        {
+          "start": 7,
+          "length": 5
+        }
+      ]
+    },
+    {
+      "id": "runs",
+      "text": "Really?! Yes!!!",
+      "spans": [
+        {
+          "start": 0,
+          "length": 8
+        },
+        {
+          "start": 9,
+          "length": 6
+        }
+      ]
+    },
+    {
+      "id": "whitespace",
+      "text": "\r\n \t",
+      "spans": []
+    },
+    {
+      "id": "arabic",
+      "language": "ar",
+      "text": "هل أرسلت 12 تقريرًا؟ لم أرسلها۔",
+      "spans": [
+        {
+          "start": 0,
+          "length": 20
+        },
+        {
+          "start": 21,
+          "length": 10
+        }
+      ]
+    },
+    {
+      "id": "indic",
+      "language": "hi",
+      "text": "रिपोर्ट तैयार है। कृपया पढ़ें॥",
+      "spans": [
+        {
+          "start": 0,
+          "length": 17
+        },
+        {
+          "start": 18,
+          "length": 12
+        }
+      ]
+    },
+    {
+      "id": "armenian",
+      "language": "hy",
+      "text": "Զեկույցը պատրաստ է։ Կարդացեք։",
+      "spans": [
+        {
+          "start": 0,
+          "length": 19
+        },
+        {
+          "start": 20,
+          "length": 9
+        }
+      ]
+    },
+    {
+      "id": "ethiopic",
+      "language": "am",
+      "text": "ሪፖርቱ ዝግጁ ነው። አነበብከው፧",
+      "spans": [
+        {
+          "start": 0,
+          "length": 12
+        },
+        {
+          "start": 13,
+          "length": 7
+        }
+      ]
+    },
+    {
+      "id": "myanmar",
+      "language": "my",
+      "text": "အစီရင်ခံစာ အဆင်သင့်ဖြစ်ပြီ။ ဖတ်ပါ။",
+      "spans": [
+        {
+          "start": 0,
+          "length": 27
+        },
+        {
+          "start": 28,
+          "length": 6
+        }
+      ]
+    },
+    {
+      "id": "khmer",
+      "language": "km",
+      "text": "របាយការណ៍រួចរាល់ហើយ។ សូមអាន៕",
+      "spans": [
+        {
+          "start": 0,
+          "length": 20
+        },
+        {
+          "start": 21,
+          "length": 7
+        }
+      ]
+    },
+    {
+      "id": "greek-question",
+      "language": "el",
+      "text": "Είναι έτοιμο; Ναι;",
+      "spans": [
+        {
+          "start": 0,
+          "length": 13
+        },
+        {
+          "start": 14,
+          "length": 4
+        }
+      ]
+    },
+    {
+      "id": "latin-semicolon",
+      "language": "en",
+      "text": "Ready; yes; still one sentence.",
+      "spans": [
+        {
+          "start": 0,
+          "length": 31
+        }
+      ]
+    },
+    {
+      "id": "greek-decimal",
+      "language": "el",
+      "text": "Η τιμή είναι 3.14. Εντάξει;",
+      "spans": [
+        {
+          "start": 0,
+          "length": 18
+        },
+        {
+          "start": 19,
+          "length": 8
+        }
+      ]
+    },
+    {
+      "id": "hebrew-mixed",
+      "language": "he",
+      "text": "הדוח באתר https://example.test/12 מוכן. קראו אותו!",
+      "spans": [
+        {
+          "start": 0,
+          "length": 39
+        },
+        {
+          "start": 40,
+          "length": 10
+        }
+      ]
+    },
+    {
+      "id": "japanese-no-space",
+      "language": "ja",
+      "text": "準備できました。読んでください！",
+      "spans": [
+        {
+          "start": 0,
+          "length": 8
+        },
+        {
+          "start": 8,
+          "length": 8
+        }
+      ]
+    },
+    {
+      "id": "korean",
+      "language": "ko",
+      "text": "보고서가 준비되었습니다. 읽어 주세요.",
+      "spans": [
+        {
+          "start": 0,
+          "length": 13
+        },
+        {
+          "start": 14,
+          "length": 7
+        }
+      ]
+    },
+    {
+      "id": "thai-fragment",
+      "language": "th",
+      "text": "รายงานพร้อมแล้ว",
+      "spans": [
+        {
+          "start": 0,
+          "length": 15
+        }
+      ]
+    },
+    {
+      "id": "lao-fragment",
+      "language": "lo",
+      "text": "ລາຍງານພ້ອມແລ້ວ",
+      "spans": [
+        {
+          "start": 0,
+          "length": 14
+        }
+      ]
+    },
+    {
+      "id": "complex",
+      "language": "hi",
+      "text": "क्‍ष é 👩‍💻 तैयार है। हाँ!",
+      "spans": [
+        {
+          "start": 0,
+          "length": 21
+        },
+        {
+          "start": 22,
+          "length": 4
+        }
+      ]
+    },
+    {
+      "id": "bidi",
+      "language": "ar",
+      "text": "⁧التقرير 12 جاهز⁩؟ نعم!",
+      "spans": [
+        {
+          "start": 0,
+          "length": 18
+        },
+        {
+          "start": 19,
+          "length": 4
+        }
+      ]
+    },
+    {
+      "id": "closers",
+      "language": "ar",
+      "text": "«جاهز؟» نعم۔",
+      "spans": [
+        {
+          "start": 0,
+          "length": 7
+        },
+        {
+          "start": 8,
+          "length": 4
+        }
+      ]
+    },
+    {
+      "id": "combining-terminal",
+      "language": "en",
+      "text": "What?́ continues!",
+      "spans": [
+        {
+          "start": 0,
+          "length": 17
+        }
+      ]
+    },
+    {
+      "id": "serbian-latin",
+      "language": "sr",
+      "text": "Izveštaj je spreman. Pročitajte ga.",
+      "spans": [
+        {
+          "start": 0,
+          "length": 20
+        },
+        {
+          "start": 21,
+          "length": 14
+        }
+      ]
+    },
+    {
+      "id": "serbian-cyrillic",
+      "language": "sr",
+      "text": "Извештај је спреман. Прочитајте га.",
+      "spans": [
+        {
+          "start": 0,
+          "length": 20
+        },
+        {
+          "start": 21,
+          "length": 14
+        }
+      ]
+    },
+    {
+      "id": "non-bmp-letter-initial",
+      "text": "𐐀. Smith is ready. Next.",
+      "spans": [
+        {
+          "start": 0,
+          "length": 18
+        },
+        {
+          "start": 19,
+          "length": 5
+        }
+      ]
+    },
+    {
+      "id": "fixed-whitespace-next-word",
+      "text": "A.﻿Next.",
+      "spans": [
+        {
+          "start": 0,
+          "length": 8
+        }
+      ]
+    }
+  ]
+}

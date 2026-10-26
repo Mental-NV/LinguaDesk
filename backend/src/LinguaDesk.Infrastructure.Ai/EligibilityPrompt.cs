@@ -5,10 +5,10 @@ namespace LinguaDesk.Infrastructure.Ai;
 
 public static class EligibilityPrompt
 {
-    public const string PromptId = "eligibility.v1";
+    public const string PromptId = "eligibility.v2";
 
     private const string ResourceName =
-        "LinguaDesk.Infrastructure.Ai.Prompts.eligibility.v1.txt";
+        "LinguaDesk.Infrastructure.Ai.Prompts.eligibility.v2.txt";
 
     private static readonly JsonSerializerOptions SerializerOptions = new()
     {
@@ -16,12 +16,14 @@ public static class EligibilityPrompt
     };
 
     private static readonly Lazy<(string Content, string Sha256)> Resource =
-        new(() => PromptResource.Load(ResourceName));
+        new(() => PromptResource.Compose(ResourceName, PromptResource.EligibilityCatalog));
 
     public static PromptSnapshot Create(string source, string? sourceHint = null)
     {
         ArgumentNullException.ThrowIfNull(source);
 
+        if (sourceHint is not null && !LinguaDesk.Core.ProductCatalog.IsLanguage(sourceHint))
+            throw new ArgumentException("Unknown canonical source hint.", nameof(sourceHint));
         var userData = JsonSerializer.Serialize(
             new EligibilityUserData(source, sourceHint),
             SerializerOptions);

@@ -34,7 +34,7 @@ public sealed class EvaluationReportTests
         Assert.AreEqual("deepseek", document.CredentialRef);
         Assert.IsTrue(document.CredentialPresent);
         Assert.IsTrue(document.Live);
-        Assert.AreEqual("eligibility.v1", document.Revisions.EligibilityPrompt);
+        Assert.AreEqual("eligibility.v2", document.Revisions.EligibilityPrompt);
         Assert.IsFalse(string.IsNullOrWhiteSpace(document.Revisions.EligibilityPromptResourceSha256));
         Assert.IsFalse(string.IsNullOrWhiteSpace(document.Revisions.TranslationPromptResourceSha256));
         Assert.IsFalse(string.IsNullOrWhiteSpace(document.Revisions.RewritingPromptResourceSha256));
@@ -151,11 +151,11 @@ public sealed class EvaluationReportTests
         ".NET 10.0.10",
         "1.0.0",
         "1.0.0",
-        "eligibility.v1",
+        "eligibility.v2",
         "e2e2e2",
-        "translation.v1",
+        "translation.v2",
         "t3t3t3",
-        "rewriting.v1",
+        "rewriting.v2",
         "r4r4r4",
         "validator.v3",
         0,

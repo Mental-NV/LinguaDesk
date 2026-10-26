@@ -15,4 +15,7 @@
     <ProjectReference Include="../../src/LinguaDesk.Core/LinguaDesk.Core.csproj" />
     <ProjectReference Include="../../src/LinguaDesk.Infrastructure.Ai/LinguaDesk.Infrastructure.Ai.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="../../../contracts/fixtures/languages.v1.json" Link="Fixtures/languages.v1.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
 </Project>

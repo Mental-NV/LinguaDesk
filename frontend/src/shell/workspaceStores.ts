@@ -1,3 +1,4 @@
+import { alternativesCompatible } from './workspaceModel'
 import { submitAlternatives } from '../api/alternatives'
 import { spanKey, type SentenceSpan } from '../rewrite/sentences'
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type Dispatch } from 'react'
@@ -293,7 +294,7 @@ function useFeatureInstance(feature: Feature, sharedChannel?: UsageChannel): Fea
   const requestAlternatives = useCallback((span: SentenceSpan) => {
     const current = stateRef.current
     apply({ type: 'sentenceSelected', span })
-    if (feature !== 'rewriting' || !currentResult(current) || !current.association || !current.comparisonSource || current.editingResult
+    if (feature !== 'rewriting' || !alternativesCompatible(current) || !currentResult(current) || !current.association || !current.comparisonSource || current.editingResult
       || current.alternativeSets[spanKey(span)] || current.phase !== 'idle' || current.pendingOperationId || flight.current || candidate.current
       || !active.current || !online.current || current.composing || Array.from(current.resultText).length > 8000 || span.length > 2000) return
     if (!current.usage || current.usageUnavailable || Date.parse(current.usage.resetAtUtc) <= Date.now()) { void refreshUsageRead(); return }

@@ -11,15 +11,14 @@ public sealed record AlternativesInput(string Context, int Start, int Length, Gu
 
 public static class AlternativesPrompt
 {
-    public const string PromptId = "alternatives.v9";
-    private static readonly Lazy<(string Content, string Sha256)> Resource = new(() =>
-        PromptResource.Load("LinguaDesk.Infrastructure.Ai.Prompts.alternatives.v9.txt"));
+    public const string PromptId = "alternatives.v10";
+
 
     public static PromptSnapshot Create(AlternativesInput input)
     {
         var validation = input.Validate();
         if (!validation.IsValid) throw new ArgumentException("Invalid alternatives input.", nameof(input));
-        var resource = Resource.Value;
+        var resource = PromptResource.Compose("LinguaDesk.Infrastructure.Ai.Prompts.alternatives.v10.txt", "Source: " + PromptResource.Descriptor(input.Language));
         var scaffold = JsonSerializer.Serialize(new { context = "", selectedText = "", start = input.Start, length = input.Length, sourceLanguage = input.Language, mode = validation.EffectiveMode });
         if (Encoding.UTF8.GetByteCount(resource.Content) + Encoding.UTF8.GetByteCount(scaffold) > 4096)
             throw new InvalidOperationException("Alternatives prompt scaffolding exceeds 4 KiB.");

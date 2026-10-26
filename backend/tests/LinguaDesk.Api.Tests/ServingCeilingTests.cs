@@ -20,6 +20,12 @@ public sealed class ServingCeilingTests
 {
     private const string CandidateId = "DeepSeek-V4.1-Flash";
 
+    private static decimal TwoStageBound()
+    {
+        var view = FullTextProfile.ForTranslation(CandidateRegistry.Default[0], new("Hello.", Target: "ru"));
+        return 2 * EvaluationBudget.UpperBoundUsd(view.Bounds.MaxInputTokens, view.Bounds.MaxOutputTokens, view.Billing.PeakInputPerMillionTokens, view.Billing.PeakOutputPerMillionTokens);
+    }
+
     private static Dictionary<string, string?> ServingConfig(
         string translationCeiling,
         string rewritingCeiling) => new()
@@ -98,7 +104,7 @@ public sealed class ServingCeilingTests
         primary.EnqueueResponse("{\"status\":\"eligible\",\"language\":\"en\"}");
         primary.EnqueueResponse("{\"status\":\"result\",\"text\":\"Привет.\"}");
         await using var fixture = await OperationFixture.CreateAsync(
-            ServingConfig("0.014746", "0.05"),
+            ServingConfig(TwoStageBound().ToString(System.Globalization.CultureInfo.InvariantCulture), "0.05"),
             services =>
             {
                 services.RemoveAll<ITranslationClientProvider>();
@@ -128,7 +134,7 @@ public sealed class ServingCeilingTests
         using var fallback = new ScriptedClient();
         primary.EnqueueResponse("{\"status\":\"eligible\",\"language\":\"en\"}");
         await using var fixture = await OperationFixture.CreateAsync(
-            ServingConfig("0.014745", "0.05"),
+            ServingConfig((TwoStageBound() - 0.000001m).ToString(System.Globalization.CultureInfo.InvariantCulture), "0.05"),
             services =>
             {
                 services.RemoveAll<ITranslationClientProvider>();

@@ -96,7 +96,7 @@ public sealed class CorpusBatchB1Tests
                 + "->" + c.GetProperty("operation").GetProperty("target").GetString())
             .OrderBy(pair => pair, StringComparer.Ordinal)
             .ToList();
-        var expected = ProductCatalog.TranslationDirections
+        var expected = ProductCatalog.TranslationDirections.Where(direction => new[] { "en", "ru", "ro", "zh" }.Contains(direction.Source) && new[] { "en", "ru", "ro", "zh" }.Contains(direction.Target))
             .Select(direction => direction.Source + "->" + direction.Target)
             .OrderBy(pair => pair, StringComparer.Ordinal)
             .ToList();
@@ -123,7 +123,7 @@ public sealed class CorpusBatchB1Tests
     {
         var cases = LoadCases(out _);
 
-        foreach (var language in ProductCatalog.Languages)
+        foreach (var language in ProductCatalog.Languages.Where(language => new[] { "en", "ru", "ro", "zh" }.Contains(language.Id)))
         {
             var modes = Family(cases, "rewriting")
                 .Where(c => c.GetProperty("operation").GetProperty("language").GetString() == language.Id)

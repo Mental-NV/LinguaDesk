@@ -414,7 +414,7 @@ export interface components {
              * @description Opaque nonempty UUID correlating the in-memory result revision; never stored.
              */
             association: string;
-            /** @description Explicit supported source language: en, ru, ro or zh. */
+            /** @description Explicit canonical source language from capabilities. */
             language: string;
             /**
              * @description One effective rewriting mode; correctionOnly when omitted; explicit null is rejected.
@@ -452,7 +452,7 @@ export interface components {
              */
             length: number;
             /** @description Validated source language from eligibility, never inferred from generated output. */
-            resolvedSourceLanguage: string;
+            resolvedSourceLanguage: components["schemas"]["LanguageId"];
             /** @description One effective rewriting mode; correctionOnly when omitted; explicit null is rejected. */
             mode: string;
             /**
@@ -566,6 +566,11 @@ export interface components {
             /** @description Unpadded base64url encoding of the delivered email-confirmation token. Maximum 4096 characters. */
             code: string;
         };
+        /**
+         * @description Content direction: ltr or rtl; application controls remain LTR.
+         * @enum {string}
+         */
+        ContentDirection: "ltr" | "rtl";
         /** @description Canonical decoded-input counting and local rejection policy. */
         CountingPolicyCapability: {
             /** @description Versioned counting policy identifier. */
@@ -632,12 +637,18 @@ export interface components {
             id: components["schemas"]["LanguageId"];
             /** @description English display name. */
             name: string;
+            /** @description Content direction: ltr or rtl; application controls remain LTR. */
+            direction: components["schemas"]["ContentDirection"];
+            /** @description Selected writing system. */
+            script: string;
+            /** @description Selected script and variety constraints. */
+            policy: string;
         };
         /**
          * @description Stable language identifier.
          * @enum {string}
          */
-        LanguageId: "en" | "ru" | "ro" | "zh";
+        LanguageId: "en" | "ru" | "ro" | "zh" | "af" | "ak" | "sq" | "am" | "ar" | "hy" | "as" | "az" | "bm" | "eu" | "be" | "bn" | "bs" | "br" | "bg" | "my" | "ca" | "ceb" | "ny" | "co" | "hr" | "cs" | "da" | "nl" | "eo" | "et" | "ee" | "fil" | "fi" | "fr" | "gl" | "ka" | "de" | "el" | "gu" | "ht" | "ha" | "haw" | "he" | "hi" | "hu" | "is" | "ig" | "id" | "ga" | "it" | "ja" | "jv" | "kn" | "kk" | "km" | "rw" | "ko" | "ku" | "ckb" | "ky" | "lo" | "la" | "lv" | "ln" | "lt" | "lg" | "lb" | "mk" | "mg" | "ms" | "ml" | "mt" | "mi" | "mr" | "mn" | "ne" | "nb" | "nn" | "oc" | "or" | "om" | "ps" | "fa" | "pl" | "pt" | "pa" | "qu" | "sm" | "sa" | "gd" | "sr" | "st" | "sn" | "sd" | "si" | "sk" | "sl" | "so" | "es" | "su" | "sw" | "sv" | "tg" | "ta" | "tt" | "te" | "th" | "ti" | "ts" | "tn" | "tr" | "tk" | "uk" | "ur" | "ug" | "uz" | "vi" | "cy" | "fy" | "wo" | "xh" | "yi" | "yo" | "zu";
         /**
          * @description Line-ending treatment before counting; exact line endings are preserved.
          * @enum {string}
@@ -971,8 +982,8 @@ export interface components {
             usage: components["schemas"]["UsageSnapshot"];
             /** @description Operation kind; fullText for existing operations, sentenceAlternatives for selected-sentence requests. */
             kind?: components["schemas"]["OperationKind"];
-            /** @description Validated source language from eligibility: en, ru, ro or zh; never inferred from output. */
-            resolvedSourceLanguage: string;
+            /** @description Validated canonical source language from capabilities; never inferred from output. */
+            resolvedSourceLanguage: components["schemas"]["LanguageId"];
         };
         SessionProblemDetails: {
             /** @description RFC 9457 problem type reference. */
@@ -1028,7 +1039,7 @@ export interface components {
          * @description Source selection used when a client omits the setting.
          * @enum {string}
          */
-        SourceSelectionValue: "auto" | "en" | "ru" | "ro" | "zh";
+        SourceSelectionValue: "auto" | "en" | "ru" | "ro" | "zh" | "af" | "ak" | "sq" | "am" | "ar" | "hy" | "as" | "az" | "bm" | "eu" | "be" | "bn" | "bs" | "br" | "bg" | "my" | "ca" | "ceb" | "ny" | "co" | "hr" | "cs" | "da" | "nl" | "eo" | "et" | "ee" | "fil" | "fi" | "fr" | "gl" | "ka" | "de" | "el" | "gu" | "ht" | "ha" | "haw" | "he" | "hi" | "hu" | "is" | "ig" | "id" | "ga" | "it" | "ja" | "jv" | "kn" | "kk" | "km" | "rw" | "ko" | "ku" | "ckb" | "ky" | "lo" | "la" | "lv" | "ln" | "lt" | "lg" | "lb" | "mk" | "mg" | "ms" | "ml" | "mt" | "mi" | "mr" | "mn" | "ne" | "nb" | "nn" | "oc" | "or" | "om" | "ps" | "fa" | "pl" | "pt" | "pa" | "qu" | "sm" | "sa" | "gd" | "sr" | "st" | "sn" | "sd" | "si" | "sk" | "sl" | "so" | "es" | "su" | "sw" | "sv" | "tg" | "ta" | "tt" | "te" | "th" | "ti" | "ts" | "tn" | "tr" | "tk" | "uk" | "ur" | "ug" | "uz" | "vi" | "cy" | "fy" | "wo" | "xh" | "yi" | "yo" | "zu";
         SubmitOperationRequest: {
             /**
              * Format: uuid
@@ -1104,8 +1115,8 @@ export interface components {
             usage: components["schemas"]["UsageSnapshot"];
             /** @description Operation kind; fullText for existing operations, sentenceAlternatives for selected-sentence requests. */
             kind?: components["schemas"]["OperationKind"];
-            /** @description Validated source language from eligibility: en, ru, ro or zh; never inferred from output. */
-            resolvedSourceLanguage: string;
+            /** @description Validated canonical source language from capabilities; never inferred from output. */
+            resolvedSourceLanguage: components["schemas"]["LanguageId"];
         };
         /**
          * @description Categorical availability: `available`, `user-exhausted`, `service-exhausted`, `monetary-suspended` or `unavailable`.

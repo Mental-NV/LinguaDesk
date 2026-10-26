@@ -9,9 +9,9 @@
     <ProjectReference Include="..\LinguaDesk.Core\LinguaDesk.Core.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Prompts/eligibility.v1.txt" />
-    <EmbeddedResource Include="Prompts/translation.v1.txt" />
-    <EmbeddedResource Include="Prompts/rewriting.v1.txt" />
-    <EmbeddedResource Include="Prompts/alternatives.v9.txt" />
+    <EmbeddedResource Include="Prompts/eligibility.v2.txt" />
+    <EmbeddedResource Include="Prompts/translation.v2.txt" />
+    <EmbeddedResource Include="Prompts/rewriting.v2.txt" />
+    <EmbeddedResource Include="Prompts/alternatives.v10.txt" />
   </ItemGroup>
 </Project>

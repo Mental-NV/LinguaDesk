@@ -122,7 +122,7 @@ const run = async () => {
   const capabilities = await call("capabilities", "GET", "/api/capabilities");
   expect("capabilities", capabilities.status, 200);
   expect("capabilities", capabilities.json.alternatives.maximumContextCharacters, 8000);
-  expect("capabilities", capabilities.json.alternatives.segmentationRevision, "sentence-boundaries-v1");
+  expect("capabilities", capabilities.json.alternatives.segmentationRevision, "sentence-boundaries-v2");
   expect("capabilities", capabilities.json.alternatives.optionCount, 2);
 
   // 2. Translation submit (AC-001).
@@ -267,6 +267,37 @@ const run = async () => {
   console.log(
     `[9] invalid-input ok: status=422 category=inputEligibility, no charge (consumed=${afterInvalid.json.consumedCharacters})`
   );
+
+  // M046: new LTR, RTL and three-letter IDs cross the real bearer boundary.
+  expect("expanded-catalog", capabilities.json.languages.length, 124);
+  expect("expanded-directions", capabilities.json.translation.supportedDirections.length, 15252);
+  for (const [language, source] of [
+    ["ar", "التقرير جاهز جدًا. سنرسله اليوم."],
+    ["hi", "रिपोर्ट बिल्कुल बिल्कुल तैयार है। हम इसे आज भेजेंगे।"],
+    ["fil", "Handang handa na ang ulat. Ipapadala namin ito ngayon."],
+  ]) {
+    const before = await call("expanded-before", "GET", "/api/usage", { token });
+    const body = { operationId: uuidv7(), family: "rewriting", source, sourceSelection: language };
+    const response = await call("expanded-write", "POST", "/api/operations", { token, body });
+    expect("expanded-write", response.status, 201, response.json);
+    expect("expanded-language", response.json.resolvedSourceLanguage, language);
+    expect("expanded-count", response.json.characterCount, scalarCount(source));
+    const replay = await call("expanded-replay", "POST", "/api/operations", { token, body });
+    expect("expanded-replay", replay.status, 200, replay.json);
+    expect("expanded-replay", replay.json.outputAvailable, false);
+    expect("expanded-replay-text", replay.json.rewrittenText, undefined);
+    const conflict = await call("expanded-conflict", "POST", "/api/operations", { token, body: { ...body, source: source + " " } });
+    expect("expanded-conflict", conflict.status, 409, conflict.json);
+    const after = await call("expanded-after", "GET", "/api/usage", { token });
+    expect("expanded-once-only", after.json.consumedCharacters - before.json.consumedCharacters, scalarCount(source));
+  }
+  const priorInvalid = await call("expanded-invalid-before", "GET", "/api/usage", { token });
+  for (const [sourceSelection, target] of [["ar", "ar"], ["tl", "en"], ["en-US", "ar"], ["en", "sr-Latn"]]) {
+    const invalid = await call("expanded-invalid", "POST", "/api/operations", { token, body: { operationId: uuidv7(), family: "translation", source: "Synthetic text.", sourceSelection, target } });
+    expect("expanded-invalid", invalid.status, 422, invalid.json);
+  }
+  const afterExpandedInvalid = await call("expanded-invalid-after", "GET", "/api/usage", { token });
+  expect("expanded-invalid-zero-charge", afterExpandedInvalid.json.consumedCharacters, priorInvalid.json.consumedCharacters);
 
   // 10. Unauthenticated usage read is rejected distinctly from success (AC-004).
   const anonymous = await call("anonymous-usage", "GET", "/api/usage");

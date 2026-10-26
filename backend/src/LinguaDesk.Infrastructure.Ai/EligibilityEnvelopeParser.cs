@@ -17,7 +17,7 @@ public sealed record EligibilityClassification(EligibilityStatus Status, string?
 
 public static class EligibilityEnvelopeParser
 {
-    public const string PromptRevision = "eligibility.v1";
+    public const string PromptRevision = EligibilityPrompt.PromptId;
 
     public const int MaxRawBytes = 65536;
 
@@ -194,11 +194,7 @@ public static class EligibilityEnvelopeParser
         return true;
     }
 
-    public static bool IsSupportedLanguage(string? value) =>
-        string.Equals(value, "en", StringComparison.Ordinal)
-        || string.Equals(value, "ru", StringComparison.Ordinal)
-        || string.Equals(value, "ro", StringComparison.Ordinal)
-        || string.Equals(value, "zh", StringComparison.Ordinal);
+    public static bool IsSupportedLanguage(string? value) => LinguaDesk.Core.ProductCatalog.IsLanguage(value);
 
     private static string? NormalizeHint(string? validatedSourceHint) =>
         IsSupportedLanguage(validatedSourceHint) ? validatedSourceHint : null;

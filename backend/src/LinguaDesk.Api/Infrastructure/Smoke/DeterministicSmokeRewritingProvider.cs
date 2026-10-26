@@ -119,6 +119,9 @@ public sealed class DeterministicSmokeRewritingClient : IChatClient
         if (root.TryGetProperty("selectedText", out var selected))
         {
             var text = selected.GetString();
+            var context = root.GetProperty("context").GetString()!;
+            if (ExpandedSmokeFixtures.Match(context) is { } fixture)
+                return JsonSerializer.Serialize(new { status = "result", options = fixture.Options });
             var alternatives = text == "The report is ready."
                 ? new[] { "The report is prepared.", "The report is complete." }
                 : new[] { "We will send it today.", "We are sending it today." };
@@ -127,13 +130,16 @@ public sealed class DeterministicSmokeRewritingClient : IChatClient
         var isTransformation = root.TryGetProperty("mode", out _);
         if (!isTransformation)
         {
-            return EligibilityResponse(source);
+            return ExpandedSmokeFixtures.Classify(source, root) ?? EligibilityResponse(source);
         }
 
         if (source.Contains(ProcessingFailureSentinel, StringComparison.Ordinal))
         {
             throw new HttpRequestException("Smoke deterministic processing failure.");
         }
+
+        if (ExpandedSmokeFixtures.Match(source) is { } expanded)
+            return JsonSerializer.Serialize(new TransformationResult("result", expanded.Result), SerializerOptions);
 
         return JsonSerializer.Serialize(
             new TransformationResult("result", source.Contains("M045-DELAY-ALTERNATIVES", StringComparison.Ordinal) ? "M039-DELAY. The report is ready." : source.Contains("M045-EXPANDED-RESULT", StringComparison.Ordinal) ? "The report is ready. " + new string('a', 8000) : source.Contains("M045-DELETION", StringComparison.Ordinal) ? "The report is ready." : FixtureResult),

@@ -10,19 +10,15 @@ public sealed class ScalarInputPolicyTests
     {
         PropertyNameCaseInsensitive = true,
     };
-    private static readonly string[] ExpectedLanguages = ["en:English", "ru:Russian", "ro:Romanian", "zh:Chinese"];
-    private static readonly string[] ExpectedSources = ["auto", "en", "ru", "ro", "zh"];
+    private static readonly string[] ExpectedLanguages = LanguageFixture.Languages.Select(language => $"{language.Id}:{language.Name}").ToArray();
+    private static readonly string[] ExpectedSources = new[] { "auto" }.Concat(LanguageFixture.Languages.Select(language => language.Id)).ToArray();
     private static readonly string[] ExpectedChineseInputScripts = ["simplified", "traditional"];
     private static readonly string[] ExpectedWhitespaceRanges =
     [
         "U+0009-U+000D", "U+0020", "U+0085", "U+00A0", "U+1680",
         "U+2000-U+200A", "U+2028-U+2029", "U+202F", "U+205F", "U+3000",
     ];
-    private static readonly string[] ExpectedDirections =
-    [
-        "en:ru", "en:ro", "en:zh", "ru:en", "ru:ro", "ru:zh",
-        "ro:en", "ro:ru", "ro:zh", "zh:en", "zh:ru", "zh:ro",
-    ];
+    private static readonly string[] ExpectedDirections = LanguageFixture.Directions;
     private static readonly string[] ExpectedModes =
     [
         "correctionOnly:correction", "simple:style", "casual:style", "business:style",

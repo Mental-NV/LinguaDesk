@@ -1,5 +1,5 @@
 import { act, cleanup, fireEvent, screen, within } from '@testing-library/react'
-import fixtures from '../../../contracts/fixtures/sentences.v1.json'
+import fixtures from '../../../contracts/fixtures/sentences.v2.json'
 import { sentenceSpans, SEGMENTATION_REVISION, scalarSlice } from '../../src/rewrite/sentences'
 import { compareText } from '../../src/rewrite/comparison'
 import { createInitialWorkspace, workspaceReducer, canReuseResult } from '../../src/shell/workspaceModel'
@@ -7,7 +7,7 @@ import { advance, chooseMode, deferred, editSource, expectResult, FIXED_TIME, fl
 
 it('uses the same scalar sentence fixtures as the server', () => {
   expect(SEGMENTATION_REVISION).toBe(fixtures.revision)
-  for (const fixture of fixtures.cases) expect(sentenceSpans(fixture.text), fixture.id).toEqual(fixture.spans)
+  for (const fixture of fixtures.cases) expect(sentenceSpans(fixture.text, 'language' in fixture ? fixture.language : undefined), fixture.id).toEqual(fixture.spans)
   expect(sentenceSpans('bad\ud800')).toEqual([])
 })
 it.each([

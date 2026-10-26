@@ -57,7 +57,7 @@ public static class TranslationPipeline
             var probe = TranslationPrompt.Create(
                 string.Empty,
                 eligibility.ResolvedLanguage ?? "en",
-                input.Target ?? "en");
+                ProductCatalog.IsLanguage(input.Target) ? input.Target! : "en");
             return new TranslationOutcome(
                 eligibility.Decision == EligibilityDecision.Failed
                     ? TranslationDecision.Failed

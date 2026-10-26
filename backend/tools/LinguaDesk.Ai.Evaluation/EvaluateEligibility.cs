@@ -53,6 +53,7 @@ internal static class EvaluateEligibility
 
     internal static async Task<int> RunAsync(string[] options)
     {
+        if (options.Contains("--suite", StringComparer.Ordinal)) return await M046Suite.RunAsync("eligibility", options).ConfigureAwait(false);
         if (!EvaluateEligibilityOptions.TryParse(options, out var selected, out var error))
         {
             Console.Error.WriteLine(error);

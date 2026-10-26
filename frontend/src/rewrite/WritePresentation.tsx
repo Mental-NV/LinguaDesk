@@ -1,6 +1,6 @@
 import { useMemo, useRef, type ReactNode } from 'react'
 import type { WorkspaceAction, WorkspaceState } from '../shell/workspaceModel'
-import { currentResult } from '../shell/workspaceModel'
+import { alternativesCompatible, MESSAGE_SEGMENTATION_REFRESH, currentResult } from '../shell/workspaceModel'
 import { compareText, changedScalarRanges } from './comparison'
 import { scalarSlice, sentenceSpans, spanKey, type SentenceSpan } from './sentences'
 
@@ -10,7 +10,10 @@ export function WritePresentation({ state, dispatch, requestAlternatives }: { re
   const ranges = changedScalarRanges(comparison)
   const contextLength = Array.from(state.resultText).length
   const assistance = currentResult(state) && state.association !== null && state.comparisonSource !== null
-  const spans = useMemo(() => assistance && contextLength <= 8000 ? sentenceSpans(state.resultText) : [], [assistance, contextLength, state.resultText])
+  const compatible = alternativesCompatible(state)
+  const language = currentResult(state) ? state.resolvedSourceLanguage ?? undefined : undefined
+  const direction = language ? state.capabilities?.languageDirections?.[language] ?? 'auto' : 'auto'
+  const spans = useMemo(() => assistance && compatible && contextLength <= 8000 ? sentenceSpans(state.resultText, language) : [], [assistance, compatible, contextLength, state.resultText, language])
   const selectedSet = state.selectedSentence ? state.alternativeSets[spanKey(state.selectedSentence)] : undefined
   const loading = state.phase === 'submitting' && state.operationKind === 'sentenceAlternatives' && state.selectedSentence && state.alternativesCapture && spanKey(state.selectedSentence) === spanKey(state.alternativesCapture.span)
   const highlight = (start: number, length: number): ReactNode => {
@@ -45,7 +48,7 @@ export function WritePresentation({ state, dispatch, requestAlternatives }: { re
   }
   if (offset < contextLength) main.push(highlight(offset, contextLength - offset))
   return <div className="write-presentation">
-    <div className="result-plain-text" aria-label="Improved result" data-testid="write-result" aria-busy={state.phase === 'submitting' && state.operationKind === 'fullText' && state.inputRevision === state.submittedInputRevision && state.resultEditRevision === state.submittedResultEditRevision} tabIndex={0} onKeyDown={event => {
+    <div dir={direction} lang={language} className="result-plain-text" aria-label="Improved result" data-testid="write-result" aria-busy={state.phase === 'submitting' && state.operationKind === 'fullText' && state.inputRevision === state.submittedInputRevision && state.resultEditRevision === state.submittedResultEditRevision} tabIndex={0} onKeyDown={event => {
       if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'a') {
         event.preventDefault()
         const range = document.createRange(); range.selectNodeContents(event.currentTarget)
@@ -53,16 +56,17 @@ export function WritePresentation({ state, dispatch, requestAlternatives }: { re
       }
     }}>{main}</div>
     {state.showChanges && comparison.some(part => part.kind === 'delete') && <div className="deletion-review" aria-label="Deleted source text">
-      <span>Deleted from source:</span> {comparison.filter(part => part.kind === 'delete').map((part, index) => <del key={index}>{part.text}</del>)}
+      <span>Deleted from source:</span> {comparison.filter(part => part.kind === 'delete').map((part, index) => <del dir="auto" lang={language} key={index}>{part.text}</del>)}
     </div>}
+    {assistance && !compatible && <p className="assistance-message" role="status">{MESSAGE_SEGMENTATION_REFRESH}</p>}
     {assistance && contextLength > 8000 && <p className="assistance-message">Sentence alternatives are unavailable because this result exceeds 8,000 characters. You can still edit and copy it.</p>}
-    {assistance && state.selectedSentence && (loading || selectedSet || state.alternativesError) && <section className="alternatives" aria-label="Sentence alternatives" aria-busy={!!loading}>
+    {assistance && compatible && state.selectedSentence && (loading || selectedSet || state.alternativesError) && <section className="alternatives" aria-label="Sentence alternatives" aria-busy={!!loading}>
       <h3>Alternatives:</h3>
       {loading && <p role="status">Generating alternatives…</p>}
       {state.alternativesError && <p role="alert">{state.alternativesError}</p>}
       {state.alternativesError && state.alternativesCanRetry && <button type="button" className="text-action" onClick={() => { if (state.selectedSentence) requestAlternatives?.(state.selectedSentence) }}>Try again</button>}
       {selectedSet && <p className="visually-hidden" role="status">Alternatives ready.</p>}
-      {selectedSet?.choices.filter(value => value !== selectedSet.current).map(value => <button type="button" key={value} className="alternative-option" disabled={!currentResult(state) || state.composing} onClick={() => dispatch({ type: 'alternativeApplied', value, association: crypto.randomUUID() })}>{value}</button>)}
+      {selectedSet?.choices.filter(value => value !== selectedSet.current).map(value => <button dir={direction} lang={language} type="button" key={value} className="alternative-option" disabled={!currentResult(state) || state.composing} onClick={() => dispatch({ type: 'alternativeApplied', value, association: crypto.randomUUID() })}>{value}</button>)}
     </section>}
   </div>
 }

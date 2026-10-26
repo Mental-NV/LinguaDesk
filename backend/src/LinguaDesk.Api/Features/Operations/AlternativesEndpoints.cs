@@ -88,7 +88,7 @@ public static partial class OperationsEndpoints
             var settled = result.Settlement;
             if (result.Decision == ChainDecision.Succeeded)
                 return Results.Json(new AlternativesSuccessResponse(request.OperationId, OperationFamily.Rewriting, OperationKind.SentenceAlternatives,
-                    OperationStatus.Succeeded, result.Options!, request.Association, request.Start, request.Length, request.Language,
+                    OperationStatus.Succeeded, result.Options!, request.Association, request.Start, request.Length, LinguaDesk.Api.Features.Capabilities.CapabilitiesDocument.ToLanguageId(request.Language),
                     request.Mode ?? ProductCatalog.DefaultRewritingMode, settled.Submission!.ScalarCount, settled.Submission.AdmissionDay,
                     settled.Submission.DeadlineUtc, settled.ServerTime, ToUsage(settled.Usage)), statusCode: 201);
             if (result.Decision == ChainDecision.Ineligible)

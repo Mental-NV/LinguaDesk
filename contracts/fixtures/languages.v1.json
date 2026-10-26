@@ -1,0 +1,873 @@
+{
+  "revision": "languages-v1",
+  "languages": [
+    {
+      "id": "af",
+      "name": "Afrikaans",
+      "direction": "ltr",
+      "script": "Latin",
+      "policy": "Use Latin script; preserve the source variety in rewriting where possible."
+    },
+    {
+      "id": "ak",
+      "name": "Akan",
+      "direction": "ltr",
+      "script": "Latin",
+      "policy": "Use Latin script; preserve the source variety in rewriting where possible."
+    },
+    {
+      "id": "sq",
+      "name": "Albanian",
+      "direction": "ltr",
+      "script": "Latin",
+      "policy": "Use Latin script; preserve the source variety in rewriting where possible."
+    },
+    {
+      "id": "am",
+      "name": "Amharic",
+      "direction": "ltr",
+      "script": "Ethiopic",
+      "policy": "Use Ethiopic script; preserve the source variety in rewriting where possible."
+    },
+    {
+      "id": "ar",
+      "name": "Arabic",
+      "direction": "rtl",
+      "script": "Arabic",
+      "policy": "Use Modern Standard Arabic; dialect conversion is not promised."
+    },
+    {
+      "id": "hy",
+      "name": "Armenian",
+      "direction": "ltr",
+      "script": "Armenian",
+      "policy": "Use Armenian script; preserve the source variety in rewriting where possible."
+    },
+    {
+      "id": "as",
+      "name": "Assamese",
+      "direction": "ltr",
+      "script": "Bengali",
+      "policy": "Use Bengali script; preserve the source variety in rewriting where possible."
+    },
+    {
+      "id": "az",
+      "name": "Azerbaijani",
+      "direction": "ltr",
+      "script": "Latin",
+      "policy": "Use Latin script; preserve the source variety in rewriting where possible."
+    },
+    {
+      "id": "bm",
+      "name": "Bambara",
+      "direction": "ltr",
+      "script": "Latin",
+      "policy": "Use Latin script; preserve the source variety in rewriting where possible."
+    },
+    {
+      "id": "eu",
+      "name": "Basque",
+      "direction": "ltr",
+      "script": "Latin",
+      "policy": "Use Latin script; preserve the source variety in rewriting where possible."
+    },
+    {
+      "id": "be",
+      "name": "Belarusian",
+      "direction": "ltr",
+      "script": "Cyrillic",
+      "policy": "Use Cyrillic script; preserve the source variety in rewriting where possible."
+    },
+    {
+      "id": "bn",
+      "name": "Bengali",
+      "direction": "ltr",
+      "script": "Bengali",
+      "policy": "Use Bengali script; preserve the source variety in rewriting where possible."
+    },
+    {
+      "id": "bs",
+      "name": "Bosnian",
+      "direction": "ltr",
+      "script": "Latin",
+      "policy": "Use Latin script; preserve the source variety in rewriting where possible."
+    },
+    {
+      "id": "br",
+      "name": "Breton",
+      "direction": "ltr",
+      "script": "Latin",
+      "policy": "Use Latin script; preserve the source variety in rewriting where possible."
+    },
+    {
+      "id": "bg",
+      "name": "Bulgarian",
+      "direction": "ltr",
+      "script": "Cyrillic",
+      "policy": "Use Cyrillic script; preserve the source variety in rewriting where possible."
+    },
+    {
+      "id": "my",
+      "name": "Burmese",
+      "direction": "ltr",
+      "script": "Myanmar",
+      "policy": "Use Myanmar script; preserve the source variety in rewriting where possible."
+    },
+    {
+      "id": "ca",
+      "name": "Catalan",
+      "direction": "ltr",
+      "script": "Latin",
+      "policy": "Use Latin script; preserve the source variety in rewriting where possible."
+    },
+    {
+      "id": "ceb",
+      "name": "Cebuano",
+      "direction": "ltr",
+      "script": "Latin",
+      "policy": "Use Latin script; preserve the source variety in rewriting where possible."
+    },
+    {
+      "id": "ny",
+      "name": "Chichewa",
+      "direction": "ltr",
+      "script": "Latin",
+      "policy": "Use Latin script; preserve the source variety in rewriting where possible."
+    },
+    {
+      "id": "zh",
+      "name": "Chinese",
+      "direction": "ltr",
+      "script": "Chinese",
+      "policy": "Accept Simplified and Traditional input; always output Simplified Chinese."
+    },
+    {
+      "id": "co",
+      "name": "Corsican",
+      "direction": "ltr",
+      "script": "Latin",
+      "policy": "Use Latin script; preserve the source variety in rewriting where possible."
+    },
+    {
+      "id": "hr",
+      "name": "Croatian",
+      "direction": "ltr",
+      "script": "Latin",
+      "policy": "Use Latin script; preserve the source variety in rewriting where possible."
+    },
+    {
+      "id": "cs",
+      "name": "Czech",
+      "direction": "ltr",
+      "script": "Latin",
+      "policy": "Use Latin script; preserve the source variety in rewriting where possible."
+    },
+    {
+      "id": "da",
+      "name": "Danish",
+      "direction": "ltr",
+      "script": "Latin",
+      "policy": "Use Latin script; preserve the source variety in rewriting where possible."
+    },
+    {
+      "id": "nl",
+      "name": "Dutch",
+      "direction": "ltr",
+      "script": "Latin",
+      "policy": "Use Latin script; preserve the source variety in rewriting where possible."
+    },
+    {
+      "id": "en",
+      "name": "English",
+      "direction": "ltr",
+      "script": "Latin",
+      "policy": "Use Latin script; preserve the source variety in rewriting where possible."
+    },
+    {
+      "id": "eo",
+      "name": "Esperanto",
+      "direction": "ltr",
+      "script": "Latin",
+      "policy": "Use Latin script; preserve the source variety in rewriting where possible."
+    },
+    {
+      "id": "et",
+      "name": "Estonian",
+      "direction": "ltr",
+      "script": "Latin",
+      "policy": "Use Latin script; preserve the source variety in rewriting where possible."
+    },
+    {
+      "id": "ee",
+      "name": "Ewe",
+      "direction": "ltr",
+      "script": "Latin",
+      "policy": "Use Latin script; preserve the source variety in rewriting where possible."
+    },
+    {
+      "id": "fil",
+      "name": "Filipino",
+      "direction": "ltr",
+      "script": "Latin",
+      "policy": "Filipino uses fil; tl is not an alias."
+    },
+    {
+      "id": "fi",
+      "name": "Finnish",
+      "direction": "ltr",
+      "script": "Latin",
+      "policy": "Use Latin script; preserve the source variety in rewriting where possible."
+    },
+    {
+      "id": "fr",
+      "name": "French",
+      "direction": "ltr",
+      "script": "Latin",
+      "policy": "Use Latin script; preserve the source variety in rewriting where possible."
+    },
+    {
+      "id": "gl",
+      "name": "Galician",
+      "direction": "ltr",
+      "script": "Latin",
+      "policy": "Use Latin script; preserve the source variety in rewriting where possible."
+    },
+    {
+      "id": "ka",
+      "name": "Georgian",
+      "direction": "ltr",
+      "script": "Georgian",
+      "policy": "Use Georgian script; preserve the source variety in rewriting where possible."
+    },
+    {
+      "id": "de",
+      "name": "German",
+      "direction": "ltr",
+      "script": "Latin",
+      "policy": "Use Latin script; preserve the source variety in rewriting where possible."
+    },
+    {
+      "id": "el",
+      "name": "Greek",
+      "direction": "ltr",
+      "script": "Greek",
+      "policy": "Use Greek script; preserve the source variety in rewriting where possible."
+    },
+    {
+      "id": "gu",
+      "name": "Gujarati",
+      "direction": "ltr",
+      "script": "Gujarati",
+      "policy": "Use Gujarati script; preserve the source variety in rewriting where possible."
+    },
+    {
+      "id": "ht",
+      "name": "Haitian Creole",
+      "direction": "ltr",
+      "script": "Latin",
+      "policy": "Use Latin script; preserve the source variety in rewriting where possible."
+    },
+    {
+      "id": "ha",
+      "name": "Hausa",
+      "direction": "ltr",
+      "script": "Latin",
+      "policy": "Use Latin script; preserve the source variety in rewriting where possible."
+    },
+    {
+      "id": "haw",
+      "name": "Hawaiian",
+      "direction": "ltr",
+      "script": "Latin",
+      "policy": "Use Latin script; preserve the source variety in rewriting where possible."
+    },
+    {
+      "id": "he",
+      "name": "Hebrew",
+      "direction": "rtl",
+      "script": "Hebrew",
+      "policy": "Use Hebrew script; preserve the source variety in rewriting where possible."
+    },
+    {
+      "id": "hi",
+      "name": "Hindi",
+      "direction": "ltr",
+      "script": "Devanagari",
+      "policy": "Use Devanagari script; preserve the source variety in rewriting where possible."
+    },
+    {
+      "id": "hu",
+      "name": "Hungarian",
+      "direction": "ltr",
+      "script": "Latin",
+      "policy": "Use Latin script; preserve the source variety in rewriting where possible."
+    },
+    {
+      "id": "is",
+      "name": "Icelandic",
+      "direction": "ltr",
+      "script": "Latin",
+      "policy": "Use Latin script; preserve the source variety in rewriting where possible."
+    },
+    {
+      "id": "ig",
+      "name": "Igbo",
+      "direction": "ltr",
+      "script": "Latin",
+      "policy": "Use Latin script; preserve the source variety in rewriting where possible."
+    },
+    {
+      "id": "id",
+      "name": "Indonesian",
+      "direction": "ltr",
+      "script": "Latin",
+      "policy": "Use Latin script; preserve the source variety in rewriting where possible."
+    },
+    {
+      "id": "ga",
+      "name": "Irish",
+      "direction": "ltr",
+      "script": "Latin",
+      "policy": "Use Latin script; preserve the source variety in rewriting where possible."
+    },
+    {
+      "id": "it",
+      "name": "Italian",
+      "direction": "ltr",
+      "script": "Latin",
+      "policy": "Use Latin script; preserve the source variety in rewriting where possible."
+    },
+    {
+      "id": "ja",
+      "name": "Japanese",
+      "direction": "ltr",
+      "script": "Japanese",
+      "policy": "Use Japanese script; preserve the source variety in rewriting where possible."
+    },
+    {
+      "id": "jv",
+      "name": "Javanese",
+      "direction": "ltr",
+      "script": "Latin",
+      "policy": "Use Latin script; preserve the source variety in rewriting where possible."
+    },
+    {
+      "id": "kn",
+      "name": "Kannada",
+      "direction": "ltr",
+      "script": "Kannada",
+      "policy": "Use Kannada script; preserve the source variety in rewriting where possible."
+    },
+    {
+      "id": "kk",
+      "name": "Kazakh",
+      "direction": "ltr",
+      "script": "Cyrillic",
+      "policy": "Use Cyrillic script; preserve the source variety in rewriting where possible."
+    },
+    {
+      "id": "km",
+      "name": "Khmer",
+      "direction": "ltr",
+      "script": "Khmer",
+      "policy": "Use Khmer script; preserve the source variety in rewriting where possible."
+    },
+    {
+      "id": "rw",
+      "name": "Kinyarwanda",
+      "direction": "ltr",
+      "script": "Latin",
+      "policy": "Use Latin script; preserve the source variety in rewriting where possible."
+    },
+    {
+      "id": "ko",
+      "name": "Korean",
+      "direction": "ltr",
+      "script": "Korean",
+      "policy": "Use Korean script; preserve the source variety in rewriting where possible."
+    },
+    {
+      "id": "ku",
+      "name": "Kurdish (Kurmanji)",
+      "direction": "ltr",
+      "script": "Latin",
+      "policy": "Use Latin-script Kurmanji."
+    },
+    {
+      "id": "ckb",
+      "name": "Kurdish (Sorani)",
+      "direction": "rtl",
+      "script": "Arabic",
+      "policy": "Use Arabic-script Sorani."
+    },
+    {
+      "id": "ky",
+      "name": "Kyrgyz",
+      "direction": "ltr",
+      "script": "Cyrillic",
+      "policy": "Use Cyrillic script; preserve the source variety in rewriting where possible."
+    },
+    {
+      "id": "lo",
+      "name": "Lao",
+      "direction": "ltr",
+      "script": "Lao",
+      "policy": "Use Lao script; preserve the source variety in rewriting where possible."
+    },
+    {
+      "id": "la",
+      "name": "Latin",
+      "direction": "ltr",
+      "script": "Latin",
+      "policy": "Use Latin script; preserve the source variety in rewriting where possible."
+    },
+    {
+      "id": "lv",
+      "name": "Latvian",
+      "direction": "ltr",
+      "script": "Latin",
+      "policy": "Use Latin script; preserve the source variety in rewriting where possible."
+    },
+    {
+      "id": "ln",
+      "name": "Lingala",
+      "direction": "ltr",
+      "script": "Latin",
+      "policy": "Use Latin script; preserve the source variety in rewriting where possible."
+    },
+    {
+      "id": "lt",
+      "name": "Lithuanian",
+      "direction": "ltr",
+      "script": "Latin",
+      "policy": "Use Latin script; preserve the source variety in rewriting where possible."
+    },
+    {
+      "id": "lg",
+      "name": "Luganda",
+      "direction": "ltr",
+      "script": "Latin",
+      "policy": "Use Latin script; preserve the source variety in rewriting where possible."
+    },
+    {
+      "id": "lb",
+      "name": "Luxembourgish",
+      "direction": "ltr",
+      "script": "Latin",
+      "policy": "Use Latin script; preserve the source variety in rewriting where possible."
+    },
+    {
+      "id": "mk",
+      "name": "Macedonian",
+      "direction": "ltr",
+      "script": "Cyrillic",
+      "policy": "Use Cyrillic script; preserve the source variety in rewriting where possible."
+    },
+    {
+      "id": "mg",
+      "name": "Malagasy",
+      "direction": "ltr",
+      "script": "Latin",
+      "policy": "Use Latin script; preserve the source variety in rewriting where possible."
+    },
+    {
+      "id": "ms",
+      "name": "Malay",
+      "direction": "ltr",
+      "script": "Latin",
+      "policy": "Use Latin script; preserve the source variety in rewriting where possible."
+    },
+    {
+      "id": "ml",
+      "name": "Malayalam",
+      "direction": "ltr",
+      "script": "Malayalam",
+      "policy": "Use Malayalam script; preserve the source variety in rewriting where possible."
+    },
+    {
+      "id": "mt",
+      "name": "Maltese",
+      "direction": "ltr",
+      "script": "Latin",
+      "policy": "Use Latin script; preserve the source variety in rewriting where possible."
+    },
+    {
+      "id": "mi",
+      "name": "Maori",
+      "direction": "ltr",
+      "script": "Latin",
+      "policy": "Use Latin script; preserve the source variety in rewriting where possible."
+    },
+    {
+      "id": "mr",
+      "name": "Marathi",
+      "direction": "ltr",
+      "script": "Devanagari",
+      "policy": "Use Devanagari script; preserve the source variety in rewriting where possible."
+    },
+    {
+      "id": "mn",
+      "name": "Mongolian",
+      "direction": "ltr",
+      "script": "Cyrillic",
+      "policy": "Use Cyrillic; vertical Mongolian is unsupported."
+    },
+    {
+      "id": "ne",
+      "name": "Nepali",
+      "direction": "ltr",
+      "script": "Devanagari",
+      "policy": "Use Devanagari script; preserve the source variety in rewriting where possible."
+    },
+    {
+      "id": "nb",
+      "name": "Norwegian Bokmål",
+      "direction": "ltr",
+      "script": "Latin",
+      "policy": "Use Latin script; preserve the source variety in rewriting where possible."
+    },
+    {
+      "id": "nn",
+      "name": "Norwegian Nynorsk",
+      "direction": "ltr",
+      "script": "Latin",
+      "policy": "Use Latin script; preserve the source variety in rewriting where possible."
+    },
+    {
+      "id": "oc",
+      "name": "Occitan",
+      "direction": "ltr",
+      "script": "Latin",
+      "policy": "Use Latin script; preserve the source variety in rewriting where possible."
+    },
+    {
+      "id": "or",
+      "name": "Odia",
+      "direction": "ltr",
+      "script": "Odia",
+      "policy": "Use Odia script; preserve the source variety in rewriting where possible."
+    },
+    {
+      "id": "om",
+      "name": "Oromo",
+      "direction": "ltr",
+      "script": "Latin",
+      "policy": "Use Latin script; preserve the source variety in rewriting where possible."
+    },
+    {
+      "id": "ps",
+      "name": "Pashto",
+      "direction": "rtl",
+      "script": "Arabic",
+      "policy": "Use Arabic script; preserve the source variety in rewriting where possible."
+    },
+    {
+      "id": "fa",
+      "name": "Persian",
+      "direction": "rtl",
+      "script": "Arabic",
+      "policy": "Use Arabic script; preserve the source variety in rewriting where possible."
+    },
+    {
+      "id": "pl",
+      "name": "Polish",
+      "direction": "ltr",
+      "script": "Latin",
+      "policy": "Use Latin script; preserve the source variety in rewriting where possible."
+    },
+    {
+      "id": "pt",
+      "name": "Portuguese",
+      "direction": "ltr",
+      "script": "Latin",
+      "policy": "Use Latin script; preserve the source variety in rewriting where possible."
+    },
+    {
+      "id": "pa",
+      "name": "Punjabi",
+      "direction": "ltr",
+      "script": "Gurmukhi",
+      "policy": "Use Gurmukhi; Shahmukhi is unsupported."
+    },
+    {
+      "id": "qu",
+      "name": "Quechua",
+      "direction": "ltr",
+      "script": "Latin",
+      "policy": "Use Latin script; preserve the source variety in rewriting where possible."
+    },
+    {
+      "id": "ro",
+      "name": "Romanian",
+      "direction": "ltr",
+      "script": "Latin",
+      "policy": "Use Latin script; preserve the source variety in rewriting where possible."
+    },
+    {
+      "id": "ru",
+      "name": "Russian",
+      "direction": "ltr",
+      "script": "Cyrillic",
+      "policy": "Use Cyrillic script; preserve the source variety in rewriting where possible."
+    },
+    {
+      "id": "sm",
+      "name": "Samoan",
+      "direction": "ltr",
+      "script": "Latin",
+      "policy": "Use Latin script; preserve the source variety in rewriting where possible."
+    },
+    {
+      "id": "sa",
+      "name": "Sanskrit",
+      "direction": "ltr",
+      "script": "Devanagari",
+      "policy": "Use Devanagari script; preserve the source variety in rewriting where possible."
+    },
+    {
+      "id": "gd",
+      "name": "Scottish Gaelic",
+      "direction": "ltr",
+      "script": "Latin",
+      "policy": "Use Latin script; preserve the source variety in rewriting where possible."
+    },
+    {
+      "id": "sr",
+      "name": "Serbian",
+      "direction": "ltr",
+      "script": "Cyrillic",
+      "policy": "Accept Cyrillic and Latin input. For rewriting and alternatives preserve the main input script; translation target defaults to Cyrillic. No same-language cross-script conversion."
+    },
+    {
+      "id": "st",
+      "name": "Sesotho",
+      "direction": "ltr",
+      "script": "Latin",
+      "policy": "Use Latin script; preserve the source variety in rewriting where possible."
+    },
+    {
+      "id": "sn",
+      "name": "Shona",
+      "direction": "ltr",
+      "script": "Latin",
+      "policy": "Use Latin script; preserve the source variety in rewriting where possible."
+    },
+    {
+      "id": "sd",
+      "name": "Sindhi",
+      "direction": "rtl",
+      "script": "Arabic",
+      "policy": "Use Arabic script; preserve the source variety in rewriting where possible."
+    },
+    {
+      "id": "si",
+      "name": "Sinhala",
+      "direction": "ltr",
+      "script": "Sinhala",
+      "policy": "Use Sinhala script; preserve the source variety in rewriting where possible."
+    },
+    {
+      "id": "sk",
+      "name": "Slovak",
+      "direction": "ltr",
+      "script": "Latin",
+      "policy": "Use Latin script; preserve the source variety in rewriting where possible."
+    },
+    {
+      "id": "sl",
+      "name": "Slovenian",
+      "direction": "ltr",
+      "script": "Latin",
+      "policy": "Use Latin script; preserve the source variety in rewriting where possible."
+    },
+    {
+      "id": "so",
+      "name": "Somali",
+      "direction": "ltr",
+      "script": "Latin",
+      "policy": "Use Latin script; preserve the source variety in rewriting where possible."
+    },
+    {
+      "id": "es",
+      "name": "Spanish",
+      "direction": "ltr",
+      "script": "Latin",
+      "policy": "Use Latin script; preserve the source variety in rewriting where possible."
+    },
+    {
+      "id": "su",
+      "name": "Sundanese",
+      "direction": "ltr",
+      "script": "Latin",
+      "policy": "Use Latin script; preserve the source variety in rewriting where possible."
+    },
+    {
+      "id": "sw",
+      "name": "Swahili",
+      "direction": "ltr",
+      "script": "Latin",
+      "policy": "Use Latin script; preserve the source variety in rewriting where possible."
+    },
+    {
+      "id": "sv",
+      "name": "Swedish",
+      "direction": "ltr",
+      "script": "Latin",
+      "policy": "Use Latin script; preserve the source variety in rewriting where possible."
+    },
+    {
+      "id": "tg",
+      "name": "Tajik",
+      "direction": "ltr",
+      "script": "Cyrillic",
+      "policy": "Use Cyrillic script; preserve the source variety in rewriting where possible."
+    },
+    {
+      "id": "ta",
+      "name": "Tamil",
+      "direction": "ltr",
+      "script": "Tamil",
+      "policy": "Use Tamil script; preserve the source variety in rewriting where possible."
+    },
+    {
+      "id": "tt",
+      "name": "Tatar",
+      "direction": "ltr",
+      "script": "Cyrillic",
+      "policy": "Use Cyrillic script; preserve the source variety in rewriting where possible."
+    },
+    {
+      "id": "te",
+      "name": "Telugu",
+      "direction": "ltr",
+      "script": "Telugu",
+      "policy": "Use Telugu script; preserve the source variety in rewriting where possible."
+    },
+    {
+      "id": "th",
+      "name": "Thai",
+      "direction": "ltr",
+      "script": "Thai",
+      "policy": "Use Thai script; preserve the source variety in rewriting where possible."
+    },
+    {
+      "id": "ti",
+      "name": "Tigrinya",
+      "direction": "ltr",
+      "script": "Ethiopic",
+      "policy": "Use Ethiopic script; preserve the source variety in rewriting where possible."
+    },
+    {
+      "id": "ts",
+      "name": "Tsonga",
+      "direction": "ltr",
+      "script": "Latin",
+      "policy": "Use Latin script; preserve the source variety in rewriting where possible."
+    },
+    {
+      "id": "tn",
+      "name": "Tswana",
+      "direction": "ltr",
+      "script": "Latin",
+      "policy": "Use Latin script; preserve the source variety in rewriting where possible."
+    },
+    {
+      "id": "tr",
+      "name": "Turkish",
+      "direction": "ltr",
+      "script": "Latin",
+      "policy": "Use Latin script; preserve the source variety in rewriting where possible."
+    },
+    {
+      "id": "tk",
+      "name": "Turkmen",
+      "direction": "ltr",
+      "script": "Latin",
+      "policy": "Use Latin script; preserve the source variety in rewriting where possible."
+    },
+    {
+      "id": "uk",
+      "name": "Ukrainian",
+      "direction": "ltr",
+      "script": "Cyrillic",
+      "policy": "Use Cyrillic script; preserve the source variety in rewriting where possible."
+    },
+    {
+      "id": "ur",
+      "name": "Urdu",
+      "direction": "rtl",
+      "script": "Arabic",
+      "policy": "Use Arabic script; preserve the source variety in rewriting where possible."
+    },
+    {
+      "id": "ug",
+      "name": "Uyghur",
+      "direction": "rtl",
+      "script": "Arabic",
+      "policy": "Use Arabic script; preserve the source variety in rewriting where possible."
+    },
+    {
+      "id": "uz",
+      "name": "Uzbek",
+      "direction": "ltr",
+      "script": "Latin",
+      "policy": "Use Latin script; preserve the source variety in rewriting where possible."
+    },
+    {
+      "id": "vi",
+      "name": "Vietnamese",
+      "direction": "ltr",
+      "script": "Latin",
+      "policy": "Use Latin script; preserve the source variety in rewriting where possible."
+    },
+    {
+      "id": "cy",
+      "name": "Welsh",
+      "direction": "ltr",
+      "script": "Latin",
+      "policy": "Use Latin script; preserve the source variety in rewriting where possible."
+    },
+    {
+      "id": "fy",
+      "name": "Western Frisian",
+      "direction": "ltr",
+      "script": "Latin",
+      "policy": "Use Latin script; preserve the source variety in rewriting where possible."
+    },
+    {
+      "id": "wo",
+      "name": "Wolof",
+      "direction": "ltr",
+      "script": "Latin",
+      "policy": "Use Latin script; preserve the source variety in rewriting where possible."
+    },
+    {
+      "id": "xh",
+      "name": "Xhosa",
+      "direction": "ltr",
+      "script": "Latin",
+      "policy": "Use Latin script; preserve the source variety in rewriting where possible."
+    },
+    {
+      "id": "yi",
+      "name": "Yiddish",
+      "direction": "rtl",
+      "script": "Hebrew",
+      "policy": "Use Hebrew script; preserve the source variety in rewriting where possible."
+    },
+    {
+      "id": "yo",
+      "name": "Yoruba",
+      "direction": "ltr",
+      "script": "Latin",
+      "policy": "Use Latin script; preserve the source variety in rewriting where possible."
+    },
+    {
+      "id": "zu",
+      "name": "Zulu",
+      "direction": "ltr",
+      "script": "Latin",
+      "policy": "Use Latin script; preserve the source variety in rewriting where possible."
+    }
+  ]
+}

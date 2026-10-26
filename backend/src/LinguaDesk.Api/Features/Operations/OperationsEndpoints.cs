@@ -574,7 +574,7 @@ public static partial class OperationsEndpoints
         execution.Submission.AdmissionDay,
         execution.Submission.DeadlineUtc,
         execution.ServerTime,
-        ToUsage(execution.Usage)) { ResolvedSourceLanguage = execution.ResolvedSourceLanguage! };
+        ToUsage(execution.Usage)) { ResolvedSourceLanguage = LinguaDesk.Api.Features.Capabilities.CapabilitiesDocument.ToLanguageId(execution.ResolvedSourceLanguage!) };
 
     internal static IResult MapRewritingExecution(
         RewritingExecutionResult execution,
@@ -624,7 +624,7 @@ public static partial class OperationsEndpoints
         execution.Submission.AdmissionDay,
         execution.Submission.DeadlineUtc,
         execution.ServerTime,
-        ToUsage(execution.Usage)) { ResolvedSourceLanguage = execution.ResolvedSourceLanguage! };
+        ToUsage(execution.Usage)) { ResolvedSourceLanguage = LinguaDesk.Api.Features.Capabilities.CapabilitiesDocument.ToLanguageId(execution.ResolvedSourceLanguage!) };
 
     internal static IResult ToDuplicate(
         OperationSubmission submission,

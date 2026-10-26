@@ -1,6 +1,6 @@
 # Language catalog and expansion policy
 
-Product authority: continuation of [PRD #1](../01-PRD.md), FR-004–006/009/012 and D-24. **Selected design, 2026-10-26; not an implementation or model-quality claim.** Runtime remains the four-language M045 baseline until M046 is implemented and verified. [Research](../research/language-expansion-2026-10-26.md) records the feasibility boundary; [M046](../08-backlogs/M046/backlog.md) owns delivery.
+Product authority: continuation of [PRD #1](../01-PRD.md), FR-004–006/009/012 and D-24. **Selected catalog, 2026-10-26; live model quality remains pending.** The local M046 runtime and generated contract expose this catalog. Required live-development evidence and milestone completion remain pending; earlier four-language reports do not qualify additions. [Research](../research/language-expansion-2026-10-26.md) records the feasibility boundary; [M046](../08-backlogs/M046/backlog.md) owns delivery.
 
 ## Selected catalog
 

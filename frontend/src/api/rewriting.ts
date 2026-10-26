@@ -1,3 +1,4 @@
+import { languageCapabilities } from './languages'
 import type { components, operations } from './generated/linguadesk-api.d'
 import { getAccountAntiforgeryToken, ANTIFORGERY_HEADER } from './accounts'
 import type { RewritingCapabilities, RewritingUsage } from '../rewrite/rewritingWorkspace'
@@ -14,16 +15,8 @@ export const OPERATIONS_PATH = '/api/operations' as const
 export const USAGE_PATH = '/api/usage' as const
 export const CAPABILITIES_PATH = '/api/capabilities' as const
 
-function languageName(language: components['schemas']['LanguageCapability']): [string, string] {
-  return [language.id, language.id === 'zh' ? 'Chinese (Simplified output)' : language.name]
-}
-
 export function toCapabilities(body: CapabilitiesBody): RewritingCapabilities {
-  const languages: Record<string, string> = {}
-  for (const language of body.languages) {
-    const [id, name] = languageName(language)
-    languages[id] = name
-  }
+  const { languages, languageDirections, languageValues } = languageCapabilities(body.languages)
   const modeNames: Record<string, string> = {}
   for (const mode of body.rewriting.modes) {
     modeNames[mode.id] = mode.name
@@ -32,7 +25,9 @@ export function toCapabilities(body: CapabilitiesBody): RewritingCapabilities {
     maximumSourceCharacters: body.rewriting.maximumSourceCharacters,
     overallDeadlineSeconds: body.rewriting.overallDeadlineSeconds,
     sourceDefault: body.sourceSelection.default,
-    sourceValues: [...body.sourceSelection.values],
+    sourceValues: [body.sourceSelection.default, ...languageValues],
+    languageDirections,
+    segmentationRevision: body.alternatives?.segmentationRevision,
     languages,
     modeDefault: body.rewriting.defaultMode,
     modeValues: body.rewriting.modes.map((mode) => mode.id),
@@ -109,7 +104,7 @@ async function readProblem(response: Response): Promise<ProblemBody | null> {
 
 export type SubmitRewritingResult =
   | {
-      readonly resolvedSourceLanguage?: string
+      readonly resolvedSourceLanguage?: SuccessBody['resolvedSourceLanguage']
       readonly kind: 'succeeded'
       readonly rewrittenText: string
       readonly admissionDay: string

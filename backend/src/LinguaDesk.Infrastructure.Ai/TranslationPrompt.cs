@@ -5,18 +5,15 @@ namespace LinguaDesk.Infrastructure.Ai;
 
 public static class TranslationPrompt
 {
-    public const string PromptId = "translation.v1";
+    public const string PromptId = "translation.v2";
 
     private const string ResourceName =
-        "LinguaDesk.Infrastructure.Ai.Prompts.translation.v1.txt";
+        "LinguaDesk.Infrastructure.Ai.Prompts.translation.v2.txt";
 
     private static readonly JsonSerializerOptions SerializerOptions = new()
     {
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
     };
-
-    private static readonly Lazy<(string Content, string Sha256)> Resource =
-        new(() => PromptResource.Load(ResourceName));
 
     public static PromptSnapshot Create(string source, string sourceLanguage, string targetLanguage)
     {
@@ -27,7 +24,7 @@ public static class TranslationPrompt
         var userData = JsonSerializer.Serialize(
             new TranslationUserData(source, sourceLanguage, targetLanguage),
             SerializerOptions);
-        var resource = Resource.Value;
+        var resource = PromptResource.Compose(ResourceName, "Source: " + PromptResource.Descriptor(sourceLanguage) + "\nTarget: " + PromptResource.Descriptor(targetLanguage));
 
         return new PromptSnapshot(
             PromptId,

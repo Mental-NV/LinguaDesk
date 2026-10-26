@@ -6,7 +6,7 @@
       "path": "docs/product/languages.md",
       "use": "excerpt",
       "reason": "Canonical selected language identities, script policies and coverage scope",
-      "sha256": "0f3d7578c651276990c04571239eb7326510101de07e79d70777eddb19680e3e"
+      "sha256": "4293a5167a92738ac732d24b2ee3ad3ddc16edcec2db692b45081cbd3b3e82f8"
     },
     {
       "path": "docs/01-PRD.md",
@@ -152,7 +152,7 @@
       "use": "reference",
       "reason": "Shared AI behavior, strict output, family qualification and finite dispatch/cost rules",
       "heading": "5.4 Context and monetary bounds",
-      "sha256": "5addd6f4fecd65a9bee3700fb9a4204e672ef7f7b70d0dd407c8d497b64ae00a"
+      "sha256": "0bb89610ded21403c39086bd224e7b9f2ca8060c3f8bdae9a05ae16be0d2f21d"
     },
     {
       "path": "docs/04-llm-specification.md",
@@ -318,55 +318,55 @@
       "path": "backend/src/LinguaDesk.Core/ProductCatalog.cs",
       "use": "reference",
       "reason": "Inspected current implementation or executable verification boundary; open when changing this component",
-      "sha256": "60de0c7227b53a871cba618f194bb6190d27e4916e5cb79f7c7bfe1f219d376c"
+      "sha256": "8d5ebec4b0745dcdda955d255f4624944b34acadda8f1a45c8dad86a5bdea29a"
     },
     {
       "path": "backend/src/LinguaDesk.Core/SentenceBoundaryPolicy.cs",
       "use": "reference",
       "reason": "Inspected current implementation or executable verification boundary; open when changing this component",
-      "sha256": "f3e7dc6ce1a14d8954dd3716ce55e8d3fc5db383f7c9acbe5000f54a1ff59d92"
+      "sha256": "6b74868d40653e7e233110ef71dea76eb0abdbd0c09dd8b2fb07ef759d5c8eeb"
     },
     {
       "path": "backend/src/LinguaDesk.Api/Features/Capabilities/CapabilitiesContract.cs",
       "use": "reference",
       "reason": "Inspected current implementation or executable verification boundary; open when changing this component",
-      "sha256": "de5212d87854844900a8d921caf1e0f69b2762722bb192d945f6b09f49788898"
+      "sha256": "d11e4e91547117c94e548b3a095152ece9ddd7b99ad8631d3cc7465f659a8785"
     },
     {
       "path": "backend/src/LinguaDesk.Api/Features/Capabilities/CapabilitiesDocument.cs",
       "use": "reference",
       "reason": "Inspected current implementation or executable verification boundary; open when changing this component",
-      "sha256": "b4b6b9ed3339144fd72ad8f0c6ced7cd81ec788cfec3585f4d7c5c644ed5460d"
+      "sha256": "12e8e028fec20c64d20f8d0d739bea4d28c3121f1e5b4604e73de5ae42242645"
     },
     {
       "path": "backend/src/LinguaDesk.Api/Features/Operations/OperationsContract.cs",
       "use": "reference",
       "reason": "Inspected current implementation or executable verification boundary; open when changing this component",
-      "sha256": "e3ec4527edaed5c1a11238dbbbbe903b26bb1573dde9b53cd97c80ff2facf4ee"
+      "sha256": "958f00f522ab134ec021055de626cedd4b977e2e2f6aab753994becd40c43df2"
     },
     {
       "path": "backend/src/LinguaDesk.Infrastructure.Ai/EligibilityEnvelopeParser.cs",
       "use": "reference",
       "reason": "Inspected current implementation or executable verification boundary; open when changing this component",
-      "sha256": "30e3b224d1bab6e5af5d1e6951d3198a4745014136e442870d0d2acdae8e8dd2"
+      "sha256": "21aeae8aab8586a03661b6c2b96ed49a3d1057ab298460e7f52ba4a5d5bbe649"
     },
     {
       "path": "backend/src/LinguaDesk.Infrastructure.Ai/EligibilityPrompt.cs",
       "use": "reference",
       "reason": "Inspected current implementation or executable verification boundary; open when changing this component",
-      "sha256": "83989a1f4d69acca78ffe059af0c9ff88fdabcff3edc3a1fd5bd06a43d1c8492"
+      "sha256": "1fbb24c5a7f598cd9b4df253c4424b2b0c9483bc45fdc1b35e029edab2dbd5a1"
     },
     {
       "path": "backend/src/LinguaDesk.Infrastructure.Ai/AlternativesPrompt.cs",
       "use": "reference",
       "reason": "Inspected current implementation or executable verification boundary; open when changing this component",
-      "sha256": "bb1045d9faa203a7584c7624d6c7a45ee11e6a1caf022a4ce5f05f5670249b2b"
+      "sha256": "43dc8dea893fa3bbc48284a911fb328bcc17a8237e0e77e23d23cf37ca57fb92"
     },
     {
       "path": "backend/src/LinguaDesk.Infrastructure.Ai/AlternativesEnvelopeParser.cs",
       "use": "reference",
       "reason": "Inspected current implementation or executable verification boundary; open when changing this component",
-      "sha256": "c96076fb33c866c103b0f1cd70bcfb44d818971ffc9c8e3b53ed7d603c46ac55"
+      "sha256": "3b255f6bd5d17088c6e3038e62dd1296262c1371b81dc86e58c1a3e42f7d3940"
     },
     {
       "path": "backend/src/LinguaDesk.Infrastructure.Ai/Prompts/eligibility.v1.txt",
@@ -396,7 +396,7 @@
       "path": "frontend/src/api/translation.ts",
       "use": "reference",
       "reason": "Inspected current implementation or executable verification boundary; open when changing this component",
-      "sha256": "2b4da7722bf05a467d636f16d259535f1b677b40c304b81296fec40f6f8759f6"
+      "sha256": "8fd1e740a2b196f22e1471ab68fde3ca362af97992e4c393543f77cfc6a509b7"
     },
     {
       "path": "frontend/src/translate/TranslatePage.tsx",
@@ -414,7 +414,7 @@
       "path": "frontend/src/rewrite/sentences.ts",
       "use": "reference",
       "reason": "Inspected current implementation or executable verification boundary; open when changing this component",
-      "sha256": "99a071f3f1c0229ff065a216a5197a24c34743f103b54b7338d1180f5f14cb0a"
+      "sha256": "2e93839991735675df4265ff83e9a53cdf1e8065284d61f0280b374451e063f3"
     },
     {
       "path": "frontend/src/rewrite/comparison.ts",
@@ -426,19 +426,19 @@
       "path": "frontend/src/shell/WorkspaceView.tsx",
       "use": "reference",
       "reason": "Inspected current implementation or executable verification boundary; open when changing this component",
-      "sha256": "57195b8fc295637ab048007e063532a09ac00fab2e05bca1c9cdab73d9531021"
+      "sha256": "d1ae73efe6931c3a1ba5f5d72530d89fc672a0e52934e11064f00b47113586c0"
     },
     {
       "path": "frontend/src/shell/workspaceModel.ts",
       "use": "reference",
       "reason": "Inspected current implementation or executable verification boundary; open when changing this component",
-      "sha256": "611bd5b91d1373dca0398934a211fec16981745818a08abe07da8b5e226796de"
+      "sha256": "d6a5733fb72c6a0be97d7b409d34ebbe3a2796bd7144fdf8e5c308dbb1014620"
     },
     {
       "path": "scripts/ai.sh",
       "use": "reference",
       "reason": "Inspected current implementation or executable verification boundary; open when changing this component",
-      "sha256": "3e6e95c63cfe5cd632fd3fae7426d99d151bd6f14dd50c01683958aeae648d3e"
+      "sha256": "5d1e104e43e34266e63ca68070304c8c6714a2279a655deeaa64aeb2ff62ef26"
     },
     {
       "path": "scripts/verify-milestone.sh",
@@ -450,15 +450,105 @@
       "path": "frontend/tests/e2e/fonts/README.md",
       "use": "reference",
       "reason": "Inspected current implementation or executable verification boundary; open when changing this component",
-      "sha256": "c8434b0545ceaf709a60cbfd25b587bdc8f395a5bd2e2a5351033f8cec5556fd"
+      "sha256": "433e1b7a05097866c70bbb08739810db3743d4a6d996037246083e968695d2ba"
+    },
+    {
+      "path": "contracts/fixtures/languages.v1.json",
+      "use": "reference",
+      "reason": "M046 implemented boundary or frozen verification input; reviewed during implementation.",
+      "sha256": "4af54cdebb6c1e7b5de8d4e8780f7a5cdbbf1eab3911effc1cb791b340779465"
+    },
+    {
+      "path": "contracts/fixtures/sentences.v2.json",
+      "use": "reference",
+      "reason": "M046 implemented boundary or frozen verification input; reviewed during implementation.",
+      "sha256": "8fc9ce80f94abf1bbb219b7e122ad0d8d63d30b5cc7ee27cedd2f2e86448fbdb"
+    },
+    {
+      "path": "backend/tools/LinguaDesk.Ai.Evaluation/Corpus/m046/development.v1.json",
+      "use": "reference",
+      "reason": "M046 implemented boundary or frozen verification input; reviewed during implementation.",
+      "sha256": "550777c025e5577b45fdc742dc04edeb4b35b063f44bfb12ee785a1214574142"
+    },
+    {
+      "path": "backend/tools/LinguaDesk.Ai.Evaluation/M046Suite.cs",
+      "use": "reference",
+      "reason": "M046 implemented boundary or frozen verification input; reviewed during implementation.",
+      "sha256": "9f439111202144592e5d5f472279a22eb33deb9a442c16d23544c2bda5bc93b9"
+    },
+    {
+      "path": "backend/src/LinguaDesk.Infrastructure.Ai/FullTextProfile.cs",
+      "use": "reference",
+      "reason": "M046 implemented boundary or frozen verification input; reviewed during implementation.",
+      "sha256": "6528755a32903d28f7e0c16d798ebb722befb26db057bf0ca4ba4e40c47a1e73"
+    },
+    {
+      "path": "backend/src/LinguaDesk.Infrastructure.Ai/Prompts/eligibility.v2.txt",
+      "use": "reference",
+      "reason": "M046 implemented boundary or frozen verification input; reviewed during implementation.",
+      "sha256": "ec72710c612947fbb9f3de434443dc71d5c4e3236c3a18cd8acecd58aecb2e2d"
+    },
+    {
+      "path": "backend/src/LinguaDesk.Infrastructure.Ai/Prompts/translation.v2.txt",
+      "use": "reference",
+      "reason": "M046 implemented boundary or frozen verification input; reviewed during implementation.",
+      "sha256": "3782f8f5bf7cce409a65b2bdc74255c9ac795c342c133f2c3efd8742fa616cac"
+    },
+    {
+      "path": "backend/src/LinguaDesk.Infrastructure.Ai/Prompts/rewriting.v2.txt",
+      "use": "reference",
+      "reason": "M046 implemented boundary or frozen verification input; reviewed during implementation.",
+      "sha256": "e6f0a59f34aa509060c597e4a2948c60c548b526dfa487dca186ad4f800d5aef"
+    },
+    {
+      "path": "backend/src/LinguaDesk.Infrastructure.Ai/Prompts/alternatives.v10.txt",
+      "use": "reference",
+      "reason": "M046 implemented boundary or frozen verification input; reviewed during implementation.",
+      "sha256": "a07c34d8c2adb93a3bf79c91bb948599c0b8f6e8d39952c6f3c7ca8d4bcfb06b"
+    },
+    {
+      "path": "backend/tests/LinguaDesk.Infrastructure.Ai.Tests/ExpandedLanguagesTests.cs",
+      "use": "reference",
+      "reason": "M046 implemented boundary or frozen verification input; reviewed during implementation.",
+      "sha256": "6090db925686262f5acd2381a9c196e80d11d2ad7143a58c370cfca01aa221a0"
+    },
+    {
+      "path": "backend/tests/LinguaDesk.Api.Tests/ExpandedLanguageOperationTests.cs",
+      "use": "reference",
+      "reason": "M046 implemented boundary or frozen verification input; reviewed during implementation.",
+      "sha256": "10a5b782beffe214cb6590ea95c5bdfafa0075c53a019efd0af1549758818c25"
+    },
+    {
+      "path": "frontend/src/api/languages.ts",
+      "use": "reference",
+      "reason": "M046 implemented boundary or frozen verification input; reviewed during implementation.",
+      "sha256": "252a3183d9e5f83873a7208a31b640bab18720eedb8b71569968d1760cbe6c44"
+    },
+    {
+      "path": "frontend/tests/unit/expandedLanguages.test.tsx",
+      "use": "reference",
+      "reason": "M046 implemented boundary or frozen verification input; reviewed during implementation.",
+      "sha256": "254b2c190e3129ecf17ccf5e086e3b3913576439cedc1a5133c1ef2fc5d1d8d1"
+    },
+    {
+      "path": "frontend/tests/e2e/m046-languages.spec.ts",
+      "use": "reference",
+      "reason": "M046 implemented boundary or frozen verification input; reviewed during implementation.",
+      "sha256": "eaa7e7956f388d646cc4d94b49b96baa76eb731ab353a66bbf0e338463478afb"
+    },
+    {
+      "path": "frontend/tests/e2e/fonts/manifest.m046.json",
+      "use": "reference",
+      "reason": "M046 implemented boundary or frozen verification input; reviewed during implementation.",
+      "sha256": "ec257db899e2210ee9973bf0e2f4315a6827200d0b2ea0158c4aa728fadafb1e"
     }
   ],
-  "source_map_sha256": "3856c80ab6f49b7403bd375f22a80d87e3a82903f77abb874e82ab72ca16e4af",
-  "baseline_commit": "554493f63625b1ea10736f61206ae2aab2f7d60f",
+  "source_map_sha256": "758c37685ecd27679100a8efd8c78f36815b7222142d13fc1f8b317e24b6da4e",
+  "baseline_commit": "a5684268e70880a5a2cbae5facc2a8095cc23902",
   "locked_files": {
     "docs/00-SDD-Planning-Workflow.md": "7e0f058c2b7ea290598030ab46d71e2c13def0a37e4b5de7cc029d1e6bb6e7ea",
     "docs/00-workflow/execution.md": "106a00f4d7004fbf3fcbbd106502fd61a1be41e5db9fd99ee20c92d8688038a8",
-    "docs/08-backlogs/M046/spec.md": "f084cc4333ed6dae1449e695cd351df1f0cf892ab23952395a24b63ec07f62f5",
-    "docs/08-backlogs/M046/plan.md": "a5ce4e935e4fa6035a9a9cb5dd47aa15772b2867b08634179714242f6f7016ed"
+    "docs/08-backlogs/M046/spec.md": "5dc49979a633dbf75e42d97bf3d9af616c4707d0888b6b72352d49a84e08f724",
+    "docs/08-backlogs/M046/plan.md": "02e6cef2dc708ded53aefb83cd6391545609aebf8c3301fb46d773428a9aa6e2"
   }
 }

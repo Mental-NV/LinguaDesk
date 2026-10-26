@@ -20,7 +20,7 @@ public static class CandidateRegistry
                         Mode: CandidateProfile.DisabledReasoningMode,
                         Effort: null),
                     JsonResponseMode: true),
-                PromptRevision: "eligibility.v1",
+                PromptRevision: EligibilityPrompt.PromptId,
                 ValidatorRevision: "envelope.v1",
                 new ContextBounds(
                     MaxOutputTokens: 4096,
@@ -48,7 +48,7 @@ public static class CandidateRegistry
                         Mode: CandidateProfile.DisabledReasoningMode,
                         Effort: null),
                     JsonResponseMode: true),
-                PromptRevision: "eligibility.v1",
+                PromptRevision: EligibilityPrompt.PromptId,
                 ValidatorRevision: "envelope.v1",
                 new ContextBounds(
                     MaxOutputTokens: 4096,
@@ -76,7 +76,7 @@ public static class CandidateRegistry
                         Mode: CandidateProfile.EffortReasoningMode,
                         Effort: CandidateProfile.DefaultReasoningEffort),
                     JsonResponseMode: true),
-                PromptRevision: "eligibility.v1",
+                PromptRevision: EligibilityPrompt.PromptId,
                 ValidatorRevision: "envelope.v1",
                 new ContextBounds(
                     MaxOutputTokens: 10000,
@@ -104,7 +104,7 @@ public static class CandidateRegistry
                         Mode: CandidateProfile.EffortReasoningMode,
                         Effort: CandidateProfile.DefaultReasoningEffort),
                     JsonResponseMode: true),
-                PromptRevision: "eligibility.v1",
+                PromptRevision: EligibilityPrompt.PromptId,
                 ValidatorRevision: "envelope.v1",
                 new ContextBounds(
                     MaxOutputTokens: 10000,

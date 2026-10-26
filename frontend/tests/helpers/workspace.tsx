@@ -12,6 +12,7 @@ export const SOURCE = 'Hello, the meeting starts at 14:30. Please go.'
 export const RESULT = 'Bună, întâlnirea începe la 14:30. Te rog să mergi.'
 export const MODES = ['correctionOnly', 'simple', 'casual', 'business', 'academic', 'enthusiastic', 'friendly', 'confident', 'diplomatic']
 export const CAPABILITIES = {
+  alternatives: { segmentationRevision: 'sentence-boundaries-v2' },
   languages: [{ id: 'en', name: 'English' }, { id: 'ru', name: 'Russian' }, { id: 'ro', name: 'Romanian' }, { id: 'zh', name: 'Chinese' }],
   sourceSelection: { default: 'auto', values: ['auto', 'en', 'ru', 'ro', 'zh'] },
   translation: { maximumSourceCharacters: 5000, overallDeadlineSeconds: 30 },

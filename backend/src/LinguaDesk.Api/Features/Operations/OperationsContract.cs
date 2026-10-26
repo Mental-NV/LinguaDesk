@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using LinguaDesk.Api.Features.Capabilities;
 using System.Text.Json.Serialization;
 
 namespace LinguaDesk.Api.Features.Operations;
@@ -31,7 +32,7 @@ public sealed record AlternativesRequest(
     int Length,
     [property: Description("Opaque nonempty UUID correlating the in-memory result revision; never stored.")]
     Guid Association,
-    [property: Description("Explicit supported source language: en, ru, ro or zh.")]
+    [property: Description("Explicit canonical source language from capabilities.")]
     string Language,
     [property: Description("One effective rewriting mode; correctionOnly when omitted; explicit null is rejected.")]
     string Mode = "correctionOnly");
@@ -55,7 +56,7 @@ public sealed record AlternativesSuccessResponse(
     [property: Description("Selected complete sentence length, from 1 to 2000 Unicode scalars.")]
     int Length,
     [property: Description("Validated source language from eligibility, never inferred from generated output.")]
-    string ResolvedSourceLanguage,
+    LanguageId ResolvedSourceLanguage,
     [property: Description("One effective rewriting mode; correctionOnly when omitted; explicit null is rejected.")]
     string Mode,
     [property: Description("Selected-sentence scalar count charged once on success.")]
@@ -168,8 +169,8 @@ public sealed record TranslationSuccessResponse(
 {
     [Description("Operation kind; fullText for existing operations, sentenceAlternatives for selected-sentence requests.")]
     public OperationKind Kind { get; init; } = OperationKind.FullText;
-    [Description("Validated source language from eligibility: en, ru, ro or zh; never inferred from output.")]
-    public required string ResolvedSourceLanguage { get; init; }
+    [Description("Validated canonical source language from capabilities; never inferred from output.")]
+    public required LanguageId ResolvedSourceLanguage { get; init; }
 }
 
 /// <summary>Synchronous rewriting success: complete validated same-language rewritten text with its committed charge and a fresh current-day usage snapshot. Text-bearing responses always use `Cache-Control: no-store`.</summary>
@@ -195,8 +196,8 @@ public sealed record RewritingSuccessResponse(
 {
     [Description("Operation kind; fullText for existing operations, sentenceAlternatives for selected-sentence requests.")]
     public OperationKind Kind { get; init; } = OperationKind.FullText;
-    [Description("Validated source language from eligibility: en, ru, ro or zh; never inferred from output.")]
-    public required string ResolvedSourceLanguage { get; init; }
+    [Description("Validated canonical source language from capabilities; never inferred from output.")]
+    public required LanguageId ResolvedSourceLanguage { get; init; }
 }
 
 /// <summary>Wire-fixed Problem Details category names for the translation execution path (API §8).</summary>

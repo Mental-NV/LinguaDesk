@@ -51,8 +51,8 @@ public sealed class TranslationPipelineTests
         Assert.AreEqual(2, outcome.TotalDispatches);
         Assert.AreEqual(2, client.CallCount);
         Assert.IsFalse(outcome.ChargesCharacters);
-        Assert.AreEqual("eligibility.v1", outcome.EligibilityPromptId);
-        Assert.AreEqual("translation.v1", outcome.PromptId);
+        Assert.AreEqual("eligibility.v2", outcome.EligibilityPromptId);
+        Assert.AreEqual("translation.v2", outcome.PromptId);
     }
 
     [TestMethod]

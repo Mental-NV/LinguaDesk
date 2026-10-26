@@ -1,8 +1,10 @@
-import { scalarSlice, spanKey, type SentenceSpan } from '../rewrite/sentences'
+import { SEGMENTATION_REVISION, scalarSlice, spanKey, type SentenceSpan } from '../rewrite/sentences'
 import { analyzeInput, validateRewriting, validateTranslation } from '../api/inputPolicy'
 
 export type Feature = 'translation' | 'rewriting'
 export interface WorkspaceCapabilities {
+  readonly languageDirections?: Readonly<Record<string, 'ltr' | 'rtl'>>
+  readonly segmentationRevision?: string
   readonly maximumSourceCharacters: number
   readonly overallDeadlineSeconds?: number
   readonly sourceDefault: string
@@ -99,7 +101,7 @@ export type WorkspaceAction<C extends WorkspaceCapabilities = WorkspaceCapabilit
 export const MESSAGE_UNCERTAIN_SOURCE = 'Choose the source language to continue.'
 export const MESSAGE_PROCESSING_FAILURE = 'We couldn’t process this text. Your text and previous result are safe.'
 export const MESSAGE_DEADLINE = 'Processing took too long. Your text and previous result are safe.'
-export const MESSAGE_UNSUPPORTED_CONTENT = 'This text contains too much unsupported or mixed-language content. Use one main language: English, Russian, Romanian, or Chinese.'
+export const MESSAGE_UNSUPPORTED_CONTENT = 'This text contains too much unsupported or mixed-language content. Use one main language from the language list.'
 export const MESSAGE_MONETARY_SUSPENDED = 'LinguaDesk processing is temporarily unavailable because its service budget has been reached. Your text is safe. Try again after service resumes.'
 export const MESSAGE_OFFLINE = 'You’re offline. Keep editing. When you’re back online, edit your text or settings to process it.'
 export const MESSAGE_UNKNOWN_OUTCOME = 'We couldn’t confirm whether this request completed. Your text is safe. Check its status before trying again.'
@@ -177,6 +179,8 @@ function withUsage<C extends WorkspaceCapabilities>(state: WorkspaceState<C>, us
   return { ...state, usage, usageObservedAtMs: at, usageUnavailable: false }
 }
 const clearAssistance = { comparisonSource: null, association: null, selectedSentence: null, alternativeSets: {}, alternativesCapture: null, alternativesError: null, alternativesCanRetry: false }
+export function alternativesCompatible(state: WorkspaceState) { return state.capabilities?.segmentationRevision === SEGMENTATION_REVISION }
+export const MESSAGE_SEGMENTATION_REFRESH = 'Refresh LinguaDesk to use sentence alternatives. You can still edit and copy your text.'
 export function currentResult(state: WorkspaceState) { return state.hasResult && !!state.resultText && !state.resultOutdated && !state.resultEdited && state.resolvedSourceLanguage !== null }
 export function canReuseResult(state: WorkspaceState) { return state.hasResult && !!state.resultText && !state.resultOutdated && state.resolvedSourceLanguage !== null && !state.composing && state.phase === 'idle' && state.pendingOperationId === null }
 function currentText(state: WorkspaceState) { return state.inputRevision === state.submittedInputRevision && state.resultEditRevision === state.submittedResultEditRevision }

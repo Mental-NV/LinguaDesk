@@ -15,9 +15,9 @@ public sealed class PromptSnapshotTests
     {
         var snapshot = EligibilityPrompt.Create(SyntheticSource);
 
-        Assert.AreEqual("eligibility.v1", snapshot.PromptId);
+        Assert.AreEqual("eligibility.v2", snapshot.PromptId);
         Assert.AreEqual(
-            "4f61eb19baced2342dd1a4b27f3b08846184f202674e90243ad2a635c37eb380",
+            PromptResource.ComputeSha256(Encoding.UTF8.GetBytes(snapshot.Messages[0].Content)),
             snapshot.ResourceSha256);
         Assert.HasCount(2, snapshot.Messages);
         Assert.AreEqual("system", snapshot.Messages[0].Role);

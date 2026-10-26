@@ -9,12 +9,12 @@ public sealed class SentenceBoundaryPolicyTests
     [TestMethod]
     public void SharedScalarSpansPreserveGapsAndRepeatedOccurrences()
     {
-        using var fixtures = JsonDocument.Parse(File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "Fixtures", "sentences.v1.json")));
+        using var fixtures = JsonDocument.Parse(File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "Fixtures", "sentences.v2.json")));
         Assert.AreEqual(SentenceBoundaryPolicy.Revision, fixtures.RootElement.GetProperty("revision").GetString());
         foreach (var row in fixtures.RootElement.GetProperty("cases").EnumerateArray())
         {
             var expected = row.GetProperty("spans").EnumerateArray().Select(s => new SentenceSpan(s.GetProperty("start").GetInt32(), s.GetProperty("length").GetInt32())).ToArray();
-            CollectionAssert.AreEqual(expected, SentenceBoundaryPolicy.Segment(row.GetProperty("text").GetString()!).ToArray(), row.GetProperty("id").GetString());
+            CollectionAssert.AreEqual(expected, SentenceBoundaryPolicy.Segment(row.GetProperty("text").GetString()!, row.TryGetProperty("language", out var language) ? language.GetString() : null).ToArray(), row.GetProperty("id").GetString());
         }
     }
 

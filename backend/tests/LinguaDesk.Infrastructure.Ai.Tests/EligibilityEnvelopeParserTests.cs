@@ -168,7 +168,7 @@ public sealed class EligibilityEnvelopeParserTests
 
     [TestMethod]
     [DataRow("{\"status\":\"likely\",\"language\":\"en\"}")]
-    [DataRow("{\"status\":\"eligible\",\"language\":\"de\"}")]
+    [DataRow("{\"status\":\"eligible\",\"language\":\"de-DE\"}")]
     [DataRow("{\"status\":\"eligible\",\"language\":42}")]
     [DataRow("{\"status\":7,\"language\":\"en\"}")]
     [DataRow("{\"status\":\"eligible\"}")]

@@ -115,7 +115,7 @@ public sealed class DeterministicSmokeTranslationClient : IChatClient
         var isTransformation = root.TryGetProperty("targetLanguage", out _);
         if (!isTransformation)
         {
-            return EligibilityResponse(source);
+            return ExpandedSmokeFixtures.Classify(source, root) ?? EligibilityResponse(source);
         }
 
         if (source.Contains(ProcessingFailureSentinel, StringComparison.Ordinal))
@@ -127,7 +127,7 @@ public sealed class DeterministicSmokeTranslationClient : IChatClient
             ? targetElement.GetString()
             : null;
         return JsonSerializer.Serialize(
-            new TransformationResult("result", FixtureText(target)),
+            new TransformationResult("result", ExpandedSmokeFixtures.Cases.FirstOrDefault(fixture => fixture.Language == target)?.Result ?? FixtureText(target)),
             SerializerOptions);
     }
 

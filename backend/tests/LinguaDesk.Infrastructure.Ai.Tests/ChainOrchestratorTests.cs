@@ -24,15 +24,6 @@ public sealed class ChainOrchestratorTests
         TimeSpan.FromSeconds(2),
         clock);
 
-    private static decimal PerDispatchReservation()
-    {
-        var profile = CandidateRegistry.Select(CandidateRegistry.Default, FamilyChain.EvaluationPrimaryId);
-        return EvaluationBudget.UpperBoundUsd(
-            profile.Bounds.MaxInputTokens,
-            profile.Bounds.MaxOutputTokens,
-            profile.Billing.PeakInputPerMillionTokens,
-            profile.Billing.PeakOutputPerMillionTokens);
-    }
 
     private static Func<CandidateProfile, IChatClient> Router(SequenceClient primary, SequenceClient fallback) =>
         profile => string.Equals(profile.CandidateId, FamilyChain.EvaluationPrimaryId, StringComparison.Ordinal)
@@ -430,12 +421,14 @@ public sealed class ChainOrchestratorTests
             PolicyFor(new ManualChainClock(DateTimeOffset.UtcNow)),
             budget);
 
-        var expected = 3 * PerDispatchReservation();
+        var view = FullTextProfile.ForTranslation(CandidateRegistry.Default[0], new("Please send the report tomorrow.", Target: "ru"));
+        var perDispatch = EvaluationBudget.UpperBoundUsd(view.Bounds.MaxInputTokens, view.Bounds.MaxOutputTokens, view.Billing.PeakInputPerMillionTokens, view.Billing.PeakOutputPerMillionTokens);
+        var expected = 3 * perDispatch;
         Assert.AreEqual(ChainDecision.Succeeded, outcome.Decision);
         Assert.AreEqual(3, budget.DispatchesUsed);
         Assert.AreEqual(expected, budget.ReservedUsd);
         Assert.AreEqual(expected, budget.UnresolvedUsd);
-        Assert.IsTrue(outcome.Attempts.All(static attempt => attempt.ReservedUsd == PerDispatchReservation()));
+        Assert.IsTrue(outcome.Attempts.All(attempt => attempt.ReservedUsd == perDispatch));
     }
 
     [TestMethod]

@@ -64,6 +64,8 @@ public static class ChainOrchestrator
             throw new ArgumentException("The translation traversal requires a translation family chain.", nameof(chain));
         }
 
+        if (LinguaDesk.Core.ScalarInputPolicy.ValidateTranslation(input.Source, LinguaDesk.Core.ProductCatalog.TranslationMaximumSourceCharacters, input.SourceSelection, input.Target).IsValid)
+            chain = chain with { Primary = FullTextProfile.ForTranslation(chain.Primary, input), Fallback = chain.Fallback is null ? null : FullTextProfile.ForTranslation(chain.Fallback, input) };
         var eligibilityInput = new EligibilityInput(
             input.Source, EligibilityOperation.Translation, input.SourceSelection, input.Target);
         return ExecuteAsync<EligibilityOutcome, TranslationOutcome>(
@@ -116,6 +118,8 @@ public static class ChainOrchestrator
                 chain.Fallback?.CandidateId));
         }
 
+        if (LinguaDesk.Core.ScalarInputPolicy.ValidateRewriting(input.Source, LinguaDesk.Core.ProductCatalog.RewritingMaximumSourceCharacters, input.SourceSelection, input.Mode).IsValid)
+            chain = chain with { Primary = FullTextProfile.ForRewriting(chain.Primary, input), Fallback = chain.Fallback is null ? null : FullTextProfile.ForRewriting(chain.Fallback, input) };
         var eligibilityInput = new EligibilityInput(
             input.Source, EligibilityOperation.Rewriting, input.SourceSelection, Mode: mode);
         return ExecuteAsync<EligibilityOutcome, RewritingOutcome>(

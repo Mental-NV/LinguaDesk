@@ -38,10 +38,11 @@ cp -R "$frontend_dist/." "$web_root/"
 
 rm -rf "$publish_directory"
 mkdir -p "$publish_directory"
-dotnet restore "$solution" --locked-mode
+dotnet restore "$solution" --locked-mode --disable-build-servers --disable-parallel -m:1
 dotnet publish "$api_project" \
     --configuration Release \
     --no-restore \
+    --disable-build-servers -m:1 \
     --output "$publish_directory"
 
 if [ ! -f "$publish_directory/wwwroot/index.html" ]; then

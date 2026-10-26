@@ -19,14 +19,10 @@ public sealed class CapabilitiesEndpointTests
         "U+0009-U+000D", "U+0020", "U+0085", "U+00A0", "U+1680",
         "U+2000-U+200A", "U+2028-U+2029", "U+202F", "U+205F", "U+3000",
     ];
-    private static readonly string[] ExpectedLanguages = ["en:English", "ru:Russian", "ro:Romanian", "zh:Chinese"];
-    private static readonly string[] ExpectedSources = ["auto", "en", "ru", "ro", "zh"];
+    private static readonly string[] ExpectedLanguages = LanguageFixture.Languages.Select(language => $"{language.Id}:{language.Name}").ToArray();
+    private static readonly string[] ExpectedSources = new[] { "auto" }.Concat(LanguageFixture.Languages.Select(language => language.Id)).ToArray();
     private static readonly ChineseScript[] ExpectedChineseScripts = [ChineseScript.Simplified, ChineseScript.Traditional];
-    private static readonly string[] ExpectedDirections =
-    [
-        "en:ru", "en:ro", "en:zh", "ru:en", "ru:ro", "ru:zh",
-        "ro:en", "ro:ru", "ro:zh", "zh:en", "zh:ru", "zh:ro",
-    ];
+    private static readonly string[] ExpectedDirections = LanguageFixture.Directions;
     private static readonly string[] ExpectedModes =
     [
         "correctionOnly:Correction only:correction", "simple:Simple:style", "casual:Casual:style",
@@ -98,7 +94,18 @@ public sealed class CapabilitiesEndpointTests
             capability.Translation.SupportedDirections
                 .Select(static direction => $"{ToWire(direction.Source)}:{ToWire(direction.Target)}")
                 .ToArray());
-        Assert.HasCount(12, capability.Translation.SupportedDirections.Distinct());
+        Assert.HasCount(15252, capability.Translation.SupportedDirections.Distinct());
+        Assert.HasCount(124, Enum.GetValues<LanguageId>());
+        Assert.HasCount(125, Enum.GetValues<SourceSelectionValue>());
+        CollectionAssert.AreEquivalent(LanguageFixture.Languages.Select(l => l.Id).ToArray(), Enum.GetValues<LanguageId>().Select(ToWire).ToArray());
+        foreach (var language in capability.Languages)
+        {
+            var expected = LanguageFixture.Languages.Single(l => l.Id == ToWire(language.Id));
+            Assert.AreEqual(expected.Direction, JsonSerializer.Serialize(language.Direction).Trim('"'));
+            Assert.AreEqual(expected.Script, language.Script);
+            Assert.AreEqual(expected.Policy, language.Policy);
+        }
+        Assert.IsLessThan(1000000, JsonSerializer.SerializeToUtf8Bytes(capability).Length);
         CollectionAssert.AreEqual(
             ExpectedModes,
             capability.Rewriting.Modes
@@ -171,24 +178,9 @@ public sealed class CapabilitiesEndpointTests
         Assert.AreEqual(404, problem.Status);
     }
 
-    private static string ToWire(LanguageId value) => value switch
-    {
-        LanguageId.English => "en",
-        LanguageId.Russian => "ru",
-        LanguageId.Romanian => "ro",
-        LanguageId.Chinese => "zh",
-        _ => throw new ArgumentOutOfRangeException(nameof(value), value, null),
-    };
+    private static string ToWire(LanguageId value) => JsonSerializer.Serialize(value).Trim('"');
 
-    private static string ToWire(SourceSelectionValue value) => value switch
-    {
-        SourceSelectionValue.Automatic => "auto",
-        SourceSelectionValue.English => "en",
-        SourceSelectionValue.Russian => "ru",
-        SourceSelectionValue.Romanian => "ro",
-        SourceSelectionValue.Chinese => "zh",
-        _ => throw new ArgumentOutOfRangeException(nameof(value), value, null),
-    };
+    private static string ToWire(SourceSelectionValue value) => JsonSerializer.Serialize(value).Trim('"');
 
     private static string ToWire(RewritingModeId value) => value switch
     {

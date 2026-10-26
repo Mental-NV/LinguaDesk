@@ -107,7 +107,7 @@ public sealed class ChatCompletionsAdapter
         }
 
         var body = BuildRequestBody(messages);
-        long estimatedInputTokens = profile.PromptRevision == AlternativesPrompt.PromptId
+        long estimatedInputTokens = profile.PromptRevision is AlternativesPrompt.PromptId or FullTextProfile.Revision
             ? ConservativeInputTokenBound(profile, messages) : EstimateInputTokens(messages);
         if (estimatedInputTokens > profile.Bounds.MaxInputTokens)
         {
