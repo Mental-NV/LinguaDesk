@@ -6,7 +6,7 @@ Mutable #7 status owner. Read for selection/dependency checks and closeout; do n
 
 ## Selected milestone
 
-No active milestone is selected by this closeout. M046 is closed with the eight recorded accuracy exceptions accepted by the user; no further paid run is scheduled. Release quality/performance and production rollout remain separate, unclaimed work. [Live review](../08-backlogs/M046/live-review.md) preserves actual cases, revisions, costs and checker replay.
+**[M047 — Azure App Service delivery](../08-backlogs/M047/backlog.md)** is selected for planning by user direction on 2026-10-26. The [implementation plan](../08-backlogs/M047/plan.md) covers two Linux F1 Web Apps, PR → Staging, master → Production, per-app persistent SQLite files, Bicep provisioning, capped Application Insights, versioned/generated configuration with zero GitHub variables and one secret per environment, and offline-only CI. Implementation has not started; hosted verification waits for authenticated Azure/GitHub bootstrap and provider keys. M046 remains closed with its eight accepted accuracy exceptions; no paid run is scheduled and full release qualification remains unclaimed. [Live review](../08-backlogs/M046/live-review.md) retains its evidence.
 
 **D-22 policy:** required checks may run unattended; optional physical-device/native-IME/AT/additional-browser observations remain unclaimed. M045's final live batch passed after preserved failed prompt revisions; total conservative exposure including unresolved calls was USD 0.2716808 under the authorized quiescent scope.
 

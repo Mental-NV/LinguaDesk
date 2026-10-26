@@ -37,6 +37,8 @@ The broadest set of cases belongs to pure units, followed by focused DOM compone
 | Playwright integrated smoke | Published SPA → real API/auth → migrated SQLite → deterministic provider adapter; paused Translator and Write journeys plus explicit alternatives generation/reuse with local sign-in | Live email/provider service reliability |
 | Separate release evidence (#6) | Automated current local-account smoke, live provider quality/performance/cost eligibility and published migration/restore/privacy checks; real email deferred under DF-008 | Required live evidence cannot be replaced by fixture success; human/device/AT review is optional |
 
+**M047 GitHub CI policy — user direction, 2026-10-26:** GitHub Actions runs deterministic/offline checks only, including the published Chromium harness with controlled providers. Never invoke live LLM evaluation, live access probes or paid performance tests in GitHub CI or postdeploy smoke. Provider runtime secrets belong only to environment-scoped deployment configuration. Required live release evidence remains a separate authorized activity and is not satisfied by offline CI. See [M047](08-backlogs/M047/plan.md).
+
 ### 2.2 Stable check groups
 
 V-IDs name shared verification groups, not backlog tasks. Selected packages refine them into concrete test names and evidence paths; keep these IDs when implementation is split. Coverage is by assertion: a fake UI response cannot prove charging, and a database test cannot prove caret behavior.

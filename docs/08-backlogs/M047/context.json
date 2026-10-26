@@ -1,0 +1,174 @@
+{
+  "version": 1,
+  "scope": "M047",
+  "sources": [
+    {
+      "path": "docs/07-roadmap.md",
+      "ids": [
+        "M047"
+      ],
+      "use": "excerpt",
+      "reason": "Selected delivery outcome",
+      "sha256": "7ba2baf891cf89445968c46a82587c86fdaefdedebd1d178c3532720859e1ec3"
+    },
+    {
+      "path": "docs/delivery/current.md",
+      "heading": "Selected milestone",
+      "use": "reference",
+      "reason": "Selection and dependency status",
+      "sha256": "704228eb33d994f550064eb9d0fffc505ee87089ef5f0a5062ea00f83828e400"
+    },
+    {
+      "path": "docs/03-architecture.md",
+      "heading": "5. Identity, API Boundaries, and Configuration",
+      "use": "excerpt",
+      "reason": "Identity, configuration and privacy constraints",
+      "sha256": "332c495d162a6f442c17884487d78960b3e0d5c5afd6ed43dbbfcf8fd27f36e6"
+    },
+    {
+      "path": "docs/03-architecture.md",
+      "heading": "6.1 SQLite and migrations",
+      "use": "excerpt",
+      "reason": "SQLite lifecycle and selected Linux App Service exception",
+      "sha256": "977ee05ffaf8aea3762d87cd67eb665bf47d0ce5177226c795fb1ba10d2e75f7"
+    },
+    {
+      "path": "docs/06-verification-plan.md",
+      "heading": "2.1 Layer ownership",
+      "use": "excerpt",
+      "reason": "Offline CI policy and verification boundaries",
+      "sha256": "989057d799f6f4caacbe1d8a0a5851f99c292cd50ee0cd9cb4217fea6c82d67c"
+    },
+    {
+      "path": "docs/01-PRD.md",
+      "ids": [
+        "NFR-004",
+        "NFR-006"
+      ],
+      "use": "excerpt",
+      "reason": "Privacy and finite runtime monetary limits",
+      "sha256": "277e882dafe98b12d6d9c8b62d6da8763e531ec713aef28b97d8f003285b9382"
+    },
+    {
+      "path": "docs/product/open-questions.md",
+      "ids": [
+        "Q-001",
+        "Q-004",
+        "Q-008"
+      ],
+      "use": "reference",
+      "reason": "Hosting, data retention and operational scope",
+      "sha256": "26eaaf5f1b0958db93755d056ca931f70f9928fb436e5d3652d8397f3b8edebd"
+    },
+    {
+      "path": "global.json",
+      "use": "reference",
+      "reason": "Current implementation/toolchain contract for deployment planning",
+      "sha256": "0588e32d44bdf884e0305ded21820b13a59b1518efd39976c34d909eff3b1044"
+    },
+    {
+      "path": "frontend/package.json",
+      "use": "reference",
+      "reason": "Current implementation/toolchain contract for deployment planning",
+      "sha256": "1e080864de83e24a24660998f2a9f3a04ac3ff1528741a01838340a0fa5d5ea9"
+    },
+    {
+      "path": "scripts/publish.sh",
+      "use": "reference",
+      "reason": "Current implementation/toolchain contract for deployment planning",
+      "sha256": "9a73386249b00daaa4ea362d0f59047eeebdbc2428def404d5467f356bb2a32d"
+    },
+    {
+      "path": "scripts/verify-milestone.sh",
+      "use": "reference",
+      "reason": "Current implementation/toolchain contract for deployment planning",
+      "sha256": "7401b49f45b2f6c0f07d625130c2c23584de21bfb70357321ac49c7f913665c2"
+    },
+    {
+      "path": "scripts/ai.sh",
+      "use": "reference",
+      "reason": "Current implementation/toolchain contract for deployment planning",
+      "sha256": "e33a24d3beb9f00fd2a8098fc40e21f3f3bd173f65fba6925d173ed9d6132199"
+    },
+    {
+      "path": "scripts/frontend.sh",
+      "use": "reference",
+      "reason": "Current implementation/toolchain contract for deployment planning",
+      "sha256": "0b8d1767deb50ee66194f8415375da018e968e7bb62e76a4860d9f7ece52b189"
+    },
+    {
+      "path": "scripts/storage.sh",
+      "use": "reference",
+      "reason": "Current implementation/toolchain contract for deployment planning",
+      "sha256": "c819092f930aacbd513f2654dcf2e5bc43e4eb8e7f58cc7635f072f0baf40035"
+    },
+    {
+      "path": "backend/src/LinguaDesk.Api/Program.cs",
+      "use": "reference",
+      "reason": "Current implementation/toolchain contract for deployment planning",
+      "sha256": "00687641f9c1b0e256784a50d71467e967678d2f7df089e82734cadbd1627e3e"
+    },
+    {
+      "path": "backend/src/LinguaDesk.Api/appsettings.json",
+      "use": "reference",
+      "reason": "Current implementation/toolchain contract for deployment planning",
+      "sha256": "1dec36562b0030589e5d42abbb7f747d5beef3fecb2ed7891fd456b2968286c6"
+    },
+    {
+      "path": "backend/src/LinguaDesk.Api/Infrastructure/Persistence/StorageOptions.cs",
+      "use": "reference",
+      "reason": "Current implementation/toolchain contract for deployment planning",
+      "sha256": "625548b44989db2995629e6e22b2afbbbf7592d6e6a7ed6b485e9d44dd46e9de"
+    },
+    {
+      "path": "backend/src/LinguaDesk.Api/Infrastructure/Persistence/StoragePathPolicy.cs",
+      "use": "reference",
+      "reason": "Current implementation/toolchain contract for deployment planning",
+      "sha256": "c5cd8fc0ca49e1eb817b9bde8a79b9f5ff151cb64c792cb494e4175532fd9c05"
+    },
+    {
+      "path": "backend/src/LinguaDesk.Api/Infrastructure/Persistence/StorageConnectionPolicy.cs",
+      "use": "reference",
+      "reason": "Current implementation/toolchain contract for deployment planning",
+      "sha256": "623c65122d56030f4dc1a274abc0c90fa905521548de15722e16c44fd6e9bdea"
+    },
+    {
+      "path": "backend/src/LinguaDesk.Api/Infrastructure/Persistence/Migrations/20260908221711_InitialStorage.cs",
+      "use": "reference",
+      "reason": "Current implementation/toolchain contract for deployment planning",
+      "sha256": "9564186999e5988a6f113c0c2208ea4ea8e40e5e4811a2293c56c709432d8f4e"
+    },
+    {
+      "path": "backend/src/LinguaDesk.Api/Infrastructure/Security/SecurityOptions.cs",
+      "use": "reference",
+      "reason": "Current implementation/toolchain contract for deployment planning",
+      "sha256": "bc8c73d5b2d23663424efc61afbadd4f0227512c17c72282de11ac6d0a79796b"
+    },
+    {
+      "path": "backend/src/LinguaDesk.Api/Infrastructure/Security/SecurityRegistrationExtensions.cs",
+      "use": "reference",
+      "reason": "Current implementation/toolchain contract for deployment planning",
+      "sha256": "31678f3fa657555b0d54754e160c3d33564cdcf7c710ab7e23904ba26a74c960"
+    },
+    {
+      "path": "backend/src/LinguaDesk.Api/Infrastructure/Serving/ServingStartupGuard.cs",
+      "use": "reference",
+      "reason": "Current implementation/toolchain contract for deployment planning",
+      "sha256": "f68df779f6eb7b7a4dd638f1a71c3867f4b78da9fed249c104e0b4f8a641fd3e"
+    },
+    {
+      "path": "backend/src/LinguaDesk.Api/Infrastructure/Serving/ServingCredential.cs",
+      "use": "reference",
+      "reason": "Current implementation/toolchain contract for deployment planning",
+      "sha256": "d6c6d5d19416bc9ddee28d41611463542102b6397b8823ece50cb446d9bc7b23"
+    }
+  ],
+  "source_map_sha256": "bacc1ef47c2169506735f843a0b955c3906403108e900ce5e3d5d039b7249601",
+  "baseline_commit": "68d7a22a3fd74cf3729c775d341d0fcf6c00f195",
+  "locked_files": {
+    "docs/00-SDD-Planning-Workflow.md": "7e0f058c2b7ea290598030ab46d71e2c13def0a37e4b5de7cc029d1e6bb6e7ea",
+    "docs/00-workflow/execution.md": "106a00f4d7004fbf3fcbbd106502fd61a1be41e5db9fd99ee20c92d8688038a8",
+    "docs/08-backlogs/M047/spec.md": "48f44537bbe45954a5fcec52a92d171da2c85ee77ed1482f0c5f73c10dc269e8",
+    "docs/08-backlogs/M047/plan.md": "8ea943939f26498ea8ad602c41c2d94874486d3b4c4a007a4991ca8c2749658d"
+  }
+}
