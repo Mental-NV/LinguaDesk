@@ -5,15 +5,12 @@ namespace LinguaDesk.Infrastructure.Ai;
 
 public static class RewritingPrompt
 {
-    public const string PromptId = "rewriting.v2";
+    public const string PromptId = "rewriting.v4";
 
     private const string ResourceName =
-        "LinguaDesk.Infrastructure.Ai.Prompts.rewriting.v2.txt";
+        "LinguaDesk.Infrastructure.Ai.Prompts.rewriting.v4.txt";
 
-    private static readonly JsonSerializerOptions SerializerOptions = new()
-    {
-        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-    };
+    private static readonly JsonSerializerOptions SerializerOptions = PromptDataJson.Options;
 
     public static PromptSnapshot Create(string source, string sourceLanguage, string mode)
     {

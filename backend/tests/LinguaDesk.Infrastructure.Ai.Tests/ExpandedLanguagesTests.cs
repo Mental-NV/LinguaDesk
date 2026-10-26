@@ -20,6 +20,29 @@ public sealed class ExpandedLanguagesTests
     }
 
     [TestMethod]
+    public void ReducedLiveManifestHasExactlyOneHundredDiverseCasesWithoutExcludedScripts()
+    {
+        var manifest = M046Suite.Load(reduced: true);
+        Assert.HasCount(100, manifest.Cases);
+        Assert.AreEqual(16, manifest.Counts["translation"]);
+        Assert.AreEqual(40, manifest.Counts["rewriting"]);
+        Assert.AreEqual(36, manifest.Counts["alternatives"]);
+        Assert.AreEqual(8, manifest.Counts["eligibility"]);
+        Assert.HasCount(33, manifest.Cases.Where(c => c.Operation != "eligibility").Select(c => c.Language).Distinct());
+        foreach (var operation in new[] { "rewriting", "alternatives" })
+            Assert.HasCount(9, manifest.Cases.Where(c => c.Operation == operation).Select(c => c.Mode).Distinct());
+    }
+
+    [TestMethod]
+    public async Task FullMatrixCannotAccidentallyDispatchBeyondTheReducedLiveScope()
+    {
+        var output = Path.Combine(Path.GetTempPath(), "m046-no-dispatch-" + Guid.NewGuid().ToString("N") + ".json");
+        var exit = await M046Suite.RunAsync("translation", ["--suite", "m046", "--live", "--profile", "deliberately-unknown", "--max-dispatches", "528", "--max-spend-usd", "0.10", "--output", output]);
+        Assert.AreEqual(2, exit);
+        Assert.IsFalse(File.Exists(output));
+    }
+
+    [TestMethod]
     public async Task EveryCanonicalCodeTraversesBothFamiliesWithoutAdditionalStages()
     {
         foreach (var language in ProductCatalog.Languages)
@@ -58,6 +81,27 @@ public sealed class ExpandedLanguagesTests
         Assert.DoesNotContain("af=Afrikaans", translation.Messages[0].Content);
         Assert.AreEqual(translation.ResourceSha256, TranslationPrompt.Create("different text", "ar", "sr").ResourceSha256);
         Assert.AreNotEqual(translation.ResourceSha256, TranslationPrompt.Create("different text", "ar", "zh").ResourceSha256);
+    }
+
+    [TestMethod]
+    public void ModelDataRetainsNativeLettersAndExactJsonDataBoundaries()
+    {
+        foreach (var source in new[] { "ስብሰባ", "შეხვედრა", "មីរ៉ា", "बैठक", "التقارير", "Δευτέρα" })
+        {
+            var hostile = source + "\" <tag>\n\\\t";
+            foreach (var snapshot in new[] { EligibilityPrompt.Create(hostile), TranslationPrompt.Create(hostile, "ar", "he"), RewritingPrompt.Create(hostile, "ar", "correctionOnly") })
+            {
+                StringAssert.Contains(snapshot.Messages[1].Content, source);
+                using var data = JsonDocument.Parse(snapshot.Messages[1].Content);
+                Assert.AreEqual(hostile, data.RootElement.GetProperty("source").GetString());
+                Assert.DoesNotContain(hostile, snapshot.Messages[0].Content);
+            }
+            var alternatives = AlternativesPrompt.Create(new(source, 0, source.Length, Guid.NewGuid(), "ar"));
+            StringAssert.Contains(alternatives.Messages[1].Content, source);
+            using var alternativeData = JsonDocument.Parse(alternatives.Messages[1].Content);
+            Assert.AreEqual(source, alternativeData.RootElement.GetProperty("context").GetString());
+            Assert.AreEqual(source, alternativeData.RootElement.GetProperty("selectedText").GetString());
+        }
     }
 
     [TestMethod]

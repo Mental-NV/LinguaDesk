@@ -15,7 +15,7 @@ public sealed class PromptSnapshotTests
     {
         var snapshot = EligibilityPrompt.Create(SyntheticSource);
 
-        Assert.AreEqual("eligibility.v2", snapshot.PromptId);
+        Assert.AreEqual("eligibility.v5", snapshot.PromptId);
         Assert.AreEqual(
             PromptResource.ComputeSha256(Encoding.UTF8.GetBytes(snapshot.Messages[0].Content)),
             snapshot.ResourceSha256);

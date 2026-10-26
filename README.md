@@ -2,7 +2,7 @@
 
 LinguaDesk contains a minimal ASP.NET Core host, a published React SPA, explicit SQLite persistence, an independent offline AI boundary, local accounts, authenticated Translation/Rewriting workspaces, usage/accounting and bounded provider pipelines. Under M034's temporary MVP substitute, every newly created local account is durably marked verified without sending email, registration issues no credential and offers explicit sign-in. Real email-address verification and email-delivered password recovery are deferred under DF-008; the previously implemented confirmation/recovery contracts remain dormant behind unavailable production senders.
 
-The local runtime/generated contract implements the [124-language catalog](docs/product/languages.md), all 15,252 distinct direct Translation directions, nine Write modes, scoped RTL presentation and language-aware `sentence-boundaries-v2` alternatives. [M046 evidence](docs/08-backlogs/M046/tasks.md) records local verification and the pending required live-development matrix. The expanded catalog is not yet a live model-quality or production-release claim. Deploy the generated SPA and API together; incompatible sentence-policy revisions disable alternatives while preserving editing and copying.
+The local runtime/generated contract implements the [124-language catalog](docs/product/languages.md), all 15,252 distinct direct Translation directions, nine Write modes, scoped RTL presentation and language-aware `sentence-boundaries-v2` alternatives. [M046 evidence](docs/08-backlogs/M046/tasks.md) records local verification and the executed 100-case live-development matrix: 92 passed/eight failed/zero skipped; M046 is closed with user-accepted accuracy exceptions ([case results](docs/08-backlogs/M046/case-results.md)). The expanded catalog is not yet a live model-quality or production-release claim. Deploy the generated SPA and API together; incompatible sentence-policy revisions disable alternatives while preserving editing and copying.
 
 ## Prerequisites
 
@@ -269,7 +269,18 @@ Alternatives use separately bounded prompt/output settings. Full-text keeps the 
 
 ## Expanded-language development suite
 
-The evaluator accepts only the committed `--suite m046` corpus (264 Translation cases; 1,116 cells each for Write and alternatives; 12 negative/ambiguity cases). It validates the complete manifest and scalar spans before accessing credentials. Default execution remains offline; scripted outputs prove transport/shape, never language quality. Existing suites and corpus files remain available.
+M046's user-selected live completion gate is the frozen **`--suite m046-reduced`** corpus: 100 cases across 33 languages and 21 writing systems (16 Translation, 40 Write, 36 alternatives, 8 eligibility). It excludes Latin, Cyrillic, Chinese and Han-overlapping Japanese payload/targets. Both Write operations cover all nine modes. The broader original `--suite m046` corpus remains immutable and runs offline only; the CLI rejects live use of that larger scope. Default execution remains offline; scripted results prove shape, never model quality. Both manifests, all canonical cells and scalar spans are validated before credential access. Current execution/review evidence and finite limits are in [live review](docs/08-backlogs/M046/live-review.md).
+
+The reduced offline commands are:
+
+```sh
+bash scripts/ai.sh evaluate-translation --suite m046-reduced --offline --profile DeepSeek-V4.1-Flash --max-dispatches 32 --max-spend-usd 0.10 --output artifacts/m046/reduced-translation-offline-new.json
+bash scripts/ai.sh evaluate-rewriting --suite m046-reduced --offline --profile DeepSeek-V4.1-Flash --max-dispatches 80 --max-spend-usd 0.15 --output artifacts/m046/reduced-rewriting-offline-new.json
+bash scripts/ai.sh evaluate-alternatives --suite m046-reduced --offline --profile DeepSeek-V4.1-Flash --max-dispatches 72 --max-spend-usd 0.20 --output artifacts/m046/reduced-alternatives-offline-new.json
+bash scripts/ai.sh evaluate-eligibility --suite m046-reduced --offline --profile DeepSeek-V4.1-Flash --max-dispatches 8 --max-spend-usd 0.05 --output artifacts/m046/reduced-eligibility-offline-new.json
+```
+
+The retained broad offline commands are:
 
 ```sh
 bash scripts/ai.sh evaluate-translation --suite m046 --offline --profile DeepSeek-V4.1-Flash --max-dispatches 528 --max-spend-usd 0.75 --output artifacts/m046/translation-offline-new.json
@@ -277,5 +288,7 @@ bash scripts/ai.sh evaluate-rewriting --suite m046 --offline --profile DeepSeek-
 bash scripts/ai.sh evaluate-alternatives --suite m046 --offline --profile DeepSeek-V4.1-Flash --max-dispatches 2232 --max-spend-usd 1.50 --output artifacts/m046/alternatives-offline-new.json
 bash scripts/ai.sh evaluate-eligibility --suite m046 --offline --profile DeepSeek-V4.1-Flash --max-dispatches 12 --max-spend-usd 0.05 --output artifacts/m046/eligibility-offline-new.json
 ```
+
+The current alternatives checker rejects original/duplicate wording after ignoring Unicode punctuation and fixed-policy whitespace for comparison only; returned text and scalar spans are unchanged. This guard does not establish semantic fidelity. Reports explicitly name prompt/encoding revisions.
 
 Reports and interruption-safe NDJSON journals require fresh paths. A targeted investigation can select at most five existing cases with repeated `--case-id` flags; arbitrary text, corpus paths, prompt overrides and provider endpoints are not accepted. Explicit live execution requires the current access/authorization and finite shared-scope record in [live review](docs/08-backlogs/M046/live-review.md), and produces awaiting-review outputs rather than automatic semantic passes. Production rollout, release qualification and performance workloads remain separate.

@@ -49,8 +49,8 @@ public sealed class RewritingPipelineTests
         Assert.AreEqual(2, outcome.TotalDispatches, mode);
         Assert.AreEqual(2, client.CallCount, mode);
         Assert.IsFalse(outcome.ChargesCharacters, mode);
-        Assert.AreEqual("eligibility.v2", outcome.EligibilityPromptId, mode);
-        Assert.AreEqual("rewriting.v2", outcome.PromptId, mode);
+        Assert.AreEqual("eligibility.v5", outcome.EligibilityPromptId, mode);
+        Assert.AreEqual("rewriting.v4", outcome.PromptId, mode);
     }
 
     [TestMethod]

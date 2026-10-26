@@ -6,7 +6,7 @@
       "path": "docs/product/languages.md",
       "use": "excerpt",
       "reason": "Canonical selected language identities, script policies and coverage scope",
-      "sha256": "4293a5167a92738ac732d24b2ee3ad3ddc16edcec2db692b45081cbd3b3e82f8"
+      "sha256": "f2927b9dbe45a82b082626ae92fa01181a814701520e07bc89417dfc5a3cfa9a"
     },
     {
       "path": "docs/01-PRD.md",
@@ -145,7 +145,7 @@
       "use": "reference",
       "reason": "Shared AI behavior, strict output, family qualification and finite dispatch/cost rules",
       "heading": "4. Prompt and output contracts",
-      "sha256": "e3feb02f22cf7caf11120c1eda4e909a07af86839fa4a237360ee282e8302e00"
+      "sha256": "974d0b2c650616988bc6b650600d78a927f24cee79a1faeacec5833395c79fe0"
     },
     {
       "path": "docs/04-llm-specification.md",
@@ -221,7 +221,7 @@
       "use": "excerpt",
       "reason": "User-selected non-Cartesian translation matrix and Write evidence counts",
       "heading": "5.5 Expanded-language matrix (D-24)",
-      "sha256": "780e9c38da21200b8b736b35499f59aebfad3f20f6e00be7d6c57158949a3505"
+      "sha256": "c25bd54b2380f9a627212e1f19bbadfa5d788256a00b2bfda911e0425de96162"
     },
     {
       "path": "docs/verification/llm-evaluation.md",
@@ -354,19 +354,19 @@
       "path": "backend/src/LinguaDesk.Infrastructure.Ai/EligibilityPrompt.cs",
       "use": "reference",
       "reason": "Inspected current implementation or executable verification boundary; open when changing this component",
-      "sha256": "1fbb24c5a7f598cd9b4df253c4424b2b0c9483bc45fdc1b35e029edab2dbd5a1"
+      "sha256": "fb4341fd3d99eb62598a8820dc9dca20235ef24a497461c9064e3af5651355b4"
     },
     {
       "path": "backend/src/LinguaDesk.Infrastructure.Ai/AlternativesPrompt.cs",
       "use": "reference",
       "reason": "Inspected current implementation or executable verification boundary; open when changing this component",
-      "sha256": "43dc8dea893fa3bbc48284a911fb328bcc17a8237e0e77e23d23cf37ca57fb92"
+      "sha256": "dc0f1617c1d871c2b4e03f73a29fcca7610ca3332e41574bfd0562164ef0751e"
     },
     {
       "path": "backend/src/LinguaDesk.Infrastructure.Ai/AlternativesEnvelopeParser.cs",
       "use": "reference",
       "reason": "Inspected current implementation or executable verification boundary; open when changing this component",
-      "sha256": "3b255f6bd5d17088c6e3038e62dd1296262c1371b81dc86e58c1a3e42f7d3940"
+      "sha256": "2701b7501946dbcd8fc9d8502c590c471bb083e9b1cd6e608fa52b6c959e081c"
     },
     {
       "path": "backend/src/LinguaDesk.Infrastructure.Ai/Prompts/eligibility.v1.txt",
@@ -438,7 +438,7 @@
       "path": "scripts/ai.sh",
       "use": "reference",
       "reason": "Inspected current implementation or executable verification boundary; open when changing this component",
-      "sha256": "5d1e104e43e34266e63ca68070304c8c6714a2279a655deeaa64aeb2ff62ef26"
+      "sha256": "e33a24d3beb9f00fd2a8098fc40e21f3f3bd173f65fba6925d173ed9d6132199"
     },
     {
       "path": "scripts/verify-milestone.sh",
@@ -474,13 +474,13 @@
       "path": "backend/tools/LinguaDesk.Ai.Evaluation/M046Suite.cs",
       "use": "reference",
       "reason": "M046 implemented boundary or frozen verification input; reviewed during implementation.",
-      "sha256": "9f439111202144592e5d5f472279a22eb33deb9a442c16d23544c2bda5bc93b9"
+      "sha256": "df0decf716f8d014249a2581f5f2ca112ee7d2806933c547776eec5a5fbc46f1"
     },
     {
       "path": "backend/src/LinguaDesk.Infrastructure.Ai/FullTextProfile.cs",
       "use": "reference",
       "reason": "M046 implemented boundary or frozen verification input; reviewed during implementation.",
-      "sha256": "6528755a32903d28f7e0c16d798ebb722befb26db057bf0ca4ba4e40c47a1e73"
+      "sha256": "43058536229da4388d3cd3c654c4334b47b18989d2642ed9be6edc3c9e977357"
     },
     {
       "path": "backend/src/LinguaDesk.Infrastructure.Ai/Prompts/eligibility.v2.txt",
@@ -510,7 +510,7 @@
       "path": "backend/tests/LinguaDesk.Infrastructure.Ai.Tests/ExpandedLanguagesTests.cs",
       "use": "reference",
       "reason": "M046 implemented boundary or frozen verification input; reviewed during implementation.",
-      "sha256": "6090db925686262f5acd2381a9c196e80d11d2ad7143a58c370cfca01aa221a0"
+      "sha256": "002b97bc6a25912008efcacede734de26aad0712e0c064831671cd363abf40b3"
     },
     {
       "path": "backend/tests/LinguaDesk.Api.Tests/ExpandedLanguageOperationTests.cs",
@@ -541,14 +541,122 @@
       "use": "reference",
       "reason": "M046 implemented boundary or frozen verification input; reviewed during implementation.",
       "sha256": "ec257db899e2210ee9973bf0e2f4315a6827200d0b2ea0158c4aa728fadafb1e"
+    },
+    {
+      "path": "backend/tools/LinguaDesk.Ai.Evaluation/Corpus/m046/reduced-development.v1.json",
+      "use": "reference",
+      "reason": "User-authorized reduced live scope or generic ambiguity policy, frozen and reviewed before candidate generation.",
+      "sha256": "3af8e839293f913358818da7cec9e14868f9a3f5126aef49dc4f0c702d435879"
+    },
+    {
+      "path": "backend/src/LinguaDesk.Infrastructure.Ai/Prompts/eligibility.v3.txt",
+      "use": "reference",
+      "reason": "User-authorized reduced live scope or generic ambiguity policy, frozen and reviewed before candidate generation.",
+      "sha256": "9c7e12c980206c1fb1f7d23a2d1f416017349b5fb19ecb131d3990eca541d716"
+    },
+    {
+      "path": "backend/src/LinguaDesk.Infrastructure.Ai/PromptDataJson.cs",
+      "use": "reference",
+      "reason": "Reviewed native-Unicode model-data correction prompted by retained live fidelity failures.",
+      "sha256": "36b89fb554f0f5f5eadc5b5ced36d7ed5c2269213cce5974a4c3f6c88525dbc2"
+    },
+    {
+      "path": "backend/src/LinguaDesk.Infrastructure.Ai/Prompts/eligibility.v4.txt",
+      "use": "reference",
+      "reason": "Reviewed native-Unicode model-data correction prompted by retained live fidelity failures.",
+      "sha256": "9c7e12c980206c1fb1f7d23a2d1f416017349b5fb19ecb131d3990eca541d716"
+    },
+    {
+      "path": "backend/src/LinguaDesk.Infrastructure.Ai/Prompts/translation.v3.txt",
+      "use": "reference",
+      "reason": "Reviewed native-Unicode model-data correction prompted by retained live fidelity failures.",
+      "sha256": "3782f8f5bf7cce409a65b2bdc74255c9ac795c342c133f2c3efd8742fa616cac"
+    },
+    {
+      "path": "backend/src/LinguaDesk.Infrastructure.Ai/Prompts/rewriting.v3.txt",
+      "use": "reference",
+      "reason": "Reviewed native-Unicode model-data correction prompted by retained live fidelity failures.",
+      "sha256": "e6f0a59f34aa509060c597e4a2948c60c548b526dfa487dca186ad4f800d5aef"
+    },
+    {
+      "path": "backend/src/LinguaDesk.Infrastructure.Ai/Prompts/alternatives.v11.txt",
+      "use": "reference",
+      "reason": "Reviewed native-Unicode model-data correction prompted by retained live fidelity failures.",
+      "sha256": "a07c34d8c2adb93a3bf79c91bb948599c0b8f6e8d39952c6f3c7ca8d4bcfb06b"
+    },
+    {
+      "path": "backend/src/LinguaDesk.Infrastructure.Ai/Prompts/alternatives.v12.txt",
+      "use": "reference",
+      "reason": "Generic distinct-wording correction following preserved initial alternatives failures.",
+      "sha256": "0c1515251c864c2421571de14faf4b6ac06e01f2cb7412b8e519abf36275521d"
+    },
+    {
+      "path": "backend/src/LinguaDesk.Infrastructure.Ai/Prompts/eligibility.v5.txt",
+      "use": "reference",
+      "reason": "Focused shared-script language identity and preservation of name/person/plurality/uncertainty after retained live failures.",
+      "sha256": "f62c633c623a1559c392714b9aafa9e6c6109b243b7d26508619a796e33899e0"
+    },
+    {
+      "path": "backend/src/LinguaDesk.Infrastructure.Ai/Prompts/rewriting.v4.txt",
+      "use": "reference",
+      "reason": "Focused shared-script language identity and preservation of name/person/plurality/uncertainty after retained live failures.",
+      "sha256": "4f07a53b85fcffe06f062988c9406df6be8b5ceecdf8118e417fd595e1c8c855"
+    },
+    {
+      "path": "backend/src/LinguaDesk.Infrastructure.Ai/Prompts/alternatives.v13.txt",
+      "use": "reference",
+      "reason": "Reviewed possession-construction examples and preservation of unqualified clock-time specificity after retained live findings.",
+      "sha256": "5272159753d85c134c8ef6dfc7638e8d20dd390b1b6fa7933ce8f1bd77d4a66a"
+    },
+    {
+      "path": "backend/src/LinguaDesk.Infrastructure.Ai/Prompts/translation.v4.txt",
+      "use": "reference",
+      "reason": "Reviewed possession-construction examples and preservation of unqualified clock-time specificity after retained live findings.",
+      "sha256": "1d5c4e16cb5ec4c6c28256d43d0eed772b3c5bd2457603f161641023a497bcd4"
+    },
+    {
+      "path": "backend/src/LinguaDesk.Infrastructure.Ai/Prompts/alternatives.v14.txt",
+      "use": "reference",
+      "reason": "Unrelated Pashto possession-construction example following preserved exact-original duplicate failure; same semantic rules and finite scaffold.",
+      "sha256": "12e8729f5e0935db17aca275f48e97bd2910030020db26ca04490945ba567553"
+    },
+    {
+      "path": "backend/src/LinguaDesk.Infrastructure.Ai/Prompts/alternatives.v15.txt",
+      "use": "reference",
+      "reason": "Reviewed numeral-form preservation strategy forcing substantive wording variation after retained Telugu failure; unchanged schema/semantic acceptance.",
+      "sha256": "2db8f2cc1ef26412d3c48e6d369f1160e9aeb5e045cf3aab2cc43a3f5d9d6336"
+    },
+    {
+      "path": "backend/src/LinguaDesk.Infrastructure.Ai/PromptResource.cs",
+      "use": "reference",
+      "reason": "Reviewed shared metadata rendering, cross-script punctuation-only rejection regression or unchanged legacy corpus for zero-dispatch checker replay.",
+      "sha256": "560c9ef17f37b7b19813d9b659d7659d70956ed99ed86e97e6f24db33dfe07b2"
+    },
+    {
+      "path": "backend/tests/LinguaDesk.Infrastructure.Ai.Tests/AlternativesTests.cs",
+      "use": "reference",
+      "reason": "Reviewed shared metadata rendering, cross-script punctuation-only rejection regression or unchanged legacy corpus for zero-dispatch checker replay.",
+      "sha256": "45810e2cad520b36e638a82b24d703bddba622ed3c01e3670cab5f7343769f30"
+    },
+    {
+      "path": "backend/tools/LinguaDesk.Ai.Evaluation/Corpus/alternatives/development.v1.json",
+      "use": "reference",
+      "reason": "Reviewed shared metadata rendering, cross-script punctuation-only rejection regression or unchanged legacy corpus for zero-dispatch checker replay.",
+      "sha256": "77e7e8d1b8486ad8735e333afb415469776e6e6c71f9c3df8c9ae193ca5f210d"
+    },
+    {
+      "path": "docs/08-backlogs/M046/case-results.md",
+      "use": "reference",
+      "reason": "User-directed milestone closure with passed, failed and skipped dispositions; original accuracy failures retained",
+      "sha256": "165768beeb824c1449c75365954422d03e0778719976ad532d270311eab120bc"
     }
   ],
-  "source_map_sha256": "758c37685ecd27679100a8efd8c78f36815b7222142d13fc1f8b317e24b6da4e",
-  "baseline_commit": "a5684268e70880a5a2cbae5facc2a8095cc23902",
+  "source_map_sha256": "aad586ff8c34fefd3a0a688087af2f414f47aad7d3b6de9a9bb9d2a7d46ac6ef",
+  "baseline_commit": "eabac47591f9f541ff8a8ca7ddc4f7c2d59a5a30",
   "locked_files": {
     "docs/00-SDD-Planning-Workflow.md": "7e0f058c2b7ea290598030ab46d71e2c13def0a37e4b5de7cc029d1e6bb6e7ea",
     "docs/00-workflow/execution.md": "106a00f4d7004fbf3fcbbd106502fd61a1be41e5db9fd99ee20c92d8688038a8",
-    "docs/08-backlogs/M046/spec.md": "5dc49979a633dbf75e42d97bf3d9af616c4707d0888b6b72352d49a84e08f724",
-    "docs/08-backlogs/M046/plan.md": "02e6cef2dc708ded53aefb83cd6391545609aebf8c3301fb46d773428a9aa6e2"
+    "docs/08-backlogs/M046/spec.md": "4690157ab09665e7cf8ae8f8dde4b35b1692b2b5715e0d666e719252fc44e9cb",
+    "docs/08-backlogs/M046/plan.md": "6c871cec5f432fcb0d7892d57fca3dc6fa1b2e393db2e247a07f9e7f5c219512"
   }
 }

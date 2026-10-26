@@ -5,15 +5,12 @@ namespace LinguaDesk.Infrastructure.Ai;
 
 public static class EligibilityPrompt
 {
-    public const string PromptId = "eligibility.v2";
+    public const string PromptId = "eligibility.v5";
 
     private const string ResourceName =
-        "LinguaDesk.Infrastructure.Ai.Prompts.eligibility.v2.txt";
+        "LinguaDesk.Infrastructure.Ai.Prompts.eligibility.v5.txt";
 
-    private static readonly JsonSerializerOptions SerializerOptions = new()
-    {
-        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-    };
+    private static readonly JsonSerializerOptions SerializerOptions = PromptDataJson.Options;
 
     private static readonly Lazy<(string Content, string Sha256)> Resource =
         new(() => PromptResource.Compose(ResourceName, PromptResource.EligibilityCatalog));

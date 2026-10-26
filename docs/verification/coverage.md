@@ -2,7 +2,7 @@
 
 Authoritative continuation of [06-verification-plan.md](../06-verification-plan.md); section numbers refer to that document; read only when relevant to the selected scope.
 
-**D-24 scope impact (2026-10-26):** all earlier language-specific passes cover their recorded four-language catalogs only. [M046](../08-backlogs/M046/spec.md) expansion has passed local implementation/controlled-provider regression evidence (see M046 tasks) and remains Pending at the required live-development gate for FR-004–014/019–023/036, NFR-001/002/005 and RG-001/002/003/006. AC-001–009 map catalog/API, eligibility/script, Write segmentation, RTL/browser and live-development coverage to V-001–003/005–013/015. No old package is relocked or recertified by this amendment.
+**D-24 scope impact (2026-10-26):** earlier language-specific passes cover their recorded catalogs only. [M046](../08-backlogs/M046/spec.md) local implementation/controlled-provider regression passes; its required reduced live-development gate **fails (92/100 usable; eight unresolved Write/alternatives findings)**. All approved paid plans ran; no approval is pending. M046 is Done with accepted accuracy exceptions under the user’s 2026-10-26 closure direction. [Case results](../08-backlogs/M046/case-results.md) records 92 passed/eight failed/zero skipped and deferred accuracy work; [live review](../08-backlogs/M046/live-review.md) retains exact revisions and checker replay. Expanded quality claims for FR-004–014/019–023/036, NFR-001/002/005 and RG-001/002/003/006 remain Pending. AC-001–009 map to V-001–003/005–013/015. No earlier package is relocked or recertified.
 
 ## 8. Canonical coverage and acceptance allocation
 

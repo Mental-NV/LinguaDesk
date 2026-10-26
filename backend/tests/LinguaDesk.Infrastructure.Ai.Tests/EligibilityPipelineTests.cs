@@ -135,7 +135,7 @@ public sealed class EligibilityPipelineTests
         Assert.IsFalse(outcome.IsTerminalRejection);
         Assert.AreEqual(1, outcome.ClassificationDispatches);
         Assert.AreEqual(1, client.CallCount);
-        Assert.AreEqual("eligibility.v2", outcome.PromptId);
+        Assert.AreEqual("eligibility.v5", outcome.PromptId);
     }
 
     [TestMethod]

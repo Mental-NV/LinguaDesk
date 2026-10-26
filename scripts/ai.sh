@@ -105,9 +105,9 @@ check() {
     mkdir -p "$results_directory"
     rm -f "$report"
 
-    run_offline dotnet build "$ai_project" --configuration "$configuration" --no-restore
-    run_offline dotnet build "$runner_project" --configuration "$configuration" --no-restore
-    run_offline dotnet build "$ai_test_project" --configuration "$configuration" --no-restore
+    run_offline dotnet build "$ai_project" --configuration "$configuration" --no-restore --disable-build-servers -m:1
+    run_offline dotnet build "$runner_project" --configuration "$configuration" --no-restore --disable-build-servers -m:1
+    run_offline dotnet build "$ai_test_project" --configuration "$configuration" --no-restore --disable-build-servers -m:1
 
     test_arguments=(
         dotnet test "$ai_test_project"
@@ -159,6 +159,11 @@ check() {
     run_offline dotnet "$runner_dll" evaluate-rewriting --suite m046 --offline --profile DeepSeek-V4.1-Flash --max-dispatches 2232 --max-spend-usd 1.25 --output "$m046_report_directory/rewriting.json"
     run_offline dotnet "$runner_dll" evaluate-alternatives --suite m046 --offline --profile DeepSeek-V4.1-Flash --max-dispatches 2232 --max-spend-usd 1.50 --output "$m046_report_directory/alternatives.json"
     run_offline dotnet "$runner_dll" evaluate-eligibility --suite m046 --offline --profile DeepSeek-V4.1-Flash --max-dispatches 12 --max-spend-usd 0.05 --output "$m046_report_directory/eligibility.json"
+
+    run_offline dotnet "$runner_dll" evaluate-translation --suite m046-reduced --offline --profile DeepSeek-V4.1-Flash --max-dispatches 32 --max-spend-usd 0.10 --output "$m046_report_directory/reduced-translation.json"
+    run_offline dotnet "$runner_dll" evaluate-rewriting --suite m046-reduced --offline --profile DeepSeek-V4.1-Flash --max-dispatches 80 --max-spend-usd 0.15 --output "$m046_report_directory/reduced-rewriting.json"
+    run_offline dotnet "$runner_dll" evaluate-alternatives --suite m046-reduced --offline --profile DeepSeek-V4.1-Flash --max-dispatches 72 --max-spend-usd 0.20 --output "$m046_report_directory/reduced-alternatives.json"
+    run_offline dotnet "$runner_dll" evaluate-eligibility --suite m046-reduced --offline --profile DeepSeek-V4.1-Flash --max-dispatches 8 --max-spend-usd 0.05 --output "$m046_report_directory/reduced-eligibility.json"
     echo "M046 frozen offline matrix reports: $m046_report_directory"
     cleanup_inspection_files
     trap - EXIT INT TERM HUP

@@ -38,8 +38,8 @@ internal static class PromptResource
 
     internal static string Descriptor(string id) => JsonSerializer.Serialize(ProductCatalog.GetLanguage(id));
 
-    internal static string EligibilityCatalog => string.Join("\n", ProductCatalog.Languages.Select(language =>
-        language.Id + "=" + language.Name + " [" + language.Script + "]"))
+    internal static string EligibilityCatalog => string.Join("\n", ProductCatalog.Languages.GroupBy(language => language.Script).Select(group =>
+        "Writing system " + group.Key + ": " + string.Join("; ", group.Select(language => language.Id + "=" + language.Name))))
         + "\nzh: Simplified or Traditional input, Simplified output. ar: Modern Standard Arabic. "
         + "sr: Cyrillic or Latin input; preserve script in Write, default Cyrillic translation. "
         + "ku: Latin Kurmanji. ckb: Arabic Sorani. pa: Gurmukhi only. mn: Cyrillic only. "

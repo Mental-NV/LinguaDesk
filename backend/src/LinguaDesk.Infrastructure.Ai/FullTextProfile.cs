@@ -5,7 +5,7 @@ namespace LinguaDesk.Infrastructure.Ai;
 /// <summary>Finite per-input view. Decoded prompt UTF-8 bytes plus framing bound tokens; no average characters/token admission.</summary>
 public static class FullTextProfile
 {
-    public const string Revision = "full-text-prompts-v2";
+    public const string Revision = "full-text-prompts-v6";
     public const int MaximumInputTokens = 65536;
     private static readonly string LongestDescriptorLanguage = ProductCatalog.Languages
         .MaxBy(language => System.Text.Encoding.UTF8.GetByteCount(PromptResource.Descriptor(language.Id)) + language.Id.Length)!.Id;

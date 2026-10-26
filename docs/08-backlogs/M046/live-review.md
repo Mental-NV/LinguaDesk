@@ -1,21 +1,190 @@
 # M046 bounded live development
 
-Execution in progress, 2026-10-26 (Europe/Moscow). No expanded-language quality pass is claimed by this record. Corpus `m046-development-v1`, SHA-256 `550777c025e5577b45fdc742dc04edeb4b35b063f44bfb12ee785a1214574142`, was authored and reviewed by Codex before candidate generation. References and later candidate reviews use the same agent; no independent or calibrated release review is claimed. Development includes 264 Translation cases, 1,116 Write cells, 1,116 alternatives cells and 12 explicit negative/ambiguity cases. Existing four-language prohibition/context/instruction cases remain in the Write and alternatives cells. New-language book-ownership examples are shallow reachability/fidelity cases, not statistical language or style qualification. Both options require semantic review.
+**Original live quality gate: Failed — 92 usable / 100 frozen cases; eight findings remain unresolved. Milestone: Done with accepted accuracy exceptions.** On 2026-10-26 the user directed closure and deferred accuracy improvements. [Final case results and closure](case-results.md) lists 92 passed, eight failed, zero skipped and excluded scopes. All authorized plans executed; no approval or paid run is pending. Measured results and the original all-usable criterion are preserved.
 
-## Continuing authorization and current scope
+## Frozen scope
 
-The M045 owner instruction permits further needed development calls without asking again about spending limits; [provenance](../M045/evidence-design.md#execution-amendments) retains the USD 5 aggregate ceiling, primary profile `DeepSeek-V4.1-Flash`, model `deepseek-flash`, credential reference `deepseek`, no paid grader and quiescent serving scope. This implementation retains those constraints. A presence-only check found the configured credential; its value was neither read into conversation nor printed. Current local process inspection found no live LinguaDesk server or evaluator. Published browser verification runs only the nonbillable deterministic Smoke adapters.
+The user selected exactly 100 live cases, meaningfully sampled outside Latin/Cyrillic/Chinese: 16 direct Translation directions, 40 Write, 36 alternatives sets and eight eligibility cases. There are 33 supported languages and 21 writing systems, plus unsupported Thaana as a negative. Japanese is omitted to avoid Han overlap. Both Translation endpoints obey the exclusions; source/context preflight rejects Latin/Cyrillic/Han letters. English trusted instructions/global catalog are outside the payload-language exclusion. Runtime still has the full 124-language catalog.
 
-Current artifact reconciliation inspected all nine retained M045 candidate batch reports, matching their recorded dispatch/exposure totals. No later live evaluator report exists in that scope. Including the prior access check, known spend is USD 0.2491128, unresolved retained exposure USD 0.022568, total USD 0.2716808. Historical remaining capacity is not an account-balance claim: the current presence/scope/report audit is the local shared-budget basis; provider access is checked once before batches and every batch is limited by its own budget. A provider/account denial blocks execution rather than being bypassed.
+Frozen reduced manifest `reduced-development.v1.json`, SHA-256 `3af8e839293f913358818da7cec9e14868f9a3f5126aef49dc4f0c702d435879`, is unchanged. Both Write operations cover all selected languages/all nine modes. Risks include quantities, negation, uncertainty, conditions, agreement, already-correct/minimal edits, instruction-as-content, paragraph structure, Greek questions, repeated/fragments/context selections and scalar offsets. The original broad manifest remains unchanged and offline only, SHA-256 `550777c025e5577b45fdc742dc04edeb4b35b063f44bfb12ee785a1214574142`.
 
-Initial finite M046 delegation: at most 5,005 dispatches (one access, 528 Translation, 2,232 Write, 2,232 alternatives, 12 eligibility), USD 3.57 combined batch ceilings (0.02 + 0.75 + 1.25 + 1.50 + 0.05). Together with all retained prior exposure this is at most USD 3.8416808, below USD 5 even if every initial reservation remains unresolved. Each initial case has at most two calls, negatives one, no paid retry or model-review calls. Four candidate operations may run concurrently against one thread-safe finite budget; no other paid job is launched. Targeted follow-up batches require a recorded finite allocation from remaining aggregate capacity, at most five selected frozen case IDs per batch; no Cartesian expansion is authorized.
+Codex authored/reviewed references before candidate generation and reviewed every candidate, including both options. This is same-agent development review, without independent/calibrated release adjudication. Unsampled routes/cells, excluded writing systems under changed prompts, release quality and performance remain unmeasured. These counts are development-case dispositions, not an NFR quality percentage; matching negative classifications never inflate transformation quality.
 
-Official [pricing/model details](https://api-docs.deepseek.com/quick_start/pricing/) and [JSON mode](https://api-docs.deepseek.com/guides/json_mode/) checked on 2026-10-26: configured Flash model/version, JSON and non-thinking support remain compatible; peak ceilings USD 0.30/M input and USD 1.20/M output remain conservative. This establishes configuration compatibility, not language competence. No production serving, release qualification or paid performance workload is included.
+## Latest case dispositions
 
-## Results
+| Operation | Required unique cases | Usable | Failed |
+| --- | --- | --- | --- |
+| Translation | 16 | 16 | 0 |
+| Write | 40 | 35 | 5 |
+| Alternatives sets | 36 | 33 | 3 |
+| Eligibility | 8 | 8 | 0 |
+| Total | **100** | **92** | **8** |
 
-**Blocked before dispatch.** Automatic approval review rejected the attempted bounded access-check command. Its stated reason was that the paid external request uses a credential and transmits repository-derived prompt data, and that the trusted user message did not explicitly authorize the destination/payload; it did not accept the assistant's standing-authorization claim as trusted evidence. The process was not started. M046 has zero paid dispatches, zero spend and zero new unresolved exposure. No workaround or indirect paid execution was attempted. The prepared destination is `https://api.deepseek.com`, with synthetic frozen development cases and trusted catalog/prompt instructions; no real account or user text is part of this workload. Explicit user approval for that concrete destination/payload and the recorded 5,005-dispatch/USD 3.57 initial envelope is required before retrying. This is an execution-approval blocker, not a claim that the credential is invalid or that model quality passed.
+Every frozen ID remains in the denominator. Usable outputs are retained under their actual tested revisions after impact review; they are not relabeled as generated by the latest prompt. Repeated investigations add attempts, not unique cases. `artifacts/m046/final-development-review.json` contains all 100 latest dispositions, source-report hashes/revisions, rubric dimensions, candidate text/options and costs.
 
-Offline suite validation has completed for the full selected matrices with zero credential use or dispatches. Scripted shape success does not supply live classifications, candidate outputs or semantic review.
+## Eight unresolved findings
 
-Sanitized candidate reports and interruption-safe NDJSON records belong in `artifacts/m046/`. Success at the parser/chain layer remains awaiting semantic review, never automatically a quality pass. Every failed output or timeout stays in its denominator. Unsampled Translation pairs remain unmeasured.
+| Frozen ID | Observed finding | Disposition |
+| --- | --- | --- |
+| `r100-write-as-business` | False source_mismatch/bn despite the plausible Assamese hint; no output. | Unusable; blocks AC-009. |
+| `r100-write-th-simple` | Changes the named owner มีรา (Mira) to รา (Ra) by dropping the initial syllable. | Unusable; blocks AC-009. |
+| `r100-write-ur-business` | Changes named Mira to first-person میرے (my/I); owner identity is not preserved. | Unusable; blocks AC-009. |
+| `r100-write-risk-ar-0` | Changes plural التقارير (reports) to singular التقرير instead of correcting plural agreement. | Unusable; blocks AC-009. |
+| `r100-write-risk-hi-2` | Keeps the original plural-agreement error unchanged; correction-only intent remains unmet. | Unusable; blocks AC-009. |
+| `r100-alt-am-correctionOnly` | Option 1 only varies the spelling of the original possession verb rather than offering distinct wording; grammaticality also remains questionable. | Unusable; blocks AC-009. |
+| `r100-alt-he-correctionOnly` | Option 1 differs from selectedText only by a full stop; rejected by the new v2 deterministic guard. | Unusable; blocks AC-009. |
+| `r100-alt-ps-casual` | Both options exactly repeat the selected original; strict parser rejects the set. | Unusable; blocks AC-009. |
+
+Assamese is still rejected as Bengali despite a plausible manual hint. Thai/Urdu owner changes and Arabic singularization are material fidelity errors. The Hindi correction retains its agreement error. Three alternatives sets fail distinct-wording/grammar requirements; the Hebrew punctuation-only set is now also rejected deterministically by checker v2. No parser success is treated as semantic success. Persistent findings after shared prompt refinements are a scoped candidate-qualification issue under verification §5.5, not proof that a language is impossible.
+
+Accuracy improvements are deferred under the user’s explicit closure direction. Future selected work can investigate these eight IDs with a reviewed shared-prompt or globally configured candidate strategy, preserving prior failures and validating affected strata plus boundary regressions under a new finite paid allocation. Closure does not turn AC-009 into a pass. The language catalog, two-family design, direct Translation and acceptance thresholds are unchanged. No language-specific route, extra production repair stage, deployment or release waiver was introduced. Further paid work is not scheduled in this record.
+
+## Authorization and reconciled exposure
+
+[Standing M045 provenance](../M045/evidence-design.md#execution-amendments) retains a USD 5 shared development ceiling. Two early M046 commands and the first follow-up proposal were rejected by automatic approval review before process start; they dispatched nothing. The user subsequently approved each exact DeepSeek destination/payload/request envelope:
+
+- Initial 100-case plan, maximum 192 requests/USD 0.50: “I authorize sending these cases and prompts to api.deepseek.com.”
+- Follow-up, maximum 184 additional requests/USD 0.40: “Authorize the bounded follow-up.”
+- Focused plan, maximum 32 further requests/USD 0.10: “Authorize the focused checks.”
+
+All live work used `https://api.deepseek.com`, `DeepSeek-V4.1-Flash`, requested/returned `deepseek-flash`, credential reference `deepseek`, temperature 0, non-thinking, JSON mode and no tools. The existing credential was presence-checked and used internally; no value entered diagnostics/evidence. Payloads were frozen synthetic source/context and repository-derived trusted prompt/catalog instructions. No real account/user data or paid grader was sent. Sequential batches contain at most five frozen IDs with one operation in flight, no automatic retry, and finite per-batch/aggregate admission. No concurrent paid LinguaDesk serving was observed; controlled Smoke verification is nonbillable.
+
+Official [pricing/model](https://api-docs.deepseek.com/quick_start/pricing/) and [JSON-mode](https://api-docs.deepseek.com/guides/json_mode/) documentation checked 2026-10-26 supported the configured transport/settings. Conservative configured prices are USD 0.30/1.20 per million input/output tokens; public documentation does not establish language competence.
+
+| Phase | Case attempts | Usable / unusable attempts | Requests / cap | Known USD | Unresolved USD | Conservative USD / cap |
+| --- | --- | --- | --- | --- | --- | --- |
+| Initial | 100 | 67 / 33 | 191 / 192 | 0.0703665 | 0 | 0.0703665 / 0.50 |
+| Follow-up | 93 | 80 / 13 | 184 / 184 | 0.0663819 | 0.006534 | 0.0729159 / 0.40 |
+| Focused | 20 | 12 / 8 | 31 / 32 | 0.0120567 | 0 | 0.0120567 / 0.10 |
+| Total | **213** | **159 / 54** | **406** | **0.1488051** | **0.006534** | **0.1553391** |
+
+Every failed attempt remains in its run's denominator. A five-second Thai→Korean eligibility timeout admitted one request and left USD 0.006534 unresolved, although no response/attempt observation was available; its batch budget is authoritative. A subsequent fresh complete operation succeeded without changing any deadline. The old reservation is never erased. Initial review v1 mistakenly accepted Hindi singularization; v2 corrects the frozen-constraint review to 67/100, preserving the previous review, source, reference and candidate.
+
+Retained M045 exposure: known USD 0.2491128 plus unresolved USD 0.022568. Historical plus all M046 exposure: **known USD 0.3979179 + unresolved USD 0.029102 = USD 0.4270199**, below USD 5. These are reconciled local usage/reservation calculations, not a provider invoice or account-balance assertion. No paid performance or release workload ran.
+
+## Implemented refinements and impact review
+
+The initial factory spelled non-ASCII model-facing letters as literal Unicode escapes. Shared native-Unicode JSON composition now keeps letters readable while serializer-escaping syntax/controls, preserving exact decoded source and untrusted-data boundaries. Six-script round-trip tests and legal-maximum Unicode/scaffold/context/cost proofs pass; no source limit, stage count, output limit, spend ceiling or deadline changed.
+
+Retained immutable prompt history records eligibility v3–v5, Translation v2–v4, Write v2–v4 and alternatives v10–v15. Final selected resources are eligibility v5, Translation/Write v4 and alternatives v15, with full-text composition v6. Eligibility v5 groups Core-derived language names by writing system, separates alphabet labels from language identities and preserves plausible-hint versus clear-mismatch rules. The focused eight classification cases all match under v5. Write v4 explicitly preserves name/person/plurality/uncertainty; Translation v4 fixes unqualified clock specificity; alternatives v15 adds unrelated possession examples and retains written numeral forms to require substantive wording differences. None creates language-specific routing.
+
+Earlier **usable** outputs remain applicable after checking their exact source, model/settings, instruction invariants and current acceptance: correctly qualified Translation v3/v4 texts preserve the v4 time rule; reviewed Write v3 texts already preserve the explicit v4 fidelity requirements; reviewed alternatives v12/v13/v14 texts meet the same substantive-wording requirement as v15. All 36 alternative contexts exercise v5 eligibility across all 33 selected languages, and all eight direct safety cases pass. Failed cases are never reused as passes. Short factual book smokes allow limited legitimate style variation; those mode scores are conservatively 2 under verification §5.2, rather than claims of strong style qualification. Minor Nepali postposition spacing receives grammar/naturalness 2 (minor surface edit, no substantive loss), consistent with the [Nepali Grammar Project](https://www.lancaster.ac.uk/staff/hardiea/nepali/postag.php) describing preferential attachment.
+
+### Deterministic alternatives guard
+
+Live evidence exposed exact-string checking that accepted punctuation-only variations. `alternatives-envelope-v2` rejects source/duplicate wording after ignoring Unicode punctuation and fixed scalar-policy whitespace for comparison only. It does not normalize/modify returned text, spans or charging, and does not pretend to check all semantic difference, language or grammar. Four cross-script rejection fixtures and one native lexical-variation preservation fixture pass.
+
+Offline replay through the actual compiled checker covers **all 76 retained M046 sets plus all 36 previously accepted final M045 regression sets**, **112 sets, zero new provider calls**. Four formerly accepted punctuation-only sets are rejected; no rejection becomes acceptance, all 36 M045 sets remain accepted, and all 33 currently usable M046 sets retain acceptance. Historical Latin/Cyrillic/Chinese replay is regression of existing evidence, not new live cases. Replayer sources, old/new checker identities and input/output hashes are retained under `artifacts/m046/wording-guard-replay-*`.
+
+## Local verification and durable evidence
+
+The final guard gate is recorded in `artifacts/m046/guard-local-gate-01.log`: 659 backend tests (341 AI), 238 frontend, 110 published Chromium, independent bearer consumer, API socket Smoke, generated-contract drift and source/link/diff checks. The affected AI/offline/bounds gate has 341 tests (`wording-guard-ai-check-01.log`). Source lock has 96 reviewed selections; Markdown audit covers 239 documents. Existing reviewed visual captures and baselines are unchanged. These local passes cannot replace the failed live semantic gate.
+
+All 31 live JSON reports and interruption-safe NDJSON journals are immutable under `artifacts/m046/`; stdout/stderr retain batch progress and errors. `live-report-index.json` binds hashes. Review records are `initial-semantic-review.json` (preserved original), `initial-semantic-review.v2.json` (corrected), `followup-semantic-review.v1.json`, `focused-semantic-review.v1.json` and `final-development-review.json`. The initial/follow-up/focused frozen plans and implementation/replay provenance remain with them. No required case, failed output or unresolved reservation was deleted.
+
+## Latest 100-case review index
+
+This index references the actual selected report for each unchanged frozen case. Usable rows are development dispositions with the limitations above; eight failures remain recorded and deferred under the closure amendment.
+
+| Case ID | Result | Source report |
+| --- | --- | --- |
+| `r100-tr-ar-he` | Usable | `reduced-translation-followup-01.json` |
+| `r100-tr-he-ar` | Usable | `reduced-translation-followup-02.json` |
+| `r100-tr-hi-bn` | Usable | `reduced-translation-focused-01.json` |
+| `r100-tr-bn-hi` | Usable | `reduced-translation-followup-02.json` |
+| `r100-tr-el-hy` | Usable | `reduced-translation-followup-02.json` |
+| `r100-tr-hy-el` | Usable | `reduced-translation-followup-01.json` |
+| `r100-tr-ka-am` | Usable | `reduced-translation-followup-01.json` |
+| `r100-tr-am-ka` | Usable | `reduced-translation-followup-01.json` |
+| `r100-tr-ko-th` | Usable | `reduced-translation-followup-02.json` |
+| `r100-tr-th-ko` | Usable | `reduced-translation-timeout-followup-01.json` |
+| `r100-tr-gu-pa` | Usable | `reduced-translation-followup-03.json` |
+| `r100-tr-pa-gu` | Usable | `reduced-translation-followup-03.json` |
+| `r100-tr-ml-te` | Usable | `reduced-translation-followup-03.json` |
+| `r100-tr-te-ml` | Usable | `reduced-translation-followup-03.json` |
+| `r100-tr-my-km` | Usable | `reduced-translation-followup-01.json` |
+| `r100-tr-lo-kn` | Usable | `reduced-translation-followup-04.json` |
+| `r100-write-am-correctionOnly` | Usable | `reduced-rewriting-followup-01.json` |
+| `r100-write-ar-simple` | Usable | `reduced-rewriting-followup-01.json` |
+| `r100-write-hy-casual` | Usable | `reduced-rewriting-followup-01.json` |
+| `r100-write-as-business` | **Failed** | `reduced-rewriting-focused-01.json` |
+| `r100-write-bn-academic` | Usable | `reduced-rewriting-followup-01.json` |
+| `r100-write-my-enthusiastic` | Usable | `reduced-rewriting-followup-02.json` |
+| `r100-write-ka-friendly` | Usable | `reduced-rewriting-followup-02.json` |
+| `r100-write-el-confident` | Usable | `reduced-rewriting-followup-02.json` |
+| `r100-write-gu-diplomatic` | Usable | `reduced-rewriting-followup-02.json` |
+| `r100-write-he-correctionOnly` | Usable | `reduced-rewriting-followup-02.json` |
+| `r100-write-hi-simple` | Usable | `reduced-rewriting-followup-03.json` |
+| `r100-write-kn-casual` | Usable | `reduced-rewriting-followup-03.json` |
+| `r100-write-km-business` | Usable | `reduced-rewriting-followup-03.json` |
+| `r100-write-ko-academic` | Usable | `reduced-rewriting-followup-03.json` |
+| `r100-write-ckb-enthusiastic` | Usable | `reduced-rewriting-followup-03.json` |
+| `r100-write-lo-friendly` | Usable | `reduced-rewriting-followup-04.json` |
+| `r100-write-ml-confident` | Usable | `reduced-rewriting-followup-04.json` |
+| `r100-write-mr-diplomatic` | Usable | `reduced-rewriting-followup-04.json` |
+| `r100-write-ne-correctionOnly` | Usable | `reduced-rewriting-followup-04.json` |
+| `r100-write-or-simple` | Usable | `reduced-rewriting-followup-04.json` |
+| `r100-write-ps-casual` | Usable | `reduced-rewriting-focused-01.json` |
+| `r100-write-fa-business` | Usable | `reduced-rewriting-followup-05.json` |
+| `r100-write-pa-academic` | Usable | `reduced-rewriting-followup-05.json` |
+| `r100-write-sa-enthusiastic` | Usable | `reduced-rewriting-followup-05.json` |
+| `r100-write-sd-friendly` | Usable | `reduced-rewriting-followup-05.json` |
+| `r100-write-si-confident` | Usable | `reduced-rewriting-followup-06.json` |
+| `r100-write-ta-diplomatic` | Usable | `reduced-rewriting-followup-06.json` |
+| `r100-write-te-correctionOnly` | Usable | `reduced-rewriting-followup-06.json` |
+| `r100-write-th-simple` | **Failed** | `reduced-rewriting-focused-01.json` |
+| `r100-write-ti-casual` | Usable | `reduced-rewriting-followup-06.json` |
+| `r100-write-ur-business` | **Failed** | `reduced-rewriting-focused-01.json` |
+| `r100-write-ug-academic` | Usable | `reduced-rewriting-followup-07.json` |
+| `r100-write-yi-enthusiastic` | Usable | `reduced-rewriting-followup-07.json` |
+| `r100-write-risk-ar-0` | **Failed** | `reduced-rewriting-focused-01.json` |
+| `r100-write-risk-he-1` | Usable | `reduced-rewriting-followup-07.json` |
+| `r100-write-risk-hi-2` | **Failed** | `reduced-rewriting-focused-02.json` |
+| `r100-write-risk-bn-3` | Usable | `reduced-rewriting-followup-08.json` |
+| `r100-write-risk-el-4` | Usable | `reduced-rewriting-followup-08.json` |
+| `r100-write-risk-th-5` | Usable | `reduced-rewriting-focused-02.json` |
+| `r100-write-risk-ko-6` | Usable | `reduced-rewriting-followup-08.json` |
+| `r100-alt-am-correctionOnly` | **Failed** | `reduced-alternatives-focused-01.json` |
+| `r100-alt-ar-simple` | Usable | `reduced-alternatives-followup-01.json` |
+| `r100-alt-hy-casual` | Usable | `reduced-alternatives-followup-01.json` |
+| `r100-alt-as-business` | Usable | `reduced-alternatives-followup-01.json` |
+| `r100-alt-bn-academic` | Usable | `reduced-alternatives-followup-01.json` |
+| `r100-alt-my-enthusiastic` | Usable | `reduced-alternatives-followup-02.json` |
+| `r100-alt-ka-friendly` | Usable | `reduced-alternatives-followup-02.json` |
+| `r100-alt-el-confident` | Usable | `reduced-alternatives-followup-02.json` |
+| `r100-alt-gu-diplomatic` | Usable | `reduced-alternatives-followup-02.json` |
+| `r100-alt-he-correctionOnly` | **Failed** | `reduced-alternatives-focused-01.json` |
+| `r100-alt-hi-simple` | Usable | `reduced-alternatives-followup-03.json` |
+| `r100-alt-kn-casual` | Usable | `reduced-alternatives-followup-03.json` |
+| `r100-alt-km-business` | Usable | `reduced-alternatives-followup-03.json` |
+| `r100-alt-ko-academic` | Usable | `reduced-alternatives-followup-03.json` |
+| `r100-alt-ckb-enthusiastic` | Usable | `reduced-alternatives-followup-03.json` |
+| `r100-alt-lo-friendly` | Usable | `reduced-alternatives-followup-04.json` |
+| `r100-alt-ml-confident` | Usable | `reduced-alternatives-followup-04.json` |
+| `r100-alt-mr-diplomatic` | Usable | `reduced-alternatives-followup-04.json` |
+| `r100-alt-ne-correctionOnly` | Usable | `reduced-alternatives-followup-04.json` |
+| `r100-alt-or-simple` | Usable | `reduced-alternatives-followup-04.json` |
+| `r100-alt-ps-casual` | **Failed** | `reduced-alternatives-focused-01.json` |
+| `r100-alt-fa-business` | Usable | `reduced-alternatives-followup-05.json` |
+| `r100-alt-pa-academic` | Usable | `reduced-alternatives-followup-05.json` |
+| `r100-alt-sa-enthusiastic` | Usable | `reduced-alternatives-followup-05.json` |
+| `r100-alt-sd-friendly` | Usable | `reduced-alternatives-followup-05.json` |
+| `r100-alt-si-confident` | Usable | `reduced-alternatives-followup-06.json` |
+| `r100-alt-ta-diplomatic` | Usable | `reduced-alternatives-followup-06.json` |
+| `r100-alt-te-correctionOnly` | Usable | `reduced-alternatives-focused-01.json` |
+| `r100-alt-th-simple` | Usable | `reduced-alternatives-followup-06.json` |
+| `r100-alt-ti-casual` | Usable | `reduced-alternatives-followup-06.json` |
+| `r100-alt-ur-business` | Usable | `reduced-alternatives-followup-07.json` |
+| `r100-alt-ug-academic` | Usable | `reduced-alternatives-followup-07.json` |
+| `r100-alt-yi-enthusiastic` | Usable | `reduced-alternatives-followup-07.json` |
+| `r100-alt-risk-el` | Usable | `reduced-alternatives-followup-07.json` |
+| `r100-alt-risk-hi` | Usable | `reduced-alternatives-followup-07.json` |
+| `r100-alt-risk-ar` | Usable | `reduced-alternatives-followup-08.json` |
+| `r100-elig-digits` | Usable | `reduced-eligibility-focused-01.json` |
+| `r100-elig-punctuation` | Usable | `reduced-eligibility-focused-01.json` |
+| `r100-elig-mixed` | Usable | `reduced-eligibility-focused-01.json` |
+| `r100-elig-wrong-hint-greek` | Usable | `reduced-eligibility-focused-01.json` |
+| `r100-elig-wrong-hint-korean` | Usable | `reduced-eligibility-focused-01.json` |
+| `r100-elig-shared-greeting` | Usable | `reduced-eligibility-focused-02.json` |
+| `r100-elig-shared-greeting-manual` | Usable | `reduced-eligibility-focused-02.json` |
+| `r100-elig-unsupported-thaana` | Usable | `reduced-eligibility-focused-02.json` |

@@ -2,11 +2,11 @@
 
 Mutable #7 status owner. Read for selection/dependency checks and closeout; do not include in the stable execution prefix.
 
-**Most recently completed milestone: [M045 — Screenshot-aligned Translator and Write workspace](../08-backlogs/M045/backlog.md).** State: Done. D-23 shell/toolbar, copy/swap, local change review and contextual sentence alternatives now work through the published authenticated API/accounting path. Final verification: 643 backend tests, 233 frontend unit/policy tests, 99 published Chromium cases, 12 reviewed baselines, independent bearer consumer and 36 reviewed live language/mode cells. [Tasks/evidence](../08-backlogs/M045/tasks.md#completion-record).
+**Most recently completed milestone: [M046 — Expanded Translator and Write languages](../08-backlogs/M046/backlog.md).** State: Done with accepted accuracy exceptions, closed at the user’s direction on 2026-10-26. The 124-language catalog, direct Translation pairs, scoped RTL and language-aware alternatives are implemented. Local checks pass: 659 backend, 238 frontend, 110 published Chromium. The selected live sample records **92 passed, eight failed, zero skipped**; accuracy improvements are deferred, and the original all-usable quality gate remains failed. [Final case results](../08-backlogs/M046/case-results.md) and [tasks/evidence](../08-backlogs/M046/tasks.md#user-directed-closure--2026-10-26).
 
 ## Selected milestone
 
-[M046 — Expanded Translator and Write languages](../08-backlogs/M046/backlog.md) is In progress: local catalog/API/prompt/RTL/sentence-policy implementation and the aggregate regression gate passed. Required live-development execution is blocked by automatic approval review pending explicit destination/payload approval; no paid M046 call or deployment has occurred. [Tasks](../08-backlogs/M046/tasks.md) own the current evidence and resume pointer. M045 implementation is complete. Its additive migration and rollback requirements are documented, but no production rollout occurred. Full quality/performance qualification, release assembly and operational gates remain pending; the bounded development batch does not discharge G1/G2 or a product-wide release gate. Earlier M044/M039 evidence remains historical D-21 coverage.
+No active milestone is selected by this closeout. M046 is closed with the eight recorded accuracy exceptions accepted by the user; no further paid run is scheduled. Release quality/performance and production rollout remain separate, unclaimed work. [Live review](../08-backlogs/M046/live-review.md) preserves actual cases, revisions, costs and checker replay.
 
 **D-22 policy:** required checks may run unattended; optional physical-device/native-IME/AT/additional-browser observations remain unclaimed. M045's final live batch passed after preserved failed prompt revisions; total conservative exposure including unresolved calls was USD 0.2716808 under the authorized quiescent scope.
 
@@ -16,6 +16,7 @@ M019 completed the independent-track enabler for the explicit live provider path
 
 | ID | State | Acceptance and evidence |
 | --- | --- | --- |
+| M046 | Done with accepted accuracy exceptions | [Backlog](../08-backlogs/M046/backlog.md), [spec amendment](../08-backlogs/M046/spec.md#closure-amendment), [case results](../08-backlogs/M046/case-results.md), [tasks/evidence](../08-backlogs/M046/tasks.md#user-directed-closure--2026-10-26) |
 | M045 | Done | [Backlog](../08-backlogs/M045/backlog.md), [spec](../08-backlogs/M045/spec.md), [tasks/evidence](../08-backlogs/M045/tasks.md#completion-record) |
 | M001 | Done | [Backlog](../08-backlogs/M001/backlog.md), [spec](../08-backlogs/M001/spec.md), [tasks/evidence](../08-backlogs/M001/tasks.md#3-completion-record) |
 | M002 | Done | [Backlog](../08-backlogs/M002/backlog.md), [spec](../08-backlogs/M002/spec.md), [tasks/evidence](../08-backlogs/M002/tasks.md#3-completion-record) |

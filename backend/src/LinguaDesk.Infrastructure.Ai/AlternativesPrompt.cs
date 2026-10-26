@@ -11,15 +11,15 @@ public sealed record AlternativesInput(string Context, int Start, int Length, Gu
 
 public static class AlternativesPrompt
 {
-    public const string PromptId = "alternatives.v10";
+    public const string PromptId = "alternatives.v15";
 
 
     public static PromptSnapshot Create(AlternativesInput input)
     {
         var validation = input.Validate();
         if (!validation.IsValid) throw new ArgumentException("Invalid alternatives input.", nameof(input));
-        var resource = PromptResource.Compose("LinguaDesk.Infrastructure.Ai.Prompts.alternatives.v10.txt", "Source: " + PromptResource.Descriptor(input.Language));
-        var scaffold = JsonSerializer.Serialize(new { context = "", selectedText = "", start = input.Start, length = input.Length, sourceLanguage = input.Language, mode = validation.EffectiveMode });
+        var resource = PromptResource.Compose("LinguaDesk.Infrastructure.Ai.Prompts.alternatives.v15.txt", "Source: " + PromptResource.Descriptor(input.Language));
+        var scaffold = JsonSerializer.Serialize(new { context = "", selectedText = "", start = input.Start, length = input.Length, sourceLanguage = input.Language, mode = validation.EffectiveMode }, PromptDataJson.Options);
         if (Encoding.UTF8.GetByteCount(resource.Content) + Encoding.UTF8.GetByteCount(scaffold) > 4096)
             throw new InvalidOperationException("Alternatives prompt scaffolding exceeds 4 KiB.");
         return new(PromptId, resource.Sha256,
@@ -29,7 +29,7 @@ public static class AlternativesPrompt
             {
                 context = input.Context, selectedText = validation.SelectedText,
                 start = input.Start, length = input.Length, sourceLanguage = input.Language, mode = validation.EffectiveMode,
-            })),
+            }, PromptDataJson.Options)),
         ]);
     }
 }
@@ -47,7 +47,7 @@ public static class AlternativesProfile
         var view = profile with
         {
             PromptRevision = AlternativesPrompt.PromptId,
-            ValidatorRevision = "alternatives-envelope-v1",
+            ValidatorRevision = AlternativesEnvelopeParser.Revision,
             Bounds = new(MaxOutputTokens, MaxResponseBytes, MaxInputTokens, profile.Bounds.ContextCapacityTokens, 5),
         };
         var eligibility = EligibilityPrompt.Create(input.Context, input.Language);

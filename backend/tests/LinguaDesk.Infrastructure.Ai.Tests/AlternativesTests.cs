@@ -23,6 +23,26 @@ public sealed class AlternativesTests
     public void StrictParserRejectsUnusableSets(string json) => Assert.IsFalse(AlternativesEnvelopeParser.TryParse(json, "The report is ready.", out _));
 
     [TestMethod]
+    [DataRow("למירה יש 12 ספרים", "למירה יש 12 ספרים.", "ברשות מירה 12 ספרים.")]
+    [DataRow("मीरा के पास 12 किताबें हैं", "मीरा के पास 12 किताबें हैं।", "मीरा 12 किताबों की मालकिन है।")]
+    [DataRow("التقرير جاهز.", "التقرير جاهز!", "التقرير مكتمل.")]
+    [DataRow("报告准备好了。", "报告已完成。", "报告已完成！")]
+    public void PunctuationAndWhitespaceAloneCannotCreateAlternativeWording(string selected, string first, string second)
+    {
+        var json = JsonSerializer.Serialize(new { status = "result", options = new[] { first, second } });
+        Assert.IsFalse(AlternativesEnvelopeParser.TryParse(json, selected, out _));
+    }
+
+    [TestMethod]
+    public void RealNativeWordingRemainsExactAndAccepted()
+    {
+        var expected = new[] { "מירה מחזיקה ב-12 ספרים.", "ברשות מירה 12 ספרים." };
+        var json = JsonSerializer.Serialize(new { status = "result", options = expected });
+        Assert.IsTrue(AlternativesEnvelopeParser.TryParse(json, "למירה יש 12 ספרים", out var parsed, "he"));
+        CollectionAssert.AreEqual(expected, parsed!.Options!.ToArray());
+    }
+
+    [TestMethod]
     public async Task RewritingChainUsesBoundedContextAndAtMostThreeDispatches()
     {
         var chain = FamilyChain.EvaluationDefault(ChainFamily.Rewriting);
