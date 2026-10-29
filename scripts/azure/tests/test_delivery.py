@@ -13,9 +13,47 @@ SCRIPTS = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(SCRIPTS))
 import control
 import deploy
+import bootstrap
 
 
 class DeliveryTests(unittest.TestCase):
+    def test_bootstrap_reads_exact_immutable_oidc_prefix(self):
+        settings = {'use_default': True, 'use_immutable_subject': True,
+                    'sub_claim_prefix': 'repo:Mental-NV@7886867/LinguaDesk@1359148631'}
+        with patch.object(bootstrap.subprocess, 'check_output', return_value=json.dumps(settings)) as github:
+            self.assertEqual(bootstrap.github_subject_prefix('Mental-NV/LinguaDesk'), settings['sub_claim_prefix'])
+        github.assert_called_once_with(['gh', 'api', 'repos/Mental-NV/LinguaDesk/actions/oidc/customization/sub'], text=True)
+
+    def test_bootstrap_supports_explicit_legacy_oidc_mode(self):
+        settings = {'use_default': True, 'use_immutable_subject': False, 'sub_claim_prefix': 'repo:owner/repo'}
+        with patch.object(bootstrap.subprocess, 'check_output', return_value=json.dumps(settings)):
+            self.assertEqual(bootstrap.github_subject_prefix('owner/repo'), 'repo:owner/repo')
+
+    def test_unsupported_oidc_template_stops_bootstrap_before_mutations_or_keys(self):
+        replies = [json.dumps({'nameWithOwner': 'owner/repo', 'viewerPermission': 'ADMIN'}),
+                   json.dumps({'use_default': False})]
+        with patch.object(sys, 'argv', ['bootstrap.py']), patch.object(bootstrap.shutil, 'which', return_value='/fixture'), \
+             patch.object(bootstrap, 'az', return_value={}) as azure, \
+             patch.object(bootstrap.subprocess, 'check_output', side_effect=replies), \
+             patch.object(bootstrap.subprocess, 'run') as mutation, patch.object(bootstrap.getpass, 'getpass') as prompt:
+            with self.assertRaisesRegex(ValueError, 'custom templates are unsupported'):
+                bootstrap.main()
+            azure.assert_called_once_with('account', 'show')
+            mutation.assert_not_called()
+            prompt.assert_not_called()
+
+    def test_bootstrap_rejects_unknown_custom_or_mismatched_oidc_subjects(self):
+        good = {'use_default': True, 'use_immutable_subject': True, 'sub_claim_prefix': 'repo:owner@123/repo@456'}
+        invalid = [dict(good, use_default=False), dict(good, use_immutable_subject=None),
+                   dict(good, sub_claim_prefix=None), dict(good, use_immutable_subject=False)]
+        invalid += [dict(good, sub_claim_prefix=prefix) for prefix in
+                    ('repo:owner/repo', 'repo:other@123/repo@456', 'repo:owner@123/other@456',
+                     'repo:owner@0/repo@456', 'repo:owner@123/repo@456:environment:Production',
+                     'repo:owner@123/repo@456\n')]
+        for settings in invalid:
+            with self.subTest(settings=settings), patch.object(bootstrap.subprocess, 'check_output', return_value=json.dumps(settings)):
+                with self.assertRaises(ValueError): bootstrap.github_subject_prefix('owner/repo')
+
     def event(self, fork=False, bot=False):
         return {'action': 'opened', 'sender': {'login': 'human'}, 'pull_request': {'user': {'login': 'dependabot[bot]' if bot else 'human'}, 'head': {'sha': 'a'*40, 'repo': {'full_name': 'fork/repo' if fork else 'owner/repo'}}}}
 

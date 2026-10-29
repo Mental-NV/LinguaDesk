@@ -14,6 +14,24 @@ from control import ROOT, ENVIRONMENTS, manifest, environment_configuration
 from deploy import az, preflight, reconcile, check_app_name, check_group_location, validate_app_service
 
 
+def github_subject_prefix(repository):
+    settings = json.loads(subprocess.check_output(
+        ['gh', 'api', f'repos/{repository}/actions/oidc/customization/sub'], text=True))
+    if settings.get('use_default') is not True:
+        raise ValueError('Bootstrap requires the default GitHub OIDC subject template; custom templates are unsupported.')
+    owner, name = repository.split('/')
+    if settings.get('use_immutable_subject') is True:
+        pattern = rf'repo:{re.escape(owner)}@[1-9][0-9]*/{re.escape(name)}@[1-9][0-9]*'
+    elif settings.get('use_immutable_subject') is False:
+        pattern = re.escape('repo:' + repository)
+    else:
+        raise ValueError('GitHub did not report a known OIDC subject mode; refusing to guess the trust subject.')
+    prefix = settings.get('sub_claim_prefix')
+    if not isinstance(prefix, str) or not re.fullmatch(pattern, prefix):
+        raise ValueError('GitHub OIDC subject prefix is missing or does not match the selected repository and mode.')
+    return prefix
+
+
 def main():
     parser = argparse.ArgumentParser(description='Create isolated F1 resources, OIDC and GitHub environments. Never commits or pushes.')
     parser.add_argument('--dry-run', action='store_true', help='Show desired setup; no authentication, prompts or mutations.')
@@ -31,6 +49,7 @@ def main():
     repository = repository_info['nameWithOwner']
     if repository_info['viewerPermission'] != 'ADMIN': raise ValueError('GitHub repository admin access is required for environment setup.')
     if not re.fullmatch(r'[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+', repository): raise ValueError('Invalid GitHub repository.')
+    oidc_subject_prefix = github_subject_prefix(repository)
     existing_path = ROOT / 'infra/azure/deployment.json'
     if existing_path.exists():
         existing = manifest(existing_path)
@@ -55,7 +74,7 @@ def main():
     # Subscription deployment records have immutable locations too. Use a distinct
     # record name per region without changing any resource or identity names.
     deployment_name = 'linguadesk-bootstrap-' + configuration['Production']['location']
-    base = ('--name', deployment_name, '--location', configuration['Production']['location'], '--template-file', str(ROOT / 'infra/azure/bootstrap.bicep'), '--parameters', 'repository=' + repository)
+    base = ('--name', deployment_name, '--location', configuration['Production']['location'], '--template-file', str(ROOT / 'infra/azure/bootstrap.bicep'), '--parameters', 'oidcSubjectPrefix=' + oidc_subject_prefix)
     az('deployment', 'sub', 'validate', *base)
     result = az('deployment', 'sub', 'create', *base)
     data = {'subscriptionId': account['id'], 'tenantId': account['tenantId'], 'environments': {}}

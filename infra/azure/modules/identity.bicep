@@ -1,6 +1,6 @@
 param name string
 param location string
-param repository string
+param oidcSubjectPrefix string
 param environment string
 resource identity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
   name: name
@@ -11,7 +11,7 @@ resource federation 'Microsoft.ManagedIdentity/userAssignedIdentities/federatedI
   name: 'github'
   properties: {
     issuer: 'https://token.actions.githubusercontent.com'
-    subject: 'repo:${repository}:environment:${environment}'
+    subject: '${oidcSubjectPrefix}:environment:${environment}'
     audiences: ['api://AzureADTokenExchange']
   }
 }

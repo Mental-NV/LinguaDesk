@@ -1,5 +1,5 @@
 targetScope = 'subscription'
-param repository string
+param oidcSubjectPrefix string
 var configuration = loadJsonContent('./environments.json')
 var environments = ['Staging', 'Production']
 resource groups 'Microsoft.Resources/resourceGroups@2024-03-01' = [for environment in environments: {
@@ -12,7 +12,7 @@ module identity 'modules/identity.bicep' = [for (environment, i) in environments
   params: {
     name: configuration[environment].identityName
     location: configuration[environment].location
-    repository: repository
+    oidcSubjectPrefix: oidcSubjectPrefix
     environment: environment
   }
 }]

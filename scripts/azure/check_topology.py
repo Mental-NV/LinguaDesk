@@ -17,6 +17,14 @@ role=next(r for r in resources if r['type']=='Microsoft.Resources/deployments' a
 assert identity['resourceGroup']==role['resourceGroup']==groups[0]['name'], 'Identity/RBAC must be scoped to its own environment RG.'
 assert identity['properties']['parameters']['name']['value'].endswith('.identityName]')
 assert identity['properties']['parameters']['location']['value']==groups[0]['location']
+assert identity['properties']['parameters']['oidcSubjectPrefix']['value']=="[parameters('oidcSubjectPrefix')]"
+federation=next(r for r in identity['properties']['template']['resources'] if r['type'].endswith('/federatedIdentityCredentials'))
+assert federation['properties']=={
+    'issuer':'https://token.actions.githubusercontent.com',
+    'subject':"[format('{0}:environment:{1}', parameters('oidcSubjectPrefix'), parameters('environment'))]",
+    'audiences':['api://AzureADTokenExchange'],
+}, 'Federation must preserve the exact discovered prefix and isolate each environment.'
+assert identity['properties']['parameters']['environment']['value']=="[variables('environments')[copyIndex()]]"
 roles=role['properties']['template']['resources']
 definition=next(r for r in roles if r['type']=='Microsoft.Authorization/roleDefinitions')['properties']
 assert definition['assignableScopes']==['[resourceGroup().id]']
