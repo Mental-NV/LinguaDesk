@@ -318,6 +318,32 @@ class ContextTests(unittest.TestCase):
         with contextlib.redirect_stdout(io.StringIO()):
             context.audit()
 
+    def test_generated_evidence_links_are_independent_of_local_artifacts(self):
+        self.write('README.md', '[report](artifacts/test-results/backend.trx)\n'
+                   '[notes](artifacts/run%20notes.md#summary)\n')
+        self.write(self.directory + 'tasks.md',
+                   '[historical report](../../../artifacts/test-results/backend.trx)\n')
+        outputs = []
+        for present in (False, True):
+            with self.subTest(artifacts_present=present):
+                if present:
+                    self.write('artifacts/test-results/backend.trx', '<TestRun/>')
+                    self.write('artifacts/run notes.md', '# Generated, variable content\n')
+                with contextlib.redirect_stdout(io.StringIO()) as output:
+                    context.audit()
+                outputs.append(output.getvalue())
+                self.assertIn('3 generated artifact references excluded', output.getvalue())
+        self.assertEqual(outputs[0], outputs[1])
+
+    def test_artifact_exclusion_cannot_hide_missing_source_links(self):
+        for target in ('artifacts-old/missing.md', 'docs/artifacts/missing.md',
+                       'artifacts/../docs/missing.md', 'artifacts/%2e%2e/docs/missing.md',
+                       'artifacts/../docs/source.md#missing'):
+            with self.subTest(target=target):
+                self.write('README.md', f'[bad]({target})\n')
+                with self.assertRaisesRegex(ValueError, 'missing'):
+                    context.audit()
+
 
 class RunnerTests(unittest.TestCase):
     @contextlib.contextmanager

@@ -23,5 +23,6 @@ bash scripts/frontend.sh check
 bash scripts/frontend.sh smoke
 bash scripts/azure/check.sh
 python3 -m unittest discover -s scripts/azure/tests -v
+python3 -m unittest discover -s automation/tests -v
 python3 automation/context.py audit
 git diff --check
