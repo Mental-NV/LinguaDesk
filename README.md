@@ -4,6 +4,10 @@ LinguaDesk contains a minimal ASP.NET Core host, a published React SPA, explicit
 
 The local runtime/generated contract implements the [124-language catalog](docs/product/languages.md), all 15,252 distinct direct Translation directions, nine Write modes, scoped RTL presentation and language-aware `sentence-boundaries-v2` alternatives. [M046 evidence](docs/08-backlogs/M046/tasks.md) records local verification and the executed 100-case live-development matrix: 92 passed/eight failed/zero skipped; M046 is closed with user-accepted accuracy exceptions ([case results](docs/08-backlogs/M046/case-results.md)). The expanded catalog is not yet a live model-quality or production-release claim. Deploy the generated SPA and API together; incompatible sentence-policy revisions disable alternatives while preserving editing and copying.
 
+## Azure delivery
+
+[M047 deployment guide](docs/deployment/azure-app-service.md) documents isolated Linux F1 Staging/Production bootstrap, OIDC, one provider secret per environment, persistent SQLite preparation, capped monitoring and recovery. Repository implementation is available; authenticated hosted qualification remains pending the two environment provider keys. No live LLM calls run in GitHub CI.
+
 ## Prerequisites
 
 - .NET SDK `10.0.302` (pinned by `global.json`)

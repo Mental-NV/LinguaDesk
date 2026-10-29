@@ -16,7 +16,7 @@
       "heading": "Selected milestone",
       "use": "reference",
       "reason": "Selection and dependency status",
-      "sha256": "704228eb33d994f550064eb9d0fffc505ee87089ef5f0a5062ea00f83828e400"
+      "sha256": "7e9c8cf16511cf65a008938d61be73c29e65cadffbe0d3e54bf376ab171354bc"
     },
     {
       "path": "docs/03-architecture.md",
@@ -106,7 +106,7 @@
       "path": "backend/src/LinguaDesk.Api/Program.cs",
       "use": "reference",
       "reason": "Current implementation/toolchain contract for deployment planning",
-      "sha256": "00687641f9c1b0e256784a50d71467e967678d2f7df089e82734cadbd1627e3e"
+      "sha256": "6063522b5bba1bf0f766912aaa8ce684b57968dc233a8f11a2da878f947192e7"
     },
     {
       "path": "backend/src/LinguaDesk.Api/appsettings.json",
@@ -118,7 +118,7 @@
       "path": "backend/src/LinguaDesk.Api/Infrastructure/Persistence/StorageOptions.cs",
       "use": "reference",
       "reason": "Current implementation/toolchain contract for deployment planning",
-      "sha256": "625548b44989db2995629e6e22b2afbbbf7592d6e6a7ed6b485e9d44dd46e9de"
+      "sha256": "6cd3515864a2f2b34c1751f29a85da9fe145cefc3ed86b12d458a0fa5b3705cf"
     },
     {
       "path": "backend/src/LinguaDesk.Api/Infrastructure/Persistence/StoragePathPolicy.cs",
@@ -161,14 +161,20 @@
       "use": "reference",
       "reason": "Current implementation/toolchain contract for deployment planning",
       "sha256": "d6c6d5d19416bc9ddee28d41611463542102b6397b8823ece50cb446d9bc7b23"
+    },
+    {
+      "path": "infra/azure/environments.json",
+      "use": "reference",
+      "reason": "User-selected exact resource names, environment separation, regions and hostnames (2026-10-28)",
+      "sha256": "e2fcf2d242af5988b01205bdb8e26b6806a087fbfd5b767515f9cdcf75b5c393"
     }
   ],
-  "source_map_sha256": "bacc1ef47c2169506735f843a0b955c3906403108e900ce5e3d5d039b7249601",
-  "baseline_commit": "68d7a22a3fd74cf3729c775d341d0fcf6c00f195",
+  "source_map_sha256": "7868d658db8997466e00136ac639e469f65de89b73449455eb594efb9d2a955c",
+  "baseline_commit": "515b1d22031e93b1f615a25c46800c9542d8bd12",
   "locked_files": {
     "docs/00-SDD-Planning-Workflow.md": "7e0f058c2b7ea290598030ab46d71e2c13def0a37e4b5de7cc029d1e6bb6e7ea",
     "docs/00-workflow/execution.md": "106a00f4d7004fbf3fcbbd106502fd61a1be41e5db9fd99ee20c92d8688038a8",
-    "docs/08-backlogs/M047/spec.md": "48f44537bbe45954a5fcec52a92d171da2c85ee77ed1482f0c5f73c10dc269e8",
-    "docs/08-backlogs/M047/plan.md": "8ea943939f26498ea8ad602c41c2d94874486d3b4c4a007a4991ca8c2749658d"
+    "docs/08-backlogs/M047/spec.md": "3bca22a05d67241499ae762e589a09a6ae077849ba617d4a2cc6f7b9f6fd5586",
+    "docs/08-backlogs/M047/plan.md": "296a832251dfcdd7745e274794d2d5f4b9501fd4bec16722c86d9c19a0209cb5"
   }
 }

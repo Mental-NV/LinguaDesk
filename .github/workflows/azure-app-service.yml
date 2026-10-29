@@ -1,0 +1,131 @@
+name: Azure App Service
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+  push:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  checks:
+    runs-on: macos-15
+    concurrency:
+      group: checks-${{ github.event.pull_request.number || 'main' }}
+      cancel-in-progress: true
+    outputs:
+      sha: ${{ steps.revision.outputs.sha }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+      - id: revision
+        run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+      - uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9 # v4
+        with:
+          global-json-file: global.json
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version-file: frontend/package.json
+      - name: Install pinned npm
+        run: npm install --global "npm@$(node -p "require('./frontend/package.json').engines.npm")"
+      - name: Install Chromium system dependencies
+        run: |
+          npm ci --prefix frontend --no-audit --no-fund
+          cd frontend
+          npx --no-install playwright install --with-deps chromium
+      - name: Deterministic offline checks and published Chromium journeys
+        run: bash scripts/ci-offline.sh
+      - name: Package the checked publish output
+        run: bash scripts/azure/package.sh --existing-publish
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: app-${{ steps.revision.outputs.sha }}
+          path: artifacts/azure/
+          if-no-files-found: error
+          retention-days: 14
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: always()
+        with:
+          name: offline-results-${{ github.run_id }}
+          path: artifacts/test-results/
+          retention-days: 7
+      - name: Explain credential boundary
+        if: always() && github.event_name == 'pull_request' && (github.event.pull_request.head.repo.full_name != github.repository || github.actor == 'dependabot[bot]' || github.event.pull_request.user.login == 'dependabot[bot]')
+        run: echo 'Offline checks only. Fork and Dependabot PRs must be brought onto a trusted repository branch before Staging deployment.' >> "$GITHUB_STEP_SUMMARY"
+  staging:
+    needs: checks
+    if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && github.actor != 'dependabot[bot]' && github.event.pull_request.user.login != 'dependabot[bot]'
+    runs-on: ubuntu-24.04
+    environment: Staging
+    permissions:
+      contents: read
+      actions: read
+      pull-requests: read
+      id-token: write
+    concurrency:
+      group: deploy-Staging
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ needs.checks.outputs.sha }}
+          persist-credentials: false
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: app-${{ needs.checks.outputs.sha }}
+          path: artifacts/azure
+      - name: Validate generated environment configuration
+        id: identity
+        run: python3 scripts/azure/control.py manifest Staging
+      - uses: Azure/login@7184910d9eb2b1c5e48f7073824a90609bb9b6d6 # v2
+        with:
+          client-id: ${{ steps.identity.outputs.clientId }}
+          tenant-id: ${{ steps.identity.outputs.tenantId }}
+          subscription-id: ${{ steps.identity.outputs.subscriptionId }}
+          enable-AzPSSession: true
+      - name: Reconcile, cap, deploy and smoke
+        env:
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          DEPLOY_SHA: ${{ needs.checks.outputs.sha }}
+        run: bash scripts/azure/deploy.sh Staging artifacts/azure "$DEPLOY_SHA"
+  production:
+    needs: checks
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    environment: Production
+    permissions:
+      contents: read
+      actions: read
+      pull-requests: read
+      id-token: write
+    concurrency:
+      group: deploy-Production
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ needs.checks.outputs.sha }}
+          persist-credentials: false
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: app-${{ needs.checks.outputs.sha }}
+          path: artifacts/azure
+      - name: Validate generated environment configuration
+        id: identity
+        run: python3 scripts/azure/control.py manifest Production
+      - uses: Azure/login@7184910d9eb2b1c5e48f7073824a90609bb9b6d6 # v2
+        with:
+          client-id: ${{ steps.identity.outputs.clientId }}
+          tenant-id: ${{ steps.identity.outputs.tenantId }}
+          subscription-id: ${{ steps.identity.outputs.subscriptionId }}
+          enable-AzPSSession: true
+      - name: Reconcile, cap, deploy and smoke
+        env:
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          DEPLOY_SHA: ${{ needs.checks.outputs.sha }}
+        run: bash scripts/azure/deploy.sh Production artifacts/azure "$DEPLOY_SHA"

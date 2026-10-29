@@ -1,6 +1,6 @@
 # M047 — Selected specification
 
-Selected item: BI-001. Status: reviewed implementation plan; implementation pending.
+Selected item: BI-001. Selected specification, amended on 2026-10-28 for explicit resource names, separate regions, in-group deployment identities and `main` as the default/Production branch.
 Sources: [manifest](context.json), [backlog](backlog.md). User direction on 2026-10-26 selects Linux App Service F1, SQLite as a file within each App Service, Bicep-provisioned resources, automated bootstrap, minimal GitHub secrets/variables, Application Insights with daily caps and offline-only GitHub CI.
 
 ## Scope
@@ -13,18 +13,40 @@ Deliver deployment infrastructure for the existing combined ASP.NET Core API/Rea
 | --- | --- | --- |
 | AC-001 | GitHub environments named `Staging` and `Production` target distinct Bicep-provisioned Linux F1 plans/Web Apps with isolated Insights components and Log Analytics workspaces. No slot or paid SKU is required | User direction; plan topology |
 | AC-002 | A same-repository PR opened/reopened/updated triggers offline checks and then Staging deployment of that PR head SHA. Fork/Dependabot PRs receive offline checks but no credentialed deployment; their summary explains the restriction | User direction; GitHub trust boundary |
-| AC-003 | A push to `master` triggers offline checks and deploys that push SHA only to Production. Failed checks block deployment; other branch pushes do not deploy Production | User direction |
+| AC-003 | A push to `main` triggers offline checks and deploys that push SHA only to Production. Failed checks block deployment; other branch pushes do not deploy Production | User direction |
 | AC-004 | Published artifact contains matching API and SPA, revision metadata and required migration tooling, but no SQLite database, keys, credentials or test account data. Check/build jobs have no Azure or provider secrets | Architecture §3/5; V-009/V-012/V-015 |
 | AC-005 | CI performs only deterministic/offline application checks, including published Chromium journeys. No live LLM evaluator, paid probe, live browser suite or language-processing postdeploy request executes | User direction; verification §2.1 |
 | AC-006 | Non-secret runtime settings use versioned .NET configuration and generated Bicep settings. No GitHub variables are required; only `DEEPSEEK_API_KEY` is stored as a secret in each environment. Bootstrap generates Azure identifiers and GitHub setup; missing credentials/placeholders fail clearly before mutation. Production settings/credentials/data cannot be used by Staging | Architecture §5; NFR-004/006 |
 | AC-007 | Separate persistent SQLite files and Data Protection directories survive restart/redeployment on Linux App Service. Controlled initialization/migration completes before serving; failed migration leaves app unavailable and retains recovery material | User clarification; architecture §6.1; V-005/V-012/V-016 |
 | AC-008 | Same-target deployments serialize; stale runs cannot overwrite newer desired revisions. A bounded provider-free smoke checks HTTPS, SPA, API and readiness, and reports the deployed SHA | Architecture §5/7; V-012 |
 | AC-009 | Automated local failure/recovery rehearsals cover migration failure, existing and empty stores, rollback-compatible artifacts, persistence and environment routing. Hosted Staging then Production evidence is recorded only after authenticated bootstrap and provider keys exist | Architecture §6; V-016 |
-| AC-010 | Rerunnable Bicep/bootstrap creates both RGs, F1 plans, Web Apps, Insights/workspaces, OIDC identities and scoped permissions. GitHub environments and non-secret deployment manifest are generated without manual resource or variable editing; subsequent PR/master deployments reconcile only the corresponding environment | Revised user direction |
+| AC-010 | Rerunnable Bicep/bootstrap creates both RGs, F1 plans, Web Apps, Insights/workspaces, OIDC identities and scoped permissions. GitHub environments and non-secret deployment manifest are generated without manual resource or variable editing; subsequent PR/main deployments reconcile only the corresponding environment | Revised user direction |
 | AC-011 | Both components and workspaces have verified 0.05 GB/day caps, finite 30-day workspace retention and source filtering/sampling before telemetry is enabled. Fractional caps are not rounded up; cap-setting failure blocks rollout. Combined nominal 31-day volume is 3.1 GB; shared allowance/overshoot limitations are documented, not represented as a zero-cost guarantee | Revised user direction; Azure Monitor research |
 | AC-012 | Each environment emits sanitized request/dependency/error telemetry to its own Insights resource. Offline tests export nothing externally and detect private-text/secret leakage. A bounded hosted marker verifies routing without LLM calls or deliberately exhausting the cap | NFR-004; V-015; revised user direction |
 
+## Selected names and separation
+
+User direction on 2026-10-28 fixes the following names in versioned `infra/azure/environments.json`. No generated suffix or alternate name is permitted. The latest user direction explicitly selects `swedencentral` for Production, superseding the previous Austria East and Germany West Central selections. Sweden Central passed the authenticated F1 region scan on 2026-10-28. The operator's subsequent versioned configuration selects `indonesiacentral` for Staging; the 2026-10-29 investigation confirms the recreated Staging resources use that region.
+
+| Resource | Production | Staging |
+| --- | --- | --- |
+| Resource Group | `rg-prod-linguadesk` | `rg-staging-linguadesk` |
+| Web App | `linguadesk` | `staging-linguadesk` |
+| App Service Plan | `plan-prod-linguadesk` | `plan-staging-linguadesk` |
+| Application Insights | `appi-prod-linguadesk` | `appi-staging-linguadesk` |
+| Log Analytics Workspace | `law-prod-linguadesk` | `law-staging-linguadesk` |
+| Deployment Managed Identity | `id-prod-linguadesk` | `id-staging-linguadesk` |
+| Region | `swedencentral` | `indonesiacentral` |
+| GitHub environment | `Production` | `Staging` |
+| Required default hostname | `linguadesk.azurewebsites.net` | `staging-linguadesk.azurewebsites.net` |
+
+Exactly two resource groups are provisioned. Each contains its environment's deployment identity/federation and runtime resources; no shared identity group is created. An RG-scoped custom deployment role grants runtime deployment/monitoring operations while excluding identity, federation and RBAC management. Incremental runtime what-if may ignore these bootstrap-owned resources but cannot change them. Bootstrap needs custom-role creation and role-assignment permission.
+
+Check the exact global Web App names before resource mutation, accepting an existing app only when it belongs to the expected group and has the required exact hostname. Request the classic hostname without the hashed-domain option and verify the actual returned hostname before activation. An unavailable name, wrong region or hashed/regional hostname fails closed; no alternate name, region or paid SKU is selected automatically. Availability is not a reservation; actual hostname/resource provisioning remains hosted evidence under AC-001/006/008/010.
+
 ## Constraints and decisions
+
+Operator tooling includes a validation-only scanner for subscription-specific availability of one additional Linux F1 plan across candidate regions. It requires no provider keys, does not create/delete resources or rewrite environment configuration, and distinguishes quota rejection from unknown, policy or permission failures. A successful scan is point-in-time validation rather than a reservation or hosted acceptance.
 
 F1 is the requested hosting tier; cold starts, resource quotas, downtime during migration and absence of slots/Always On are accepted infrastructure limits, not an availability or performance qualification claim. The Production environment name does not establish RG-001–008. M046's eight accepted accuracy exceptions remain recorded; required live qualification stays outside GitHub CI.
 

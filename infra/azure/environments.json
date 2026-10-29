@@ -1,0 +1,22 @@
+{
+  "Production": {
+    "resourceGroup": "rg-prod-linguadesk",
+    "appName": "linguadesk",
+    "planName": "plan-prod-linguadesk",
+    "insightsName": "appi-prod-linguadesk",
+    "workspaceName": "law-prod-linguadesk",
+    "identityName": "id-prod-linguadesk",
+    "location": "swedencentral",
+    "hostname": "linguadesk.azurewebsites.net"
+  },
+  "Staging": {
+    "resourceGroup": "rg-staging-linguadesk",
+    "appName": "staging-linguadesk",
+    "planName": "plan-staging-linguadesk",
+    "insightsName": "appi-staging-linguadesk",
+    "workspaceName": "law-staging-linguadesk",
+    "identityName": "id-staging-linguadesk",
+    "location": "indonesiacentral",
+    "hostname": "staging-linguadesk.azurewebsites.net"
+  }
+}
