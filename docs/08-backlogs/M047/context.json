@@ -170,7 +170,7 @@
     }
   ],
   "source_map_sha256": "7868d658db8997466e00136ac639e469f65de89b73449455eb594efb9d2a955c",
-  "baseline_commit": "569574cf8f14481661db734b1b9ab530518bcfee",
+  "baseline_commit": "b80ade77cdb1b5563055131feb92eb1c2ce8e28d",
   "locked_files": {
     "docs/00-SDD-Planning-Workflow.md": "7e0f058c2b7ea290598030ab46d71e2c13def0a37e4b5de7cc029d1e6bb6e7ea",
     "docs/00-workflow/execution.md": "106a00f4d7004fbf3fcbbd106502fd61a1be41e5db9fd99ee20c92d8688038a8",
