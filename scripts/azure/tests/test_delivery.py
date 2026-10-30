@@ -187,6 +187,79 @@ class DeliveryTests(unittest.TestCase):
         self.assertFalse(any(c[:2] in (('webapp','start'), ('webapp','deploy')) for c in calls))
         self.assertTrue(any(c[:2] == ('webapp','stop') for c in calls))
 
+    def test_zip_waits_for_extraction_without_runtime_tracking(self):
+        with patch.object(deploy, 'az', return_value={'status': 4, 'complete': True}) as azure:
+            deploy.deploy_package('group', 'app', 'artifact')
+        args = azure.call_args.args
+        self.assertEqual(args[:2], ('webapp', 'deploy'))
+        for flag, value in {'--type':'zip', '--restart':'false', '--clean':'true', '--async':'false',
+                            '--track-status':'false', '--enable-kudu-warmup':'false', '--timeout':'300000'}.items():
+            self.assertEqual(args[args.index(flag)+1], value)
+        self.assertEqual(azure.call_args.kwargs, {'timeout': 330})
+
+    def test_zip_requires_confirmed_completion(self):
+        for result in (None, {}, {'status': 0}, {'status': 2, 'complete': True}, {'status': 3, 'complete': True},
+                       {'status': 4}, {'status': 4, 'complete': False}, {'status': '4', 'complete': True}):
+            with self.subTest(result=result), patch.object(deploy, 'az', return_value=result):
+                with self.assertRaisesRegex(ValueError, 'activation is blocked'):
+                    deploy.deploy_package('group', 'app', 'artifact')
+
+    def test_zip_process_timeout_is_bounded_and_private(self):
+        failure = subprocess.TimeoutExpired('private-command', 330, output='private-output', stderr='private-secret')
+        with patch.object(subprocess, 'run', side_effect=failure) as command:
+            with self.assertRaises(ValueError) as caught:
+                deploy.deploy_package('group', 'app', 'artifact')
+        self.assertEqual(command.call_args.kwargs['timeout'], 330)
+        self.assertIn('330 seconds', str(caught.exception))
+        self.assertIn('activation is blocked', str(caught.exception))
+        self.assertNotIn('private', str(caught.exception))
+
+    def test_zip_plain_text_failures_have_safe_phase_diagnostics(self):
+        for text, expected in (
+                ('Timeout reached while tracking deployment status, private-secret', 'DeploymentStartupTimeout'),
+                ('Deployment failed because the site failed to start within 10 mins. private-secret', 'DeploymentStartupTimeout'),
+                ('Zip deployment failed. private-secret', 'ZipDeploymentFailed'),
+                ('Timeout reached by the command, however, the deployment\n operation is still on-going. private-secret', 'ZipDeploymentTimeout')):
+            with self.subTest(text=text):
+                diagnostic = deploy.azure_failure(text)
+                self.assertIn(expected, diagnostic)
+                self.assertNotIn('private', diagnostic)
+
+    def test_reconcile_activates_only_after_caps_and_confirmed_zip(self):
+        for zip_result in ({'status': 4, 'complete': True}, {'status': 3, 'complete': True}, {'status': 2, 'complete': False}):
+            with self.subTest(zip_result=zip_result):
+                events=[]
+                output={**{k: control.environment_configuration()['Staging'][k] for k in ('appName','hostname','workspaceName','insightsName')}, 'dailyCapMb':50}
+                def azure(*args, **kwargs):
+                    if args[:2] == ('group','show'): return {'location':'indonesiacentral'}
+                    if args[:2] == ('webapp','list'): return [{'name':output['appName']}]
+                    if args[:2] == ('webapp','show'): return {'state':'Stopped'}
+                    if args[:3] == ('deployment','group','what-if'): return {'changes':[]}
+                    if args[:3] == ('deployment','group','create'):
+                        params=json.loads(Path(args[args.index('--parameters')+1][1:]).read_text())['parameters']
+                        events.append('activate' if params['enabled']['value'] else 'reconcile')
+                        return {'properties':{'outputs':{k:{'value':v} for k,v in output.items()}}}
+                    if args[:2] == ('webapp','deploy'):
+                        events.append('zip')
+                        return zip_result
+                    if args[:2] in (('webapp','stop'),('webapp','start')): events.append(args[1])
+                def command(args, **kwargs):
+                    if args[:3] == ['az','bicep','build-params']:
+                        Path(args[-1]).write_text(json.dumps({'parameters':{'environment':{'value':'Staging'},'dailyCapMb':{'value':50}}}))
+                    else: events.append('caps')
+                    return subprocess.CompletedProcess(args,0)
+                with patch.object(deploy,'az',side_effect=azure), patch.object(deploy,'preflight'), \
+                     patch.object(deploy,'check_app_name'), patch.object(deploy,'validate_app_service'), \
+                     patch.object(deploy,'fresh',return_value=True), patch.object(subprocess,'run',side_effect=command), \
+                     patch.object(control,'smoke',side_effect=lambda *args: events.append('smoke')):
+                    if zip_result['status'] == 4:
+                        deploy.reconcile('Staging',self.good_manifest(),'fixture-secret','artifact','a'*40)
+                        self.assertEqual(events, ['stop','reconcile','stop','caps','zip','activate','start','smoke'])
+                    else:
+                        with self.assertRaisesRegex(ValueError, 'activation is blocked'):
+                            deploy.reconcile('Staging',self.good_manifest(),'fixture-secret','artifact','a'*40)
+                        self.assertEqual(events, ['stop','reconcile','stop','caps','zip','stop'])
+
     def test_bootstrap_dry_run_idempotent_and_non_mutating(self):
         cmd=[sys.executable,str(SCRIPTS/'bootstrap.py'),'--dry-run']
         first=subprocess.check_output(cmd,text=True)

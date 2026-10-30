@@ -14,6 +14,13 @@ from control import ROOT, manifest, verify_artifact, fresh, environment_configur
 def azure_failure(stderr):
     # Error messages can contain expanded templates, app settings or secure input.
     # Emit only recognized service codes and our own fixed text, never raw messages.
+    if ('Timeout reached while tracking deployment status' in stderr
+            or 'Deployment failed because the site failed to start within' in stderr):
+        return '[DeploymentStartupTimeout]. ZIP extraction may have completed, but CLI runtime tracking failed. Keep startup tracking disabled for the stopped upload phase; use the separate activation/smoke gate.'
+    if 'Zip deployment failed.' in stderr:
+        return '[ZipDeploymentFailed]. Azure reported ZIP extraction failure; activation is blocked.'
+    if 'Timeout reached by the command, however, the deployment operation' in ' '.join(stderr.split()):
+        return '[ZipDeploymentTimeout]. ZIP completion is unverified; activation is blocked.'
     hints = {
         'ResourceNotFound': 'A required Azure resource was not found. Check resource dependencies and the selected group.',
         'SubscriptionIsOverQuotaForSku': 'The subscription has no available quota for this SKU in the selected region. No paid upgrade was attempted.',
@@ -72,11 +79,28 @@ def azure_failure(stderr):
     return '[' + ' > '.join(codes) + '].' + (' ' + hint if hint else '')
 
 
-def az(*args):
-    result = subprocess.run(['az', *args, '--only-show-errors', '-o', 'json'], capture_output=True, text=True)
+def az(*args, timeout=None):
+    try:
+        result = subprocess.run(['az', *args, '--only-show-errors', '-o', 'json'], capture_output=True, text=True, timeout=timeout)
+    except subprocess.TimeoutExpired:
+        raise ValueError(f'Azure operation exceeded {timeout} seconds: ' + ' '.join(args[:3]) + '. Completion is unverified; activation is blocked.') from None
     if result.returncode:
         raise ValueError('Azure operation failed: ' + ' '.join(args[:3]) + ' ' + azure_failure(result.stderr))
     return json.loads(result.stdout) if result.stdout.strip() else None
+
+
+def deploy_package(group, app, artifact):
+    # The app is stopped/gated here. Linux CLI startup tracking would wait for
+    # a runtime that cannot start until the subsequent activation deployment.
+    print('Deploying ZIP: waiting for extraction only (330-second process limit).', flush=True)
+    result = az('webapp', 'deploy', '--resource-group', group, '--name', app,
+                '--src-path', str(Path(artifact) / 'app.zip'), '--type', 'zip',
+                '--restart', 'false', '--clean', 'true', '--async', 'false',
+                '--track-status', 'false', '--enable-kudu-warmup', 'false', '--timeout', '300000',
+                timeout=330)
+    if not isinstance(result, dict) or type(result.get('status')) is not int or result['status'] != 4 or result.get('complete') is not True:
+        raise ValueError('ZIP extraction did not return verified completion; activation is blocked.')
+    print('ZIP extraction verified; proceeding to activation and provider-free smoke.', flush=True)
 
 
 def key():
@@ -258,8 +282,7 @@ def reconcile(environment, data, provider, artifact=None, sha=None, bootstrap=Fa
             if bootstrap:
                 print(environment + ' infrastructure and caps provisioned; app remains stopped until Actions deploys a checked artifact.')
                 return
-            az('webapp', 'deploy', '--resource-group', group, '--name', app, '--src-path', str(Path(artifact) / 'app.zip'),
-               '--type', 'zip', '--restart', 'false', '--clean', 'true')
+            deploy_package(group, app, artifact)
             write_params(True)
             # One complete app-settings owner, including secure values. No competing partial writers.
             az('deployment', 'group', 'create', *base, '--name', 'linguadesk-runtime')
