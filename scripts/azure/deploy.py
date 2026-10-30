@@ -219,6 +219,14 @@ def validate_changes(result, subscription, group):
             raise ValueError('Paid hosting SKU rejected.')
 
 
+def check_runtime_quota(site):
+    if (str(site.get('state', '')).casefold() == 'quotaexceeded'
+            or str(site.get('usageState', '')).casefold() == 'exceeded'):
+        raise ValueError('[AppServiceRuntimeQuotaExceeded]. Azure has disabled this app for a runtime quota; '
+                         'readiness cannot pass until Azure clears the condition. Check the app runtime quotas/reset, '
+                         'not regional F1 allocation quota. No paid upgrade was attempted.')
+
+
 def reconcile(environment, data, provider, artifact=None, sha=None, bootstrap=False):
     entry = data['environments'][environment]
     selected = environment_configuration()[environment]
@@ -230,8 +238,12 @@ def reconcile(environment, data, provider, artifact=None, sha=None, bootstrap=Fa
     location = selected['location']
     check_group_location(selected, group_info)
     existing_apps = az('webapp', 'list', '--resource-group', group)
-    preflight(subscription, location, required_plans=0 if existing_apps else 1)
     check_app_name(subscription, selected, existing_apps)
+    if existing_apps:
+        # List metadata can still say Stopped/Normal while the individual site
+        # endpoint reports a platform quota suspension.
+        check_runtime_quota(az('webapp', 'show', '--resource-group', group, '--name', selected['appName'], timeout=10))
+    preflight(subscription, location, required_plans=0 if existing_apps else 1)
     if not bootstrap and not fresh(environment, sha):
         print('Stale revision skipped before resource mutation.')
         return
@@ -288,7 +300,9 @@ def reconcile(environment, data, provider, artifact=None, sha=None, bootstrap=Fa
             az('deployment', 'group', 'create', *base, '--name', 'linguadesk-runtime')
             az('webapp', 'start', '--resource-group', group, '--name', app)
             from control import smoke
-            smoke('https://' + output['hostname'], sha)
+            def check_runtime():
+                check_runtime_quota(az('webapp', 'show', '--resource-group', group, '--name', app, timeout=10))
+            smoke('https://' + output['hostname'], sha, state_probe=check_runtime)
             summary = os.environ.get('GITHUB_STEP_SUMMARY')
             if summary:
                 with open(summary, 'a') as report:

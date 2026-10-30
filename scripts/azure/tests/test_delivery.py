@@ -251,7 +251,7 @@ class DeliveryTests(unittest.TestCase):
                 with patch.object(deploy,'az',side_effect=azure), patch.object(deploy,'preflight'), \
                      patch.object(deploy,'check_app_name'), patch.object(deploy,'validate_app_service'), \
                      patch.object(deploy,'fresh',return_value=True), patch.object(subprocess,'run',side_effect=command), \
-                     patch.object(control,'smoke',side_effect=lambda *args: events.append('smoke')):
+                     patch.object(control,'smoke',side_effect=lambda *args, **kwargs: events.append('smoke')):
                     if zip_result['status'] == 4:
                         deploy.reconcile('Staging',self.good_manifest(),'fixture-secret','artifact','a'*40)
                         self.assertEqual(events, ['stop','reconcile','stop','caps','zip','activate','start','smoke'])
@@ -259,6 +259,25 @@ class DeliveryTests(unittest.TestCase):
                         with self.assertRaisesRegex(ValueError, 'activation is blocked'):
                             deploy.reconcile('Staging',self.good_manifest(),'fixture-secret','artifact','a'*40)
                         self.assertEqual(events, ['stop','reconcile','stop','caps','zip','stop'])
+
+    def test_existing_runtime_quota_blocks_before_preflight_or_mutation(self):
+        site = {'state':'QuotaExceeded','usageState':'Exceeded'}
+        stale_list = {'name':'staging-linguadesk','defaultHostName':'staging-linguadesk.azurewebsites.net',
+                      'state':'Stopped','usageState':'Normal'}
+        with patch.object(deploy,'az',side_effect=[{'location':'indonesiacentral'},[stale_list],site]) as azure, \
+             patch.object(deploy,'preflight') as preflight:
+            with self.assertRaisesRegex(ValueError, 'AppServiceRuntimeQuotaExceeded'):
+                deploy.reconcile('Staging',self.good_manifest(),'fixture-secret','artifact','a'*40)
+            preflight.assert_not_called()
+            self.assertEqual([c.args[:2] for c in azure.call_args_list], [('group','show'),('webapp','list'),('webapp','show')])
+            self.assertEqual(azure.call_args.kwargs, {'timeout':10})
+
+    def test_runtime_quota_states_do_not_expose_configuration_or_change_sku(self):
+        for site in ({'state':'QuotaExceeded'}, {'state':'Running','usageState':'Exceeded'}):
+            with self.subTest(site=site), self.assertRaisesRegex(ValueError, 'No paid upgrade was attempted'):
+                deploy.check_runtime_quota({**site, 'private':'private-secret'})
+        for site in ({'state':'Running','usageState':'Normal'}, {'state':'Stopped'}, {}):
+            deploy.check_runtime_quota(site)
 
     def test_bootstrap_dry_run_idempotent_and_non_mutating(self):
         cmd=[sys.executable,str(SCRIPTS/'bootstrap.py'),'--dry-run']

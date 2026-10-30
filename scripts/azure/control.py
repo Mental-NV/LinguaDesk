@@ -136,43 +136,64 @@ def fresh(environment, sha):
     return True
 
 
-def smoke(url, sha):
+def smoke(url, sha, state_probe=None):
     if not re.fullmatch(r'https://[a-z0-9-]+\.azurewebsites\.net', url):
         raise ValueError('Smoke requires a generated HTTPS Azure hostname.')
     deadline = time.monotonic() + 240
     paths = {'/health/live': 200, '/health/ready': 200, '/': 200, '/translate': 200,
              '/api/capabilities': 200, '/api/accounts/antiforgery': 200, '/api/m047-missing': 404, '/assets/m047-missing.js': 404, '/revision.json': 200}
+    last_failure = 'No endpoint response.'
+    next_state_probe = 0
     while time.monotonic() < deadline:
         try:
             for path, expected in paths.items():
+                last_failure = f'{path}: network/timeout before HTTP response.'
                 request = urllib.request.Request(url + path, headers={'User-Agent': 'LinguaDesk-deployment-smoke'})
                 try:
                     response = urllib.request.urlopen(request, timeout=min(10, max(1, deadline - time.monotonic())))
                 except urllib.error.HTTPError as error:
                     response = error
                 with response:
-                    if response.status != expected or response.geturl() != url + path:
-                        raise ValueError('Unexpected status or redirect.')
+                    last_failure = f'{path}: HTTP {response.status}; expected {expected}.'
+                    if response.status != expected:
+                        raise ValueError('Unexpected status.')
+                    last_failure = f'{path}: unexpected redirect.'
+                    if response.geturl() != url + path:
+                        raise ValueError('Unexpected redirect.')
+                    last_failure = f'{path}: response body read failed.'
                     body = response.read(2_000_000)
-                    if path == '/revision.json' and json.loads(body)['sha'] != sha:
-                        raise ValueError('Deployed revision mismatch.')
-                    if path in ('/', '/translate') and b'<html' not in body.lower():
-                        raise ValueError('Missing SPA.')
+                    if path == '/revision.json':
+                        last_failure = f'{path}: invalid JSON or deployed revision mismatch.'
+                        revision = json.loads(body)
+                        if not isinstance(revision, dict) or revision.get('sha') != sha:
+                            raise ValueError('Deployed revision mismatch.')
+                    if path in ('/', '/translate'):
+                        last_failure = f'{path}: missing SPA HTML.'
+                        if b'<html' not in body.lower():
+                            raise ValueError('Missing SPA.')
                     if path == '/api/capabilities':
+                        last_failure = f'{path}: invalid capabilities JSON.'
                         json.loads(body)
                     if path == '/api/accounts/antiforgery':
+                        last_failure = f'{path}: missing Secure/HttpOnly antiforgery cookie.'
                         cookies = response.headers.get_all('Set-Cookie') or []
                         if not any('__Host-LinguaDesk.Antiforgery=' in c and '; secure' in c.lower() and '; httponly' in c.lower() for c in cookies):
                             raise ValueError('Secure antiforgery cookie is missing.')
+            last_failure = '/api/accounts/antiforgery: forwarded-header probe failed.'
             spoof = urllib.request.Request(url + '/api/accounts/antiforgery', headers={'X-Forwarded-Proto': 'http', 'X-Forwarded-For': '198.51.100.21'})
-            with urllib.request.urlopen(spoof, timeout=10) as response:
+            with urllib.request.urlopen(spoof, timeout=min(10, max(1, deadline - time.monotonic()))) as response:
                 if response.status != 200:
                     raise ValueError('Forwarded-header spoof changed the HTTPS boundary.')
             print('Provider-free HTTPS/SPA/API/readiness smoke passed: ' + sha)
             return
         except (OSError, ValueError):
+            # Probe only after HTTP failure. Explicit quota errors propagate from
+            # this handler instead of being swallowed by the readiness retry loop.
+            if state_probe and time.monotonic() >= next_state_probe and deadline - time.monotonic() >= 10:
+                state_probe()
+                next_state_probe = time.monotonic() + 30
             time.sleep(min(5, max(0, deadline - time.monotonic())))
-    raise ValueError('Bounded smoke failed for revision ' + sha)
+    raise ValueError('Bounded smoke failed for revision ' + sha + '. Last failure: ' + last_failure)
 
 
 def main():
