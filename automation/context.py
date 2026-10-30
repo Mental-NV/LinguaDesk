@@ -185,6 +185,8 @@ def document_paths():
 
 def audit():
     errors = []
+    artifacts_root = ROOT.resolve() / 'artifacts'
+    generated_links = 0
     for path in document_paths():
         text = unfenced(path.read_text())
         for match in re.finditer(r'(?<!!)\[[^\]\n]*\]\(([^)\n]+)\)', text):
@@ -193,6 +195,11 @@ def audit():
                 continue
             target, _, fragment = unquote(url).partition('#')
             target_path = (path.parent / target).resolve() if target else path
+            # Historical evidence is generated/ignored, not a source dependency.
+            # Its presence and content must not change a clean-checkout audit.
+            if target_path.is_relative_to(artifacts_root):
+                generated_links += 1
+                continue
             if not target_path.exists():
                 errors.append(f'{path.relative_to(ROOT)}: missing {url}')
             elif fragment and target_path.suffix == '.md':
@@ -211,7 +218,8 @@ def audit():
                 errors.append(f'Missing {directory.name}/{name}')
     if errors:
         raise ValueError('\n'.join(errors))
-    print(f'Checked local links/anchors and package layout in {len(document_paths())} Markdown documents.')
+    print(f'Checked source links/anchors and package layout in {len(document_paths())} Markdown documents; '
+          f'{generated_links} generated artifact references excluded.')
 
 
 def main():

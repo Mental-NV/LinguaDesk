@@ -31,6 +31,8 @@ public static class PersistenceRegistrationExtensions
         services.AddDbContext<LinguaDeskDbContext>((serviceProvider, options) =>
         {
             var policy = serviceProvider.GetRequiredService<StorageConnectionPolicy>();
+            options.AddInterceptors(new StorageJournalInterceptor(
+                serviceProvider.GetRequiredService<IOptions<StorageOptions>>().Value.JournalMode));
             options.UseSqlite(
                 policy.CreateRuntimeConnectionString(),
                 sqlite => sqlite.MigrationsAssembly(typeof(LinguaDeskDbContext).Assembly.GetName().Name));

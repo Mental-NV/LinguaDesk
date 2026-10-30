@@ -1,0 +1,10 @@
+{
+  "subscriptionId": "895bbba2-f762-48f6-83b9-e7029b6f3e96",
+  "tenantId": "3cbe8c53-bbb6-4d37-a351-aad589269d5e",
+  "environments": {
+    "Production": {
+      "clientId": "f8138cc2-7b98-4e34-94bc-a89dde7032de",
+      "resourceGroup": "rg-prod-linguadesk"
+    }
+  }
+}

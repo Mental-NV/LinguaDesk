@@ -1,0 +1,12 @@
+{
+  "bicep": "v0.48.1",
+  "azPowerShell": "16.3.0",
+  "actionlint": {
+    "version": "1.7.12",
+    "sha256": {
+      "linux_amd64": "8aca8db96f1b94770f1b0d72b6dddcb1ebb8123cb3712530b08cc387b349a3d8",
+      "darwin_arm64": "aba9ced2dee8d27fecca3dc7feb1a7f9a52caefa1eb46f3271ea66b6e0e6953f",
+      "darwin_amd64": "5b44c3bc2255115c9b69e30efc0fecdf498fdb63c5d58e17084fd5f16324c644"
+    }
+  }
+}

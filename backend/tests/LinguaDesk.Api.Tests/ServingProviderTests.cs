@@ -66,8 +66,11 @@ public sealed class ServingProviderTests
             Task.FromResult(respond(request));
     }
 
-    private static IConfiguration TestConfiguration() =>
-        new ConfigurationBuilder().AddEnvironmentVariables().Build();
+    private static IConfiguration TestConfiguration(string credential = "offline-scripted-transport-key") =>
+        new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string?>
+        {
+            [CredentialVariable.Replace("__", ":", StringComparison.Ordinal)] = credential,
+        }).Build();
 
     [TestMethod]
     public void UnconfiguredProvidersStayFailClosed()
@@ -132,25 +135,11 @@ public sealed class ServingProviderTests
     [TestMethod]
     public void MissingKeyBlocksInsteadOfFaking()
     {
-        var previous = Environment.GetEnvironmentVariable(CredentialVariable);
-        try
-        {
-            Environment.SetEnvironmentVariable(CredentialVariable, "  ");
-            var httpClient = new HttpClient(new StubHandler(_ => new HttpResponseMessage(HttpStatusCode.OK)
-            {
-                Content = new StringContent(ChatCompletionsJson("{}"), Encoding.UTF8, "application/json"),
-            }));
-            using var provider = new ServingTranslationClientProvider(Options.Create(ValidOptions()), TestConfiguration(), httpClient);
-
-            Assert.IsTrue(provider.TryGetClients(out var router, out var chain));
-            var exception = Assert.ThrowsExactly<ChatCompletionsAdapterException>(() => router(chain.Primary));
-
-            Assert.AreEqual(AttemptFailureKind.Blocked, exception.Kind);
-        }
-        finally
-        {
-            Environment.SetEnvironmentVariable(CredentialVariable, previous);
-        }
+        var httpClient = new HttpClient(new StubHandler(_ => new HttpResponseMessage(HttpStatusCode.OK)));
+        using var provider = new ServingTranslationClientProvider(Options.Create(ValidOptions()), TestConfiguration("  "), httpClient);
+        Assert.IsTrue(provider.TryGetClients(out var router, out var chain));
+        var exception = Assert.ThrowsExactly<ChatCompletionsAdapterException>(() => router(chain.Primary));
+        Assert.AreEqual(AttemptFailureKind.Blocked, exception.Kind);
     }
 
     [TestMethod]

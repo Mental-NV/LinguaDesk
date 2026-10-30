@@ -1,4 +1,5 @@
 using System.Reflection;
+using LinguaDesk.Api.Infrastructure.Telemetry;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Routing;
 using LinguaDesk.Api.Features.Capabilities;
@@ -15,6 +16,15 @@ using LinguaDesk.Api.Infrastructure.Security;
 using LinguaDesk.Api.Infrastructure.Serving;
 using LinguaDesk.Api.Infrastructure.Smoke;
 
+if (args is ["--prepare-deployment"])
+{
+    var preparation = WebApplication.CreateBuilder(Array.Empty<string>());
+    HostedDeploymentGuard.Validate(preparation.Configuration, preparation.Environment, false);
+    await DeploymentPreparation.PrepareAsync(preparation.Configuration, preparation.Environment.ContentRootPath);
+    if (preparation.Configuration.GetValue<bool>("Deployment:AzureAppService")) DeploymentRelease.Archive();
+    return;
+}
+
 var builder = WebApplication.CreateBuilder(args);
 var isContractGeneration =
     string.Equals(
@@ -30,6 +40,8 @@ builder.Logging.AddFilter(
     LogLevel.Warning);
 builder.Logging.AddFilter("Microsoft.AspNetCore.Hosting.Diagnostics", LogLevel.Warning);
 
+HostedDeploymentGuard.Validate(builder.Configuration, builder.Environment, isContractGeneration);
+builder.Services.AddDeploymentTelemetry(builder.Configuration, builder.Environment);
 builder.Services.AddProblemDetails();
 builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddLinguaDeskOpenApi();
@@ -44,7 +56,11 @@ builder.Services.AddSmokeDeterministicRewritingProvider(builder.Environment);
 builder.Services.AddLinguaDeskSecurity(builder.Configuration, isContractGeneration);
 builder.Services.AddLinguaDeskReadiness(builder.Environment, isContractGeneration);
 
+using var deploymentLease = !isContractGeneration && builder.Configuration.GetValue<bool>("Deployment:AzureAppService")
+    ? new FileStream(Path.Combine(Path.GetDirectoryName(builder.Configuration["Storage:DatabasePath"])!, ".runtime.lock"), FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None)
+    : null;
 var app = builder.Build();
+if (deploymentLease is not null) app.Lifetime.ApplicationStarted.Register(DeploymentRelease.MarkReady);
 
 if (SmokeAccountSeeder.IsRequested())
 {
@@ -53,6 +69,7 @@ if (SmokeAccountSeeder.IsRequested())
     return;
 }
 
+app.Use(DeploymentTelemetry.ObserveRequest);
 app.UseStaticFiles();
 app.UseForwardedHeaders();
 app.UseAuthentication();

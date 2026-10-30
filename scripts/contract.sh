@@ -76,8 +76,7 @@ generate_into() {
         --no-incremental \
         --disable-build-servers \
         -m:1
-    dotnet build-server shutdown
-
+    # The server-free build is complete; extract directly from its assembly.
     global_packages=$(dotnet nuget locals global-packages --list)
     nuget_root=${global_packages#global-packages: }
     getdocument_tool="$nuget_root/microsoft.extensions.apidescription.server/10.0.10/tools/dotnet-getdocument.dll"

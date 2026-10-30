@@ -129,7 +129,7 @@ public sealed class StorageHostTests
         }
     }
 
-    private sealed class OwnedKestrelHost : IAsyncDisposable
+    internal sealed class OwnedKestrelHost : IAsyncDisposable
     {
         private readonly Process process;
         private readonly ConcurrentQueue<string> output;
@@ -145,7 +145,7 @@ public sealed class StorageHostTests
 
         public int ProcessId => process.Id;
 
-        public static async Task<OwnedKestrelHost> StartAsync(string databasePath, string keysPath)
+        public static async Task<OwnedKestrelHost> StartAsync(string databasePath, string keysPath, string journalMode = "Wal")
         {
             var repositoryRoot = StoragePathPolicy.FindRepositoryRoot(AppContext.BaseDirectory)
                 ?? throw new InvalidOperationException("Could not locate repository root.");
@@ -174,6 +174,7 @@ public sealed class StorageHostTests
             startInfo.ArgumentList.Add("http://127.0.0.1:0");
             startInfo.Environment["ASPNETCORE_ENVIRONMENT"] = "Testing";
             startInfo.Environment["Storage__DatabasePath"] = databasePath;
+            startInfo.Environment["Storage__JournalMode"] = journalMode;
             startInfo.Environment["Security__DataProtectionKeysPath"] = keysPath;
 
             var output = new ConcurrentQueue<string>();

@@ -80,6 +80,8 @@ for (const [nav, tools, width] of [[false, false, 666], [true, false, 570], [fal
 
 test('panels preserve tab/page preferences, menu keyboard grouping and account focus without restarting a processing pause', async ({ workspace: { page } }) => {
   await page.clock.install()
+  // Only runFor may advance the debounce; locator actions must not consume it.
+  await page.clock.pauseAt(new Date(Date.now() + 1000))
   const posts = trackOperations(page)
   await openWorkspace(page, 'rewrite'); await page.getByLabel('Source text', { exact: true }).fill(REWRITE_SOURCE)
   await page.clock.runFor(500)

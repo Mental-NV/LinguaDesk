@@ -22,6 +22,8 @@ test('native source selection, newline and undo retain the caret without implici
 for (const feature of ['translate', 'rewrite'] as const) {
   test(`${feature} composition guards wait for committed input and native result copy preserves exact edits`, async ({ workspace: { page } }) => {
     await page.clock.install()
+    // Keep the 999/1000 ms boundary independent of browser action latency.
+    await page.clock.pauseAt(new Date(Date.now() + 1000))
     const posts = trackOperations(page)
     await openWorkspace(page, feature)
     if (feature === 'translate') await page.getByLabel('Target language').selectOption('ro')
