@@ -13,11 +13,14 @@ import urllib.request
 import zipfile
 
 ROOT = Path(__file__).resolve().parents[2]
-ENVIRONMENTS = ('Staging', 'Production')
+ENVIRONMENTS = ('Production',)
 
 
 def environment_configuration():
-    return json.loads((ROOT / 'infra/azure/environments.json').read_text())
+    data = json.loads((ROOT / 'infra/azure/environments.json').read_text())
+    if set(data) != set(ENVIRONMENTS):
+        raise ValueError('Only the Production environment may be configured.')
+    return data
 
 
 def run(*args):
@@ -37,21 +40,12 @@ def manifest(path=ROOT / 'infra/azure/deployment.json'):
     for env, entry in data['environments'].items():
         if set(entry) != {'clientId', 'resourceGroup'} or not guid.fullmatch(entry['clientId']) or entry['resourceGroup'] != environment_configuration()[env]['resourceGroup']:
             raise ValueError('Invalid environment identity or group.')
-    entries = list(data['environments'].values())
-    if any(entries[0][key] == entries[1][key] for key in ('clientId', 'resourceGroup')):
-        raise ValueError('Environment identities and resource groups must be distinct.')
     return data
 
 
 def target(event_name, event, repository):
     if event_name == 'push' and event.get('ref') == 'refs/heads/main':
         return 'Production', event['after']
-    if event_name == 'pull_request':
-        pr = event['pull_request']
-        if (event.get('action') in ('opened', 'synchronize', 'reopened', 'ready_for_review')
-                and pr['head']['repo']['full_name'] == repository
-                and pr['user']['login'] != 'dependabot[bot]' and event.get('sender', {}).get('login') != 'dependabot[bot]'):
-            return 'Staging', pr['head']['sha']
     return None
 
 
@@ -116,24 +110,10 @@ def verify_artifact(directory, sha, allow_dirty=False):
 
 
 def fresh(environment, sha):
+    if environment not in ENVIRONMENTS:
+        raise ValueError('Unknown deployment environment.')
     repo = os.environ['GITHUB_REPOSITORY']
-    if environment == 'Production':
-        return run('gh', 'api', f'repos/{repo}/git/ref/heads/main')['object']['sha'] == sha
-    number = os.environ['PR_NUMBER']
-    pr = run('gh', 'api', f'repos/{repo}/pulls/{number}')
-    if pr['state'] != 'open' or pr['head']['sha'] != sha or pr['head']['repo']['full_name'] != repo or pr['user']['login'] == 'dependabot[bot]':
-        return False
-    # A newer eligible PR run owns shared Staging even if an older run builds more slowly.
-    current = int(os.environ['GITHUB_RUN_NUMBER'])
-    runs = run('gh', 'api', f'repos/{repo}/actions/workflows/azure-app-service.yml/runs?event=pull_request&per_page=100')['workflow_runs']
-    for candidate in runs:
-        if candidate['run_number'] <= current:
-            continue
-        for reference in candidate['pull_requests']:
-            other = run('gh', 'api', f'repos/{repo}/pulls/{reference["number"]}')
-            if other['state'] == 'open' and other['head']['repo']['full_name'] == repo and other['user']['login'] != 'dependabot[bot]':
-                return False
-    return True
+    return run('gh', 'api', f'repos/{repo}/git/ref/heads/main')['object']['sha'] == sha
 
 
 def smoke(url, sha, state_probe=None):

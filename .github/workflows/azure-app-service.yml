@@ -50,47 +50,6 @@ jobs:
           name: offline-results-${{ github.run_id }}
           path: artifacts/test-results/
           retention-days: 7
-      - name: Explain credential boundary
-        if: always() && github.event_name == 'pull_request' && (github.event.pull_request.head.repo.full_name != github.repository || github.actor == 'dependabot[bot]' || github.event.pull_request.user.login == 'dependabot[bot]')
-        run: echo 'Offline checks only. Fork and Dependabot PRs must be brought onto a trusted repository branch before Staging deployment.' >> "$GITHUB_STEP_SUMMARY"
-  staging:
-    needs: checks
-    if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && github.actor != 'dependabot[bot]' && github.event.pull_request.user.login != 'dependabot[bot]'
-    runs-on: ubuntu-24.04
-    environment: Staging
-    permissions:
-      contents: read
-      actions: read
-      pull-requests: read
-      id-token: write
-    concurrency:
-      group: deploy-Staging
-      cancel-in-progress: false
-    steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
-        with:
-          ref: ${{ needs.checks.outputs.sha }}
-          persist-credentials: false
-      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
-        with:
-          name: app-${{ needs.checks.outputs.sha }}
-          path: artifacts/azure
-      - name: Validate generated environment configuration
-        id: identity
-        run: python3 scripts/azure/control.py manifest Staging
-      - uses: Azure/login@7184910d9eb2b1c5e48f7073824a90609bb9b6d6 # v2
-        with:
-          client-id: ${{ steps.identity.outputs.clientId }}
-          tenant-id: ${{ steps.identity.outputs.tenantId }}
-          subscription-id: ${{ steps.identity.outputs.subscriptionId }}
-          enable-AzPSSession: true
-      - name: Reconcile, cap, deploy and smoke
-        env:
-          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
-          GH_TOKEN: ${{ github.token }}
-          PR_NUMBER: ${{ github.event.pull_request.number }}
-          DEPLOY_SHA: ${{ needs.checks.outputs.sha }}
-        run: bash scripts/azure/deploy.sh Staging artifacts/azure "$DEPLOY_SHA"
   production:
     needs: checks
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
@@ -99,7 +58,6 @@ jobs:
     permissions:
       contents: read
       actions: read
-      pull-requests: read
       id-token: write
     concurrency:
       group: deploy-Production
@@ -126,6 +84,5 @@ jobs:
         env:
           DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
           GH_TOKEN: ${{ github.token }}
-          PR_NUMBER: ${{ github.event.pull_request.number }}
           DEPLOY_SHA: ${{ needs.checks.outputs.sha }}
         run: bash scripts/azure/deploy.sh Production artifacts/azure "$DEPLOY_SHA"

@@ -10,7 +10,7 @@ public static class HostedDeploymentGuard
         if (contractGeneration || !configuration.GetValue<bool>("Deployment:AzureAppService")) return;
         if (!configuration.GetValue<bool>("Deployment:Enabled")) throw new InvalidOperationException("Deployment is not enabled. Complete caps/settings/package reconciliation before startup.");
         if (string.IsNullOrWhiteSpace(configuration["APPLICATIONINSIGHTS_CONNECTION_STRING"])) throw new InvalidOperationException("Hosted telemetry connection is missing.");
-        if (environment.EnvironmentName is not ("Staging" or "Production")) throw new InvalidOperationException("Invalid hosted environment.");
+        if (environment.EnvironmentName != "Production") throw new InvalidOperationException("Invalid hosted environment.");
         if (Environment.GetEnvironmentVariables().Keys.Cast<string>().Any(k => k.StartsWith("LINGUADESK_SMOKE_", StringComparison.Ordinal) || k.StartsWith("LINGUADESK_E2E_", StringComparison.Ordinal)))
             throw new InvalidOperationException("Test flags are forbidden in hosted profiles.");
         var serving = configuration.GetSection("Serving").Get<ServingOptions>();

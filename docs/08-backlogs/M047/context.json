@@ -9,14 +9,14 @@
       ],
       "use": "excerpt",
       "reason": "Selected delivery outcome",
-      "sha256": "7ba2baf891cf89445968c46a82587c86fdaefdedebd1d178c3532720859e1ec3"
+      "sha256": "3607d2c46d3c36e2a7714561da483d0885e08ac8fa8791e1926560c2b8db3620"
     },
     {
       "path": "docs/delivery/current.md",
       "heading": "Selected milestone",
       "use": "reference",
       "reason": "Selection and dependency status",
-      "sha256": "dc6cb84691527edbf84ca307450b9426bc92fe3718d49cfd712052b2bc674b21"
+      "sha256": "8b1ee5727aee4a157d313d51feb80a3ba9ec1cbe9625f310b122d4550064cb89"
     },
     {
       "path": "docs/03-architecture.md",
@@ -166,15 +166,15 @@
       "path": "infra/azure/environments.json",
       "use": "reference",
       "reason": "User-selected exact resource names, environment separation, regions and hostnames (2026-10-28)",
-      "sha256": "5a9f91b79033c2fe500718ef6f61b08bf62bdc1e8d978800486ca855265e34c3"
+      "sha256": "3425c72346179d8977304ecac84291f13db8f18cc8c98e51ab209408e78eb220"
     }
   ],
   "source_map_sha256": "7868d658db8997466e00136ac639e469f65de89b73449455eb594efb9d2a955c",
-  "baseline_commit": "e73bbb178e3793e8c395d2bd474400780d12e556",
+  "baseline_commit": "f63f29cef78662d23cdb054ff84096e15d6b739e",
   "locked_files": {
     "docs/00-SDD-Planning-Workflow.md": "7e0f058c2b7ea290598030ab46d71e2c13def0a37e4b5de7cc029d1e6bb6e7ea",
     "docs/00-workflow/execution.md": "106a00f4d7004fbf3fcbbd106502fd61a1be41e5db9fd99ee20c92d8688038a8",
-    "docs/08-backlogs/M047/spec.md": "0ff13200c33f1b3736d6b664fd47bbe27e11e9ee3e19893511aa8bad1fbf1e5d",
-    "docs/08-backlogs/M047/plan.md": "34a75b7b9e1990807e809ea8f4b10d90105d814f5416bb8f792bed7afb813e1c"
+    "docs/08-backlogs/M047/spec.md": "68bc819b7f5dda252b28842aa9666b2cb13486b36477782eca0cd72f14793493",
+    "docs/08-backlogs/M047/plan.md": "71d8323306145644d5fba467a557620cd56a2611e61b893f0a9b324b24d17516"
   }
 }

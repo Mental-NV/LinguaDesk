@@ -105,7 +105,7 @@ def scan(args):
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--environment', choices=ENVIRONMENTS, default='Staging', help='Select the existing validation group (default: Staging).')
+    parser.add_argument('--environment', choices=ENVIRONMENTS, default='Production', help='Select the existing validation group (default: Production).')
     parser.add_argument('--resource-group', help='Use this existing group instead of the environment group; resources are never created.')
     parser.add_argument('--subscription', help='Subscription ID/name (default: current Azure CLI account). Does not change the active account.')
     parser.add_argument('--regions', nargs='+', help='Check only these region codes (default: all advertised Linux F1 regions).')

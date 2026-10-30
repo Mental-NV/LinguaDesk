@@ -10,7 +10,7 @@ az bicep install --version "$version"
 az bicep build --file infra/azure/bootstrap.bicep --outfile artifacts/infra/bootstrap.json
 az bicep build --file infra/azure/main.bicep --outfile artifacts/infra/main.json
 az bicep build --file infra/azure/f1-quota-probe.bicep --outfile artifacts/infra/f1-quota-probe.json
-for environment in staging production; do
+for environment in production; do
   DEEPSEEK_API_KEY=offline-placeholder az bicep build-params --file "infra/azure/$environment.bicepparam" --outfile "artifacts/infra/$environment.parameters.json"
 done
 python3 scripts/azure/check_topology.py

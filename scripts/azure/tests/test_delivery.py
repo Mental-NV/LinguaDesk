@@ -59,11 +59,10 @@ class DeliveryTests(unittest.TestCase):
 
     def test_event_table(self):
         for action in ('opened', 'synchronize', 'reopened', 'ready_for_review'):
-            event = self.event()
-            event['action'] = action
-            self.assertEqual(control.target('pull_request', event, 'owner/repo'), ('Staging', 'a'*40))
-        for fork, bot in ((True, False), (False, True)):
-            self.assertIsNone(control.target('pull_request', self.event(fork, bot), 'owner/repo'))
+            for fork, bot in ((False, False), (True, False), (False, True)):
+                event = self.event(fork, bot)
+                event['action'] = action
+                self.assertIsNone(control.target('pull_request', event, 'owner/repo'))
         self.assertEqual(control.target('push', {'ref': 'refs/heads/main', 'after': 'b'*40}, 'owner/repo'), ('Production', 'b'*40))
         self.assertIsNone(control.target('push', {'ref': 'refs/heads/master', 'after': 'b'*40}, 'owner/repo'))
         self.assertIsNone(control.target('push', {'ref': 'refs/heads/feature'}, 'owner/repo'))
@@ -83,17 +82,17 @@ class DeliveryTests(unittest.TestCase):
                 path.write_text(json.dumps(broken))
                 with self.assertRaises(ValueError): control.manifest(path)
             broken = copy.deepcopy(good)
-            broken['environments']['Staging']['clientId'] = good['environments']['Production']['clientId']
+            broken['environments']['Staging'] = copy.deepcopy(good['environments']['Production'])
             path.write_text(json.dumps(broken))
             with self.assertRaises(ValueError): control.manifest(path)
 
     def test_what_if_rejects_cross_environment_delete_and_paid_sku(self):
         data = self.good_manifest()
-        group = data['environments']['Staging']['resourceGroup']
+        group = data['environments']['Production']['resourceGroup']
         rid = f'/subscriptions/{data["subscriptionId"]}/resourceGroups/{group}/providers/Microsoft.Web/serverfarms/app'
         good = {'resourceId': rid, 'changeType': 'Modify', 'after': {'type': 'Microsoft.Web/serverfarms', 'sku': {'name': 'F1'}}}
         deploy.validate_changes({'changes': [good]}, data['subscriptionId'], group)
-        for change in (dict(good, resourceId=rid.replace('staging', 'production')), dict(good, changeType='Delete'), dict(good, after={'type': 'Microsoft.Web/serverfarms', 'sku': {'name': 'B1'}})):
+        for change in (dict(good, resourceId=rid.replace('rg-prod-linguadesk', 'rg-staging-linguadesk')), dict(good, changeType='Delete'), dict(good, after={'type': 'Microsoft.Web/serverfarms', 'sku': {'name': 'B1'}})):
             with self.assertRaises(ValueError): deploy.validate_changes({'changes': [change]}, data['subscriptionId'], group)
 
     def test_stale_main_has_no_mutation(self):
@@ -146,24 +145,24 @@ class DeliveryTests(unittest.TestCase):
         paths=[]
         def azure(*args):
             self.assertEqual(args[:3],('deployment','group','validate'))
-            self.assertEqual(args[4],'rg-staging-linguadesk')
+            self.assertEqual(args[4],'rg-prod-linguadesk')
             path=Path(args[-1][1:])
             paths.append(path)
             values=json.loads(path.read_text())['parameters']
-            self.assertEqual(values['location']['value'],'polandcentral')
+            self.assertEqual(values['location']['value'],'swedencentral')
             self.assertEqual(values['providerKey']['value'],'validation-only-not-a-credential')
             self.assertFalse(values['enabled']['value'])
             self.assertEqual(path.stat().st_mode & 0o777,0o600)
             raise ValueError('[SubscriptionIsOverQuotaForSku]')
         with patch.object(deploy,'az',side_effect=azure), patch.dict(os.environ,DEEPSEEK_API_KEY='private-sentinel'):
-            with self.assertRaisesRegex(ValueError,r'Staging App Service preflight \(polandcentral, F1\)'):
-                deploy.validate_app_service('Staging')
+            with self.assertRaisesRegex(ValueError,r'Production App Service preflight \(swedencentral, F1\)'):
+                deploy.validate_app_service('Production')
         self.assertFalse(paths[0].exists())
 
     def test_app_service_preflight_failure_blocks_runtime_and_github_changes(self):
-        with patch.object(deploy,'az',side_effect=[{'location':'polandcentral'},[]]) as azure, patch.object(deploy,'preflight'), patch.object(deploy,'check_app_name'), patch.object(deploy,'fresh',return_value=True), patch.object(deploy,'validate_app_service',side_effect=ValueError('quota')):
+        with patch.object(deploy,'az',side_effect=[{'location':'swedencentral'},[]]) as azure, patch.object(deploy,'preflight'), patch.object(deploy,'check_app_name'), patch.object(deploy,'fresh',return_value=True), patch.object(deploy,'validate_app_service',side_effect=ValueError('quota')):
             with self.assertRaisesRegex(ValueError,'quota'):
-                deploy.reconcile('Staging',self.good_manifest(),'fixture-secret',bootstrap=True)
+                deploy.reconcile('Production',self.good_manifest(),'fixture-secret',bootstrap=True)
             self.assertEqual([call.args[:2] for call in azure.call_args_list],[('group','show'),('webapp','list')])
         bootstrap=(SCRIPTS/'bootstrap.py').read_text()
         self.assertLess(bootstrap.index('        validate_app_service(environment)'),bootstrap.index("        endpoint = f'repos/"))
@@ -172,18 +171,18 @@ class DeliveryTests(unittest.TestCase):
         calls=[]
         def azure(*args):
             calls.append(args)
-            if args[:2] == ('group', 'show'): return {'location': 'polandcentral'}
+            if args[:2] == ('group', 'show'): return {'location': 'swedencentral'}
             if args[:3] == ('deployment','group','what-if'): return {'changes': []}
             if args[:2] == ('webapp', 'list'): return []
             if args[:3] == ('deployment','group','create'):
-                return {'properties': {'outputs': {k: {'value': v} for k,v in {**{k: control.environment_configuration()['Staging'][k] for k in ('appName','hostname','workspaceName','insightsName')}, 'dailyCapMb':50}.items()}}}
+                return {'properties': {'outputs': {k: {'value': v} for k,v in {**{k: control.environment_configuration()['Production'][k] for k in ('appName','hostname','workspaceName','insightsName')}, 'dailyCapMb':50}.items()}}}
         def command(args, **kwargs):
             if args[:3] == ['az','bicep','build-params']:
-                Path(args[-1]).write_text(json.dumps({'parameters': {'environment': {'value':'Staging'}, 'dailyCapMb':{'value':50}, 'providerKey':{'value':'fixture-secret'}}}))
+                Path(args[-1]).write_text(json.dumps({'parameters': {'environment': {'value':'Production'}, 'dailyCapMb':{'value':50}, 'providerKey':{'value':'fixture-secret'}}}))
                 return subprocess.CompletedProcess(args,0)
             raise subprocess.CalledProcessError(1,'pwsh')
         with patch.object(deploy, 'az', side_effect=azure), patch.object(deploy, 'preflight'), patch.object(deploy, 'check_app_name'), patch.object(deploy, 'validate_app_service'), patch.object(deploy, 'fresh', return_value=True), patch.object(subprocess, 'run', side_effect=command):
-            with self.assertRaises(subprocess.CalledProcessError): deploy.reconcile('Staging',self.good_manifest(),'secret-credential', 'artifact','a'*40)
+            with self.assertRaises(subprocess.CalledProcessError): deploy.reconcile('Production',self.good_manifest(),'secret-credential', 'artifact','a'*40)
         self.assertFalse(any(c[:2] in (('webapp','start'), ('webapp','deploy')) for c in calls))
         self.assertTrue(any(c[:2] == ('webapp','stop') for c in calls))
 
@@ -229,9 +228,9 @@ class DeliveryTests(unittest.TestCase):
         for zip_result in ({'status': 4, 'complete': True}, {'status': 3, 'complete': True}, {'status': 2, 'complete': False}):
             with self.subTest(zip_result=zip_result):
                 events=[]
-                output={**{k: control.environment_configuration()['Staging'][k] for k in ('appName','hostname','workspaceName','insightsName')}, 'dailyCapMb':50}
+                output={**{k: control.environment_configuration()['Production'][k] for k in ('appName','hostname','workspaceName','insightsName')}, 'dailyCapMb':50}
                 def azure(*args, **kwargs):
-                    if args[:2] == ('group','show'): return {'location':'polandcentral'}
+                    if args[:2] == ('group','show'): return {'location':'swedencentral'}
                     if args[:2] == ('webapp','list'): return [{'name':output['appName']}]
                     if args[:2] == ('webapp','show'): return {'state':'Stopped'}
                     if args[:3] == ('deployment','group','what-if'): return {'changes':[]}
@@ -245,7 +244,7 @@ class DeliveryTests(unittest.TestCase):
                     if args[:2] in (('webapp','stop'),('webapp','start')): events.append(args[1])
                 def command(args, **kwargs):
                     if args[:3] == ['az','bicep','build-params']:
-                        Path(args[-1]).write_text(json.dumps({'parameters':{'environment':{'value':'Staging'},'dailyCapMb':{'value':50}}}))
+                        Path(args[-1]).write_text(json.dumps({'parameters':{'environment':{'value':'Production'},'dailyCapMb':{'value':50}}}))
                     else: events.append('caps')
                     return subprocess.CompletedProcess(args,0)
                 with patch.object(deploy,'az',side_effect=azure), patch.object(deploy,'preflight'), \
@@ -253,21 +252,21 @@ class DeliveryTests(unittest.TestCase):
                      patch.object(deploy,'fresh',return_value=True), patch.object(subprocess,'run',side_effect=command), \
                      patch.object(control,'smoke',side_effect=lambda *args, **kwargs: events.append('smoke')):
                     if zip_result['status'] == 4:
-                        deploy.reconcile('Staging',self.good_manifest(),'fixture-secret','artifact','a'*40)
+                        deploy.reconcile('Production',self.good_manifest(),'fixture-secret','artifact','a'*40)
                         self.assertEqual(events, ['stop','reconcile','stop','caps','zip','activate','start','smoke'])
                     else:
                         with self.assertRaisesRegex(ValueError, 'activation is blocked'):
-                            deploy.reconcile('Staging',self.good_manifest(),'fixture-secret','artifact','a'*40)
+                            deploy.reconcile('Production',self.good_manifest(),'fixture-secret','artifact','a'*40)
                         self.assertEqual(events, ['stop','reconcile','stop','caps','zip','stop'])
 
     def test_existing_runtime_quota_blocks_before_preflight_or_mutation(self):
         site = {'state':'QuotaExceeded','usageState':'Exceeded'}
-        stale_list = {'name':'staging-linguadesk','defaultHostName':'staging-linguadesk.azurewebsites.net',
+        stale_list = {'name':'linguadesk','defaultHostName':'linguadesk.azurewebsites.net',
                       'state':'Stopped','usageState':'Normal'}
-        with patch.object(deploy,'az',side_effect=[{'location':'polandcentral'},[stale_list],site]) as azure, \
+        with patch.object(deploy,'az',side_effect=[{'location':'swedencentral'},[stale_list],site]) as azure, \
              patch.object(deploy,'preflight') as preflight:
             with self.assertRaisesRegex(ValueError, 'AppServiceRuntimeQuotaExceeded'):
-                deploy.reconcile('Staging',self.good_manifest(),'fixture-secret','artifact','a'*40)
+                deploy.reconcile('Production',self.good_manifest(),'fixture-secret','artifact','a'*40)
             preflight.assert_not_called()
             self.assertEqual([c.args[:2] for c in azure.call_args_list], [('group','show'),('webapp','list'),('webapp','show')])
             self.assertEqual(azure.call_args.kwargs, {'timeout':10})
@@ -287,6 +286,59 @@ class DeliveryTests(unittest.TestCase):
         self.assertEqual(data['githubVariables'],[])
         self.assertEqual(data['dailyCapMb'],50)
         self.assertFalse(data['mutations'])
+
+    def test_bootstrap_configures_only_production_and_preserves_identity(self):
+        data = self.good_manifest()
+        output = {'properties': {'outputs': {'environments': {'value': [
+            {'environment': 'Production', **data['environments']['Production']}
+        ]}}}}
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            destination = root/'infra/azure/deployment.json'
+            destination.parent.mkdir(parents=True)
+            destination.write_text(json.dumps(data))
+            def azure(*args):
+                if args[:2] == ('account', 'show'): return {'id': data['subscriptionId'], 'tenantId': data['tenantId']}
+                if args[:2] == ('group', 'exists'): return True
+                if args[:2] == ('group', 'show'): return {'location': 'swedencentral'}
+                if args[:3] == ('deployment', 'sub', 'create'): return output
+            replies = [json.dumps({'nameWithOwner': 'owner/repo', 'viewerPermission': 'ADMIN'}),
+                       json.dumps({'branch_policies': [{'name': 'main', 'type': 'branch'}]})]
+            with patch.object(sys, 'argv', ['bootstrap.py']), patch.object(bootstrap, 'ROOT', root), \
+                 patch.object(bootstrap.shutil, 'which', return_value='/fixture'), \
+                 patch.object(bootstrap, 'github_subject_prefix', return_value='repo:owner@123/repo@456'), \
+                 patch.dict(os.environ, LINGUADESK_BOOTSTRAP_PRODUCTION_KEY='offline-test-key'), \
+                 patch.object(bootstrap.getpass, 'getpass') as prompt, patch.object(bootstrap, 'az', side_effect=azure), \
+                 patch.object(bootstrap, 'preflight'), patch.object(bootstrap, 'check_app_name'), \
+                 patch.object(bootstrap, 'validate_app_service') as validate, patch.object(bootstrap, 'reconcile') as reconcile, \
+                 patch.object(bootstrap.subprocess, 'check_output', side_effect=replies), \
+                 patch.object(bootstrap.subprocess, 'run') as github:
+                bootstrap.main()
+                prompt.assert_not_called()
+                validate.assert_called_once_with('Production')
+                reconcile.assert_called_once_with('Production', data, 'offline-test-key', bootstrap=True)
+                self.assertNotIn('Staging', str(github.call_args_list))
+                self.assertEqual(json.loads(destination.read_text()), data)
+
+    def test_monitoring_verification_queries_only_production(self):
+        spec = importlib.util.spec_from_file_location('verify_monitoring', SCRIPTS/'verify-monitoring.py')
+        monitoring = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(monitoring)
+        data = self.good_manifest()
+        def azure(*args):
+            if args[:2] == ('account', 'show'): return {'id': data['subscriptionId']}
+            if args[:4] == ('monitor', 'log-analytics', 'workspace', 'list'):
+                self.assertEqual(args[-1], 'rg-prod-linguadesk')
+                return [{'workspaceCapping': {'dailyQuotaGb': 0.05}, 'retentionInDays': 30, 'customerId': 'workspace'}]
+            if args[:2] == ('resource', 'list'): return [{'id': '/component'}]
+            if args[0] == 'rest': return {'DataVolumeCap': {'Cap': 0.05}}
+            if args[:3] == ('deployment', 'group', 'show'):
+                return {'properties': {'outputs': {'dailyCapMb': {'value': 50}}}}
+            if args[:3] == ('monitor', 'log-analytics', 'query'): return [{'Count': 1}]
+            raise AssertionError(args)
+        with patch.object(sys, 'argv', ['verify-monitoring.py', 'Production', 'a'*40]), \
+             patch.object(monitoring, 'manifest', return_value=data), patch.object(monitoring, 'az', side_effect=azure):
+            monitoring.main()
 
     def test_missing_key_fails_before_azure(self):
         with patch.dict(os.environ, DEEPSEEK_API_KEY=''), patch.object(deploy,'az') as azure:
@@ -318,17 +370,15 @@ class DeliveryTests(unittest.TestCase):
                 (publish/'appsettings.json').write_text('{"Provider": {"ApiKey": "private-sentinel"}}')
                 with self.assertRaises(ValueError): control.package()
 
-    def test_newer_pr_run_owns_shared_staging(self):
-        pr={'state':'open','head':{'sha':'a'*40,'repo':{'full_name':'owner/repo'}},'user':{'login':'human'}}
-        responses=[pr,{'workflow_runs':[{'run_number':11,'pull_requests':[{'number':2}]}]},pr]
-        with patch.dict(os.environ,GITHUB_REPOSITORY='owner/repo',PR_NUMBER='1',GITHUB_RUN_NUMBER='10'), patch.object(control,'run',side_effect=responses):
-            self.assertFalse(control.fresh('Staging','a'*40))
-        for state,head in [('closed','a'*40),('open','b'*40)]:
-            changed=copy.deepcopy(pr)
-            changed['state']=state
-            changed['head']['sha']=head
-            with patch.dict(os.environ,GITHUB_REPOSITORY='owner/repo',PR_NUMBER='1'), patch.object(control,'run',return_value=changed):
-                self.assertFalse(control.fresh('Staging','a'*40))
+    def test_removed_staging_cannot_deploy_or_query_github(self):
+        with patch.object(control, 'run') as github:
+            with self.assertRaisesRegex(ValueError, 'Unknown deployment environment'):
+                control.fresh('Staging', 'a'*40)
+            github.assert_not_called()
+        with patch.object(deploy, 'az') as azure, patch.object(sys, 'argv', ['deploy.py', 'Staging', 'artifact', 'a'*40]):
+            with self.assertRaisesRegex(ValueError, 'Unknown environment'):
+                deploy.main()
+            azure.assert_not_called()
 
     def test_current_runtime_records_and_existing_plan_quota(self):
         for runtimes in (['DOTNETCORE:10.0'], [{'runtime':'.NET','version':'10.0 (LTS)','config':'DOTNETCORE|10.0'}]):
@@ -346,8 +396,8 @@ class DeliveryTests(unittest.TestCase):
         configuration=control.environment_configuration()
         expected={
             'Production': ('rg-prod-linguadesk','linguadesk','plan-prod-linguadesk','appi-prod-linguadesk','law-prod-linguadesk','id-prod-linguadesk','swedencentral'),
-            'Staging': ('rg-staging-linguadesk','staging-linguadesk','plan-staging-linguadesk','appi-staging-linguadesk','law-staging-linguadesk','id-staging-linguadesk','polandcentral'),
         }
+        self.assertEqual(set(configuration), {'Production'})
         keys=('resourceGroup','appName','planName','insightsName','workspaceName','identityName','location')
         for environment,values in expected.items():
             self.assertEqual(tuple(configuration[environment][k] for k in keys),values)
@@ -447,14 +497,14 @@ class DeliveryTests(unittest.TestCase):
 
     def test_passive_alert_exception_preserves_scope_name_and_payload_privacy(self):
         data=self.good_manifest()
-        selected=control.environment_configuration()['Staging']
+        selected=control.environment_configuration()['Production']
         group=selected['resourceGroup']
         resource=f'/subscriptions/{data["subscriptionId"]}/resourceGroups/{group}/providers/Microsoft.AlertsManagement/smartDetectorAlertRules/Failure Anomalies - {selected["insightsName"]}'
         for changed in (
-            resource.replace(group,'rg-prod-linguadesk'),
+            resource.replace(group,'rg-staging-linguadesk'),
             resource.replace(data['subscriptionId'],'00000000-0000-0000-0000-000000000009'),
             resource+'-unexpected',
-            resource.replace(selected['insightsName'],'appi-prod-linguadesk'),
+            resource.replace(selected['insightsName'],'appi-staging-linguadesk'),
             resource.replace('Microsoft.AlertsManagement/smartDetectorAlertRules','Microsoft.Storage/storageAccounts'),
         ):
             with self.assertRaises(ValueError) as caught:
@@ -472,12 +522,16 @@ class DeliveryTests(unittest.TestCase):
         self.assertIn("{('main', 'branch')}",(SCRIPTS/'bootstrap.py').read_text())
         self.assertNotIn('pull_request_target',source)
         self.assertNotIn('vars.',source)
-        self.assertEqual(source.count('id-token: write'),2)
-        self.assertEqual(source.count('cancel-in-progress: false'),2)
-        self.assertEqual(source.count('needs: checks'),2)
+        self.assertEqual(source.count('id-token: write'),1)
+        self.assertEqual(source.count('cancel-in-progress: false'),1)
+        self.assertEqual(source.count('needs: checks'),1)
         self.assertIn('persist-credentials: false',source)
-        check_job=source.split('  staging:')[0]
+        self.assertNotIn('  staging:',source)
+        self.assertNotIn('environment: Staging',source)
+        check_job=source.split('  production:')[0]
         self.assertNotIn('secrets.',check_job)
+        self.assertNotIn('id-token: write',check_job)
+        self.assertNotIn('Azure/login@',check_job)
         for line in source.splitlines():
             if 'uses:' in line: self.assertRegex(line,r'@[a-f0-9]{40} ')
         offline=(control.ROOT/'scripts/ci-offline.sh').read_text()

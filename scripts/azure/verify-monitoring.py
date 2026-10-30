@@ -1,17 +1,17 @@
 #!/usr/bin/env python3
-"""Bounded, provider-free hosted evidence. Requires bootstrap/operator access to BOTH groups."""
+"""Bounded, provider-free hosted evidence. Requires bootstrap/operator access to Production."""
 import argparse
 import json
 import re
 import sys
 import time
-from control import manifest
+from control import ENVIRONMENTS, manifest
 from deploy import az
 
 
 def main():
     parser=argparse.ArgumentParser()
-    parser.add_argument('environment', choices=('Staging','Production'))
+    parser.add_argument('environment', choices=ENVIRONMENTS)
     parser.add_argument('sha')
     args=parser.parse_args()
     if not re.fullmatch('[a-f0-9]{40}',args.sha): raise ValueError('Invalid revision.')
@@ -41,10 +41,8 @@ def main():
         for env,workspace in workspaces.items():
             result=az('monitor','log-analytics','query','--workspace',workspace,'--analytics-query',query)
             counts[env]=int(result[0]['Count'])
-        other='Production' if args.environment=='Staging' else 'Staging'
-        if counts[other]: raise ValueError('Telemetry crossed environment boundaries.')
         if counts[args.environment]:
-            print(f'{args.environment} marker routing, both versioned caps and both 30-day retentions verified for {args.sha}.')
+            print(f'{args.environment} marker routing, component/workspace caps and 30-day retention verified for {args.sha}.')
             return
         time.sleep(15)
     raise ValueError('Marker unavailable within five minutes; hosted telemetry acceptance remains unverified.')

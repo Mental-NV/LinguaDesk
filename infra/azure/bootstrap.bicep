@@ -1,7 +1,7 @@
 targetScope = 'subscription'
 param oidcSubjectPrefix string
 var configuration = loadJsonContent('./environments.json')
-var environments = ['Staging', 'Production']
+var environments = ['Production']
 resource groups 'Microsoft.Resources/resourceGroups@2024-03-01' = [for environment in environments: {
   name: configuration[environment].resourceGroup
   location: configuration[environment].location

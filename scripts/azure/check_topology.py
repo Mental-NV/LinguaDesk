@@ -7,11 +7,13 @@ root=Path(__file__).resolve().parents[2]
 bootstrap=json.loads((root/'artifacts/infra/bootstrap.json').read_text())
 main=json.loads((root/'artifacts/infra/main.json').read_text())
 expected=json.loads((root/'infra/azure/environments.json').read_text())
+assert set(expected)=={'Production'}
+assert bootstrap['variables']['environments']==['Production']
 assert bootstrap['variables']['$fxv#0']==expected
 assert main['variables']['$fxv#0']==expected
 resources=bootstrap['resources']
 groups=[r for r in resources if r['type']=='Microsoft.Resources/resourceGroups']
-assert len(groups)==1 and groups[0]['copy']['count']=="[length(variables('environments'))]", 'Only the two environment RGs may be created.'
+assert len(groups)==1 and groups[0]['copy']['count']=="[length(variables('environments'))]", 'Only the Production RG may be created.'
 identity=next(r for r in resources if r['type']=='Microsoft.Resources/deployments' and r['name'].startswith("[format('identity-"))
 role=next(r for r in resources if r['type']=='Microsoft.Resources/deployments' and r['name'].startswith("[format('role-"))
 assert identity['resourceGroup']==role['resourceGroup']==groups[0]['name'], 'Identity/RBAC must be scoped to its own environment RG.'
@@ -40,6 +42,8 @@ assert connection.startswith("[if(parameters('reconcileMonitoring'), ")
 assert "'monitoring')" in connection and '.outputs.connectionString.value' in connection, 'Provisioning must consume the completed monitoring module output.'
 assert connection.index('.outputs.connectionString.value') < connection.index('.ConnectionString'), 'Only activation may read an existing Insights component.'
 assert any("'monitoring')" in dependency for dependency in app['dependsOn']), 'ARM must wait for monitoring creation.'
+assert main['parameters']['environment']['allowedValues']==['Production']
+assert app['properties']['template']['parameters']['environment']['allowedValues']==['Production']
 site=next(r for r in app['properties']['template']['resources'] if r['type']=='Microsoft.Web/sites')
 assert site['properties']['siteConfig']['use32BitWorkerProcess'] is True, 'F1 rejects a 64-bit worker request at creation.'
 assert site['properties']['siteConfig']['alwaysOn'] is False
@@ -53,4 +57,4 @@ plan=probe['resources'][0]
 assert plan['type']=='Microsoft.Web/serverfarms' and plan['sku']=={'name':'F1','tier':'Free','capacity':1}
 assert plan['properties']['reserved'] is True
 assert set(probe['parameters'])=={'planName','location'}
-print('Compiled topology: exact names/regions, two RGs, in-group identities, restricted CI role and classic hostname request verified.')
+print('Compiled topology: exact names/regions, one Production RG, in-group identity, restricted CI role and classic hostname request verified.')

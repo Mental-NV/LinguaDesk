@@ -26,6 +26,13 @@ public sealed class HostedDeploymentGuardTests
         HostedDeploymentGuard.Validate(Configuration(), new HostingEnvironment { EnvironmentName = "Production" }, false);
 
     [TestMethod]
+    [DataRow("Staging")]
+    [DataRow("Development")]
+    public void NonProductionHostedEnvironmentIsRejected(string environment) =>
+        Assert.ThrowsExactly<InvalidOperationException>(() => HostedDeploymentGuard.Validate(
+            Configuration(), new HostingEnvironment { EnvironmentName = environment }, false));
+
+    [TestMethod]
     [DataRow("Deployment:Enabled", "false")]
     [DataRow("APPLICATIONINSIGHTS_CONNECTION_STRING", "")]
     [DataRow("LINGUADESK_AIEVALUATION:CREDENTIALS:DEEPSEEK:APIKEY", "")]

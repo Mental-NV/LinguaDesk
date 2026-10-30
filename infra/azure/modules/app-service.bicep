@@ -1,7 +1,7 @@
 param name string
 param planName string
 param location string
-@allowed(['Staging', 'Production'])
+@allowed(['Production'])
 param environment string
 @secure()
 param providerKey string

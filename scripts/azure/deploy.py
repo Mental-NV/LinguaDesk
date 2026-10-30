@@ -8,7 +8,7 @@ from pathlib import Path
 import subprocess
 import sys
 import tempfile
-from control import ROOT, manifest, verify_artifact, fresh, environment_configuration
+from control import ROOT, ENVIRONMENTS, manifest, verify_artifact, fresh, environment_configuration
 
 
 def azure_failure(stderr):
@@ -306,7 +306,7 @@ def reconcile(environment, data, provider, artifact=None, sha=None, bootstrap=Fa
             summary = os.environ.get('GITHUB_STEP_SUMMARY')
             if summary:
                 with open(summary, 'a') as report:
-                    report.write(f'{environment}: PR {os.environ.get("PR_NUMBER", "n/a")}; revision `{sha}`; https://{output["hostname"]}\n')
+                    report.write(f'{environment}: revision `{sha}`; https://{output["hostname"]}\n')
         except Exception:
             # Preserve persistent data and recovery material; leave failure unavailable.
             az('webapp', 'stop', '--resource-group', group, '--name', app)
@@ -315,7 +315,7 @@ def reconcile(environment, data, provider, artifact=None, sha=None, bootstrap=Fa
 
 def main():
     environment, artifact, sha = sys.argv[1:]
-    if environment not in ('Staging', 'Production'): raise ValueError('Unknown environment.')
+    if environment not in ENVIRONMENTS: raise ValueError('Unknown environment.')
     data = manifest()
     provider = key()
     verify_artifact(artifact, sha)

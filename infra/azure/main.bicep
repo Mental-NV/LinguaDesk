@@ -1,5 +1,5 @@
 targetScope = 'resourceGroup'
-@allowed(['Staging', 'Production'])
+@allowed(['Production'])
 param environment string
 @minValue(1)
 @maxValue(50)

@@ -12,7 +12,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import control
 import deploy
 
-URL = 'https://staging-linguadesk.azurewebsites.net'
+URL = 'https://linguadesk.azurewebsites.net'
 SHA = 'a' * 40
 PRIVATE = 'private-response-and-cookie-sentinel'
 

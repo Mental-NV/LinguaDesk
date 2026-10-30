@@ -14,7 +14,7 @@ public static class DeploymentTelemetry
 
     public static bool CanExport(IConfiguration configuration, IHostEnvironment environment) =>
         configuration.GetValue<bool>("Telemetry:Enabled")
-        && environment.EnvironmentName is "Staging" or "Production"
+        && environment.EnvironmentName == "Production"
         && !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("WEBSITE_SITE_NAME"))
         && !string.Equals(Environment.GetEnvironmentVariable("CI"), "true", StringComparison.OrdinalIgnoreCase);
 

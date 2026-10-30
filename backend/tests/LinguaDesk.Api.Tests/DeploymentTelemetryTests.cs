@@ -100,6 +100,7 @@ public sealed class DeploymentTelemetryTests
             Environment.SetEnvironmentVariable("CI", "true");
             Assert.IsFalse(DeploymentTelemetry.CanExport(config, environment));
             Environment.SetEnvironmentVariable("CI", "false");
+            Assert.IsFalse(DeploymentTelemetry.CanExport(config, new TestEnvironment { EnvironmentName = "Staging" }));
             Assert.ThrowsExactly<InvalidOperationException>(() => new ServiceCollection().AddDeploymentTelemetry(config, environment));
         }
         finally

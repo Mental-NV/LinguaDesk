@@ -8,15 +8,5 @@
     "identityName": "id-prod-linguadesk",
     "location": "swedencentral",
     "hostname": "linguadesk.azurewebsites.net"
-  },
-  "Staging": {
-    "resourceGroup": "rg-staging-linguadesk",
-    "appName": "staging-linguadesk",
-    "planName": "plan-staging-linguadesk",
-    "insightsName": "appi-staging-linguadesk",
-    "workspaceName": "law-staging-linguadesk",
-    "identityName": "id-staging-linguadesk",
-    "location": "polandcentral",
-    "hostname": "staging-linguadesk.azurewebsites.net"
   }
 }

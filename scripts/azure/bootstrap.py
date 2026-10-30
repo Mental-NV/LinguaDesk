@@ -33,7 +33,7 @@ def github_subject_prefix(repository):
 
 
 def main():
-    parser = argparse.ArgumentParser(description='Create isolated F1 resources, OIDC and GitHub environments. Never commits or pushes.')
+    parser = argparse.ArgumentParser(description='Create Production F1 resources, OIDC and the GitHub environment. Never commits or pushes.')
     parser.add_argument('--dry-run', action='store_true', help='Show desired setup; no authentication, prompts or mutations.')
     args = parser.parse_args()
     configuration = environment_configuration()
@@ -62,7 +62,7 @@ def main():
     for environment in ENVIRONMENTS:
         value = os.environ.get('LINGUADESK_BOOTSTRAP_' + environment.upper() + '_KEY')
         if not value:
-            if not sys.stdin.isatty(): raise ValueError('Supply both environment keys through secure input before bootstrap.')
+            if not sys.stdin.isatty(): raise ValueError('Supply the Production key through secure input before bootstrap.')
             value = getpass.getpass(environment + ' DEEPSEEK_API_KEY: ')
         if len(value.strip()) < 12 or '<' in value: raise ValueError('Missing or placeholder provider credential.')
         provider_keys[environment] = value
@@ -88,8 +88,8 @@ def main():
         if destination.exists() and manifest(destination) != data:
             raise ValueError('Existing manifest targets differ; refusing to redirect deployment identities.')
         destination.write_text(temporary.read_text())
-    # Validate BOTH regional F1 allocations before changing GitHub configuration
-    # or provisioning either runtime. The outer template can skip nested validation.
+    # Validate the Production F1 allocation before changing GitHub configuration
+    # or provisioning the runtime. The outer template can skip nested validation.
     for environment in ENVIRONMENTS:
         validate_app_service(environment)
     for environment in ENVIRONMENTS:
@@ -97,7 +97,7 @@ def main():
         policy = {'wait_timer': 0, 'reviewers': [], 'deployment_branch_policy': {'protected_branches': False, 'custom_branch_policies': True}}
         subprocess.run(['gh', 'api', '--method', 'PUT', endpoint, '--input', '-'], input=json.dumps(policy), text=True, stdout=subprocess.DEVNULL, check=True)
         policies = json.loads(subprocess.check_output(['gh', 'api', endpoint + '/deployment-branch-policies?per_page=100'], text=True))['branch_policies']
-        wanted = {('main', 'branch')} if environment == 'Production' else {('refs/pull/*/merge', 'branch')}
+        wanted = {('main', 'branch')}
         for existing in policies:
             if (existing['name'], existing['type']) not in wanted:
                 subprocess.run(['gh', 'api', '--method', 'DELETE', endpoint + '/deployment-branch-policies/' + str(existing['id'])], check=True)

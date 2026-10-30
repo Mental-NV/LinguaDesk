@@ -6,7 +6,7 @@ The local runtime/generated contract implements the [124-language catalog](docs/
 
 ## Azure delivery
 
-[M047 deployment guide](docs/deployment/azure-app-service.md) documents isolated Linux F1 Staging/Production bootstrap, OIDC, one provider secret per environment, persistent SQLite preparation, capped monitoring and recovery. Repository implementation is available; authenticated hosted qualification remains pending the two environment provider keys. No live LLM calls run in GitHub CI.
+[M047 deployment guide](docs/deployment/azure-app-service.md) documents Production Linux F1 bootstrap, OIDC, PR-only CI and one provider secret, persistent SQLite preparation, capped monitoring and recovery. Repository implementation is available; authenticated hosted qualification remains pending successful hosted acceptance. No live LLM calls run in GitHub CI.
 
 ## Prerequisites
 
