@@ -26,7 +26,7 @@ Deliver deployment infrastructure for the existing combined ASP.NET Core API/Rea
 
 ## Selected names and separation
 
-User direction on 2026-10-28 fixes the following names in versioned `infra/azure/environments.json`. No generated suffix or alternate name is permitted. The latest user direction explicitly selects `swedencentral` for Production, superseding the previous Austria East and Germany West Central selections. Sweden Central passed the authenticated F1 region scan on 2026-10-28. The operator's subsequent versioned configuration selects `indonesiacentral` for Staging; the 2026-10-29 investigation confirms the recreated Staging resources use that region.
+User direction on 2026-10-28 fixes the following names in versioned `infra/azure/environments.json`. No generated suffix or alternate name is permitted. The latest user direction explicitly selects `swedencentral` for Production, superseding the previous Austria East and Germany West Central selections. Sweden Central passed the authenticated F1 region scan on 2026-10-28. User direction on 2026-10-30 selects `polandcentral` for Staging from the supplied passing Linux F1 provider-validation results, superseding Indonesia Central. Passing validation is point-in-time evidence, not a guarantee of runtime readiness.
 
 | Resource | Production | Staging |
 | --- | --- | --- |
@@ -36,7 +36,7 @@ User direction on 2026-10-28 fixes the following names in versioned `infra/azure
 | Application Insights | `appi-prod-linguadesk` | `appi-staging-linguadesk` |
 | Log Analytics Workspace | `law-prod-linguadesk` | `law-staging-linguadesk` |
 | Deployment Managed Identity | `id-prod-linguadesk` | `id-staging-linguadesk` |
-| Region | `swedencentral` | `indonesiacentral` |
+| Region | `swedencentral` | `polandcentral` |
 | GitHub environment | `Production` | `Staging` |
 | Required default hostname | `linguadesk.azurewebsites.net` | `staging-linguadesk.azurewebsites.net` |
 

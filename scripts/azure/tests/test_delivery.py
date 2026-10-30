@@ -150,18 +150,18 @@ class DeliveryTests(unittest.TestCase):
             path=Path(args[-1][1:])
             paths.append(path)
             values=json.loads(path.read_text())['parameters']
-            self.assertEqual(values['location']['value'],'indonesiacentral')
+            self.assertEqual(values['location']['value'],'polandcentral')
             self.assertEqual(values['providerKey']['value'],'validation-only-not-a-credential')
             self.assertFalse(values['enabled']['value'])
             self.assertEqual(path.stat().st_mode & 0o777,0o600)
             raise ValueError('[SubscriptionIsOverQuotaForSku]')
         with patch.object(deploy,'az',side_effect=azure), patch.dict(os.environ,DEEPSEEK_API_KEY='private-sentinel'):
-            with self.assertRaisesRegex(ValueError,r'Staging App Service preflight \(indonesiacentral, F1\)'):
+            with self.assertRaisesRegex(ValueError,r'Staging App Service preflight \(polandcentral, F1\)'):
                 deploy.validate_app_service('Staging')
         self.assertFalse(paths[0].exists())
 
     def test_app_service_preflight_failure_blocks_runtime_and_github_changes(self):
-        with patch.object(deploy,'az',side_effect=[{'location':'indonesiacentral'},[]]) as azure, patch.object(deploy,'preflight'), patch.object(deploy,'check_app_name'), patch.object(deploy,'fresh',return_value=True), patch.object(deploy,'validate_app_service',side_effect=ValueError('quota')):
+        with patch.object(deploy,'az',side_effect=[{'location':'polandcentral'},[]]) as azure, patch.object(deploy,'preflight'), patch.object(deploy,'check_app_name'), patch.object(deploy,'fresh',return_value=True), patch.object(deploy,'validate_app_service',side_effect=ValueError('quota')):
             with self.assertRaisesRegex(ValueError,'quota'):
                 deploy.reconcile('Staging',self.good_manifest(),'fixture-secret',bootstrap=True)
             self.assertEqual([call.args[:2] for call in azure.call_args_list],[('group','show'),('webapp','list')])
@@ -172,7 +172,7 @@ class DeliveryTests(unittest.TestCase):
         calls=[]
         def azure(*args):
             calls.append(args)
-            if args[:2] == ('group', 'show'): return {'location': 'indonesiacentral'}
+            if args[:2] == ('group', 'show'): return {'location': 'polandcentral'}
             if args[:3] == ('deployment','group','what-if'): return {'changes': []}
             if args[:2] == ('webapp', 'list'): return []
             if args[:3] == ('deployment','group','create'):
@@ -231,7 +231,7 @@ class DeliveryTests(unittest.TestCase):
                 events=[]
                 output={**{k: control.environment_configuration()['Staging'][k] for k in ('appName','hostname','workspaceName','insightsName')}, 'dailyCapMb':50}
                 def azure(*args, **kwargs):
-                    if args[:2] == ('group','show'): return {'location':'indonesiacentral'}
+                    if args[:2] == ('group','show'): return {'location':'polandcentral'}
                     if args[:2] == ('webapp','list'): return [{'name':output['appName']}]
                     if args[:2] == ('webapp','show'): return {'state':'Stopped'}
                     if args[:3] == ('deployment','group','what-if'): return {'changes':[]}
@@ -264,7 +264,7 @@ class DeliveryTests(unittest.TestCase):
         site = {'state':'QuotaExceeded','usageState':'Exceeded'}
         stale_list = {'name':'staging-linguadesk','defaultHostName':'staging-linguadesk.azurewebsites.net',
                       'state':'Stopped','usageState':'Normal'}
-        with patch.object(deploy,'az',side_effect=[{'location':'indonesiacentral'},[stale_list],site]) as azure, \
+        with patch.object(deploy,'az',side_effect=[{'location':'polandcentral'},[stale_list],site]) as azure, \
              patch.object(deploy,'preflight') as preflight:
             with self.assertRaisesRegex(ValueError, 'AppServiceRuntimeQuotaExceeded'):
                 deploy.reconcile('Staging',self.good_manifest(),'fixture-secret','artifact','a'*40)
@@ -346,7 +346,7 @@ class DeliveryTests(unittest.TestCase):
         configuration=control.environment_configuration()
         expected={
             'Production': ('rg-prod-linguadesk','linguadesk','plan-prod-linguadesk','appi-prod-linguadesk','law-prod-linguadesk','id-prod-linguadesk','swedencentral'),
-            'Staging': ('rg-staging-linguadesk','staging-linguadesk','plan-staging-linguadesk','appi-staging-linguadesk','law-staging-linguadesk','id-staging-linguadesk','indonesiacentral'),
+            'Staging': ('rg-staging-linguadesk','staging-linguadesk','plan-staging-linguadesk','appi-staging-linguadesk','law-staging-linguadesk','id-staging-linguadesk','polandcentral'),
         }
         keys=('resourceGroup','appName','planName','insightsName','workspaceName','identityName','location')
         for environment,values in expected.items():

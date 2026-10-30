@@ -16,7 +16,7 @@
     "insightsName": "appi-staging-linguadesk",
     "workspaceName": "law-staging-linguadesk",
     "identityName": "id-staging-linguadesk",
-    "location": "indonesiacentral",
+    "location": "polandcentral",
     "hostname": "staging-linguadesk.azurewebsites.net"
   }
 }

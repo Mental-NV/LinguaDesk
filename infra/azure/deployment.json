@@ -3,7 +3,7 @@
   "tenantId": "3cbe8c53-bbb6-4d37-a351-aad589269d5e",
   "environments": {
     "Staging": {
-      "clientId": "72c660b7-a048-4f0b-883e-5cf220023589",
+      "clientId": "ae6c64db-c2f0-4569-9a67-11ecf32d416f",
       "resourceGroup": "rg-staging-linguadesk"
     },
     "Production": {
