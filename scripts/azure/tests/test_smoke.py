@@ -1,3 +1,4 @@
+import contextlib
 import io
 import json
 from email.message import Message
@@ -37,8 +38,9 @@ class Response:
 class SmokeTests(unittest.TestCase):
     def run_smoke(self, response, probe=None):
         self.now = 0
+        self.logs = io.StringIO()
         def sleep(seconds): self.now += seconds
-        with patch.object(control.time,'monotonic',side_effect=lambda: self.now), \
+        with contextlib.redirect_stdout(self.logs), patch.object(control.time,'monotonic',side_effect=lambda: self.now), \
              patch.object(control.time,'sleep',side_effect=sleep), \
              patch.object(control.urllib.request,'urlopen',side_effect=response) as requests:
             control.smoke(URL, SHA, state_probe=probe)
@@ -68,6 +70,7 @@ class SmokeTests(unittest.TestCase):
         self.assertEqual(requests,[URL+'/health/live'])
         self.assertEqual(self.now,0)
         self.assertNotIn(PRIVATE,str(caught.exception))
+        self.assertNotIn(PRIVATE,self.logs.getvalue())
 
     def test_persistent_http_failure_identifies_endpoint_and_throttles_state_reads(self):
         def unavailable(request, **kwargs):
@@ -81,6 +84,9 @@ class SmokeTests(unittest.TestCase):
         self.assertLessEqual(probe.call_count,8)
         self.assertGreater(probe.call_count,0)
         self.assertNotIn(PRIVATE,str(caught.exception))
+        self.assertIn('Smoke retry: /health/ready: HTTP 503; expected 200.',self.logs.getvalue())
+        self.assertIn('0s remaining.',self.logs.getvalue())
+        self.assertNotIn(PRIVATE,self.logs.getvalue())
 
     def test_invalid_revision_cookie_or_redirect_remain_blocking_and_private(self):
         for case, expected in (('revision','/revision.json: invalid JSON or deployed revision mismatch'),
@@ -96,12 +102,15 @@ class SmokeTests(unittest.TestCase):
             with self.subTest(case=case), self.assertRaisesRegex(ValueError,expected) as caught:
                 self.run_smoke(invalid)
             self.assertNotIn(PRIVATE,str(caught.exception))
+            self.assertNotIn(PRIVATE,self.logs.getvalue())
 
     def test_network_error_does_not_leak_raw_exception(self):
         def fail(request, **kwargs): raise urllib.error.URLError(PRIVATE)
         with self.assertRaisesRegex(ValueError,'/health/live: network/timeout') as caught:
             self.run_smoke(fail)
         self.assertNotIn(PRIVATE,str(caught.exception))
+        self.assertIn('Smoke retry: /health/live: network/timeout',self.logs.getvalue())
+        self.assertNotIn(PRIVATE,self.logs.getvalue())
 
     def test_transient_unavailability_recovers_without_weakening_the_smoke(self):
         count = 0
@@ -114,3 +123,8 @@ class SmokeTests(unittest.TestCase):
         self.run_smoke(transient,probe)
         probe.assert_called_once()
         self.assertEqual(self.now,5)
+        self.assertIn('Smoke attempt 1; 240s remaining.',self.logs.getvalue())
+        self.assertIn('Smoke retry: /health/live: HTTP 503',self.logs.getvalue())
+        self.assertIn('Smoke attempt 2; 235s remaining.',self.logs.getvalue())
+        self.assertIn('Smoke: passed /revision.json.',self.logs.getvalue())
+        self.assertNotIn(PRIVATE,self.logs.getvalue())

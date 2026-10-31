@@ -11,6 +11,7 @@ import time
 import urllib.error
 import urllib.request
 import zipfile
+from progress import log
 
 ROOT = Path(__file__).resolve().parents[2]
 ENVIRONMENTS = ('Production',)
@@ -124,9 +125,14 @@ def smoke(url, sha, state_probe=None):
              '/api/capabilities': 200, '/api/accounts/antiforgery': 200, '/api/m047-missing': 404, '/assets/m047-missing.js': 404, '/revision.json': 200}
     last_failure = 'No endpoint response.'
     next_state_probe = 0
+    attempt = 0
+    log(f'Provider-free smoke: 240-second budget; expected revision {sha}.')
     while time.monotonic() < deadline:
+        attempt += 1
+        log(f'Smoke attempt {attempt}; {max(0, int(deadline - time.monotonic()))}s remaining.')
         try:
             for path, expected in paths.items():
+                log(f'Smoke: checking {path}; expected HTTP {expected}.')
                 last_failure = f'{path}: network/timeout before HTTP response.'
                 request = urllib.request.Request(url + path, headers={'User-Agent': 'LinguaDesk-deployment-smoke'})
                 try:
@@ -159,19 +165,24 @@ def smoke(url, sha, state_probe=None):
                         cookies = response.headers.get_all('Set-Cookie') or []
                         if not any('__Host-LinguaDesk.Antiforgery=' in c and '; secure' in c.lower() and '; httponly' in c.lower() for c in cookies):
                             raise ValueError('Secure antiforgery cookie is missing.')
+                    log(f'Smoke: passed {path}.')
+            log('Smoke: checking forwarded-header spoof resistance.')
             last_failure = '/api/accounts/antiforgery: forwarded-header probe failed.'
             spoof = urllib.request.Request(url + '/api/accounts/antiforgery', headers={'X-Forwarded-Proto': 'http', 'X-Forwarded-For': '198.51.100.21'})
             with urllib.request.urlopen(spoof, timeout=min(10, max(1, deadline - time.monotonic()))) as response:
                 if response.status != 200:
                     raise ValueError('Forwarded-header spoof changed the HTTPS boundary.')
-            print('Provider-free HTTPS/SPA/API/readiness smoke passed: ' + sha)
+            log('Provider-free HTTPS/SPA/API/readiness smoke passed: ' + sha)
             return
         except (OSError, ValueError):
+            log('Smoke retry: ' + last_failure)
             # Probe only after HTTP failure. Explicit quota errors propagate from
             # this handler instead of being swallowed by the readiness retry loop.
             if state_probe and time.monotonic() >= next_state_probe and deadline - time.monotonic() >= 10:
+                log('Smoke: checking Azure runtime quota state before retrying.')
                 state_probe()
                 next_state_probe = time.monotonic() + 30
+            log(f'Smoke: retrying in up to 5s; {max(0, int(deadline - time.monotonic()))}s remaining.')
             time.sleep(min(5, max(0, deadline - time.monotonic())))
     raise ValueError('Bounded smoke failed for revision ' + sha + '. Last failure: ' + last_failure)
 

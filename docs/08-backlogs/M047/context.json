@@ -170,11 +170,11 @@
     }
   ],
   "source_map_sha256": "7868d658db8997466e00136ac639e469f65de89b73449455eb594efb9d2a955c",
-  "baseline_commit": "f63f29cef78662d23cdb054ff84096e15d6b739e",
+  "baseline_commit": "4268b82c8bb6392db97169e699e29681f07c075d",
   "locked_files": {
     "docs/00-SDD-Planning-Workflow.md": "7e0f058c2b7ea290598030ab46d71e2c13def0a37e4b5de7cc029d1e6bb6e7ea",
     "docs/00-workflow/execution.md": "106a00f4d7004fbf3fcbbd106502fd61a1be41e5db9fd99ee20c92d8688038a8",
-    "docs/08-backlogs/M047/spec.md": "68bc819b7f5dda252b28842aa9666b2cb13486b36477782eca0cd72f14793493",
-    "docs/08-backlogs/M047/plan.md": "71d8323306145644d5fba467a557620cd56a2611e61b893f0a9b324b24d17516"
+    "docs/08-backlogs/M047/spec.md": "af36de062b867e04b05f3b6bd82c60eb32f883a437974010ba9b06d433facd81",
+    "docs/08-backlogs/M047/plan.md": "b0195e0ab6ac8e462a3c8d1e6cb02d133fef70577528ab889d34fb27e0ec392f"
   }
 }

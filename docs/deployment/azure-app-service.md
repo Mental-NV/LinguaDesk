@@ -92,6 +92,19 @@ Environment deployment concurrency never cancels a deployment mid-migration. Bef
 
 ZIP deployment waits for extraction only: `--restart false --async false --track-status false --enable-kudu-warmup false --timeout 300000`, with a separate 330-second subprocess limit. Azure must return numeric status `4` and `complete=true` before activation. Pending, failed, absent or timed-out completion blocks activation and triggers the existing stop-on-failure path. The app stays stopped/gated until the separate activation/start/smoke phase. [Azure CLI startup tracking defaults to true](https://learn.microsoft.com/en-us/cli/azure/webapp#az-webapp-deploy); leaving it enabled here can time out waiting for a runtime deliberately not yet enabled, even after ZIP extraction succeeds. A successful ZIP record proves package extraction only; readiness still requires the subsequent smoke.
 
+The deployment step prints flushed `[deploy]` progress without timestamps: each stage starts, reports a waiting heartbeat every 20 seconds, then reports completion/failure and elapsed duration. Activation settings and Web App start are separate stages after ZIP extraction, so that interval is visible. PowerShell also reports module preparation, authentication and cap/readback phases. Smoke logs the attempt, fixed endpoint/check, safe HTTP status/failure category and remaining 240-second budget. For example:
+
+```text
+[deploy] Starting: Activate runtime settings for the extracted package.
+[deploy] Waiting: Activate runtime settings for the extracted package (20s elapsed).
+[deploy] Completed: Activate runtime settings for the extracted package (42s elapsed).
+[deploy] Starting: Start the Web App.
+[deploy] Smoke attempt 1; 240s remaining.
+[deploy] Smoke retry: /health/ready: HTTP 503; expected 200.
+```
+
+These messages show orchestration progress while Azure operations run; they do not change deployment/retry limits or stream raw CLI output, app settings, credentials, cookies or response bodies.
+
 Versioned environment parameter files own the daily cap policy. The deployment compiles them into a restricted temporary parameter file containing the secure provider input, then deletes that directory on every exit. Secure input is never passed as a command-line literal or logged. Bicep owns the complete app-settings collection. Final activation reconciles only the app/plan; it does not re-PUT monitoring resources after the cap gate. Its dynamic/secret values are environment, provider credential, generated monitoring connection, exporter enable gate and platform startup/build settings. Ordinary provider selection, character/money bounds, paths, logging and sampling come from .NET configuration. The existing finite application monetary values are preserved; their units are not reinterpreted as cents.
 
 The Production runtime still requires finite provider monetary bounds. Before enabling paid user serving, account for other consumers of any shared authorized provider budget. Infrastructure deployment and provider-free smoke do not authorize paid evaluation or establish product release qualification.

@@ -1,4 +1,6 @@
+import contextlib
 import copy
+import io
 import importlib.util
 import json
 import os
@@ -228,6 +230,7 @@ class DeliveryTests(unittest.TestCase):
         for zip_result in ({'status': 4, 'complete': True}, {'status': 3, 'complete': True}, {'status': 2, 'complete': False}):
             with self.subTest(zip_result=zip_result):
                 events=[]
+                logs=io.StringIO()
                 output={**{k: control.environment_configuration()['Production'][k] for k in ('appName','hostname','workspaceName','insightsName')}, 'dailyCapMb':50}
                 def azure(*args, **kwargs):
                     if args[:2] == ('group','show'): return {'location':'swedencentral'}
@@ -247,17 +250,22 @@ class DeliveryTests(unittest.TestCase):
                         Path(args[-1]).write_text(json.dumps({'parameters':{'environment':{'value':'Production'},'dailyCapMb':{'value':50}}}))
                     else: events.append('caps')
                     return subprocess.CompletedProcess(args,0)
-                with patch.object(deploy,'az',side_effect=azure), patch.object(deploy,'preflight'), \
+                with contextlib.redirect_stdout(logs), patch.object(deploy,'az',side_effect=azure), patch.object(deploy,'preflight'), \
                      patch.object(deploy,'check_app_name'), patch.object(deploy,'validate_app_service'), \
                      patch.object(deploy,'fresh',return_value=True), patch.object(subprocess,'run',side_effect=command), \
                      patch.object(control,'smoke',side_effect=lambda *args, **kwargs: events.append('smoke')):
                     if zip_result['status'] == 4:
                         deploy.reconcile('Production',self.good_manifest(),'fixture-secret','artifact','a'*40)
                         self.assertEqual(events, ['stop','reconcile','stop','caps','zip','activate','start','smoke'])
+                        self.assertIn('Starting: Activate runtime settings for the extracted package.',logs.getvalue())
+                        self.assertIn('Completed: Start the Web App',logs.getvalue())
                     else:
                         with self.assertRaisesRegex(ValueError, 'activation is blocked'):
                             deploy.reconcile('Production',self.good_manifest(),'fixture-secret','artifact','a'*40)
                         self.assertEqual(events, ['stop','reconcile','stop','caps','zip','stop'])
+                        self.assertIn('Failed: Upload and extract ZIP',logs.getvalue())
+                        self.assertNotIn('Starting: Activate runtime settings',logs.getvalue())
+                self.assertNotIn('fixture-secret',logs.getvalue())
 
     def test_existing_runtime_quota_blocks_before_preflight_or_mutation(self):
         site = {'state':'QuotaExceeded','usageState':'Exceeded'}
