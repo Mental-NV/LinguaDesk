@@ -9,6 +9,7 @@ import subprocess
 import sys
 import tempfile
 from control import ROOT, ENVIRONMENTS, manifest, verify_artifact, fresh, environment_configuration
+from progress import log, stage
 
 
 def azure_failure(stderr):
@@ -92,15 +93,15 @@ def az(*args, timeout=None):
 def deploy_package(group, app, artifact):
     # The app is stopped/gated here. Linux CLI startup tracking would wait for
     # a runtime that cannot start until the subsequent activation deployment.
-    print('Deploying ZIP: waiting for extraction only (330-second process limit).', flush=True)
-    result = az('webapp', 'deploy', '--resource-group', group, '--name', app,
-                '--src-path', str(Path(artifact) / 'app.zip'), '--type', 'zip',
-                '--restart', 'false', '--clean', 'true', '--async', 'false',
-                '--track-status', 'false', '--enable-kudu-warmup', 'false', '--timeout', '300000',
-                timeout=330)
-    if not isinstance(result, dict) or type(result.get('status')) is not int or result['status'] != 4 or result.get('complete') is not True:
-        raise ValueError('ZIP extraction did not return verified completion; activation is blocked.')
-    print('ZIP extraction verified; proceeding to activation and provider-free smoke.', flush=True)
+    with stage('Upload and extract ZIP; 330-second process limit'):
+        result = az('webapp', 'deploy', '--resource-group', group, '--name', app,
+                    '--src-path', str(Path(artifact) / 'app.zip'), '--type', 'zip',
+                    '--restart', 'false', '--clean', 'true', '--async', 'false',
+                    '--track-status', 'false', '--enable-kudu-warmup', 'false', '--timeout', '300000',
+                    timeout=330)
+        if not isinstance(result, dict) or type(result.get('status')) is not int or result['status'] != 4 or result.get('complete') is not True:
+            raise ValueError('ZIP extraction did not return verified completion; activation is blocked.')
+    log('ZIP extraction verified; proceeding to activation and provider-free smoke.')
 
 
 def key():
@@ -112,7 +113,9 @@ def key():
 
 def preflight(subscription, location, required_plans=0):
     tooling = json.loads((ROOT / 'infra/azure/tooling.json').read_text())
-    subprocess.run(['az', 'bicep', 'install', '--version', tooling['bicep']], check=True, stdout=subprocess.DEVNULL)
+    with stage('Install pinned Bicep compiler'):
+        subprocess.run(['az', 'bicep', 'install', '--version', tooling['bicep']], check=True, stdout=subprocess.DEVNULL)
+    log('Checking Azure subscription, .NET 10 Linux runtime and regional F1 availability/quota.')
     account = az('account', 'show')
     if account['id'] != subscription:
         raise ValueError('Azure login subscription does not match the generated manifest.')
@@ -234,28 +237,35 @@ def reconcile(environment, data, provider, artifact=None, sha=None, bootstrap=Fa
     if group != selected['resourceGroup']:
         raise ValueError('Manifest group differs from the versioned environment configuration.')
     subscription = data['subscriptionId']
-    group_info = az('group', 'show', '--name', group)
     location = selected['location']
-    check_group_location(selected, group_info)
-    existing_apps = az('webapp', 'list', '--resource-group', group)
-    check_app_name(subscription, selected, existing_apps)
-    if existing_apps:
-        # List metadata can still say Stopped/Normal while the individual site
-        # endpoint reports a platform quota suspension.
-        check_runtime_quota(az('webapp', 'show', '--resource-group', group, '--name', selected['appName'], timeout=10))
-    preflight(subscription, location, required_plans=0 if existing_apps else 1)
-    if not bootstrap and not fresh(environment, sha):
-        print('Stale revision skipped before resource mutation.')
-        return
-    validate_app_service(environment)
+    log(f'Target: {environment}; app {selected["appName"]}; group {group}; region {location}.')
+    with stage('Check target resource group, exact hostname and runtime quota state'):
+        group_info = az('group', 'show', '--name', group)
+        check_group_location(selected, group_info)
+        existing_apps = az('webapp', 'list', '--resource-group', group)
+        check_app_name(subscription, selected, existing_apps)
+        if existing_apps:
+            # List metadata can still say Stopped/Normal while the individual site
+            # endpoint reports a platform quota suspension.
+            check_runtime_quota(az('webapp', 'show', '--resource-group', group, '--name', selected['appName'], timeout=10))
+    with stage('Preflight Azure subscription, runtime and F1 allocation'):
+        preflight(subscription, location, required_plans=0 if existing_apps else 1)
+    if not bootstrap:
+        with stage('Check current main revision before resource validation'):
+            if not fresh(environment, sha):
+                log('Stale revision skipped before resource mutation.')
+                return
+    with stage('Validate App Service provider configuration and F1 quota'):
+        validate_app_service(environment)
     # Check all desired inputs and what-if before the first stop/resource mutation.
     with tempfile.TemporaryDirectory(prefix='linguadesk-secure-') as temporary:
         os.chmod(temporary, 0o700)
         params = Path(temporary) / 'parameters.json'
-        compiled = subprocess.run(['az', 'bicep', 'build-params', '--file', str(ROOT / 'infra/azure' / (environment.lower() + '.bicepparam')),
-                                   '--outfile', str(params)], env={**os.environ, 'DEEPSEEK_API_KEY': provider}, capture_output=True)
-        if compiled.returncode:
-            raise ValueError('Environment parameter compilation failed.')
+        with stage('Compile secure environment parameters'):
+            compiled = subprocess.run(['az', 'bicep', 'build-params', '--file', str(ROOT / 'infra/azure' / (environment.lower() + '.bicepparam')),
+                                       '--outfile', str(params)], env={**os.environ, 'DEEPSEEK_API_KEY': provider}, capture_output=True)
+            if compiled.returncode:
+                raise ValueError('Environment parameter compilation failed.')
         desired = json.loads(params.read_text())
         parameters = desired['parameters']
         cap = parameters['dailyCapMb']['value']
@@ -268,57 +278,70 @@ def reconcile(environment, data, provider, artifact=None, sha=None, bootstrap=Fa
             os.chmod(params, 0o600)
         write_params(False)
         base = ('--resource-group', group, '--template-file', str(ROOT / 'infra/azure/main.bicep'), '--parameters', '@' + str(params))
-        az('deployment', 'group', 'validate', *base)
-        changes = az('deployment', 'group', 'what-if', *base, '--no-pretty-print', '--result-format', 'FullResourcePayloads')
-        validate_changes(changes, subscription, group)
-        apps = az('webapp', 'list', '--resource-group', group)
-        if len(apps) > 1:
-            raise ValueError('Unexpected extra Web Apps in the isolated resource group.')
-        if not bootstrap and not fresh(environment, sha):
-            print('Stale revision skipped immediately before stop.')
-            return
-        for app in apps:
-            az('webapp', 'stop', '--resource-group', group, '--name', app['name'])
-            if az('webapp', 'show', '--resource-group', group, '--name', app['name'])['state'] != 'Stopped':
-                raise ValueError('Old serving worker is not stopped.')
-        result = az('deployment', 'group', 'create', *base, '--name', 'linguadesk-runtime')
+        with stage('Validate infrastructure template'):
+            az('deployment', 'group', 'validate', *base)
+        with stage('Review infrastructure what-if against the resource boundary'):
+            changes = az('deployment', 'group', 'what-if', *base, '--no-pretty-print', '--result-format', 'FullResourcePayloads')
+            validate_changes(changes, subscription, group)
+        with stage('Recheck target and current main revision before stopping'):
+            apps = az('webapp', 'list', '--resource-group', group)
+            if len(apps) > 1:
+                raise ValueError('Unexpected extra Web Apps in the isolated resource group.')
+            if not bootstrap and not fresh(environment, sha):
+                log('Stale revision skipped immediately before stop.')
+                return
+        with stage('Stop existing app and verify the old worker is stopped'):
+            for app in apps:
+                az('webapp', 'stop', '--resource-group', group, '--name', app['name'])
+                if az('webapp', 'show', '--resource-group', group, '--name', app['name'])['state'] != 'Stopped':
+                    raise ValueError('Old serving worker is not stopped.')
+        with stage('Apply infrastructure with serving and telemetry disabled'):
+            result = az('deployment', 'group', 'create', *base, '--name', 'linguadesk-runtime')
         output = {k: v['value'] for k, v in result['properties']['outputs'].items()}
         app = output['appName']
         try:
             validate_outputs(environment, output, cap)
             # Explicit stop covers first creation; the runtime deployment guard and disabled exporter gate collection.
-            az('webapp', 'stop', '--resource-group', group, '--name', app)
-            subprocess.run(['pwsh', '-NoProfile', '-File', str(ROOT / 'scripts/azure/configure-monitoring.ps1'),
-                            '-ResourceGroup', group, '-Workspace', output['workspaceName'], '-Insights', output['insightsName'],
-                            '-DailyCapMb', str(output['dailyCapMb']), '-UseAzureCli'], check=True)
+            with stage('Ensure the provisioned app is stopped'):
+                az('webapp', 'stop', '--resource-group', group, '--name', app)
+            with stage('Enforce and verify telemetry caps and retention with PowerShell'):
+                subprocess.run(['pwsh', '-NoProfile', '-File', str(ROOT / 'scripts/azure/configure-monitoring.ps1'),
+                                '-ResourceGroup', group, '-Workspace', output['workspaceName'], '-Insights', output['insightsName'],
+                                '-DailyCapMb', str(output['dailyCapMb']), '-UseAzureCli'], check=True)
             if bootstrap:
-                print(environment + ' infrastructure and caps provisioned; app remains stopped until Actions deploys a checked artifact.')
+                log(environment + ' infrastructure and caps provisioned; app remains stopped until Actions deploys a checked artifact.')
                 return
             deploy_package(group, app, artifact)
             write_params(True)
             # One complete app-settings owner, including secure values. No competing partial writers.
-            az('deployment', 'group', 'create', *base, '--name', 'linguadesk-runtime')
-            az('webapp', 'start', '--resource-group', group, '--name', app)
+            with stage('Activate runtime settings for the extracted package'):
+                az('deployment', 'group', 'create', *base, '--name', 'linguadesk-runtime')
+            with stage('Start the Web App'):
+                az('webapp', 'start', '--resource-group', group, '--name', app)
             from control import smoke
             def check_runtime():
                 check_runtime_quota(az('webapp', 'show', '--resource-group', group, '--name', app, timeout=10))
-            smoke('https://' + output['hostname'], sha, state_probe=check_runtime)
+            with stage('Run provider-free HTTPS, readiness, revision and cookie smoke; 240-second budget'):
+                smoke('https://' + output['hostname'], sha, state_probe=check_runtime)
             summary = os.environ.get('GITHUB_STEP_SUMMARY')
             if summary:
                 with open(summary, 'a') as report:
                     report.write(f'{environment}: revision `{sha}`; https://{output["hostname"]}\n')
         except Exception:
             # Preserve persistent data and recovery material; leave failure unavailable.
-            az('webapp', 'stop', '--resource-group', group, '--name', app)
+            with stage('Stop the failed deployment and retain data and backups'):
+                az('webapp', 'stop', '--resource-group', group, '--name', app)
             raise
 
 
 def main():
     environment, artifact, sha = sys.argv[1:]
     if environment not in ENVIRONMENTS: raise ValueError('Unknown environment.')
-    data = manifest()
-    provider = key()
-    verify_artifact(artifact, sha)
+    with stage('Validate generated manifest, provider input and artifact integrity'):
+        data = manifest()
+        provider = key()
+        verify_artifact(artifact, sha)
+    log(f'Deploying checked revision {sha}.')
     reconcile(environment, data, provider, artifact, sha)
 
 
